@@ -5,7 +5,7 @@
 //
 // Environment variables (auto-injected by the Vercel Marketplace Upstash Redis
 // integration): UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN (and/or the
-// KV_REST_API_URL / KV_REST_API_TOKEN aliases). Redis.fromEnv() handles both.
+// KV_REST_API_URL / KV_REST_API_TOKEN aliases).
 //
 // Anti-troll design:
 //   - Reports stored as a rolling window of the last MAX_REPORTS per location
@@ -15,12 +15,42 @@
 
 import { Redis } from "@upstash/redis";
 
-const redis = Redis.fromEnv();
-
 const MASTER_KEY = "cmat-prices:all";
 const MAX_REPORTS_PER_LOCATION = 50;
 const MIN_PRICE = 100;
 const MAX_PRICE = 200000;
+
+// Lazy Redis client — initialized on first request.
+// If Upstash env vars are missing, we return a clear error instead of crashing.
+let redisInstance = null;
+let redisInitError = null;
+
+function getRedis() {
+  if (redisInstance) return redisInstance;
+  if (redisInitError) throw redisInitError;
+
+  const url =
+    process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
+  const token =
+    process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
+
+  if (!url || !token) {
+    redisInitError = new Error(
+      "Upstash Redis is not configured. In your Vercel project, go to Storage → Create Database → Upstash for Redis, connect it to the project, then redeploy."
+    );
+    throw redisInitError;
+  }
+
+  try {
+    redisInstance = new Redis({ url, token });
+    return redisInstance;
+  } catch (e) {
+    redisInitError = new Error(
+      "Failed to initialize Upstash Redis client: " + (e && e.message ? e.message : String(e))
+    );
+    throw redisInitError;
+  }
+}
 
 function median(nums) {
   if (!nums.length) return 0;
@@ -50,13 +80,26 @@ function buildPublicView(dataMap) {
 }
 
 export default async function handler(req, res) {
+  // Check Upstash availability up front
+  let redis;
+  try {
+    redis = getRedis();
+  } catch (e) {
+    console.error("Upstash init failed:", e.message);
+    // For GET, silently return empty so the frontend falls back to baseline prices
+    if (req.method === "GET") {
+      return res.status(200).json({});
+    }
+    return res.status(503).json({ error: e.message });
+  }
+
   if (req.method === "GET") {
     try {
       const raw = (await redis.get(MASTER_KEY)) || {};
       res.setHeader("cache-control", "public, max-age=30");
       return res.status(200).json(buildPublicView(raw));
     } catch (e) {
-      // Silent fallback — frontend uses baseline prices
+      console.error("GET /api/prices failed:", e && e.message ? e.message : e);
       return res.status(200).json({});
     }
   }
@@ -105,7 +148,10 @@ export default async function handler(req, res) {
         lastReportedAt: nextReports[nextReports.length - 1].ts,
       });
     } catch (e) {
-      return res.status(500).json({ error: "Server error" });
+      console.error("POST /api/prices failed:", e && e.message ? e.message : e);
+      return res.status(500).json({
+        error: "Storage write failed. " + (e && e.message ? e.message : "Unknown error."),
+      });
     }
   }
 

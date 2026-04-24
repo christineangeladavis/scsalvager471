@@ -1470,8 +1470,8 @@ export default function StarCitizenSalvageGuideWebsite() {
                   {sellOrders.length === 0 ? (
                     <div className="mt-2 rounded-xl border border-dashed border-slate-700 p-4 text-center text-xs text-slate-500">No sales logged yet.</div>
                   ) : (
-                    <div className="mt-2 space-y-2">
-                      {sellOrders.slice(0, 10).map((o) => (
+                    <div className="mt-2 max-h-96 space-y-2 overflow-y-auto rounded-xl border border-slate-800 bg-slate-950/40 p-2 pr-3">
+                      {sellOrders.map((o) => (
                         <div key={o.id} className="rounded-xl border border-slate-700 bg-slate-950/60 p-3 text-sm">
                           <div className="flex items-start justify-between gap-2">
                             <div className="min-w-0">
@@ -1489,9 +1489,6 @@ export default function StarCitizenSalvageGuideWebsite() {
                           </div>
                         </div>
                       ))}
-                      {sellOrders.length > 10 && (
-                        <div className="pt-1 text-center text-xs text-slate-500">+ {sellOrders.length - 10} older — see history below</div>
-                      )}
                     </div>
                   )}
                 </div>

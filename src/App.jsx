@@ -271,6 +271,7 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [orderForm, setOrderForm] = useState({ scu: "", location: sellPoints[0].name, aUEC: "" });
   const [tick, setTick] = useState(0);
   const [isLedgerLoading, setIsLedgerLoading] = useState(true);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   // --- Auth state ---
   const [user, setUser] = useState(null);
@@ -649,6 +650,13 @@ export default function StarCitizenSalvageGuideWebsite() {
     const nextOrders = sellOrders.filter((o) => o.id !== id);
     setSellOrders(nextOrders);
     saveLedger(refineryJobs, nextOrders);
+  };
+
+  const clearAllHistory = () => {
+    setRefineryJobs([]);
+    setSellOrders([]);
+    setShowClearConfirm(false);
+    saveLedger([], []);
   };
 
   // --- Ledger: format helpers ---
@@ -1497,8 +1505,22 @@ export default function StarCitizenSalvageGuideWebsite() {
 
             {/* --- 30-day history --- */}
             <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
-              <h2 className="text-xl font-bold text-cyan-300">30-Day History</h2>
-              <p className="mt-1 text-sm text-slate-400">Collected refinery jobs and sell orders from the last 30 days.</p>
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <h2 className="text-xl font-bold text-cyan-300">30-Day History</h2>
+                  <p className="mt-1 text-sm text-slate-400">Collected refinery jobs and sell orders from the last 30 days.</p>
+                </div>
+                {user && (refineryJobs.length > 0 || sellOrders.length > 0) && (
+                  <button
+                    type="button"
+                    onClick={() => setShowClearConfirm(true)}
+                    disabled={isLedgerLoading}
+                    className="shrink-0 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-200 hover:border-rose-400/60 hover:bg-rose-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Clear History
+                  </button>
+                )}
+              </div>
 
               {historyEntries.length === 0 ? (
                 <div className="mt-4 rounded-xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">
@@ -1538,9 +1560,45 @@ export default function StarCitizenSalvageGuideWebsite() {
               )}
 
               <div className="mt-4 text-xs text-slate-500">
-                Ledger data is stored in this browser only — it won't sync to other devices or browsers.
+                {user
+                  ? "Ledger data is synced to your Discord account and persists across devices."
+                  : "Log in with Discord to save your ledger across devices."}
               </div>
             </div>
+
+            {/* --- Clear history confirmation modal --- */}
+            {showClearConfirm && (
+              <div
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+                onClick={() => setShowClearConfirm(false)}
+              >
+                <div
+                  className="mx-4 max-w-md rounded-3xl border border-rose-500/40 bg-slate-900 p-6 shadow-2xl shadow-rose-950/40"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <h3 className="text-lg font-bold text-rose-200">Clear all history?</h3>
+                  <p className="mt-3 text-sm text-slate-300">
+                    All data will reset. This is irreversible. Do you wish to continue?
+                  </p>
+                  <div className="mt-5 flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowClearConfirm(false)}
+                      className="rounded-xl border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-slate-500 hover:bg-slate-700"
+                    >
+                      No
+                    </button>
+                    <button
+                      type="button"
+                      onClick={clearAllHistory}
+                      className="rounded-xl border border-rose-400 bg-rose-500 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-rose-950/50 hover:bg-rose-600"
+                    >
+                      Yes
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

@@ -862,6 +862,20 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [reportError, setReportError] = useState("");
   const [isLoadingCommunityPrices, setIsLoadingCommunityPrices] = useState(true);
 
+  // --- Ledger state ---
+  const [activeTab, setActiveTab] = useState("home"); // "home" | "ledger"
+  const [refineryJobs, setRefineryJobs] = useState([]);
+  const [sellOrders, setSellOrders] = useState([]);
+  const [jobForm, setJobForm] = useState({ material: "Construction Salvage", location: "Levski", yield: "", cost: "", time: "" });
+  const [orderForm, setOrderForm] = useState({ scu: "", location: sellPoints[0].name, aUEC: "" });
+  const [tick, setTick] = useState(0);
+  const [ledgerHydrated, setLedgerHydrated] = useState(false);
+
+  // --- Auth state ---
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [ledgerSaveError, setLedgerSaveError] = useState("");
+
   const shipsPanelWidth = 35;
   const detailsPanelWidth = 65;
   const refineryPanelWidth = 52;
@@ -997,7 +1011,7 @@ export default function StarCitizenSalvageGuideWebsite() {
       });
       const info = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setReportError(info.error || "Could not submit report.");
+        setReportError(info.error || `Could not submit report (HTTP ${res.status}).`);
         return;
       }
       setReportedPrices((prev) => ({
@@ -1019,6 +1033,217 @@ export default function StarCitizenSalvageGuideWebsite() {
     }
   };
   const selectedShipImageFailed = Boolean(imageLoadErrors[selectedShip.name]);
+
+  // --- Auth: fetch current user on mount ---
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/auth/me", { credentials: "same-origin" })
+      .then((res) => res.json())
+      .then((data) => {
+        if (cancelled) return;
+        setUser(data && data.user ? data.user : null);
+        setAuthLoading(false);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setUser(null);
+        setAuthLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, []);
+
+  // --- Ledger: fetch from server when user changes ---
+  useEffect(() => {
+    let cancelled = false;
+    setLedgerHydrated(false);
+    setLedgerSaveError("");
+    if (!user) {
+      // Logged out: empty ledger, no server calls
+      setRefineryJobs([]);
+      setSellOrders([]);
+      setLedgerHydrated(true);
+      return;
+    }
+    fetch("/api/ledger", { credentials: "same-origin" })
+      .then((res) => res.json())
+      .then((data) => {
+        if (cancelled) return;
+        setRefineryJobs(Array.isArray(data.refineryJobs) ? data.refineryJobs : []);
+        setSellOrders(Array.isArray(data.sellOrders) ? data.sellOrders : []);
+        setLedgerHydrated(true);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setLedgerSaveError("Could not load your ledger.");
+        setLedgerHydrated(true);
+      });
+    return () => { cancelled = true; };
+  }, [user]);
+
+  // --- Ledger: persist to server on change ---
+  useEffect(() => {
+    if (!ledgerHydrated || !user) return;
+    const controller = new AbortController();
+    fetch("/api/ledger", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ refineryJobs, sellOrders }),
+      signal: controller.signal,
+    })
+      .then(async (res) => {
+        const info = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          setLedgerSaveError(info.error || `Could not save ledger (HTTP ${res.status}).`);
+        } else {
+          setLedgerSaveError("");
+        }
+      })
+      .catch((e) => {
+        if (e && e.name === "AbortError") return;
+        setLedgerSaveError("Could not save ledger (network error).");
+      });
+    return () => controller.abort();
+  }, [refineryJobs, sellOrders, ledgerHydrated, user]);
+
+  // --- Ledger: 1-second tick so timers update live ---
+  useEffect(() => {
+    if (activeTab !== "ledger") return; // only tick when Ledger is visible
+    const id = setInterval(() => setTick((t) => t + 1), 1000);
+    return () => clearInterval(id);
+  }, [activeTab]);
+
+  // --- Ledger: derived job status + stats ---
+  const now = Date.now();
+  void tick; // ensure this block re-evaluates each tick
+
+  const jobStatus = (job) => {
+    if (job.pickedUpAt) return "picked_up";
+    if (job.completesAt && job.completesAt <= now) return "ready";
+    return "in_progress";
+  };
+
+  const inProgressJobs = refineryJobs.filter((j) => jobStatus(j) === "in_progress");
+  const readyJobs = refineryJobs.filter((j) => jobStatus(j) === "ready");
+  const activeJobsCount = inProgressJobs.length + readyJobs.length;
+  const lifetimeRefinedSCU = refineryJobs
+    .filter((j) => j.pickedUpAt)
+    .reduce((sum, j) => sum + (Number(j.yield) || 0), 0);
+  const lifetimeRefineryCost = refineryJobs
+    .reduce((sum, j) => sum + (Number(j.cost) || 0), 0);
+  const lifetimeAUEC = sellOrders.reduce((sum, o) => sum + (Number(o.aUEC) || 0), 0);
+
+  const historyCutoff = now - 30 * 24 * 60 * 60 * 1000;
+  const historyEntries = useMemo(() => {
+    const refinery = refineryJobs
+      .filter((j) => j.pickedUpAt && j.pickedUpAt >= historyCutoff)
+      .map((j) => {
+        const parts = [];
+        if (j.location) parts.push(`At ${j.location}`);
+        if (j.cost > 0) parts.push(`Cost: ${Number(j.cost).toLocaleString()} aUEC`);
+        else parts.push("No refinery cost");
+        return {
+          id: j.id,
+          type: "Refined",
+          ts: j.pickedUpAt,
+          primary: `${Number(j.yield).toLocaleString()} SCU ${j.material}`,
+          secondary: parts.join(" · "),
+        };
+      });
+    const sells = sellOrders
+      .filter((o) => o.submittedAt && o.submittedAt >= historyCutoff)
+      .map((o) => ({
+        id: o.id,
+        type: "Sold",
+        ts: o.submittedAt,
+        primary: `${Number(o.scu).toLocaleString()} SCU → ${Number(o.aUEC).toLocaleString()} aUEC`,
+        secondary: `At ${o.location}`,
+      }));
+    return [...refinery, ...sells].sort((a, b) => b.ts - a.ts);
+  }, [refineryJobs, sellOrders, historyCutoff]);
+
+  // --- Ledger: form validity (requires login + all fields valid) ---
+  const isJobFormValid =
+    Boolean(user) &&
+    Boolean(jobForm.material) &&
+    Boolean(jobForm.location) &&
+    Number(jobForm.yield) > 0 &&
+    Number(jobForm.cost) >= 0 &&
+    jobForm.cost !== "" &&
+    Number(jobForm.time) > 0;
+  const isOrderFormValid =
+    Boolean(user) &&
+    Number(orderForm.scu) > 0 &&
+    Boolean(orderForm.location) &&
+    Number(orderForm.aUEC) > 0;
+
+  // --- Ledger: handlers ---
+  const submitJob = () => {
+    if (!isJobFormValid) return;
+    const timeMs = Number(jobForm.time) * 60 * 1000;
+    const submittedAt = Date.now();
+    const newJob = {
+      id: `job_${submittedAt}_${Math.random().toString(36).slice(2, 8)}`,
+      material: jobForm.material,
+      location: jobForm.location,
+      yield: Number(jobForm.yield),
+      cost: Number(jobForm.cost),
+      timeMinutes: Number(jobForm.time),
+      submittedAt,
+      completesAt: submittedAt + timeMs,
+      pickedUpAt: null,
+    };
+    setRefineryJobs((prev) => [newJob, ...prev]);
+    setJobForm({ material: jobForm.material, location: jobForm.location, yield: "", cost: "", time: "" });
+  };
+
+  const pickupJob = (id) => {
+    setRefineryJobs((prev) => prev.map((j) => (j.id === id ? { ...j, pickedUpAt: Date.now() } : j)));
+  };
+
+  const deleteJob = (id) => {
+    setRefineryJobs((prev) => prev.filter((j) => j.id !== id));
+  };
+
+  const submitSellOrder = () => {
+    if (!isOrderFormValid) return;
+    const submittedAt = Date.now();
+    const newOrder = {
+      id: `sell_${submittedAt}_${Math.random().toString(36).slice(2, 8)}`,
+      scu: Number(orderForm.scu),
+      location: orderForm.location,
+      aUEC: Number(orderForm.aUEC),
+      submittedAt,
+    };
+    setSellOrders((prev) => [newOrder, ...prev]);
+    setOrderForm({ scu: "", location: orderForm.location, aUEC: "" });
+  };
+
+  const deleteSellOrder = (id) => {
+    setSellOrders((prev) => prev.filter((o) => o.id !== id));
+  };
+
+  // --- Ledger: format helpers ---
+  const formatRemaining = (ms) => {
+    if (ms <= 0) return "Ready";
+    const totalSec = Math.ceil(ms / 1000);
+    const h = Math.floor(totalSec / 3600);
+    const m = Math.floor((totalSec % 3600) / 60);
+    const s = totalSec % 60;
+    if (h > 0) return `${h}h ${String(m).padStart(2, "0")}m ${String(s).padStart(2, "0")}s`;
+    if (m > 0) return `${m}m ${String(s).padStart(2, "0")}s`;
+    return `${s}s`;
+  };
+  const formatTimestamp = (ts) => {
+    if (!ts) return "";
+    const d = new Date(ts);
+    return d.toLocaleString(undefined, {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  };
 
   return (
     <div className="relative min-h-screen text-slate-100" style={{ display: "flex", flexDirection: "column" }}>
@@ -1049,12 +1274,76 @@ export default function StarCitizenSalvageGuideWebsite() {
                 check refinery bonuses, and calculate yield instantly.
               </p>
             </div>
-            <div className="rounded-2xl border border-cyan-400/30 bg-cyan-500/10 px-4 py-3 text-sm text-cyan-100">
-              <div className="font-semibold">Patch Verified</div>
-              <div>4.7.2</div>
+            <div className="flex flex-col items-end gap-3">
+              <div className="flex items-center gap-2">
+                {authLoading ? (
+                  <div className="rounded-lg border border-slate-700 bg-slate-800/50 px-3 py-1.5 text-xs text-slate-500">Loading…</div>
+                ) : user ? (
+                  <div className="flex items-center gap-2 rounded-lg border border-cyan-500/25 bg-slate-900/70 px-2 py-1.5">
+                    {user.avatar ? (
+                      <img
+                        src={`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`}
+                        alt=""
+                        className="h-7 w-7 rounded-full"
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-cyan-500/20 text-xs font-bold text-cyan-200">
+                        {(user.username || "?").charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <span className="text-xs font-semibold text-slate-200">{user.username}</span>
+                    <a
+                      href="/api/auth/logout"
+                      className="ml-1 rounded-md border border-slate-700 bg-slate-800/60 px-2 py-1 text-xs text-slate-300 hover:border-rose-500/40 hover:text-rose-300"
+                    >
+                      Logout
+                    </a>
+                  </div>
+                ) : (
+                  <a
+                    href="/api/auth/login"
+                    className="rounded-lg border border-indigo-400/40 bg-indigo-500/15 px-3 py-1.5 text-xs font-semibold text-indigo-100 hover:bg-indigo-500/25"
+                  >
+                    Log in with Discord
+                  </a>
+                )}
+              </div>
+              <div className="rounded-2xl border border-cyan-400/30 bg-cyan-500/10 px-4 py-3 text-sm text-cyan-100">
+                <div className="font-semibold">Patch Verified</div>
+                <div>4.7.2</div>
+              </div>
             </div>
           </div>
         </header>
+
+        {/* --- Tab navigation --- */}
+        <nav className="mb-6 flex gap-1 border-b border-cyan-500/25" role="tablist">
+          {[
+            { id: "home", label: "Home" },
+            { id: "ledger", label: "Ledger" },
+          ].map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => setActiveTab(tab.id)}
+                className={`-mb-px border-b-2 px-5 py-3 text-sm font-semibold uppercase tracking-[0.2em] transition ${
+                  isActive
+                    ? "border-cyan-400 text-cyan-200"
+                    : "border-transparent text-slate-400 hover:border-cyan-500/40 hover:text-slate-200"
+                }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
+        </nav>
+
+        {activeTab === "home" && (<>
 
         <DesktopGrid columns={`${shipsPanelWidth}fr ${detailsPanelWidth}fr`} className="mb-8">
           <div
@@ -1470,6 +1759,367 @@ export default function StarCitizenSalvageGuideWebsite() {
             </div>
           </div>
         </DesktopGrid>
+
+        </>)}
+
+        {activeTab === "ledger" && (
+          <div className="space-y-6">
+            {/* --- Login required banner --- */}
+            {!user && !authLoading && (
+              <div className="rounded-3xl border border-indigo-400/40 bg-indigo-500/10 p-5">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <div className="text-base font-bold text-indigo-100">Log in to use the Ledger</div>
+                    <div className="mt-1 text-sm text-indigo-200/80">Sign in with your Discord account to track refinery jobs and sell orders across devices.</div>
+                  </div>
+                  <a
+                    href="/api/auth/login"
+                    className="shrink-0 rounded-xl border border-indigo-300/60 bg-indigo-500/30 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500/50"
+                  >
+                    Log in with Discord
+                  </a>
+                </div>
+              </div>
+            )}
+            {user && ledgerSaveError && (
+              <div className="rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-2 text-sm text-rose-200">
+                {ledgerSaveError}
+              </div>
+            )}
+
+            {/* --- Stats bar --- */}
+            <div className="grid gap-4 md:grid-cols-4">
+              <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
+                <div className="text-xs uppercase tracking-[0.25em] text-cyan-300/80">Lifetime Refined</div>
+                <div className="mt-2 text-2xl font-black text-amber-300">{lifetimeRefinedSCU.toLocaleString(undefined, { maximumFractionDigits: 1 })} <span className="text-base font-semibold text-amber-200/70">SCU</span></div>
+              </div>
+              <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
+                <div className="text-xs uppercase tracking-[0.25em] text-cyan-300/80">Lifetime aUEC</div>
+                <div className="mt-2 text-2xl font-black text-emerald-300">{lifetimeAUEC.toLocaleString()} <span className="text-base font-semibold text-emerald-200/70">aUEC</span></div>
+              </div>
+              <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
+                <div className="text-xs uppercase tracking-[0.25em] text-cyan-300/80">Refinery Fees</div>
+                <div className="mt-2 text-2xl font-black text-rose-300">{lifetimeRefineryCost.toLocaleString()} <span className="text-base font-semibold text-rose-200/70">aUEC</span></div>
+              </div>
+              <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
+                <div className="text-xs uppercase tracking-[0.25em] text-cyan-300/80">Active Jobs</div>
+                <div className="mt-2 text-2xl font-black text-cyan-300">{activeJobsCount}</div>
+                <div className="mt-1 text-xs text-slate-400">{inProgressJobs.length} refining · {readyJobs.length} ready</div>
+              </div>
+            </div>
+
+            {/* --- Refinery jobs + sell orders --- */}
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* REFINERY JOBS */}
+              <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
+                <h2 className="text-xl font-bold text-cyan-300">Refinery Job Orders</h2>
+                <p className="mt-1 text-sm text-slate-400">Log a new refinery job. It will move to Ready for Pickup when the timer finishes.</p>
+
+                <div className="mt-4 grid gap-3 rounded-2xl border border-slate-700 bg-slate-950/70 p-4">
+                  <div>
+                    <label className="mb-1 block text-xs text-slate-400">Refinery Location</label>
+                    <select
+                      value={jobForm.location}
+                      onChange={(e) => setJobForm({ ...jobForm, location: e.target.value })}
+                      disabled={!user}
+                      className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <optgroup label="Stanton">
+                        {refineryLocations.filter((loc) => loc.system === "Stanton").map((loc) => (
+                          <option key={loc.name} value={loc.name}>{loc.name}</option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="Pyro">
+                        {refineryLocations.filter((loc) => loc.system === "Pyro").map((loc) => (
+                          <option key={loc.name} value={loc.name}>{loc.name}</option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="Nyx">
+                        {refineryLocations.filter((loc) => loc.system === "Nyx").map((loc) => (
+                          <option key={loc.name} value={loc.name}>{loc.name}</option>
+                        ))}
+                      </optgroup>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs text-slate-400">Material</label>
+                    <select
+                      value={jobForm.material}
+                      onChange={(e) => setJobForm({ ...jobForm, material: e.target.value })}
+                      disabled={!user}
+                      className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {refinery.map((r) => (
+                        <option key={r.material} value={r.material}>{r.material}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="mb-1 block text-xs text-slate-400">Yield (SCU)</label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.1"
+                        placeholder="0"
+                        value={jobForm.yield}
+                        onChange={(e) => setJobForm({ ...jobForm, yield: e.target.value })}
+                        disabled={!user}
+                        className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs text-slate-400">Cost (aUEC)</label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="1"
+                        placeholder="0"
+                        value={jobForm.cost}
+                        onChange={(e) => setJobForm({ ...jobForm, cost: e.target.value })}
+                        disabled={!user}
+                        className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs text-slate-400">Time (min)</label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="1"
+                        placeholder="0"
+                        value={jobForm.time}
+                        onChange={(e) => setJobForm({ ...jobForm, time: e.target.value })}
+                        disabled={!user}
+                        className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+                      />
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={submitJob}
+                    disabled={!isJobFormValid}
+                    className={`mt-1 rounded-xl border px-4 py-2 text-sm font-semibold transition ${
+                      isJobFormValid
+                        ? "border-cyan-400 bg-cyan-500/20 text-cyan-100 hover:bg-cyan-500/30"
+                        : "cursor-not-allowed border-slate-700 bg-slate-800/50 text-slate-500"
+                    }`}
+                  >
+                    Submit Order
+                  </button>
+                </div>
+
+                {/* In Progress */}
+                <div className="mt-5">
+                  <div className="text-xs uppercase tracking-[0.25em] text-cyan-300/80">In Progress · {inProgressJobs.length}</div>
+                  {inProgressJobs.length === 0 ? (
+                    <div className="mt-2 rounded-xl border border-dashed border-slate-700 p-4 text-center text-xs text-slate-500">No jobs running.</div>
+                  ) : (
+                    <div className="mt-2 space-y-2">
+                      {inProgressJobs.map((j) => (
+                        <div key={j.id} className="rounded-xl border border-slate-700 bg-slate-950/60 p-3 text-sm">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0">
+                              <div className="font-semibold text-white truncate">{j.material}</div>
+                              <div className="text-xs text-slate-400">{Number(j.yield).toLocaleString()} SCU · {Number(j.cost).toLocaleString()} aUEC{j.location ? ` · ${j.location}` : ""}</div>
+                            </div>
+                            <div className="shrink-0 text-right">
+                              <div className="font-mono text-sm font-bold text-amber-300">{formatRemaining(j.completesAt - now)}</div>
+                              <button
+                                type="button"
+                                onClick={() => deleteJob(j.id)}
+                                className="mt-1 text-xs text-slate-500 underline-offset-2 hover:text-rose-300 hover:underline"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Ready for Pickup */}
+                <div className="mt-5">
+                  <div className="text-xs uppercase tracking-[0.25em] text-emerald-300/80">Ready for Pickup · {readyJobs.length}</div>
+                  {readyJobs.length === 0 ? (
+                    <div className="mt-2 rounded-xl border border-dashed border-slate-700 p-4 text-center text-xs text-slate-500">No jobs ready.</div>
+                  ) : (
+                    <div className="mt-2 space-y-2">
+                      {readyJobs.map((j) => (
+                        <div key={j.id} className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-3 text-sm">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0">
+                              <div className="font-semibold text-white truncate">{j.material}</div>
+                              <div className="text-xs text-slate-400">{Number(j.yield).toLocaleString()} SCU · {Number(j.cost).toLocaleString()} aUEC{j.location ? ` · ${j.location}` : ""}</div>
+                            </div>
+                            <div className="shrink-0 flex flex-col items-end gap-1">
+                              <button
+                                type="button"
+                                onClick={() => pickupJob(j.id)}
+                                className="rounded-lg border border-emerald-400 bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-100 hover:bg-emerald-500/30"
+                              >
+                                Collect
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => deleteJob(j.id)}
+                                className="text-xs text-slate-500 underline-offset-2 hover:text-rose-300 hover:underline"
+                              >
+                                Discard
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* SELL ORDERS */}
+              <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
+                <h2 className="text-xl font-bold text-cyan-300">CMAT Sell Orders</h2>
+                <p className="mt-1 text-sm text-slate-400">Log a sale for your lifetime aUEC total.</p>
+
+                <div className="mt-4 grid gap-3 rounded-2xl border border-slate-700 bg-slate-950/70 p-4">
+                  <div>
+                    <label className="mb-1 block text-xs text-slate-400">CMAT SCU Amount</label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.1"
+                      placeholder="0"
+                      value={orderForm.scu}
+                      onChange={(e) => setOrderForm({ ...orderForm, scu: e.target.value })}
+                      disabled={!user}
+                      className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs text-slate-400">Sell Point</label>
+                    <select
+                      value={orderForm.location}
+                      onChange={(e) => setOrderForm({ ...orderForm, location: e.target.value })}
+                      disabled={!user}
+                      className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {sortedSellPointEntries.map((p) => (
+                        <option key={p.name} value={p.name}>
+                          {p.name} · {p.effectivePrice.toLocaleString()} aUEC/SCU{p.isReported ? " ★" : ""}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs text-slate-400">aUEC Amount Received</label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      placeholder="0"
+                      value={orderForm.aUEC}
+                      onChange={(e) => setOrderForm({ ...orderForm, aUEC: e.target.value })}
+                      disabled={!user}
+                      className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={submitSellOrder}
+                    disabled={!isOrderFormValid}
+                    className={`mt-1 rounded-xl border px-4 py-2 text-sm font-semibold transition ${
+                      isOrderFormValid
+                        ? "border-cyan-400 bg-cyan-500/20 text-cyan-100 hover:bg-cyan-500/30"
+                        : "cursor-not-allowed border-slate-700 bg-slate-800/50 text-slate-500"
+                    }`}
+                  >
+                    Log Sale
+                  </button>
+                </div>
+
+                <div className="mt-5">
+                  <div className="text-xs uppercase tracking-[0.25em] text-cyan-300/80">Recent Sales · {sellOrders.length}</div>
+                  {sellOrders.length === 0 ? (
+                    <div className="mt-2 rounded-xl border border-dashed border-slate-700 p-4 text-center text-xs text-slate-500">No sales logged yet.</div>
+                  ) : (
+                    <div className="mt-2 space-y-2">
+                      {sellOrders.slice(0, 10).map((o) => (
+                        <div key={o.id} className="rounded-xl border border-slate-700 bg-slate-950/60 p-3 text-sm">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0">
+                              <div className="font-semibold text-emerald-300">{Number(o.aUEC).toLocaleString()} aUEC</div>
+                              <div className="text-xs text-slate-400">{Number(o.scu).toLocaleString()} SCU at {o.location}</div>
+                              <div className="text-xs text-slate-500">{formatTimestamp(o.submittedAt)}</div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => deleteSellOrder(o.id)}
+                              className="shrink-0 text-xs text-slate-500 underline-offset-2 hover:text-rose-300 hover:underline"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                      {sellOrders.length > 10 && (
+                        <div className="pt-1 text-center text-xs text-slate-500">+ {sellOrders.length - 10} older — see history below</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* --- 30-day history --- */}
+            <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
+              <h2 className="text-xl font-bold text-cyan-300">30-Day History</h2>
+              <p className="mt-1 text-sm text-slate-400">Collected refinery jobs and sell orders from the last 30 days.</p>
+
+              {historyEntries.length === 0 ? (
+                <div className="mt-4 rounded-xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">
+                  Nothing in your 30-day history yet. Collect a refinery job or log a sale to get started.
+                </div>
+              ) : (
+                <div className="mt-4 overflow-hidden rounded-2xl border border-slate-700">
+                  <table className="w-full text-left text-sm">
+                    <thead className="bg-slate-950 text-slate-300">
+                      <tr>
+                        <th className="px-4 py-3">Date</th>
+                        <th className="px-4 py-3">Type</th>
+                        <th className="px-4 py-3">Details</th>
+                        <th className="px-4 py-3 text-right">Notes</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {historyEntries.map((entry) => (
+                        <tr key={entry.id} className="border-t border-slate-800 bg-slate-900/40">
+                          <td className="px-4 py-3 text-slate-300 whitespace-nowrap">{formatTimestamp(entry.ts)}</td>
+                          <td className="px-4 py-3">
+                            <span className={`rounded-lg px-2 py-1 text-xs font-semibold ${
+                              entry.type === "Refined"
+                                ? "bg-amber-500/15 text-amber-200"
+                                : "bg-emerald-500/15 text-emerald-200"
+                            }`}>
+                              {entry.type}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-white">{entry.primary}</td>
+                          <td className="px-4 py-3 text-right text-slate-400">{entry.secondary}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+
+              <div className="mt-4 text-xs text-slate-500">
+                Ledger data is stored in this browser only — it won't sync to other devices or browsers.
+              </div>
+            </div>
+          </div>
+        )}
 
         <footer className="mt-auto border-t border-slate-800 pt-5 pb-6 text-sm text-slate-400" style={{ marginTop: "auto" }}>
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">

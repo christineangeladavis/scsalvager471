@@ -55,7 +55,7 @@ const ships = [
   },
   {
     name: "RSI Salvation",
-    role: "Snub Salvage",
+    role: "Small Starter Salvage",
     cargoGrid: 6,
     hopper: 6,
     total: 12,

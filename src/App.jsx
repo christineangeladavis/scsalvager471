@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 const ships = [
   {
@@ -277,6 +277,11 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [authLoading, setAuthLoading] = useState(true);
   const [ledgerSaveError, setLedgerSaveError] = useState("");
 
+  // Tracks which user ID the current refineryJobs/sellOrders state was loaded for.
+  // The save effect only writes to the server when this matches the logged-in user —
+  // prevents an empty-state POST from clobbering saved data during the login flow.
+  const hydratedForUserRef = useRef(null);
+
   const shipsPanelWidth = 35;
   const detailsPanelWidth = 65;
   const refineryPanelWidth = 52;
@@ -456,12 +461,16 @@ export default function StarCitizenSalvageGuideWebsite() {
   // --- Ledger: fetch from server when user changes ---
   useEffect(() => {
     let cancelled = false;
+    // Invalidate the hydration marker synchronously so the save effect below
+    // won't fire with stale data in the same render cycle.
+    hydratedForUserRef.current = null;
     setLedgerHydrated(false);
     setLedgerSaveError("");
     if (!user) {
       // Logged out: empty ledger, no server calls
       setRefineryJobs([]);
       setSellOrders([]);
+      hydratedForUserRef.current = "__anonymous__";
       setLedgerHydrated(true);
       return;
     }
@@ -471,10 +480,13 @@ export default function StarCitizenSalvageGuideWebsite() {
         if (cancelled) return;
         setRefineryJobs(Array.isArray(data.refineryJobs) ? data.refineryJobs : []);
         setSellOrders(Array.isArray(data.sellOrders) ? data.sellOrders : []);
+        // Mark as hydrated for THIS user, enabling the save effect.
+        hydratedForUserRef.current = user.id;
         setLedgerHydrated(true);
       })
       .catch(() => {
         if (cancelled) return;
+        // Load failed — leave ref as null so we don't save empty data back
         setLedgerSaveError("Could not load your ledger.");
         setLedgerHydrated(true);
       });
@@ -482,8 +494,11 @@ export default function StarCitizenSalvageGuideWebsite() {
   }, [user]);
 
   // --- Ledger: persist to server on change ---
+  // Only fires when we've successfully loaded data for the current user.
+  // The ref guard is what prevents stale empty-state saves during login.
   useEffect(() => {
-    if (!ledgerHydrated || !user) return;
+    if (!user) return;
+    if (hydratedForUserRef.current !== user.id) return;
     const controller = new AbortController();
     fetch("/api/ledger", {
       method: "POST",
@@ -505,7 +520,7 @@ export default function StarCitizenSalvageGuideWebsite() {
         setLedgerSaveError("Could not save ledger (network error).");
       });
     return () => controller.abort();
-  }, [refineryJobs, sellOrders, ledgerHydrated, user]);
+  }, [refineryJobs, sellOrders, user]);
 
   // --- Ledger: 1-second tick so timers update live ---
   useEffect(() => {
@@ -657,13 +672,21 @@ export default function StarCitizenSalvageGuideWebsite() {
       <div className="relative mx-auto max-w-7xl px-4 py-8 md:px-8" style={{ zIndex: 10, flex: 1, display: "flex", flexDirection: "column", width: "100%" }}>
         <header className="mb-8 rounded-3xl border border-cyan-500/30 bg-gradient-to-br from-slate-900 via-slate-950 to-blue-950 p-6 shadow-2xl shadow-cyan-950/40">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="text-sm uppercase tracking-[0.35em] text-cyan-300/80">Quick Reference · Accurate Data · Maximize Profits</p>
-              <h1 className="mt-2 text-3xl font-black tracking-tight text-white md:text-5xl">SC Salvager</h1>
-              <p className="mt-3 max-w-3xl text-sm text-slate-300 md:text-base">
-                Interactive companion site based on your infographic. Browse salvage ship capacities, compare disintegration types,
-                check refinery bonuses, and calculate yield instantly.
-              </p>
+            <div className="flex items-center gap-4 md:gap-5">
+              <img
+                src="/scsalvager_logo.png"
+                alt="SC Salvager"
+                className="h-16 w-16 shrink-0 md:h-20 md:w-20"
+                style={{ filter: "drop-shadow(0 4px 12px rgba(8, 47, 73, 0.5))" }}
+              />
+              <div>
+                <p className="text-sm uppercase tracking-[0.35em] text-cyan-300/80">Quick Reference · Accurate Data · Maximize Profits</p>
+                <h1 className="mt-2 text-3xl font-black tracking-tight text-white md:text-5xl">SC Salvager</h1>
+                <p className="mt-3 max-w-3xl text-sm text-slate-300 md:text-base">
+                  Interactive companion site based on your infographic. Browse salvage ship capacities, compare disintegration types,
+                  check refinery bonuses, and calculate yield instantly.
+                </p>
+              </div>
             </div>
             <div className="flex flex-col items-end gap-3">
               <div className="flex items-center gap-2">

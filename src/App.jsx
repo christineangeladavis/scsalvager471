@@ -272,6 +272,8 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [tick, setTick] = useState(0);
   const [isLedgerLoading, setIsLedgerLoading] = useState(true);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [editingEntry, setEditingEntry] = useState(null);
+  const [editForm, setEditForm] = useState({});
 
   // --- Auth state ---
   const [user, setUser] = useState(null);
@@ -561,6 +563,7 @@ export default function StarCitizenSalvageGuideWebsite() {
         else parts.push("No refinery cost");
         return {
           id: j.id,
+          source: "refinery",
           type: "Refined",
           ts: j.pickedUpAt,
           primary: `${Number(j.yield).toLocaleString()} SCU ${j.material}`,
@@ -571,6 +574,7 @@ export default function StarCitizenSalvageGuideWebsite() {
       .filter((o) => o.submittedAt && o.submittedAt >= historyCutoff)
       .map((o) => ({
         id: o.id,
+        source: "sell",
         type: "Sold",
         ts: o.submittedAt,
         primary: `${Number(o.scu).toLocaleString()} SCU → ${Number(o.aUEC).toLocaleString()} aUEC`,
@@ -657,6 +661,97 @@ export default function StarCitizenSalvageGuideWebsite() {
     setSellOrders([]);
     setShowClearConfirm(false);
     saveLedger([], []);
+  };
+
+  // --- History entry editing ---
+  const openEdit = (entry) => {
+    if (entry.source === "refinery") {
+      const j = refineryJobs.find((x) => x.id === entry.id);
+      if (!j) return;
+      setEditingEntry(entry);
+      setEditForm({
+        material: j.material,
+        location: j.location || "Levski",
+        yield: String(j.yield ?? ""),
+        cost: String(j.cost ?? ""),
+      });
+    } else if (entry.source === "sell") {
+      const o = sellOrders.find((x) => x.id === entry.id);
+      if (!o) return;
+      setEditingEntry(entry);
+      setEditForm({
+        scu: String(o.scu ?? ""),
+        location: o.location,
+        aUEC: String(o.aUEC ?? ""),
+      });
+    }
+  };
+
+  const closeEdit = () => {
+    setEditingEntry(null);
+    setEditForm({});
+  };
+
+  const isEditFormValid = (() => {
+    if (!editingEntry) return false;
+    if (editingEntry.source === "refinery") {
+      return (
+        Boolean(editForm.material) &&
+        Boolean(editForm.location) &&
+        Number(editForm.yield) > 0 &&
+        editForm.cost !== "" &&
+        Number(editForm.cost) >= 0
+      );
+    }
+    if (editingEntry.source === "sell") {
+      return (
+        Number(editForm.scu) > 0 &&
+        Boolean(editForm.location) &&
+        Number(editForm.aUEC) > 0
+      );
+    }
+    return false;
+  })();
+
+  const saveEdit = () => {
+    if (!editingEntry || !isEditFormValid) return;
+    if (editingEntry.source === "refinery") {
+      const nextJobs = refineryJobs.map((j) =>
+        j.id === editingEntry.id
+          ? {
+              ...j,
+              material: editForm.material,
+              location: editForm.location,
+              yield: Number(editForm.yield),
+              cost: Number(editForm.cost),
+            }
+          : j
+      );
+      setRefineryJobs(nextJobs);
+      saveLedger(nextJobs, sellOrders);
+    } else if (editingEntry.source === "sell") {
+      const nextOrders = sellOrders.map((o) =>
+        o.id === editingEntry.id
+          ? {
+              ...o,
+              scu: Number(editForm.scu),
+              location: editForm.location,
+              aUEC: Number(editForm.aUEC),
+            }
+          : o
+      );
+      setSellOrders(nextOrders);
+      saveLedger(refineryJobs, nextOrders);
+    }
+    closeEdit();
+  };
+
+  const deleteHistoryEntry = (entry) => {
+    if (entry.source === "refinery") {
+      deleteJob(entry.id);
+    } else if (entry.source === "sell") {
+      deleteSellOrder(entry.id);
+    }
   };
 
   // --- Ledger: format helpers ---
@@ -1534,7 +1629,8 @@ export default function StarCitizenSalvageGuideWebsite() {
                         <th className="px-4 py-3">Date</th>
                         <th className="px-4 py-3">Type</th>
                         <th className="px-4 py-3">Details</th>
-                        <th className="px-4 py-3 text-right">Notes</th>
+                        <th className="px-4 py-3">Notes</th>
+                        <th className="px-4 py-3 text-right">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1551,7 +1647,23 @@ export default function StarCitizenSalvageGuideWebsite() {
                             </span>
                           </td>
                           <td className="px-4 py-3 text-white">{entry.primary}</td>
-                          <td className="px-4 py-3 text-right text-slate-400">{entry.secondary}</td>
+                          <td className="px-4 py-3 text-slate-400">{entry.secondary}</td>
+                          <td className="px-4 py-3 text-right whitespace-nowrap">
+                            <button
+                              type="button"
+                              onClick={() => openEdit(entry)}
+                              className="mr-2 rounded-md border border-cyan-500/30 bg-cyan-500/10 px-2 py-1 text-xs font-semibold text-cyan-200 hover:border-cyan-400/60 hover:bg-cyan-500/20"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => deleteHistoryEntry(entry)}
+                              className="rounded-md border border-rose-500/30 bg-rose-500/10 px-2 py-1 text-xs font-semibold text-rose-200 hover:border-rose-400/60 hover:bg-rose-500/20"
+                            >
+                              Delete
+                            </button>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -1565,6 +1677,154 @@ export default function StarCitizenSalvageGuideWebsite() {
                   : "Log in with Discord to save your ledger across devices."}
               </div>
             </div>
+
+            {/* --- Edit entry modal --- */}
+            {editingEntry && (
+              <div
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+                onClick={closeEdit}
+              >
+                <div
+                  className="mx-4 w-full max-w-md rounded-3xl border border-cyan-500/30 bg-slate-900 p-6 shadow-2xl shadow-cyan-950/40"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <h3 className="text-lg font-bold text-cyan-300">
+                    Edit {editingEntry.type === "Refined" ? "refinery job" : "sale"}
+                  </h3>
+                  <p className="mt-1 text-xs text-slate-400">
+                    Logged {formatTimestamp(editingEntry.ts)}
+                  </p>
+
+                  <div className="mt-4 grid gap-3">
+                    {editingEntry.source === "refinery" ? (
+                      <>
+                        <div>
+                          <label className="mb-1 block text-xs text-slate-400">Refinery Location</label>
+                          <select
+                            value={editForm.location || "Levski"}
+                            onChange={(e) => setEditForm({ ...editForm, location: e.target.value })}
+                            className="w-full rounded-xl border border-cyan-500/25 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-cyan-400"
+                          >
+                            <optgroup label="Stanton">
+                              {refineryLocations.filter((loc) => loc.system === "Stanton").map((loc) => (
+                                <option key={loc.name} value={loc.name}>{loc.name}</option>
+                              ))}
+                            </optgroup>
+                            <optgroup label="Pyro">
+                              {refineryLocations.filter((loc) => loc.system === "Pyro").map((loc) => (
+                                <option key={loc.name} value={loc.name}>{loc.name}</option>
+                              ))}
+                            </optgroup>
+                            <optgroup label="Nyx">
+                              {refineryLocations.filter((loc) => loc.system === "Nyx").map((loc) => (
+                                <option key={loc.name} value={loc.name}>{loc.name}</option>
+                              ))}
+                            </optgroup>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="mb-1 block text-xs text-slate-400">Material</label>
+                          <select
+                            value={editForm.material || ""}
+                            onChange={(e) => setEditForm({ ...editForm, material: e.target.value })}
+                            className="w-full rounded-xl border border-cyan-500/25 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-cyan-400"
+                          >
+                            {refinery.map((r) => (
+                              <option key={r.material} value={r.material}>{r.material}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="mb-1 block text-xs text-slate-400">Yield (SCU)</label>
+                            <input
+                              type="number"
+                              min="0"
+                              step="0.1"
+                              value={editForm.yield || ""}
+                              onChange={(e) => setEditForm({ ...editForm, yield: e.target.value })}
+                              className="w-full rounded-xl border border-cyan-500/25 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-cyan-400"
+                            />
+                          </div>
+                          <div>
+                            <label className="mb-1 block text-xs text-slate-400">Cost (aUEC)</label>
+                            <input
+                              type="number"
+                              min="0"
+                              step="1"
+                              value={editForm.cost || ""}
+                              onChange={(e) => setEditForm({ ...editForm, cost: e.target.value })}
+                              className="w-full rounded-xl border border-cyan-500/25 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-cyan-400"
+                            />
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div>
+                          <label className="mb-1 block text-xs text-slate-400">CMAT SCU Amount</label>
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.1"
+                            value={editForm.scu || ""}
+                            onChange={(e) => setEditForm({ ...editForm, scu: e.target.value })}
+                            className="w-full rounded-xl border border-cyan-500/25 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-cyan-400"
+                          />
+                        </div>
+                        <div>
+                          <label className="mb-1 block text-xs text-slate-400">Sell Point</label>
+                          <select
+                            value={editForm.location || ""}
+                            onChange={(e) => setEditForm({ ...editForm, location: e.target.value })}
+                            className="w-full rounded-xl border border-cyan-500/25 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-cyan-400"
+                          >
+                            {sortedSellPointEntries.map((p) => (
+                              <option key={p.name} value={p.name}>
+                                {p.name} · {p.effectivePrice.toLocaleString()} aUEC/SCU{p.isReported ? " ★" : ""}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="mb-1 block text-xs text-slate-400">aUEC Amount Received</label>
+                          <input
+                            type="number"
+                            min="0"
+                            step="1"
+                            value={editForm.aUEC || ""}
+                            onChange={(e) => setEditForm({ ...editForm, aUEC: e.target.value })}
+                            className="w-full rounded-xl border border-cyan-500/25 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-cyan-400"
+                          />
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  <div className="mt-5 flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={closeEdit}
+                      className="rounded-xl border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-slate-500 hover:bg-slate-700"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={saveEdit}
+                      disabled={!isEditFormValid}
+                      className={`rounded-xl border px-4 py-2 text-sm font-bold shadow-lg ${
+                        isEditFormValid
+                          ? "border-cyan-400 bg-cyan-500 text-slate-950 shadow-cyan-950/50 hover:bg-cyan-400"
+                          : "cursor-not-allowed border-slate-700 bg-slate-800 text-slate-500"
+                      }`}
+                    >
+                      Save Changes
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* --- Clear history confirmation modal --- */}
             {showClearConfirm && (

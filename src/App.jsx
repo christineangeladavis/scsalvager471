@@ -42,7 +42,7 @@ const ships = [
   },
   {
     name: "MISC Fortune",
-    role: "Snub Salvage",
+    role: "Solo Salvage",
     cargoGrid: 12,
     hopper: 13,
     total: 25,

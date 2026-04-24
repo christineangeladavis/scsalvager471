@@ -821,20 +821,6 @@ function getSafeScuValue(value) {
   return Math.max(0, parsed);
 }
 
-function formatTimeAgo(ts) {
-  if (!ts || typeof ts !== "number") return null;
-  const diff = Date.now() - ts;
-  if (diff < 0) return "just now";
-  const s = Math.floor(diff / 1000);
-  if (s < 60) return "just now";
-  const m = Math.floor(s / 60);
-  if (m < 60) return `${m}m ago`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
-  const d = Math.floor(h / 24);
-  return `${d}d ago`;
-}
-
 function DesktopGrid({ columns, className, children }) {
   return (
     <>
@@ -850,17 +836,11 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [selectedShip, setSelectedShip] = useState(ships[0]);
   const [selectedMaterial, setSelectedMaterial] = useState(refinery[0].material);
   const [selectedRefineryLocation, setSelectedRefineryLocation] = useState("Levski");
-  const [scuInput, setScuInput] = useState("0");
+  const [scuInput, setScuInput] = useState("420");
   const [search, setSearch] = useState("");
   const [imageLoadErrors, setImageLoadErrors] = useState({});
   const [selectedSellPointName, setSelectedSellPointName] = useState(sellPoints[0].name);
-  const [sellYieldInput, setSellYieldInput] = useState("0");
-  const [reportedPrices, setReportedPrices] = useState({});
-  const [reportedMeta, setReportedMeta] = useState({});
-  const [reportPriceInput, setReportPriceInput] = useState("");
-  const [isSubmittingReport, setIsSubmittingReport] = useState(false);
-  const [reportError, setReportError] = useState("");
-  const [isLoadingCommunityPrices, setIsLoadingCommunityPrices] = useState(true);
+  const [sellYieldInput, setSellYieldInput] = useState("63");
 
   const shipsPanelWidth = 35;
   const detailsPanelWidth = 65;
@@ -930,94 +910,7 @@ export default function StarCitizenSalvageGuideWebsite() {
   const refineryBonusYield = scu * appliedBonusRate;
   const bonusYield = baseYield + refineryBonusYield;
   const sellYield = getSafeScuValue(sellYieldInput);
-  const selectedSellPointPrice =
-    reportedPrices[selectedSellPointName] ?? selectedSellPoint.pricePerScu;
-  const isSelectedSellPointReported = reportedPrices[selectedSellPointName] !== undefined;
-  const sellYieldTotal = sellYield * selectedSellPointPrice;
-  const displaySellPrice = sellYield > 0 ? selectedSellPointPrice : 0;
-
-  const sortedSellPointEntries = useMemo(() => {
-    return [...sellPoints]
-      .map((point) => ({
-        ...point,
-        effectivePrice: reportedPrices[point.name] ?? point.pricePerScu,
-        isReported: reportedPrices[point.name] !== undefined,
-      }))
-      .sort(
-        (a, b) =>
-          b.effectivePrice - a.effectivePrice || a.name.localeCompare(b.name)
-      );
-  }, [reportedPrices]);
-
-  // Fetch community price reports on mount
-  useEffect(() => {
-    let cancelled = false;
-    fetch("/api/prices")
-      .then((r) => (r.ok ? r.json() : {}))
-      .then((data) => {
-        if (cancelled || !data || typeof data !== "object") return;
-        const prices = {};
-        const meta = {};
-        Object.entries(data).forEach(([name, info]) => {
-          if (info && typeof info.medianPrice === "number") {
-            prices[name] = info.medianPrice;
-            meta[name] = {
-              reportCount: info.reportCount || 0,
-              lastReportedAt: info.lastReportedAt || 0,
-            };
-          }
-        });
-        setReportedPrices(prices);
-        setReportedMeta(meta);
-      })
-      .catch(() => {
-        // Network error — silently fall back to baseline prices
-      })
-      .finally(() => {
-        if (!cancelled) setIsLoadingCommunityPrices(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const handleReportPrice = async () => {
-    const parsed = parseFloat(reportPriceInput);
-    if (!Number.isFinite(parsed) || parsed < 0) {
-      setReportError("Enter a valid price.");
-      return;
-    }
-    setReportError("");
-    setIsSubmittingReport(true);
-    try {
-      const res = await fetch("/api/prices", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ location: selectedSellPointName, price: parsed }),
-      });
-      const info = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        setReportError(info.error || "Could not submit report.");
-        return;
-      }
-      setReportedPrices((prev) => ({
-        ...prev,
-        [selectedSellPointName]: info.medianPrice,
-      }));
-      setReportedMeta((prev) => ({
-        ...prev,
-        [selectedSellPointName]: {
-          reportCount: info.reportCount || 0,
-          lastReportedAt: info.lastReportedAt || Date.now(),
-        },
-      }));
-      setReportPriceInput("");
-    } catch (e) {
-      setReportError("Network error. Try again.");
-    } finally {
-      setIsSubmittingReport(false);
-    }
-  };
+  const sellYieldTotal = sellYield * selectedSellPoint.pricePerScu;
   const selectedShipImageFailed = Boolean(imageLoadErrors[selectedShip.name]);
 
   return (
@@ -1051,7 +944,7 @@ export default function StarCitizenSalvageGuideWebsite() {
             </div>
             <div className="rounded-2xl border border-cyan-400/30 bg-cyan-500/10 px-4 py-3 text-sm text-cyan-100">
               <div className="font-semibold">Patch Verified</div>
-              <div>4.7.2</div>
+              <div>4.7.1</div>
             </div>
           </div>
         </header>
@@ -1347,7 +1240,7 @@ export default function StarCitizenSalvageGuideWebsite() {
 
           <div className="flex h-full flex-col">
             <div className="flex flex-1 flex-col rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
-              <h2 className="text-xl font-bold text-cyan-300">CMAT Sell Estimate</h2>
+              <h2 className="text-xl font-bold text-cyan-300">Construction Material Sell Point</h2>
               <p className="mt-1 text-sm text-slate-400">Enter your yield amount and select a sell location to calculate your total aUEC value.</p>
               <div className="mt-4 space-y-4">
                 <div className="rounded-2xl border border-slate-700 bg-slate-950/70 p-4">
@@ -1369,9 +1262,9 @@ export default function StarCitizenSalvageGuideWebsite() {
                     onChange={(e) => setSelectedSellPointName(e.target.value)}
                     className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 outline-none focus:border-cyan-400"
                   >
-                    {sortedSellPointEntries.map((point) => (
+                    {[...sellPoints].sort((a, b) => b.pricePerScu - a.pricePerScu || a.name.localeCompare(b.name)).map((point) => (
                       <option key={point.name} value={point.name}>
-                        {point.name} · {point.effectivePrice.toLocaleString()} aUEC/SCU{point.isReported ? " ★" : ""}
+                        {point.name} · {point.pricePerScu.toLocaleString()} aUEC/SCU
                       </option>
                     ))}
                   </select>
@@ -1386,7 +1279,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                   </div>
                   <div className="rounded-2xl border border-cyan-500/25 bg-cyan-500/10 p-4">
                     <div className="text-slate-400">Sell Price</div>
-                    <div className="mt-1 text-xl font-black text-cyan-300">{displaySellPrice.toLocaleString()} aUEC/SCU</div>
+                    <div className="mt-1 text-xl font-black text-cyan-300">{selectedSellPoint.pricePerScu.toLocaleString()} aUEC/SCU</div>
                     <div className="mt-3 text-slate-400">Base Yield Value</div>
                     <div className="mt-1 text-xl font-black text-emerald-300">{Math.round(sellYieldTotal).toLocaleString()} aUEC</div>
                   </div>
@@ -1407,7 +1300,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                       </tr>
                       <tr className="border-t border-slate-800 bg-slate-900/40">
                         <td className="px-4 py-3">Selected Sell Price</td>
-                        <td className="px-4 py-3 font-bold text-cyan-300">{displaySellPrice.toLocaleString()} aUEC/SCU</td>
+                        <td className="px-4 py-3 font-bold text-cyan-300">{selectedSellPoint.pricePerScu.toLocaleString()} aUEC/SCU</td>
                       </tr>
                       <tr className="border-t border-slate-800 bg-slate-900/40">
                         <td className="px-4 py-3">Total From Base Yield</td>
@@ -1415,56 +1308,6 @@ export default function StarCitizenSalvageGuideWebsite() {
                       </tr>
                     </tbody>
                   </table>
-                </div>
-
-                <div className="rounded-2xl border border-cyan-500/30 bg-cyan-500/5 p-4">
-                  <div className="text-xs uppercase tracking-[0.2em] text-cyan-200">Report a Price</div>
-                  <p className="mt-1 text-xs text-slate-400">
-                    Seeing a different in-game price at <span className="font-semibold text-cyan-300">{selectedSellPointName}</span>? Report it — the Sell Location list updates for everyone.
-                  </p>
-                  <div className="mt-3 flex items-stretch gap-2">
-                    <input
-                      type="number"
-                      min="0"
-                      step="1"
-                      placeholder="Reported aUEC/SCU"
-                      value={reportPriceInput}
-                      onChange={(e) => { setReportPriceInput(e.target.value); if (reportError) setReportError(""); }}
-                      onKeyDown={(e) => { if (e.key === "Enter" && !isSubmittingReport) handleReportPrice(); }}
-                      disabled={isSubmittingReport}
-                      className="min-w-0 flex-1 rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 outline-none focus:border-cyan-400 disabled:opacity-60"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleReportPrice}
-                      disabled={isSubmittingReport}
-                      className="shrink-0 rounded-xl border border-cyan-400 bg-cyan-500/20 px-4 py-2 text-sm font-semibold text-cyan-200 transition hover:bg-cyan-500/30 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      {isSubmittingReport ? "Reporting…" : "Report Price"}
-                    </button>
-                  </div>
-                  {reportError && (
-                    <div className="mt-2 text-xs text-rose-300">{reportError}</div>
-                  )}
-                  {isLoadingCommunityPrices ? (
-                    <div className="mt-3 text-xs text-slate-500">Loading community reports…</div>
-                  ) : isSelectedSellPointReported ? (
-                    <div className="mt-3 text-xs text-amber-200/90">
-                      <span className="font-semibold">★ Community median:</span>{" "}
-                      {reportedPrices[selectedSellPointName].toLocaleString()} aUEC/SCU
-                      {reportedMeta[selectedSellPointName] && (
-                        <span className="text-slate-400">
-                          {" · "}
-                          {reportedMeta[selectedSellPointName].reportCount} report{reportedMeta[selectedSellPointName].reportCount === 1 ? "" : "s"}
-                          {reportedMeta[selectedSellPointName].lastReportedAt
-                            ? ` · last ${formatTimeAgo(reportedMeta[selectedSellPointName].lastReportedAt)}`
-                            : ""}
-                        </span>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="mt-3 text-xs text-slate-500">No community reports yet — be the first!</div>
-                  )}
                 </div>
               </div>
             </div>
@@ -1474,7 +1317,7 @@ export default function StarCitizenSalvageGuideWebsite() {
         <footer className="mt-auto border-t border-slate-800 pt-5 pb-6 text-sm text-slate-400" style={{ marginTop: "auto" }}>
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <span>
-              <span className="font-semibold text-slate-200">Made by Chrissyy</span> · Data verified for patch 4.7.2
+              <span className="font-semibold text-slate-200">Made by Chrissyy</span> · Data verified for patch 4.7.1
             </span>
             <span className="rounded-xl border border-cyan-500/25 bg-cyan-500/10 px-4 py-2 font-mono tracking-widest text-cyan-300">
               STAR CITIZEN REFERRAL CODE: <span className="font-bold text-white">STAR-CH2W-R73F</span>

@@ -270,7 +270,7 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [jobForm, setJobForm] = useState({ material: "Construction Salvage", location: "Levski", yield: "", cost: "", time: "" });
   const [orderForm, setOrderForm] = useState({ scu: "", location: sellPoints[0].name, aUEC: "" });
   const [tick, setTick] = useState(0);
-  const [ledgerHydrated, setLedgerHydrated] = useState(false);
+  const [isLedgerLoading, setIsLedgerLoading] = useState(true);
 
   // --- Auth state ---
   const [user, setUser] = useState(null);
@@ -278,8 +278,8 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [ledgerSaveError, setLedgerSaveError] = useState("");
 
   // Tracks which user ID the current refineryJobs/sellOrders state was loaded for.
-  // The save effect only writes to the server when this matches the logged-in user —
-  // prevents an empty-state POST from clobbering saved data during the login flow.
+  // saveLedger() checks this defensively before POSTing to prevent any empty-state
+  // write from clobbering saved data if the load hasn't finished yet.
   const hydratedForUserRef = useRef(null);
 
   const shipsPanelWidth = 35;
@@ -461,66 +461,66 @@ export default function StarCitizenSalvageGuideWebsite() {
   // --- Ledger: fetch from server when user changes ---
   useEffect(() => {
     let cancelled = false;
-    // Invalidate the hydration marker synchronously so the save effect below
-    // won't fire with stale data in the same render cycle.
+    // Invalidate the hydration marker so any in-flight saveLedger() calls for
+    // the previous user can't complete and overwrite the new user's data.
     hydratedForUserRef.current = null;
-    setLedgerHydrated(false);
     setLedgerSaveError("");
     if (!user) {
-      // Logged out: empty ledger, no server calls
+      // Logged out: empty ledger, no server calls.
       setRefineryJobs([]);
       setSellOrders([]);
       hydratedForUserRef.current = "__anonymous__";
-      setLedgerHydrated(true);
+      setIsLedgerLoading(false);
       return;
     }
+    setIsLedgerLoading(true);
     fetch("/api/ledger", { credentials: "same-origin" })
       .then((res) => res.json())
       .then((data) => {
         if (cancelled) return;
         setRefineryJobs(Array.isArray(data.refineryJobs) ? data.refineryJobs : []);
         setSellOrders(Array.isArray(data.sellOrders) ? data.sellOrders : []);
-        // Mark as hydrated for THIS user, enabling the save effect.
+        // Mark hydration complete for THIS user — this is the only path that
+        // unlocks saveLedger() for this user's session.
         hydratedForUserRef.current = user.id;
-        setLedgerHydrated(true);
+        setIsLedgerLoading(false);
       })
       .catch(() => {
         if (cancelled) return;
-        // Load failed — leave ref as null so we don't save empty data back
-        setLedgerSaveError("Could not load your ledger.");
-        setLedgerHydrated(true);
+        // Load failed — leave ref as null so we never save empty data back.
+        setLedgerSaveError("Could not load your ledger. Refresh to retry.");
+        setIsLedgerLoading(false);
       });
     return () => { cancelled = true; };
   }, [user]);
 
-  // --- Ledger: persist to server on change ---
-  // Only fires when we've successfully loaded data for the current user.
-  // The ref guard is what prevents stale empty-state saves during login.
-  useEffect(() => {
+  // --- Ledger: explicit save function ---
+  // Called directly by mutation handlers with the NEXT state values. There is
+  // no useEffect that saves on state change — that pattern had a race with the
+  // load where an initial render with stale empty state could POST before the
+  // fetch returned, clobbering saved data. With explicit saves, a POST can only
+  // ever happen as a direct result of a user-triggered mutation after hydration
+  // has completed for the current user.
+  const saveLedger = async (nextRefineryJobs, nextSellOrders) => {
     if (!user) return;
     if (hydratedForUserRef.current !== user.id) return;
-    const controller = new AbortController();
-    fetch("/api/ledger", {
-      method: "POST",
-      credentials: "same-origin",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ refineryJobs, sellOrders }),
-      signal: controller.signal,
-    })
-      .then(async (res) => {
-        const info = await res.json().catch(() => ({}));
-        if (!res.ok) {
-          setLedgerSaveError(info.error || `Could not save ledger (HTTP ${res.status}).`);
-        } else {
-          setLedgerSaveError("");
-        }
-      })
-      .catch((e) => {
-        if (e && e.name === "AbortError") return;
-        setLedgerSaveError("Could not save ledger (network error).");
+    try {
+      const res = await fetch("/api/ledger", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ refineryJobs: nextRefineryJobs, sellOrders: nextSellOrders }),
       });
-    return () => controller.abort();
-  }, [refineryJobs, sellOrders, user]);
+      const info = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setLedgerSaveError(info.error || `Could not save ledger (HTTP ${res.status}).`);
+      } else {
+        setLedgerSaveError("");
+      }
+    } catch (e) {
+      setLedgerSaveError("Could not save ledger (network error).");
+    }
+  };
 
   // --- Ledger: 1-second tick so timers update live ---
   useEffect(() => {
@@ -578,9 +578,10 @@ export default function StarCitizenSalvageGuideWebsite() {
     return [...refinery, ...sells].sort((a, b) => b.ts - a.ts);
   }, [refineryJobs, sellOrders, historyCutoff]);
 
-  // --- Ledger: form validity (requires login + all fields valid) ---
+  // --- Ledger: form validity (requires login + load complete + all fields valid) ---
   const isJobFormValid =
     Boolean(user) &&
+    !isLedgerLoading &&
     Boolean(jobForm.material) &&
     Boolean(jobForm.location) &&
     Number(jobForm.yield) > 0 &&
@@ -589,6 +590,7 @@ export default function StarCitizenSalvageGuideWebsite() {
     Number(jobForm.time) > 0;
   const isOrderFormValid =
     Boolean(user) &&
+    !isLedgerLoading &&
     Number(orderForm.scu) > 0 &&
     Boolean(orderForm.location) &&
     Number(orderForm.aUEC) > 0;
@@ -609,16 +611,22 @@ export default function StarCitizenSalvageGuideWebsite() {
       completesAt: submittedAt + timeMs,
       pickedUpAt: null,
     };
-    setRefineryJobs((prev) => [newJob, ...prev]);
+    const nextJobs = [newJob, ...refineryJobs];
+    setRefineryJobs(nextJobs);
     setJobForm({ material: jobForm.material, location: jobForm.location, yield: "", cost: "", time: "" });
+    saveLedger(nextJobs, sellOrders);
   };
 
   const pickupJob = (id) => {
-    setRefineryJobs((prev) => prev.map((j) => (j.id === id ? { ...j, pickedUpAt: Date.now() } : j)));
+    const nextJobs = refineryJobs.map((j) => (j.id === id ? { ...j, pickedUpAt: Date.now() } : j));
+    setRefineryJobs(nextJobs);
+    saveLedger(nextJobs, sellOrders);
   };
 
   const deleteJob = (id) => {
-    setRefineryJobs((prev) => prev.filter((j) => j.id !== id));
+    const nextJobs = refineryJobs.filter((j) => j.id !== id);
+    setRefineryJobs(nextJobs);
+    saveLedger(nextJobs, sellOrders);
   };
 
   const submitSellOrder = () => {
@@ -631,12 +639,16 @@ export default function StarCitizenSalvageGuideWebsite() {
       aUEC: Number(orderForm.aUEC),
       submittedAt,
     };
-    setSellOrders((prev) => [newOrder, ...prev]);
+    const nextOrders = [newOrder, ...sellOrders];
+    setSellOrders(nextOrders);
     setOrderForm({ scu: "", location: orderForm.location, aUEC: "" });
+    saveLedger(refineryJobs, nextOrders);
   };
 
   const deleteSellOrder = (id) => {
-    setSellOrders((prev) => prev.filter((o) => o.id !== id));
+    const nextOrders = sellOrders.filter((o) => o.id !== id);
+    setSellOrders(nextOrders);
+    saveLedger(refineryJobs, nextOrders);
   };
 
   // --- Ledger: format helpers ---

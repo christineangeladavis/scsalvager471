@@ -143,6 +143,11 @@ export default async function handler(req, res) {
 
     // Schedule notifications. Errors here do NOT fail the save — the user's
     // ledger is already persisted. Worst case is no DM for one job.
+    //
+    // CRITICAL: we must AWAIT the QStash calls. Vercel terminates the function
+    // the moment we send a response, killing any in-flight fire-and-forget
+    // network requests. Without await, the schedule call is started but the
+    // HTTP request to QStash never completes.
     if (previousJobIds) {
       try {
         const prefs = await getPrefs(redis, session.userId);
@@ -165,6 +170,7 @@ export default async function handler(req, res) {
           let skippedExisting = 0;
           let skippedPast = 0;
           let skippedNotified = 0;
+          const schedulePromises = [];
           for (const job of refineryJobs) {
             const isNew = !previousJobIds.has(job.id);
             const inFuture = job.completesAt > now;
@@ -173,34 +179,39 @@ export default async function handler(req, res) {
             if (!inFuture) { skippedPast++; continue; }
             if (!notYetSent) { skippedNotified++; continue; }
             scheduledCount++;
-            scheduleJobCompletionCallback({
-              deliverUrl,
-              userId: session.userId,
-              jobId: job.id,
-              completesAt: job.completesAt,
-            })
-              .then((result) => {
-                if (result && result.ok) {
-                  console.log(
-                    "Ledger POST: scheduled notification",
-                    JSON.stringify({ jobId: job.id, messageId: result.messageId, completesAt: job.completesAt })
-                  );
-                } else {
-                  console.warn(
-                    "Ledger POST: schedule returned not-ok for job",
-                    job.id,
-                    result && result.error
-                  );
-                }
+            schedulePromises.push(
+              scheduleJobCompletionCallback({
+                deliverUrl,
+                userId: session.userId,
+                jobId: job.id,
+                completesAt: job.completesAt,
               })
-              .catch((e) => {
-                console.warn(
-                  "Ledger POST: schedule failed for job",
-                  job.id,
-                  e && e.message ? e.message : e
-                );
-              });
+                .then((result) => {
+                  if (result && result.ok) {
+                    console.log(
+                      "Ledger POST: scheduled notification",
+                      JSON.stringify({ jobId: job.id, messageId: result.messageId, completesAt: job.completesAt })
+                    );
+                  } else {
+                    console.warn(
+                      "Ledger POST: schedule returned not-ok for job",
+                      job.id,
+                      result && result.error
+                    );
+                  }
+                })
+                .catch((e) => {
+                  console.warn(
+                    "Ledger POST: schedule failed for job",
+                    job.id,
+                    e && e.message ? e.message : e
+                  );
+                })
+            );
           }
+          // Await all schedule calls before returning, so Vercel doesn't kill
+          // the function while the publish requests are still in flight.
+          await Promise.all(schedulePromises);
           console.log(
             "Ledger POST: scheduling summary",
             JSON.stringify({ scheduledCount, skippedExisting, skippedPast, skippedNotified, deliverUrl })

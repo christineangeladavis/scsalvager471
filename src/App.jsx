@@ -694,6 +694,28 @@ export default function StarCitizenSalvageGuideWebsite() {
     return "in_progress";
   };
 
+  // Renders a tiny pill showing the DM delivery outcome for a refinery job.
+  // Returns null for jobs where there's nothing useful to display (no DM
+  // attempted, user opted out, etc.) so the UI stays clean for users who
+  // don't have notifications turned on.
+  const notificationPill = (status) => {
+    if (status === "sent") {
+      return (
+        <span className="inline-flex items-center gap-1 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald-300">
+          <span aria-hidden="true">✓</span> DM sent
+        </span>
+      );
+    }
+    if (status === "failed") {
+      return (
+        <span className="inline-flex items-center gap-1 rounded-md border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-medium text-amber-300">
+          <span aria-hidden="true">!</span> DM failed
+        </span>
+      );
+    }
+    return null;
+  };
+
   const inProgressJobs = refineryJobs.filter((j) => jobStatus(j) === "in_progress");
   const readyJobs = refineryJobs.filter((j) => jobStatus(j) === "ready");
   const activeJobsCount = inProgressJobs.length + readyJobs.length;
@@ -720,6 +742,7 @@ export default function StarCitizenSalvageGuideWebsite() {
           ts: j.pickedUpAt,
           primary: `${Number(j.yield).toLocaleString()} SCU ${j.material}`,
           secondary: parts.join(" · "),
+          notificationStatus: j.notificationStatus || null,
         };
       });
     const sells = sellOrders
@@ -913,6 +936,7 @@ export default function StarCitizenSalvageGuideWebsite() {
         methodName: editForm.method,
         locationName: editForm.location,
       });
+      const newTimeMinutes = secondsToMinutes(result.timeSeconds);
       const nextJobs = refineryJobs.map((j) =>
         j.id === editingEntry.id
           ? {
@@ -923,7 +947,12 @@ export default function StarCitizenSalvageGuideWebsite() {
               materialScu: Number(editForm.materialScu),
               yield: result.totalYield,
               cost: Math.round(result.cost),
-              timeMinutes: secondsToMinutes(result.timeSeconds),
+              timeMinutes: newTimeMinutes,
+              // Recompute completesAt from the original submittedAt so the
+              // in-app countdown and the scheduled DM both reflect the edit.
+              // The server detects this change and reschedules the QStash
+              // callback; the original DM (if any) is cancelled.
+              completesAt: j.submittedAt + newTimeMinutes * 60 * 1000,
             }
           : j
       );
@@ -1748,6 +1777,9 @@ export default function StarCitizenSalvageGuideWebsite() {
                             <div className="min-w-0">
                               <div className="font-semibold text-white truncate">{j.material}</div>
                               <div className="text-xs text-slate-400">{Number(j.yield).toLocaleString()} SCU · {Number(j.cost).toLocaleString()} aUEC{j.location ? ` · ${j.location}` : ""}</div>
+                              {j.notificationStatus && (
+                                <div className="mt-1">{notificationPill(j.notificationStatus)}</div>
+                              )}
                             </div>
                             <div className="shrink-0 flex flex-col items-end gap-1">
                               <button
@@ -1913,7 +1945,12 @@ export default function StarCitizenSalvageGuideWebsite() {
                             </span>
                           </td>
                           <td className="px-4 py-3 text-white">{entry.primary}</td>
-                          <td className="px-4 py-3 text-slate-400">{entry.secondary}</td>
+                          <td className="px-4 py-3 text-slate-400">
+                            {entry.secondary}
+                            {entry.notificationStatus && (
+                              <span className="ml-2 align-middle">{notificationPill(entry.notificationStatus)}</span>
+                            )}
+                          </td>
                           <td className="px-4 py-3 text-right whitespace-nowrap">
                             <button
                               type="button"

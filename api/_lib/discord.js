@@ -14,14 +14,24 @@ export function getDiscordCredentials() {
   return { clientId, clientSecret };
 }
 
-export function buildAuthorizeUrl({ clientId, redirectUri, state }) {
+export function buildAuthorizeUrl({
+  clientId,
+  redirectUri,
+  state,
+  scope = "identify",
+  extra = {},
+  prompt = "none",
+}) {
   const url = new URL(`${DISCORD_API}/oauth2/authorize`);
   url.searchParams.set("client_id", clientId);
   url.searchParams.set("redirect_uri", redirectUri);
   url.searchParams.set("response_type", "code");
-  url.searchParams.set("scope", "identify");
+  url.searchParams.set("scope", scope);
   url.searchParams.set("state", state);
-  url.searchParams.set("prompt", "none");
+  if (prompt) url.searchParams.set("prompt", prompt);
+  for (const [k, v] of Object.entries(extra)) {
+    if (v !== undefined && v !== null) url.searchParams.set(k, String(v));
+  }
   return url.toString();
 }
 
@@ -58,8 +68,12 @@ export async function fetchDiscordUser(accessToken) {
   return await res.json();
 }
 
-export function getCallbackUri(req) {
+export function getOrigin(req) {
   const host = req.headers["x-forwarded-host"] || req.headers.host;
   const proto = req.headers["x-forwarded-proto"] || (host && host.startsWith("localhost") ? "http" : "https");
-  return `${proto}://${host}/api/auth/callback`;
+  return `${proto}://${host}`;
+}
+
+export function getCallbackUri(req, path = "/api/auth/callback") {
+  return `${getOrigin(req)}${path}`;
 }

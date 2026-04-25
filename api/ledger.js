@@ -152,33 +152,15 @@ export default async function handler(req, res) {
       try {
         const prefs = await getPrefs(redis, session.userId);
         const userOptedIn = prefs.discordNotifications && prefs.notificationLinkedAt;
-        console.log(
-          "Ledger POST: scheduling check",
-          JSON.stringify({
-            userId: session.userId,
-            discordNotifications: prefs.discordNotifications,
-            notificationLinkedAt: prefs.notificationLinkedAt,
-            userOptedIn: Boolean(userOptedIn),
-            incomingJobs: refineryJobs.length,
-            previousJobCount: previousJobIds.size,
-          })
-        );
         if (userOptedIn) {
           const deliverUrl = `${getOrigin(req)}/api/notifications/deliver`;
           const now = Date.now();
-          let scheduledCount = 0;
-          let skippedExisting = 0;
-          let skippedPast = 0;
-          let skippedNotified = 0;
           const schedulePromises = [];
           for (const job of refineryJobs) {
             const isNew = !previousJobIds.has(job.id);
             const inFuture = job.completesAt > now;
             const notYetSent = !job.notifiedAt;
-            if (!isNew) { skippedExisting++; continue; }
-            if (!inFuture) { skippedPast++; continue; }
-            if (!notYetSent) { skippedNotified++; continue; }
-            scheduledCount++;
+            if (!isNew || !inFuture || !notYetSent) continue;
             schedulePromises.push(
               scheduleJobCompletionCallback({
                 deliverUrl,
@@ -187,12 +169,7 @@ export default async function handler(req, res) {
                 completesAt: job.completesAt,
               })
                 .then((result) => {
-                  if (result && result.ok) {
-                    console.log(
-                      "Ledger POST: scheduled notification",
-                      JSON.stringify({ jobId: job.id, messageId: result.messageId, completesAt: job.completesAt })
-                    );
-                  } else {
+                  if (!result || !result.ok) {
                     console.warn(
                       "Ledger POST: schedule returned not-ok for job",
                       job.id,
@@ -212,18 +189,10 @@ export default async function handler(req, res) {
           // Await all schedule calls before returning, so Vercel doesn't kill
           // the function while the publish requests are still in flight.
           await Promise.all(schedulePromises);
-          console.log(
-            "Ledger POST: scheduling summary",
-            JSON.stringify({ scheduledCount, skippedExisting, skippedPast, skippedNotified, deliverUrl })
-          );
-        } else {
-          console.log("Ledger POST: user not opted in, no notifications scheduled");
         }
       } catch (e) {
         console.warn("Ledger POST: notification scheduling skipped:", e && e.message ? e.message : e);
       }
-    } else {
-      console.log("Ledger POST: previousJobIds is null, skipping all scheduling this round");
     }
 
     return res.status(200).json({

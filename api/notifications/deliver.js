@@ -31,13 +31,12 @@ function readRawBody(req) {
 const LEDGER_KEY_PREFIX = "ledger:";
 
 function buildJobMessage(job) {
-  // Plain text only, per product decision. Keep it under ~2000 chars (Discord
-  // message limit) — we're well under but truncation is built into sendDirectMessage.
-  const yieldStr = Number.isFinite(job.yield) ? `${job.yield.toFixed(1)} SCU` : "your refined materials";
-  const material = job.material || "refinery job";
-  const location = job.location ? ` at ${job.location}` : "";
-  const method = job.method ? ` (${job.method})` : "";
-  return `Your ${material}${method} refinery job is complete${location}. Expected yield: ${yieldStr}. Ready for pickup.`;
+  // The refinery output for Construction Salvage / Pieces / Rubble is always
+  // "Construction Material", regardless of which input was used.
+  // Format: "Your Refinery Job for {materialScu} SCU of Construction Material is ready for pickup at {location}."
+  const scu = Number.isFinite(job.materialScu) ? `${job.materialScu} SCU` : "your batch";
+  const location = job.location || "your refinery";
+  return `Your Refinery Job for ${scu} of Construction Material is ready for pickup at ${location}.`;
 }
 
 export default async function handler(req, res) {

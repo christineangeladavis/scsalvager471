@@ -1,110 +1,174 @@
-// Thin wrapper around @upstash/qstash for scheduling delayed HTTP callbacks.
-// Used to fire a one-shot delivery request when a refinery job completes.
+// POST /api/notifications/deliver
+//
+// QStash invokes this endpoint at (approximately) the moment a refinery job
+// completes. We verify the request actually came from QStash (HMAC signature),
+// look up the user's prefs and the job, send a Discord DM, and mark the job
+// as notified so we don't double-fire if QStash retries.
+//
+// Returns 200 in all "expected" non-delivery cases (job missing, user
+// disabled DMs, etc.) so QStash treats them as terminal and doesn't retry.
+// Returns 5xx only for transient infrastructure failures we want retried.
 
-import { Client, Receiver } from "@upstash/qstash";
+import { getRedis } from "../_lib/redis.js";
+import { getPrefs } from "../_lib/prefs.js";
+import { sendDirectMessage, explainDmFailure } from "../_lib/discordBot.js";
+import { verifyQstashSignature } from "../_lib/qstash.js";
 
-let cachedClient = null;
-let cachedReceiver = null;
+// Disable Vercel's automatic body parsing so we can read the raw bytes for
+// HMAC verification. (Parsed JSON would be re-stringified differently and
+// fail the signature check.)
+export const config = { api: { bodyParser: false } };
 
-export function getQstashClient() {
-  if (cachedClient) return cachedClient;
-  const token = process.env.QSTASH_TOKEN;
-  if (!token) {
-    throw new Error(
-      "QStash is not configured. Set QSTASH_TOKEN in your Vercel project's Environment Variables, then redeploy."
-    );
-  }
-  // Optional: region-specific QStash accounts need an explicit base URL.
-  // Find it in your Upstash Console under QStash → REST URL. If left unset,
-  // the SDK uses the global default endpoint, which only works for accounts
-  // provisioned in the global region.
-  const baseUrl = process.env.QSTASH_URL || undefined;
-  cachedClient = new Client({ token, baseUrl, enableTelemetry: false });
-  return cachedClient;
+function readRawBody(req) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    req.on("data", (chunk) => chunks.push(chunk));
+    req.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
+    req.on("error", reject);
+  });
 }
 
-export function getQstashReceiver() {
-  if (cachedReceiver) return cachedReceiver;
-  const currentSigningKey = process.env.QSTASH_CURRENT_SIGNING_KEY;
-  const nextSigningKey = process.env.QSTASH_NEXT_SIGNING_KEY;
-  if (!currentSigningKey || !nextSigningKey) {
-    throw new Error(
-      "QStash signing keys are not configured. Set QSTASH_CURRENT_SIGNING_KEY and QSTASH_NEXT_SIGNING_KEY in your Vercel project's Environment Variables, then redeploy."
-    );
-  }
-  cachedReceiver = new Receiver({ currentSigningKey, nextSigningKey });
-  return cachedReceiver;
+const LEDGER_KEY_PREFIX = "ledger:";
+
+function buildJobMessage(job) {
+  // The refinery output for Construction Salvage / Pieces / Rubble is always
+  // "Construction Material", regardless of which input was used.
+  // Format: "Your Refinery Job for {materialScu} SCU of Construction Material is ready for pickup at {location}."
+  const scu = Number.isFinite(job.materialScu) ? `${job.materialScu} SCU` : "your batch";
+  const location = job.location || "your refinery";
+  return `Your Refinery Job for ${scu} of Construction Material is ready for pickup at ${location}.`;
 }
 
-/**
- * Schedule a one-shot HTTP callback to fire at (or near) `completesAt`.
- *
- * @param {object} args
- * @param {string} args.deliverUrl       - absolute URL of the deliver endpoint
- *                                          (e.g. "https://example.com/api/notifications/deliver")
- * @param {string} args.userId           - Discord user ID; included in payload
- * @param {string} args.jobId            - refinery job ID; included in payload + dedup key
- * @param {number} args.completesAt      - ms timestamp when the job finishes
- * @returns {Promise<{ ok: boolean, messageId?: string, error?: string }>}
- */
-export async function scheduleJobCompletionCallback({
-  deliverUrl,
-  userId,
-  jobId,
-  completesAt,
-}) {
-  const now = Date.now();
-  const delaySeconds = Math.max(0, Math.round((completesAt - now) / 1000));
-
-  // Sanity guard: if completesAt is far in the past (>5 min), the job was
-  // probably already completed before this code path ran. Skip rather than
-  // scheduling an instant callback.
-  if (now - completesAt > 5 * 60 * 1000) {
-    return { ok: false, error: "completesAt too far in the past; skipped" };
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    res.setHeader("Allow", "POST");
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
+  // Step 1: read raw body, verify QStash signature.
+  let rawBody;
   try {
-    const client = getQstashClient();
-    const result = await client.publishJSON({
-      url: deliverUrl,
-      body: { jobId, userId },
-      delay: delaySeconds,
-      retries: 3,
-      // Same job re-scheduled within QStash's dedup window is a no-op.
-      // 15-min default window is fine; a job submitted multiple times is
-      // a UI-level problem we don't need to handle here.
-      // Note: QStash rejects deduplicationIds containing ':'; use '-' instead.
-      deduplicationId: `notify-${jobId}`,
-    });
-    return { ok: true, messageId: result && result.messageId };
+    rawBody = await readRawBody(req);
   } catch (e) {
-    console.error("QStash schedule failed:", e && e.message ? e.message : e);
-    return { ok: false, error: e && e.message ? e.message : "QStash error" };
+    console.error("deliver: failed to read body:", e && e.message ? e.message : e);
+    return res.status(400).json({ error: "Could not read body" });
   }
-}
 
-/**
- * Verify an incoming request was actually sent by QStash. Reads the
- * `upstash-signature` header (case-insensitive) and verifies it against the
- * raw body using the configured signing keys.
- *
- * @param {string} signature - value of the upstash-signature header
- * @param {string} rawBody   - raw request body (NOT parsed JSON)
- * @returns {Promise<boolean>}
- */
-export async function verifyQstashSignature({ signature, rawBody }) {
-  if (!signature || rawBody === undefined || rawBody === null) return false;
-  try {
-    const receiver = getQstashReceiver();
-    const isValid = await receiver.verify({
-      signature,
-      body: rawBody,
-      // Tolerate small clock skew between QStash and Vercel.
-      clockTolerance: 30,
-    });
-    return Boolean(isValid);
-  } catch (e) {
-    console.warn("QStash signature verify threw:", e && e.message ? e.message : e);
-    return false;
+  const signature =
+    req.headers["upstash-signature"] || req.headers["Upstash-Signature"];
+  const isValid = await verifyQstashSignature({ signature, rawBody });
+  if (!isValid) {
+    console.warn("deliver: invalid or missing QStash signature");
+    return res.status(401).json({ error: "Invalid signature" });
   }
+
+  // Step 2: parse payload.
+  let payload;
+  try {
+    payload = JSON.parse(rawBody);
+  } catch {
+    console.warn("deliver: payload not valid JSON");
+    return res.status(400).json({ error: "Invalid payload" });
+  }
+  const { jobId, userId } = payload || {};
+  if (!jobId || !userId) {
+    return res.status(400).json({ error: "Missing jobId or userId" });
+  }
+
+  // Step 3: load Redis client.
+  let redis;
+  try {
+    redis = getRedis();
+  } catch (e) {
+    console.error("deliver: Redis unavailable:", e.message);
+    // Transient — let QStash retry.
+    return res.status(503).json({ error: e.message });
+  }
+
+  // Step 4: load the user's ledger and find the target job.
+  const ledgerKey = `${LEDGER_KEY_PREFIX}${userId}`;
+  let ledger;
+  try {
+    ledger = (await redis.get(ledgerKey)) || { refineryJobs: [], sellOrders: [] };
+  } catch (e) {
+    console.error("deliver: ledger read failed:", e.message);
+    return res.status(503).json({ error: "Storage error" });
+  }
+
+  const refineryJobs = Array.isArray(ledger.refineryJobs) ? ledger.refineryJobs : [];
+  const jobIndex = refineryJobs.findIndex((j) => j && j.id === jobId);
+  if (jobIndex === -1) {
+    // Job was deleted before completion. Terminal: don't retry.
+    return res.status(200).json({ ok: false, reason: "job-not-found" });
+  }
+
+  const job = refineryJobs[jobIndex];
+
+  // Already notified — QStash double-delivery or manual re-publish. Skip.
+  if (job.notifiedAt) {
+    return res.status(200).json({ ok: false, reason: "already-notified" });
+  }
+
+  // Defensive: if the job was edited to complete later, the original QStash
+  // callback may fire before our cancellation took effect (or cancellation
+  // failed entirely). The new schedule will deliver at the correct time;
+  // skip this stale callback rather than DM the user too early.
+  // Allow a 60s grace window for clock skew.
+  if (job.completesAt > Date.now() + 60 * 1000) {
+    return res.status(200).json({ ok: false, reason: "stale-schedule" });
+  }
+
+  // Step 5: check user prefs.
+  const prefs = await getPrefs(redis, userId);
+  if (!prefs.discordNotifications || !prefs.notificationLinkedAt) {
+    // User turned DMs off or disconnected after the job was scheduled.
+    // Mark the job so we record the decision; don't retry.
+    refineryJobs[jobIndex] = {
+      ...job,
+      notifiedAt: Date.now(),
+      notificationStatus: "skipped",
+    };
+    try {
+      await redis.set(ledgerKey, { ...ledger, refineryJobs });
+    } catch (e) {
+      console.error("deliver: failed to mark job skipped:", e.message);
+      // Even if the write fails, return 200 — the user explicitly disabled DMs.
+    }
+    return res.status(200).json({ ok: false, reason: "user-opted-out" });
+  }
+
+  // Step 6: send the DM.
+  const message = buildJobMessage(job);
+  const result = await sendDirectMessage(userId, message);
+
+  // Step 7: record outcome on the job.
+  const updatedJob = {
+    ...job,
+    notifiedAt: Date.now(),
+    notificationStatus: result.ok ? "sent" : "failed",
+  };
+  refineryJobs[jobIndex] = updatedJob;
+  try {
+    await redis.set(ledgerKey, { ...ledger, refineryJobs });
+  } catch (e) {
+    console.error("deliver: failed to mark job notified:", e.message);
+    // The DM did go out (if result.ok). Don't return 5xx — that would cause
+    // QStash to retry and re-DM the user. Eat the bookkeeping error.
+  }
+
+  if (result.ok) {
+    return res.status(200).json({ ok: true });
+  }
+
+  const friendly = explainDmFailure(result);
+  console.warn(
+    "deliver: DM failed",
+    JSON.stringify({ userId, jobId, status: result.status, code: result.code })
+  );
+  // DM rejected by Discord (e.g. user has DMs disabled). Terminal: don't retry.
+  return res.status(200).json({
+    ok: false,
+    reason: "dm-rejected",
+    error: friendly || result.message,
+  });
 }

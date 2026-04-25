@@ -14,7 +14,12 @@ export function getQstashClient() {
       "QStash is not configured. Set QSTASH_TOKEN in your Vercel project's Environment Variables, then redeploy."
     );
   }
-  cachedClient = new Client({ token, enableTelemetry: false });
+  // Optional: region-specific QStash accounts need an explicit base URL.
+  // Find it in your Upstash Console under QStash → REST URL. If left unset,
+  // the SDK uses the global default endpoint, which only works for accounts
+  // provisioned in the global region.
+  const baseUrl = process.env.QSTASH_URL || undefined;
+  cachedClient = new Client({ token, baseUrl, enableTelemetry: false });
   return cachedClient;
 }
 

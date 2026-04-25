@@ -388,6 +388,8 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [tick, setTick] = useState(0);
   const [isLedgerLoading, setIsLedgerLoading] = useState(true);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [showSubmitJobConfirm, setShowSubmitJobConfirm] = useState(false);
+  const [showSubmitSellConfirm, setShowSubmitSellConfirm] = useState(false);
   const [editingEntry, setEditingEntry] = useState(null);
   const [editForm, setEditForm] = useState({});
 
@@ -1115,6 +1117,60 @@ export default function StarCitizenSalvageGuideWebsite() {
       deleteJob(entry.id);
     } else if (entry.source === "sell") {
       deleteSellOrder(entry.id);
+    }
+  };
+
+  // --- 30-day history export ---
+  const buildHistoryRows = () => {
+    const headers = ["Date", "Type", "Details", "Notes"];
+    const rows = historyEntries.map((e) => [
+      formatTimestamp(e.ts),
+      e.type,
+      e.primary,
+      e.secondary || "",
+    ]);
+    return { headers, rows };
+  };
+
+  const downloadBlob = (blob, filename) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+
+  const exportHistoryCSV = () => {
+    if (historyEntries.length === 0) return;
+    const { headers, rows } = buildHistoryRows();
+    const escape = (v) => {
+      const s = String(v ?? "");
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const csv = [headers, ...rows].map((r) => r.map(escape).join(",")).join("\r\n");
+    // Prepend BOM so Excel recognizes UTF-8 correctly
+    const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
+    const dateStr = new Date().toISOString().slice(0, 10);
+    downloadBlob(blob, `scsalvager-history-${dateStr}.csv`);
+  };
+
+  const exportHistoryExcel = async () => {
+    if (historyEntries.length === 0) return;
+    try {
+      const XLSX = await import("xlsx");
+      const { headers, rows } = buildHistoryRows();
+      const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+      ws["!cols"] = [{ wch: 18 }, { wch: 10 }, { wch: 38 }, { wch: 42 }];
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "30-Day History");
+      const dateStr = new Date().toISOString().slice(0, 10);
+      XLSX.writeFile(wb, `scsalvager-history-${dateStr}.xlsx`);
+    } catch (err) {
+      console.error("Excel export failed:", err);
+      alert("Could not export to Excel. Try CSV instead.");
     }
   };
 
@@ -1874,7 +1930,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                   </div>
                   <button
                     type="button"
-                    onClick={submitJob}
+                    onClick={() => setShowSubmitJobConfirm(true)}
                     disabled={!isJobFormValid}
                     className={`mt-1 rounded-xl border px-4 py-2 text-sm font-semibold transition ${
                       isJobFormValid
@@ -2007,7 +2063,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                   </div>
                   <button
                     type="button"
-                    onClick={submitSellOrder}
+                    onClick={() => setShowSubmitSellConfirm(true)}
                     disabled={!isOrderFormValid}
                     className={`mt-1 rounded-xl border px-4 py-2 text-sm font-semibold transition ${
                       isOrderFormValid
@@ -2033,13 +2089,15 @@ export default function StarCitizenSalvageGuideWebsite() {
                               <div className="text-xs text-slate-400">{Number(o.scu).toLocaleString()} SCU at {o.location}</div>
                               <div className="text-xs text-slate-500">{formatTimestamp(o.submittedAt)}</div>
                             </div>
-                            <button
-                              type="button"
-                              onClick={() => deleteSellOrder(o.id)}
-                              className="shrink-0 text-xs text-slate-500 underline-offset-2 hover:text-rose-300 hover:underline"
-                            >
-                              Delete
-                            </button>
+                            {(now - o.submittedAt) < 30000 && (
+                              <button
+                                type="button"
+                                onClick={() => deleteSellOrder(o.id)}
+                                className="shrink-0 text-xs text-slate-500 underline-offset-2 hover:text-rose-300 hover:underline"
+                              >
+                                Delete
+                              </button>
+                            )}
                           </div>
                         </div>
                       ))}
@@ -2056,16 +2114,38 @@ export default function StarCitizenSalvageGuideWebsite() {
                   <h2 className="text-xl font-bold text-cyan-300">30-Day History</h2>
                   <p className="mt-1 text-sm text-slate-400">Collected refinery jobs and sell orders from the last 30 days.</p>
                 </div>
-                {user && (refineryJobs.length > 0 || sellOrders.length > 0) && (
-                  <button
-                    type="button"
-                    onClick={() => setShowClearConfirm(true)}
-                    disabled={isLedgerLoading}
-                    className="shrink-0 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-200 hover:border-rose-400/60 hover:bg-rose-500/20 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    Clear History
-                  </button>
-                )}
+                <div className="flex flex-wrap items-center gap-2">
+                  {historyEntries.length > 0 && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={exportHistoryCSV}
+                        disabled={isLedgerLoading}
+                        className="shrink-0 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-3 py-1.5 text-xs font-semibold text-cyan-200 hover:border-cyan-400/60 hover:bg-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        Export CSV
+                      </button>
+                      <button
+                        type="button"
+                        onClick={exportHistoryExcel}
+                        disabled={isLedgerLoading}
+                        className="shrink-0 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-200 hover:border-emerald-400/60 hover:bg-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        Export Excel
+                      </button>
+                    </>
+                  )}
+                  {user && (refineryJobs.length > 0 || sellOrders.length > 0) && (
+                    <button
+                      type="button"
+                      onClick={() => setShowClearConfirm(true)}
+                      disabled={isLedgerLoading}
+                      className="shrink-0 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-200 hover:border-rose-400/60 hover:bg-rose-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      Clear History
+                    </button>
+                  )}
+                </div>
               </div>
 
               {historyEntries.length === 0 ? (
@@ -2105,20 +2185,26 @@ export default function StarCitizenSalvageGuideWebsite() {
                             )}
                           </td>
                           <td className="px-4 py-3 text-right whitespace-nowrap">
-                            <button
-                              type="button"
-                              onClick={() => openEdit(entry)}
-                              className="mr-2 rounded-md border border-cyan-500/30 bg-cyan-500/10 px-2 py-1 text-xs font-semibold text-cyan-200 hover:border-cyan-400/60 hover:bg-cyan-500/20"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => deleteHistoryEntry(entry)}
-                              className="rounded-md border border-rose-500/30 bg-rose-500/10 px-2 py-1 text-xs font-semibold text-rose-200 hover:border-rose-400/60 hover:bg-rose-500/20"
-                            >
-                              Delete
-                            </button>
+                            {(now - entry.ts) < 30000 ? (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() => openEdit(entry)}
+                                  className="mr-2 rounded-md border border-cyan-500/30 bg-cyan-500/10 px-2 py-1 text-xs font-semibold text-cyan-200 hover:border-cyan-400/60 hover:bg-cyan-500/20"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => deleteHistoryEntry(entry)}
+                                  className="rounded-md border border-rose-500/30 bg-rose-500/10 px-2 py-1 text-xs font-semibold text-rose-200 hover:border-rose-400/60 hover:bg-rose-500/20"
+                                >
+                                  Delete
+                                </button>
+                              </>
+                            ) : (
+                              <span className="text-xs text-slate-600">Locked</span>
+                            )}
                           </td>
                         </tr>
                       ))}
@@ -2291,6 +2377,80 @@ export default function StarCitizenSalvageGuideWebsite() {
                       }`}
                     >
                       Save Changes
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* --- Submit refinery job confirmation --- */}
+            {showSubmitJobConfirm && (
+              <div
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+                onClick={() => setShowSubmitJobConfirm(false)}
+              >
+                <div
+                  className="mx-4 max-w-md rounded-3xl border border-cyan-500/40 bg-slate-900 p-6 shadow-2xl shadow-cyan-950/40"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <h3 className="text-lg font-bold text-cyan-200">Submit refinery order?</h3>
+                  <p className="mt-3 text-sm text-slate-300">
+                    Are you sure you wish to submit this refinery order?
+                  </p>
+                  <div className="mt-5 flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowSubmitJobConfirm(false)}
+                      className="rounded-xl border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-slate-500 hover:bg-slate-700"
+                    >
+                      No
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowSubmitJobConfirm(false);
+                        submitJob();
+                      }}
+                      className="rounded-xl border border-cyan-400 bg-cyan-500 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-cyan-950/50 hover:bg-cyan-600"
+                    >
+                      Yes
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* --- Log sale confirmation --- */}
+            {showSubmitSellConfirm && (
+              <div
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+                onClick={() => setShowSubmitSellConfirm(false)}
+              >
+                <div
+                  className="mx-4 max-w-md rounded-3xl border border-emerald-500/40 bg-slate-900 p-6 shadow-2xl shadow-emerald-950/40"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <h3 className="text-lg font-bold text-emerald-200">Log sale?</h3>
+                  <p className="mt-3 text-sm text-slate-300">
+                    Are you sure you wish to log this sale as valid?
+                  </p>
+                  <div className="mt-5 flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowSubmitSellConfirm(false)}
+                      className="rounded-xl border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-slate-500 hover:bg-slate-700"
+                    >
+                      No
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowSubmitSellConfirm(false);
+                        submitSellOrder();
+                      }}
+                      className="rounded-xl border border-emerald-400 bg-emerald-500 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-emerald-950/50 hover:bg-emerald-600"
+                    >
+                      Yes
                     </button>
                   </div>
                 </div>

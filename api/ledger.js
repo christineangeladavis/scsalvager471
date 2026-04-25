@@ -1,110 +1,237 @@
-// Thin wrapper around @upstash/qstash for scheduling delayed HTTP callbacks.
-// Used to fire a one-shot delivery request when a refinery job completes.
+// GET  /api/ledger         — returns { refineryJobs, sellOrders } for the logged-in user
+// POST /api/ledger         — replaces the ledger with the request body (full snapshot).
+//                            For new refinery jobs, schedules a one-shot QStash callback
+//                            that fires at completesAt and DMs the user via Discord.
+// Returns 401 if not logged in.
 
-import { Client, Receiver } from "@upstash/qstash";
+import { getRedis } from "./_lib/redis.js";
+import { getSession } from "./_lib/session.js";
+import { getPrefs } from "./_lib/prefs.js";
+import { scheduleJobCompletionCallback } from "./_lib/qstash.js";
+import { getOrigin } from "./_lib/discord.js";
 
-let cachedClient = null;
-let cachedReceiver = null;
+const MAX_REFINERY_JOBS = 500;
+const MAX_SELL_ORDERS = 500;
 
-export function getQstashClient() {
-  if (cachedClient) return cachedClient;
-  const token = process.env.QSTASH_TOKEN;
-  if (!token) {
-    throw new Error(
-      "QStash is not configured. Set QSTASH_TOKEN in your Vercel project's Environment Variables, then redeploy."
-    );
-  }
-  // Optional: region-specific QStash accounts need an explicit base URL.
-  // Find it in your Upstash Console under QStash → REST URL. If left unset,
-  // the SDK uses the global default endpoint, which only works for accounts
-  // provisioned in the global region.
-  const baseUrl = process.env.QSTASH_URL || undefined;
-  cachedClient = new Client({ token, baseUrl, enableTelemetry: false });
-  return cachedClient;
+function ledgerKey(userId) {
+  return `ledger:${userId}`;
 }
 
-export function getQstashReceiver() {
-  if (cachedReceiver) return cachedReceiver;
-  const currentSigningKey = process.env.QSTASH_CURRENT_SIGNING_KEY;
-  const nextSigningKey = process.env.QSTASH_NEXT_SIGNING_KEY;
-  if (!currentSigningKey || !nextSigningKey) {
-    throw new Error(
-      "QStash signing keys are not configured. Set QSTASH_CURRENT_SIGNING_KEY and QSTASH_NEXT_SIGNING_KEY in your Vercel project's Environment Variables, then redeploy."
-    );
-  }
-  cachedReceiver = new Receiver({ currentSigningKey, nextSigningKey });
-  return cachedReceiver;
+function sanitizeRefineryJob(j) {
+  if (!j || typeof j !== "object") return null;
+  const out = {
+    id: String(j.id || "").slice(0, 80),
+    material: String(j.material || "").slice(0, 80),
+    location: j.location ? String(j.location).slice(0, 80) : undefined,
+    method: j.method ? String(j.method).slice(0, 80) : undefined,
+    materialScu: Number.isFinite(Number(j.materialScu)) ? Number(j.materialScu) : undefined,
+    yield: Number(j.yield),
+    cost: Number(j.cost),
+    timeMinutes: Number(j.timeMinutes),
+    submittedAt: Number(j.submittedAt),
+    completesAt: Number(j.completesAt),
+    pickedUpAt: j.pickedUpAt ? Number(j.pickedUpAt) : null,
+    // Notification bookkeeping (set by the deliver endpoint, never by the client).
+    notifiedAt: j.notifiedAt ? Number(j.notifiedAt) : null,
+    notificationStatus: j.notificationStatus
+      ? String(j.notificationStatus).slice(0, 32)
+      : null,
+  };
+  if (!out.id || !out.material) return null;
+  if (!Number.isFinite(out.yield) || !Number.isFinite(out.cost)) return null;
+  if (!Number.isFinite(out.submittedAt) || !Number.isFinite(out.completesAt)) return null;
+  if (out.pickedUpAt !== null && !Number.isFinite(out.pickedUpAt)) out.pickedUpAt = null;
+  if (out.notifiedAt !== null && !Number.isFinite(out.notifiedAt)) out.notifiedAt = null;
+  if (out.location === undefined) delete out.location;
+  if (out.method === undefined) delete out.method;
+  if (out.materialScu === undefined) delete out.materialScu;
+  return out;
 }
 
-/**
- * Schedule a one-shot HTTP callback to fire at (or near) `completesAt`.
- *
- * @param {object} args
- * @param {string} args.deliverUrl       - absolute URL of the deliver endpoint
- *                                          (e.g. "https://example.com/api/notifications/deliver")
- * @param {string} args.userId           - Discord user ID; included in payload
- * @param {string} args.jobId            - refinery job ID; included in payload + dedup key
- * @param {number} args.completesAt      - ms timestamp when the job finishes
- * @returns {Promise<{ ok: boolean, messageId?: string, error?: string }>}
- */
-export async function scheduleJobCompletionCallback({
-  deliverUrl,
-  userId,
-  jobId,
-  completesAt,
-}) {
-  const now = Date.now();
-  const delaySeconds = Math.max(0, Math.round((completesAt - now) / 1000));
+function sanitizeSellOrder(o) {
+  if (!o || typeof o !== "object") return null;
+  const out = {
+    id: String(o.id || "").slice(0, 80),
+    scu: Number(o.scu),
+    location: String(o.location || "").slice(0, 120),
+    aUEC: Number(o.aUEC),
+    submittedAt: Number(o.submittedAt),
+  };
+  if (!out.id || !out.location) return null;
+  if (!Number.isFinite(out.scu) || !Number.isFinite(out.aUEC)) return null;
+  if (!Number.isFinite(out.submittedAt)) return null;
+  return out;
+}
 
-  // Sanity guard: if completesAt is far in the past (>5 min), the job was
-  // probably already completed before this code path ran. Skip rather than
-  // scheduling an instant callback.
-  if (now - completesAt > 5 * 60 * 1000) {
-    return { ok: false, error: "completesAt too far in the past; skipped" };
-  }
-
+export default async function handler(req, res) {
+  let redis;
   try {
-    const client = getQstashClient();
-    const result = await client.publishJSON({
-      url: deliverUrl,
-      body: { jobId, userId },
-      delay: delaySeconds,
-      retries: 3,
-      // Same job re-scheduled within QStash's dedup window is a no-op.
-      // 15-min default window is fine; a job submitted multiple times is
-      // a UI-level problem we don't need to handle here.
-      // Note: QStash rejects deduplicationIds containing ':'; use '-' instead.
-      deduplicationId: `notify-${jobId}`,
-    });
-    return { ok: true, messageId: result && result.messageId };
+    redis = getRedis();
   } catch (e) {
-    console.error("QStash schedule failed:", e && e.message ? e.message : e);
-    return { ok: false, error: e && e.message ? e.message : "QStash error" };
+    console.error("Ledger — Redis unavailable:", e.message);
+    return res.status(503).json({ error: e.message });
   }
-}
 
-/**
- * Verify an incoming request was actually sent by QStash. Reads the
- * `upstash-signature` header (case-insensitive) and verifies it against the
- * raw body using the configured signing keys.
- *
- * @param {string} signature - value of the upstash-signature header
- * @param {string} rawBody   - raw request body (NOT parsed JSON)
- * @returns {Promise<boolean>}
- */
-export async function verifyQstashSignature({ signature, rawBody }) {
-  if (!signature || rawBody === undefined || rawBody === null) return false;
-  try {
-    const receiver = getQstashReceiver();
-    const isValid = await receiver.verify({
-      signature,
-      body: rawBody,
-      // Tolerate small clock skew between QStash and Vercel.
-      clockTolerance: 30,
-    });
-    return Boolean(isValid);
-  } catch (e) {
-    console.warn("QStash signature verify threw:", e && e.message ? e.message : e);
-    return false;
+  const session = await getSession(req, redis);
+  if (!session) {
+    return res.status(401).json({ error: "Not authenticated" });
   }
+
+  const key = ledgerKey(session.userId);
+  res.setHeader("cache-control", "private, no-store");
+
+  if (req.method === "GET") {
+    try {
+      const data = (await redis.get(key)) || { refineryJobs: [], sellOrders: [] };
+      return res.status(200).json({
+        refineryJobs: Array.isArray(data.refineryJobs) ? data.refineryJobs : [],
+        sellOrders: Array.isArray(data.sellOrders) ? data.sellOrders : [],
+      });
+    } catch (e) {
+      console.error("GET /api/ledger failed:", e && e.message ? e.message : e);
+      return res.status(500).json({ error: "Could not load ledger" });
+    }
+  }
+
+  if (req.method === "POST") {
+    let body = req.body;
+    if (typeof body === "string") {
+      try {
+        body = JSON.parse(body);
+      } catch {
+        body = null;
+      }
+    }
+    if (!body || typeof body !== "object") {
+      return res.status(400).json({ error: "Invalid JSON" });
+    }
+
+    const refineryJobsRaw = Array.isArray(body.refineryJobs) ? body.refineryJobs : [];
+    const sellOrdersRaw = Array.isArray(body.sellOrders) ? body.sellOrders : [];
+
+    const refineryJobs = refineryJobsRaw
+      .slice(-MAX_REFINERY_JOBS)
+      .map(sanitizeRefineryJob)
+      .filter(Boolean);
+    const sellOrders = sellOrdersRaw.slice(-MAX_SELL_ORDERS).map(sanitizeSellOrder).filter(Boolean);
+
+    // Compare incoming jobs to what was previously stored, so we only schedule
+    // notifications for *newly added* jobs. Existing jobs (edited or idle) and
+    // jobs that pre-date this feature are left alone.
+    let previousJobIds = new Set();
+    try {
+      const existing = await redis.get(key);
+      if (existing && Array.isArray(existing.refineryJobs)) {
+        for (const j of existing.refineryJobs) {
+          if (j && j.id) previousJobIds.add(j.id);
+        }
+      }
+    } catch (e) {
+      // If we can't read the old set we fall back to "schedule nothing this
+      // round", erring on the side of dropped notifications rather than
+      // duplicates. A future submit will pick up future jobs.
+      console.warn("Ledger POST: could not read previous jobs:", e && e.message ? e.message : e);
+      previousJobIds = null;
+    }
+
+    try {
+      await redis.set(key, { refineryJobs, sellOrders });
+    } catch (e) {
+      console.error("POST /api/ledger failed:", e && e.message ? e.message : e);
+      return res.status(500).json({ error: "Could not save ledger" });
+    }
+
+    // Schedule notifications. Errors here do NOT fail the save — the user's
+    // ledger is already persisted. Worst case is no DM for one job.
+    //
+    // CRITICAL: we must AWAIT the QStash calls. Vercel terminates the function
+    // the moment we send a response, killing any in-flight fire-and-forget
+    // network requests. Without await, the schedule call is started but the
+    // HTTP request to QStash never completes.
+    if (previousJobIds) {
+      try {
+        const prefs = await getPrefs(redis, session.userId);
+        const userOptedIn = prefs.discordNotifications && prefs.notificationLinkedAt;
+        console.log(
+          "Ledger POST: scheduling check",
+          JSON.stringify({
+            userId: session.userId,
+            discordNotifications: prefs.discordNotifications,
+            notificationLinkedAt: prefs.notificationLinkedAt,
+            userOptedIn: Boolean(userOptedIn),
+            incomingJobs: refineryJobs.length,
+            previousJobCount: previousJobIds.size,
+          })
+        );
+        if (userOptedIn) {
+          const deliverUrl = `${getOrigin(req)}/api/notifications/deliver`;
+          const now = Date.now();
+          let scheduledCount = 0;
+          let skippedExisting = 0;
+          let skippedPast = 0;
+          let skippedNotified = 0;
+          const schedulePromises = [];
+          for (const job of refineryJobs) {
+            const isNew = !previousJobIds.has(job.id);
+            const inFuture = job.completesAt > now;
+            const notYetSent = !job.notifiedAt;
+            if (!isNew) { skippedExisting++; continue; }
+            if (!inFuture) { skippedPast++; continue; }
+            if (!notYetSent) { skippedNotified++; continue; }
+            scheduledCount++;
+            schedulePromises.push(
+              scheduleJobCompletionCallback({
+                deliverUrl,
+                userId: session.userId,
+                jobId: job.id,
+                completesAt: job.completesAt,
+              })
+                .then((result) => {
+                  if (result && result.ok) {
+                    console.log(
+                      "Ledger POST: scheduled notification",
+                      JSON.stringify({ jobId: job.id, messageId: result.messageId, completesAt: job.completesAt })
+                    );
+                  } else {
+                    console.warn(
+                      "Ledger POST: schedule returned not-ok for job",
+                      job.id,
+                      result && result.error
+                    );
+                  }
+                })
+                .catch((e) => {
+                  console.warn(
+                    "Ledger POST: schedule failed for job",
+                    job.id,
+                    e && e.message ? e.message : e
+                  );
+                })
+            );
+          }
+          // Await all schedule calls before returning, so Vercel doesn't kill
+          // the function while the publish requests are still in flight.
+          await Promise.all(schedulePromises);
+          console.log(
+            "Ledger POST: scheduling summary",
+            JSON.stringify({ scheduledCount, skippedExisting, skippedPast, skippedNotified, deliverUrl })
+          );
+        } else {
+          console.log("Ledger POST: user not opted in, no notifications scheduled");
+        }
+      } catch (e) {
+        console.warn("Ledger POST: notification scheduling skipped:", e && e.message ? e.message : e);
+      }
+    } else {
+      console.log("Ledger POST: previousJobIds is null, skipping all scheduling this round");
+    }
+
+    return res.status(200).json({
+      ok: true,
+      counts: { refineryJobs: refineryJobs.length, sellOrders: sellOrders.length },
+    });
+  }
+
+  res.setHeader("Allow", "GET, POST");
+  return res.status(405).json({ error: "Method not allowed" });
 }

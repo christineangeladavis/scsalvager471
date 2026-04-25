@@ -1,9 +1,14 @@
 // GET  /api/ledger         — returns { refineryJobs, sellOrders } for the logged-in user
-// POST /api/ledger         — replaces the ledger with the request body (full snapshot)
+// POST /api/ledger         — replaces the ledger with the request body (full snapshot).
+//                            For new refinery jobs, schedules a one-shot QStash callback
+//                            that fires at completesAt and DMs the user via Discord.
 // Returns 401 if not logged in.
 
 import { getRedis } from "./_lib/redis.js";
 import { getSession } from "./_lib/session.js";
+import { getPrefs } from "./_lib/prefs.js";
+import { scheduleJobCompletionCallback } from "./_lib/qstash.js";
+import { getOrigin } from "./_lib/discord.js";
 
 const MAX_REFINERY_JOBS = 500;
 const MAX_SELL_ORDERS = 500;
@@ -18,18 +23,28 @@ function sanitizeRefineryJob(j) {
     id: String(j.id || "").slice(0, 80),
     material: String(j.material || "").slice(0, 80),
     location: j.location ? String(j.location).slice(0, 80) : undefined,
+    method: j.method ? String(j.method).slice(0, 80) : undefined,
+    materialScu: Number.isFinite(Number(j.materialScu)) ? Number(j.materialScu) : undefined,
     yield: Number(j.yield),
     cost: Number(j.cost),
     timeMinutes: Number(j.timeMinutes),
     submittedAt: Number(j.submittedAt),
     completesAt: Number(j.completesAt),
     pickedUpAt: j.pickedUpAt ? Number(j.pickedUpAt) : null,
+    // Notification bookkeeping (set by the deliver endpoint, never by the client).
+    notifiedAt: j.notifiedAt ? Number(j.notifiedAt) : null,
+    notificationStatus: j.notificationStatus
+      ? String(j.notificationStatus).slice(0, 32)
+      : null,
   };
   if (!out.id || !out.material) return null;
   if (!Number.isFinite(out.yield) || !Number.isFinite(out.cost)) return null;
   if (!Number.isFinite(out.submittedAt) || !Number.isFinite(out.completesAt)) return null;
   if (out.pickedUpAt !== null && !Number.isFinite(out.pickedUpAt)) out.pickedUpAt = null;
+  if (out.notifiedAt !== null && !Number.isFinite(out.notifiedAt)) out.notifiedAt = null;
   if (out.location === undefined) delete out.location;
+  if (out.method === undefined) delete out.method;
+  if (out.materialScu === undefined) delete out.materialScu;
   return out;
 }
 
@@ -100,16 +115,73 @@ export default async function handler(req, res) {
       .filter(Boolean);
     const sellOrders = sellOrdersRaw.slice(-MAX_SELL_ORDERS).map(sanitizeSellOrder).filter(Boolean);
 
+    // Compare incoming jobs to what was previously stored, so we only schedule
+    // notifications for *newly added* jobs. Existing jobs (edited or idle) and
+    // jobs that pre-date this feature are left alone.
+    let previousJobIds = new Set();
+    try {
+      const existing = await redis.get(key);
+      if (existing && Array.isArray(existing.refineryJobs)) {
+        for (const j of existing.refineryJobs) {
+          if (j && j.id) previousJobIds.add(j.id);
+        }
+      }
+    } catch (e) {
+      // If we can't read the old set we fall back to "schedule nothing this
+      // round", erring on the side of dropped notifications rather than
+      // duplicates. A future submit will pick up future jobs.
+      console.warn("Ledger POST: could not read previous jobs:", e && e.message ? e.message : e);
+      previousJobIds = null;
+    }
+
     try {
       await redis.set(key, { refineryJobs, sellOrders });
-      return res.status(200).json({
-        ok: true,
-        counts: { refineryJobs: refineryJobs.length, sellOrders: sellOrders.length },
-      });
     } catch (e) {
       console.error("POST /api/ledger failed:", e && e.message ? e.message : e);
       return res.status(500).json({ error: "Could not save ledger" });
     }
+
+    // Schedule notifications. Errors here do NOT fail the save — the user's
+    // ledger is already persisted. Worst case is no DM for one job.
+    if (previousJobIds) {
+      try {
+        const prefs = await getPrefs(redis, session.userId);
+        const userOptedIn = prefs.discordNotifications && prefs.notificationLinkedAt;
+        if (userOptedIn) {
+          const deliverUrl = `${getOrigin(req)}/api/notifications/deliver`;
+          const now = Date.now();
+          for (const job of refineryJobs) {
+            // Only schedule for genuinely new jobs that haven't already
+            // completed and haven't already been notified.
+            const isNew = !previousJobIds.has(job.id);
+            const inFuture = job.completesAt > now;
+            const notYetSent = !job.notifiedAt;
+            if (isNew && inFuture && notYetSent) {
+              // Fire-and-forget; we don't await each one in series.
+              scheduleJobCompletionCallback({
+                deliverUrl,
+                userId: session.userId,
+                jobId: job.id,
+                completesAt: job.completesAt,
+              }).catch((e) => {
+                console.warn(
+                  "Ledger POST: schedule failed for job",
+                  job.id,
+                  e && e.message ? e.message : e
+                );
+              });
+            }
+          }
+        }
+      } catch (e) {
+        console.warn("Ledger POST: notification scheduling skipped:", e && e.message ? e.message : e);
+      }
+    }
+
+    return res.status(200).json({
+      ok: true,
+      counts: { refineryJobs: refineryJobs.length, sellOrders: sellOrders.length },
+    });
   }
 
   res.setHeader("Allow", "GET, POST");

@@ -7,7 +7,7 @@
 import { getRedis } from "./_lib/redis.js";
 import { getSession } from "./_lib/session.js";
 import { getPrefs } from "./_lib/prefs.js";
-import { scheduleJobCompletionCallback } from "./_lib/qstash.js";
+import { scheduleJobCompletionCallback, cancelScheduledMessage } from "./_lib/qstash.js";
 import { getOrigin } from "./_lib/discord.js";
 
 const MAX_REFINERY_JOBS = 500;
@@ -35,6 +35,11 @@ function sanitizeRefineryJob(j) {
     notifiedAt: j.notifiedAt ? Number(j.notifiedAt) : null,
     notificationStatus: j.notificationStatus
       ? String(j.notificationStatus).slice(0, 32)
+      : null,
+    // QStash message ID for the scheduled DM. Used to cancel/reschedule
+    // when the job is edited. Server-managed.
+    notificationMessageId: j.notificationMessageId
+      ? String(j.notificationMessageId).slice(0, 80)
       : null,
   };
   if (!out.id || !out.material) return null;
@@ -115,15 +120,18 @@ export default async function handler(req, res) {
       .filter(Boolean);
     const sellOrders = sellOrdersRaw.slice(-MAX_SELL_ORDERS).map(sanitizeSellOrder).filter(Boolean);
 
-    // Compare incoming jobs to what was previously stored, so we only schedule
-    // notifications for *newly added* jobs. Existing jobs (edited or idle) and
-    // jobs that pre-date this feature are left alone.
-    let previousJobIds = new Set();
+    // Compare incoming jobs to what was previously stored, so we can:
+    //   • schedule a new DM for genuinely new jobs
+    //   • cancel + reschedule for edited jobs (completesAt changed)
+    //   • leave unchanged jobs alone
+    // Track the full previous job records (not just IDs) so we have access to
+    // the previous completesAt and the QStash messageId for cancellation.
+    let previousJobs = new Map();
     try {
       const existing = await redis.get(key);
       if (existing && Array.isArray(existing.refineryJobs)) {
         for (const j of existing.refineryJobs) {
-          if (j && j.id) previousJobIds.add(j.id);
+          if (j && j.id) previousJobs.set(j.id, j);
         }
       }
     } catch (e) {
@@ -131,7 +139,26 @@ export default async function handler(req, res) {
       // round", erring on the side of dropped notifications rather than
       // duplicates. A future submit will pick up future jobs.
       console.warn("Ledger POST: could not read previous jobs:", e && e.message ? e.message : e);
-      previousJobIds = null;
+      previousJobs = null;
+    }
+
+    // Preserve server-managed notification fields across the save. The client
+    // never writes notifiedAt / notificationStatus / notificationMessageId, but
+    // it does send the full job snapshot back, so values from older Redis
+    // reads need to be carried forward into the new save.
+    if (previousJobs) {
+      for (let i = 0; i < refineryJobs.length; i++) {
+        const incoming = refineryJobs[i];
+        const prev = previousJobs.get(incoming.id);
+        if (prev) {
+          refineryJobs[i] = {
+            ...incoming,
+            notifiedAt: prev.notifiedAt ?? incoming.notifiedAt ?? null,
+            notificationStatus: prev.notificationStatus ?? incoming.notificationStatus ?? null,
+            notificationMessageId: prev.notificationMessageId ?? incoming.notificationMessageId ?? null,
+          };
+        }
+      }
     }
 
     try {
@@ -148,19 +175,53 @@ export default async function handler(req, res) {
     // the moment we send a response, killing any in-flight fire-and-forget
     // network requests. Without await, the schedule call is started but the
     // HTTP request to QStash never completes.
-    if (previousJobIds) {
+    if (previousJobs) {
       try {
         const prefs = await getPrefs(redis, session.userId);
         const userOptedIn = prefs.discordNotifications && prefs.notificationLinkedAt;
         if (userOptedIn) {
           const deliverUrl = `${getOrigin(req)}/api/notifications/deliver`;
           const now = Date.now();
+          // Collect the published messageIds so we can write them back to the
+          // job records in a second Redis save once all schedule calls finish.
+          const messageIdsByJobId = {};
           const schedulePromises = [];
           for (const job of refineryJobs) {
-            const isNew = !previousJobIds.has(job.id);
+            const prev = previousJobs.get(job.id);
+            const isNew = !prev;
             const inFuture = job.completesAt > now;
             const notYetSent = !job.notifiedAt;
-            if (!isNew || !inFuture || !notYetSent) continue;
+
+            // Skip already-notified, picked-up, or past-due jobs. Editing a
+            // job we already DM'd doesn't reschedule — that DM has been read,
+            // we're not going to send another.
+            if (!inFuture || !notYetSent) continue;
+
+            let shouldPublish = false;
+            if (isNew) {
+              shouldPublish = true;
+            } else if (prev.completesAt !== job.completesAt) {
+              // Edited job: cancel the old QStash message before publishing
+              // a new one with the new completesAt. If cancel fails (e.g.
+              // already delivered, network hiccup) we still publish — the
+              // deliver endpoint defends against double-delivery via the
+              // notifiedAt check on the job record.
+              if (prev.notificationMessageId) {
+                schedulePromises.push(
+                  cancelScheduledMessage(prev.notificationMessageId).catch((e) => {
+                    console.warn(
+                      "Ledger POST: cancel failed for job",
+                      job.id,
+                      e && e.message ? e.message : e
+                    );
+                  })
+                );
+              }
+              shouldPublish = true;
+            }
+
+            if (!shouldPublish) continue;
+
             schedulePromises.push(
               scheduleJobCompletionCallback({
                 deliverUrl,
@@ -169,7 +230,11 @@ export default async function handler(req, res) {
                 completesAt: job.completesAt,
               })
                 .then((result) => {
-                  if (!result || !result.ok) {
+                  if (result && result.ok) {
+                    if (result.messageId) {
+                      messageIdsByJobId[job.id] = result.messageId;
+                    }
+                  } else {
                     console.warn(
                       "Ledger POST: schedule returned not-ok for job",
                       job.id,
@@ -189,6 +254,30 @@ export default async function handler(req, res) {
           // Await all schedule calls before returning, so Vercel doesn't kill
           // the function while the publish requests are still in flight.
           await Promise.all(schedulePromises);
+
+          // Write back the freshly-collected messageIds so future edits can
+          // cancel the right scheduled message. Best-effort: a failure here
+          // doesn't unwind anything; the worst case is we lose the ability
+          // to cancel one specific scheduled message on a future edit.
+          if (Object.keys(messageIdsByJobId).length > 0) {
+            try {
+              for (let i = 0; i < refineryJobs.length; i++) {
+                const newId = messageIdsByJobId[refineryJobs[i].id];
+                if (newId) {
+                  refineryJobs[i] = {
+                    ...refineryJobs[i],
+                    notificationMessageId: newId,
+                  };
+                }
+              }
+              await redis.set(key, { refineryJobs, sellOrders });
+            } catch (e) {
+              console.warn(
+                "Ledger POST: could not persist messageIds:",
+                e && e.message ? e.message : e
+              );
+            }
+          }
         }
       } catch (e) {
         console.warn("Ledger POST: notification scheduling skipped:", e && e.message ? e.message : e);

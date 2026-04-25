@@ -5,6 +5,17 @@ Made by Chrissyy · Referral: STAR-CH2W-R73F
 
 ## What's in this build
 
+UPDATE 4/25/2026 v2.2
+Notable Changes:
+- Users can now opt-in to receive Discord DM's from SCSalvager bot to notify them of completed refinery jobs. with the response: "Your Refinery Job for {Amount}SCU of Construction Material is ready for pickup at {Location}.
+- Added "Join our Discord" button to the header. Linking to this server.
+- Moved Ship Selected Details and Ship selection to a new tab titled "Ship Details".
+- Added stock component list for all 5 ships.
+
+UPDATE 4/24/2026 v2.1 
+- Users can now select refinery methods in both the ledger and home calculator to calculate expected yield, cost, and time required for less human input.
+
+RELEASE V1.0
 - Refinery Bonus Yield Calculator with a Refinery Location dropdown (Stanton / Pyro / Nyx)
 - Scraper Module Performance reference
 - CMAT Sell Estimate panel with a community-driven **Report a Price** field

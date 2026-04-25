@@ -109,6 +109,15 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: false, reason: "already-notified" });
   }
 
+  // Defensive: if the job was edited to complete later, the original QStash
+  // callback may fire before our cancellation took effect (or cancellation
+  // failed entirely). The new schedule will deliver at the correct time;
+  // skip this stale callback rather than DM the user too early.
+  // Allow a 60s grace window for clock skew.
+  if (job.completesAt > Date.now() + 60 * 1000) {
+    return res.status(200).json({ ok: false, reason: "stale-schedule" });
+  }
+
   // Step 5: check user prefs.
   const prefs = await getPrefs(redis, userId);
   if (!prefs.discordNotifications || !prefs.notificationLinkedAt) {

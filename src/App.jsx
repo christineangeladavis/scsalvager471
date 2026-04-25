@@ -261,6 +261,24 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [authLoading, setAuthLoading] = useState(true);
   const [ledgerSaveError, setLedgerSaveError] = useState("");
 
+  // --- User preferences (loaded from /api/me/prefs after auth) ---
+  const [prefs, setPrefs] = useState({
+    discordNotifications: false,
+    notificationLinkedAt: null,
+  });
+  const [prefsLoading, setPrefsLoading] = useState(false);
+  const [prefsError, setPrefsError] = useState("");
+
+  // --- UI state for the user menu and Settings modal ---
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  // Transient feedback for notification actions (test DM result, disconnect, etc.)
+  // Shape: { kind: "success" | "error" | "info", text: string } | null
+  const [notificationFeedback, setNotificationFeedback] = useState(null);
+  const [testDmInFlight, setTestDmInFlight] = useState(false);
+  const [disconnectInFlight, setDisconnectInFlight] = useState(false);
+
   // Tracks which user ID the current refineryJobs/sellOrders state was loaded for.
   // saveLedger() checks this defensively before POSTing to prevent any empty-state
   // write from clobbering saved data if the load hasn't finished yet.
@@ -451,6 +469,149 @@ export default function StarCitizenSalvageGuideWebsite() {
       });
     return () => { cancelled = true; };
   }, []);
+
+  // --- Preferences: load from server when user changes ---
+  useEffect(() => {
+    let cancelled = false;
+    setPrefsError("");
+    if (!user) {
+      // Logged out: reset to defaults, no server call.
+      setPrefs({ discordNotifications: false, notificationLinkedAt: null });
+      setPrefsLoading(false);
+      return;
+    }
+    setPrefsLoading(true);
+    fetch("/api/me/prefs", { credentials: "same-origin" })
+      .then(async (res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        if (cancelled) return;
+        if (data && data.prefs) setPrefs(data.prefs);
+        setPrefsLoading(false);
+      })
+      .catch((e) => {
+        if (cancelled) return;
+        setPrefsError(e && e.message ? e.message : "Could not load preferences");
+        setPrefsLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [user]);
+
+  // --- Preferences: optimistic update + persist to server ---
+  // Reverts the local state if the server rejects the change.
+  const updatePref = async (patch) => {
+    setPrefsError("");
+    const previous = prefs;
+    setPrefs({ ...prefs, ...patch });
+    try {
+      const res = await fetch("/api/me/prefs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify(patch),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (data && data.prefs) setPrefs(data.prefs);
+    } catch (e) {
+      setPrefs(previous);
+      setPrefsError(e && e.message ? e.message : "Could not save preferences");
+    }
+  };
+
+  // --- Detect return from notifications OAuth on mount ---
+  // /api/auth/notifications-callback redirects here with one of:
+  //   ?notifications=linked              → success, show confirmation
+  //   ?notifications=denied              → user cancelled the Discord prompt
+  //   ?notifications=error&reason=...    → something broke (state, exchange, etc.)
+  // We open the Settings modal so the user sees the result, refresh prefs to
+  // pick up the new notificationLinkedAt, and clean up the URL.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get("notifications");
+    if (!status) return;
+
+    setIsSettingsOpen(true);
+
+    if (status === "linked") {
+      setNotificationFeedback({ kind: "success", text: "Discord connected. You'll get a DM when refinery jobs complete." });
+    } else if (status === "denied") {
+      setNotificationFeedback({ kind: "info", text: "Discord connection cancelled." });
+    } else if (status === "error") {
+      const reason = params.get("reason") || "unknown";
+      const reasonMessages = {
+        state: "Something went wrong validating the request. Please try connecting again.",
+        storage: "Couldn't reach the server's storage. Try again in a moment.",
+        session: "Your login session expired. Sign in again, then reconnect.",
+        config: "The site isn't fully configured for Discord notifications yet.",
+        identity: "Discord didn't return your account info. Try connecting again.",
+        mismatch: "The Discord account you authorized doesn't match the one you're logged in with.",
+        exchange: "Discord rejected the connection. Try connecting again.",
+      };
+      setNotificationFeedback({
+        kind: "error",
+        text: reasonMessages[reason] || "Connection failed. Please try again.",
+      });
+    }
+
+    // Strip the query params without reloading or pushing a new history entry.
+    const cleanUrl = window.location.pathname + window.location.hash;
+    window.history.replaceState({}, "", cleanUrl);
+  }, []);
+
+  // --- Notifications: send a test DM ---
+  const sendTestDm = async () => {
+    setTestDmInFlight(true);
+    setNotificationFeedback(null);
+    try {
+      const res = await fetch("/api/notifications/test", {
+        method: "POST",
+        credentials: "same-origin",
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.ok) {
+        setNotificationFeedback({ kind: "success", text: "Test DM sent. Check your Discord DMs." });
+      } else {
+        setNotificationFeedback({
+          kind: "error",
+          text: data.error || `Couldn't send the test DM (HTTP ${res.status}).`,
+        });
+      }
+    } catch (e) {
+      setNotificationFeedback({
+        kind: "error",
+        text: e && e.message ? e.message : "Network error sending test DM.",
+      });
+    } finally {
+      setTestDmInFlight(false);
+    }
+  };
+
+  // --- Notifications: disconnect (clears link + turns toggle off) ---
+  const disconnectNotifications = async () => {
+    setDisconnectInFlight(true);
+    setNotificationFeedback(null);
+    try {
+      const res = await fetch("/api/notifications/disconnect", {
+        method: "POST",
+        credentials: "same-origin",
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (data && data.prefs) setPrefs(data.prefs);
+      setNotificationFeedback({ kind: "info", text: "Discord notifications disconnected." });
+    } catch (e) {
+      setNotificationFeedback({
+        kind: "error",
+        text: e && e.message ? e.message : "Couldn't disconnect.",
+      });
+    } finally {
+      setDisconnectInFlight(false);
+    }
+  };
+
 
   // --- Ledger: fetch from server when user changes ---
   useEffect(() => {
@@ -847,26 +1008,68 @@ export default function StarCitizenSalvageGuideWebsite() {
                 {authLoading ? (
                   <div className="rounded-lg border border-slate-700 bg-slate-800/50 px-3 py-1.5 text-xs text-slate-500">Loading…</div>
                 ) : user ? (
-                  <div className="flex items-center gap-2 rounded-lg border border-cyan-500/25 bg-slate-900/70 px-2 py-1.5">
-                    {user.avatar ? (
-                      <img
-                        src={`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`}
-                        alt=""
-                        className="h-7 w-7 rounded-full"
-                        referrerPolicy="no-referrer"
-                      />
-                    ) : (
-                      <div className="flex h-7 w-7 items-center justify-center rounded-full bg-cyan-500/20 text-xs font-bold text-cyan-200">
-                        {(user.username || "?").charAt(0).toUpperCase()}
-                      </div>
-                    )}
-                    <span className="text-xs font-semibold text-slate-200">{user.username}</span>
-                    <a
-                      href="/api/auth/logout"
-                      className="ml-1 rounded-md border border-slate-700 bg-slate-800/60 px-2 py-1 text-xs text-slate-300 hover:border-rose-500/40 hover:text-rose-300"
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setIsUserMenuOpen((v) => !v)}
+                      aria-haspopup="menu"
+                      aria-expanded={isUserMenuOpen}
+                      className="flex items-center gap-2 rounded-lg border border-cyan-500/25 bg-slate-900/70 px-2 py-1.5 hover:border-cyan-400/50"
                     >
-                      Logout
-                    </a>
+                      {user.avatar ? (
+                        <img
+                          src={`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`}
+                          alt=""
+                          className="h-7 w-7 rounded-full"
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : (
+                        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-cyan-500/20 text-xs font-bold text-cyan-200">
+                          {(user.username || "?").charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      <span className="text-xs font-semibold text-slate-200">{user.username}</span>
+                      <svg
+                        className={`h-3 w-3 text-slate-400 transition-transform ${isUserMenuOpen ? "rotate-180" : ""}`}
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.06l3.71-3.83a.75.75 0 111.08 1.04l-4.25 4.39a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clipRule="evenodd" />
+                      </svg>
+                    </button>
+                    {isUserMenuOpen && (
+                      <>
+                        {/* Click-outside catcher */}
+                        <div
+                          className="fixed inset-0 z-40"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        />
+                        <div
+                          role="menu"
+                          className="absolute right-0 top-full z-50 mt-1 w-44 overflow-hidden rounded-lg border border-cyan-500/25 bg-slate-900 shadow-xl shadow-cyan-950/40"
+                        >
+                          <button
+                            type="button"
+                            role="menuitem"
+                            onClick={() => {
+                              setIsUserMenuOpen(false);
+                              setIsSettingsOpen(true);
+                            }}
+                            className="block w-full px-3 py-2 text-left text-xs text-slate-200 hover:bg-slate-800"
+                          >
+                            Settings
+                          </button>
+                          <a
+                            role="menuitem"
+                            href="/api/auth/logout"
+                            className="block border-t border-slate-800 px-3 py-2 text-xs text-slate-300 hover:bg-slate-800 hover:text-rose-300"
+                          >
+                            Logout
+                          </a>
+                        </div>
+                      </>
+                    )}
                   </div>
                 ) : (
                   <a
@@ -1937,6 +2140,141 @@ export default function StarCitizenSalvageGuideWebsite() {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* --- Settings modal --- */}
+        {isSettingsOpen && user && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+            onClick={() => setIsSettingsOpen(false)}
+          >
+            <div
+              className="mx-4 w-full max-w-md rounded-3xl border border-cyan-500/30 bg-slate-900 p-6 shadow-2xl shadow-cyan-950/40"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="settings-title"
+            >
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 id="settings-title" className="text-lg font-bold text-cyan-300">Settings</h3>
+                  <p className="mt-1 text-xs text-slate-400">Signed in as @{user.username}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsSettingsOpen(false)}
+                  aria-label="Close settings"
+                  className="rounded-md border border-slate-700 bg-slate-800/60 px-2 py-1 text-xs text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Notifications section */}
+              <section className="mt-6">
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Notifications</h4>
+                <div className="mt-3 rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="text-sm font-semibold text-slate-200">Discord DMs</div>
+                      <p className="mt-1 text-xs text-slate-400">
+                        Get a Discord DM when your refinery jobs complete and are ready for pickup.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={prefs.discordNotifications}
+                      disabled={prefsLoading}
+                      onClick={() => updatePref({ discordNotifications: !prefs.discordNotifications })}
+                      className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                        prefs.discordNotifications ? "bg-cyan-500" : "bg-slate-700"
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
+                          prefs.discordNotifications ? "translate-x-5" : "translate-x-0.5"
+                        }`}
+                      />
+                    </button>
+                  </div>
+                  {/* Connection state below the toggle. Three branches:
+                       (a) toggle ON, not yet linked → "Connect Discord" button
+                       (b) toggle ON, linked         → "Send test DM" + "Disconnect"
+                       (c) toggle OFF, linked        → small dim "Connected (off) · Disconnect"
+                       (d) toggle OFF, not linked    → render nothing
+                  */}
+                  {prefs.discordNotifications && !prefs.notificationLinkedAt && (
+                    <div className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3">
+                      <p className="text-xs text-amber-200">
+                        Connect your Discord account so we can DM you when jobs complete.
+                      </p>
+                      <a
+                        href="/api/auth/notifications-link"
+                        className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-indigo-400/40 bg-indigo-500/15 px-3 py-1.5 text-xs font-semibold text-indigo-100 hover:bg-indigo-500/25"
+                      >
+                        Connect Discord
+                      </a>
+                    </div>
+                  )}
+                  {prefs.discordNotifications && prefs.notificationLinkedAt && (
+                    <div className="mt-3 flex items-center justify-between gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/5 px-3 py-2">
+                      <span className="text-xs text-emerald-200">Connected to Discord</span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={sendTestDm}
+                          disabled={testDmInFlight}
+                          className="rounded-md border border-cyan-400/30 bg-cyan-500/10 px-2 py-1 text-xs text-cyan-200 hover:bg-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          {testDmInFlight ? "Sending…" : "Send test DM"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={disconnectNotifications}
+                          disabled={disconnectInFlight}
+                          className="rounded-md border border-slate-700 bg-slate-800/60 px-2 py-1 text-xs text-slate-300 hover:border-rose-500/40 hover:text-rose-300 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          {disconnectInFlight ? "…" : "Disconnect"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  {!prefs.discordNotifications && prefs.notificationLinkedAt && (
+                    <div className="mt-3 flex items-center justify-between gap-2 text-xs text-slate-500">
+                      <span>Discord linked but DMs are off.</span>
+                      <button
+                        type="button"
+                        onClick={disconnectNotifications}
+                        disabled={disconnectInFlight}
+                        className="rounded-md border border-slate-700 bg-slate-800/60 px-2 py-1 text-xs text-slate-300 hover:border-rose-500/40 hover:text-rose-300 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {disconnectInFlight ? "…" : "Disconnect"}
+                      </button>
+                    </div>
+                  )}
+                  {notificationFeedback && (
+                    <p
+                      className={`mt-3 rounded-lg border px-3 py-2 text-xs ${
+                        notificationFeedback.kind === "success"
+                          ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-200"
+                          : notificationFeedback.kind === "error"
+                          ? "border-rose-500/30 bg-rose-500/10 text-rose-200"
+                          : "border-slate-600/40 bg-slate-700/20 text-slate-300"
+                      }`}
+                    >
+                      {notificationFeedback.text}
+                    </p>
+                  )}
+                  {prefsError && (
+                    <p className="mt-3 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+                      {prefsError}
+                    </p>
+                  )}
+                </div>
+              </section>
+            </div>
           </div>
         )}
 

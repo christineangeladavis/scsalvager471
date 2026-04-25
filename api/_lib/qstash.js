@@ -73,7 +73,8 @@ export async function scheduleJobCompletionCallback({
       // Same job re-scheduled within QStash's dedup window is a no-op.
       // 15-min default window is fine; a job submitted multiple times is
       // a UI-level problem we don't need to handle here.
-      deduplicationId: `notify:${jobId}`,
+      // Note: QStash rejects deduplicationIds containing ':'; use '-' instead.
+      deduplicationId: `notify-${jobId}`,
     });
     return { ok: true, messageId: result && result.messageId };
   } catch (e) {

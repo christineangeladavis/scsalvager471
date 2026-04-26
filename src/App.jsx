@@ -657,6 +657,10 @@ export default function StarCitizenSalvageGuideWebsite() {
   const sellYieldTotal = sellYield * selectedSellPointPrice;
   const displaySellPrice = sellYield > 0 ? selectedSellPointPrice : 0;
 
+  // Mirrors the Refinery Location dropdown's grouping: Stanton → Pyro →
+  // Nyx, with each system's entries sorted by best-effective-price desc.
+  const SYSTEM_ORDER = ["Stanton", "Pyro", "Nyx"];
+
   const buildSortedSellPointEntries = (material, { includePlayer = true } = {}) => {
     const filtered = sellPoints
       .filter((p) => p.material === material)
@@ -668,10 +672,18 @@ export default function StarCitizenSalvageGuideWebsite() {
           isReported: reportedPrices[key] !== undefined,
         };
       })
-      .sort(
-        (a, b) =>
-          b.effectivePrice - a.effectivePrice || a.name.localeCompare(b.name)
-      );
+      .sort((a, b) => {
+        const aSys = SYSTEM_ORDER.indexOf(a.system);
+        const bSys = SYSTEM_ORDER.indexOf(b.system);
+        // Unknown systems fall to the end, alphabetical by system name.
+        const aRank = aSys === -1 ? SYSTEM_ORDER.length : aSys;
+        const bRank = bSys === -1 ? SYSTEM_ORDER.length : bSys;
+        if (aRank !== bRank) return aRank - bRank;
+        if (aSys === -1 && bSys === -1 && a.system !== b.system) {
+          return a.system.localeCompare(b.system);
+        }
+        return b.effectivePrice - a.effectivePrice || a.name.localeCompare(b.name);
+      });
     if (!includePlayer) return filtered;
     return [
       ...filtered,
@@ -686,6 +698,32 @@ export default function StarCitizenSalvageGuideWebsite() {
         material,
       },
     ];
+  };
+
+  // Groups a flat (already-sorted) sell-point entry list by system in
+  // SYSTEM_ORDER plus a trailing "Player" group for the special player-
+  // sale sentinel. Used to render <optgroup>s in the dropdowns.
+  const groupSellPointEntriesBySystem = (entries) => {
+    const bySystem = new Map();
+    let playerEntry = null;
+    for (const entry of entries) {
+      if (entry.isPlayer) {
+        playerEntry = entry;
+        continue;
+      }
+      if (!bySystem.has(entry.system)) bySystem.set(entry.system, []);
+      bySystem.get(entry.system).push(entry);
+    }
+    const groups = [];
+    for (const sys of SYSTEM_ORDER) {
+      if (bySystem.has(sys)) groups.push({ system: sys, entries: bySystem.get(sys) });
+    }
+    // Any unknown systems after the canonical three.
+    for (const [sys, list] of bySystem) {
+      if (!SYSTEM_ORDER.includes(sys)) groups.push({ system: sys, entries: list });
+    }
+    if (playerEntry) groups.push({ system: "Player", entries: [playerEntry] });
+    return groups;
   };
 
   const sortedSellPointEntries = useMemo(
@@ -2397,12 +2435,16 @@ export default function StarCitizenSalvageGuideWebsite() {
                     onChange={(e) => setSelectedSellPointName(e.target.value)}
                     className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 outline-none focus:border-cyan-400"
                   >
-                    {sortedSellPointEntries.map((point) => (
-                      <option key={point.name} value={point.name}>
-                        {point.isPlayer
-                          ? point.name
-                          : `${point.name} · ${point.effectivePrice.toLocaleString()} aUEC/SCU${point.isReported ? " ★" : ""}`}
-                      </option>
+                    {groupSellPointEntriesBySystem(sortedSellPointEntries).map((group) => (
+                      <optgroup key={group.system} label={group.system}>
+                        {group.entries.map((point) => (
+                          <option key={point.name} value={point.name}>
+                            {point.isPlayer
+                              ? point.name
+                              : `${point.name} · ${point.effectivePrice.toLocaleString()} aUEC/SCU${point.isReported ? " ★" : ""}`}
+                          </option>
+                        ))}
+                      </optgroup>
                     ))}
                   </select>
                   {isPlayerEstimate && (
@@ -2801,12 +2843,16 @@ export default function StarCitizenSalvageGuideWebsite() {
                       disabled={!user && !import.meta.env.DEV}
                       className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      {orderSellPointEntries.map((p) => (
-                        <option key={p.name} value={p.name}>
-                          {p.isPlayer
-                            ? p.name
-                            : `${p.name} · ${p.effectivePrice.toLocaleString()} aUEC/SCU${p.isReported ? " ★" : ""}`}
-                        </option>
+                      {groupSellPointEntriesBySystem(orderSellPointEntries).map((group) => (
+                        <optgroup key={group.system} label={group.system}>
+                          {group.entries.map((p) => (
+                            <option key={p.name} value={p.name}>
+                              {p.isPlayer
+                                ? p.name
+                                : `${p.name} · ${p.effectivePrice.toLocaleString()} aUEC/SCU${p.isReported ? " ★" : ""}`}
+                            </option>
+                          ))}
+                        </optgroup>
                       ))}
                     </select>
                   </div>
@@ -3218,12 +3264,16 @@ export default function StarCitizenSalvageGuideWebsite() {
                             onChange={(e) => setEditForm({ ...editForm, location: e.target.value, playerName: "" })}
                             className="w-full rounded-xl border border-cyan-500/25 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-cyan-400"
                           >
-                            {editSellPointEntries.map((p) => (
-                              <option key={p.name} value={p.name}>
-                                {p.isPlayer
-                                  ? p.name
-                                  : `${p.name} · ${p.effectivePrice.toLocaleString()} aUEC/SCU${p.isReported ? " ★" : ""}`}
-                              </option>
+                            {groupSellPointEntriesBySystem(editSellPointEntries).map((group) => (
+                              <optgroup key={group.system} label={group.system}>
+                                {group.entries.map((p) => (
+                                  <option key={p.name} value={p.name}>
+                                    {p.isPlayer
+                                      ? p.name
+                                      : `${p.name} · ${p.effectivePrice.toLocaleString()} aUEC/SCU${p.isReported ? " ★" : ""}`}
+                                  </option>
+                                ))}
+                              </optgroup>
                             ))}
                           </select>
                         </div>

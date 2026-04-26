@@ -513,10 +513,14 @@ export default function StarCitizenSalvageGuideWebsite() {
   // built with, a banner asks the user to hard-refresh.
   const [updateAvailable, setUpdateAvailable] = useState(false);
 
-  // --- Admin "Active Refineries" tab data ---
+  // --- Admin Panel data ---
+  const [adminSection, setAdminSection] = useState("refineries"); // "refineries" | "users"
   const [adminRefineries, setAdminRefineries] = useState(null);
   const [adminRefineriesLoading, setAdminRefineriesLoading] = useState(false);
   const [adminRefineriesError, setAdminRefineriesError] = useState("");
+  const [adminUsers, setAdminUsers] = useState(null);
+  const [adminUsersLoading, setAdminUsersLoading] = useState(false);
+  const [adminUsersError, setAdminUsersError] = useState("");
 
   // --- User preferences (loaded from /api/me/prefs after auth) ---
   const [prefs, setPrefs] = useState({
@@ -779,12 +783,13 @@ export default function StarCitizenSalvageGuideWebsite() {
     return () => { cancelled = true; };
   }, []);
 
-  // --- Admin Active Refineries: load when the admin tab is opened.
-  // In dev (no auth, no Redis), fall back to mock data so the table can be
-  // exercised in the local preview. The dev branch is dead-code-eliminated by
-  // vite build, so production never sees the mock.
+  // --- Admin Active Refineries: load when the admin tab + refineries
+  // sub-section are opened. In dev (no auth, no Redis), fall back to mock
+  // data so the table can be exercised in the local preview. The dev branch
+  // is dead-code-eliminated by vite build, so production never sees the mock.
   useEffect(() => {
     if (activeTab !== "admin") return;
+    if (adminSection !== "refineries") return;
     if (!(user?.isAdmin || import.meta.env.DEV)) return;
     let cancelled = false;
     setAdminRefineriesLoading(true);
@@ -896,7 +901,65 @@ export default function StarCitizenSalvageGuideWebsite() {
     return () => {
       cancelled = true;
     };
-  }, [activeTab, user]);
+  }, [activeTab, adminSection, user]);
+
+  // --- Admin Active Users: load when the admin tab + users sub-section is
+  // opened. Same dev-mock fallback pattern as the refineries fetch.
+  useEffect(() => {
+    if (activeTab !== "admin") return;
+    if (adminSection !== "users") return;
+    if (!(user?.isAdmin || import.meta.env.DEV)) return;
+    let cancelled = false;
+    setAdminUsersLoading(true);
+    setAdminUsersError("");
+
+    const devMockUsers = () => {
+      const now = Date.now();
+      const min = 60 * 1000;
+      const hour = 60 * min;
+      return {
+        fetchedAt: now,
+        activeWindowMs: 24 * hour,
+        users: [
+          { userId: "dev-1", username: "Chrissyy", lastLoginAt: now - 4 * min },
+          { userId: "dev-2", username: "Denavago", lastLoginAt: now - 95 * min },
+          { userId: "dev-3", username: "TestPilot42", lastLoginAt: now - 11 * hour },
+          { userId: "dev-4", username: "RefiningQueen", lastLoginAt: now - 22 * hour },
+        ],
+      };
+    };
+
+    fetch("/api/admin/users", { credentials: "same-origin" })
+      .then((res) => {
+        if (res.status === 401 || res.status === 403) {
+          if (import.meta.env.DEV) return { __useMock: true };
+          throw new Error(
+            res.status === 401 ? "Not signed in." : "You don't have admin access."
+          );
+        }
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        if (cancelled) return;
+        setAdminUsers(data && data.__useMock ? devMockUsers() : data);
+        setAdminUsersLoading(false);
+      })
+      .catch((e) => {
+        if (cancelled) return;
+        if (import.meta.env.DEV) {
+          setAdminUsers(devMockUsers());
+          setAdminUsersLoading(false);
+          return;
+        }
+        setAdminUsersError(e.message || "Could not load.");
+        setAdminUsersLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab, adminSection, user]);
 
   // --- Deploy detection: poll /version.json and flip updateAvailable when it
   // diverges from the version this bundle was built with. Active only for
@@ -3053,6 +3116,33 @@ export default function StarCitizenSalvageGuideWebsite() {
 
         {activeTab === "admin" && (user?.isAdmin || import.meta.env.DEV) && (
           <div className="space-y-6">
+            {/* Admin sub-nav */}
+            <div className="flex flex-wrap gap-1 border-b border-cyan-500/20" role="tablist" aria-label="Admin sections">
+              {[
+                { id: "refineries", label: "Active Refineries" },
+                { id: "users", label: "Active Users" },
+              ].map((sec) => {
+                const isActive = adminSection === sec.id;
+                return (
+                  <button
+                    key={sec.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={isActive}
+                    onClick={() => setAdminSection(sec.id)}
+                    className={`-mb-px border-b-2 px-3 py-2 text-xs font-semibold uppercase tracking-wider transition sm:px-4 sm:tracking-[0.18em] ${
+                      isActive
+                        ? "border-cyan-400 text-cyan-200"
+                        : "border-transparent text-slate-400 hover:border-cyan-500/40 hover:text-slate-200"
+                    }`}
+                  >
+                    {sec.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {adminSection === "refineries" && (
             <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                 <div>
@@ -3140,6 +3230,70 @@ export default function StarCitizenSalvageGuideWebsite() {
                 </div>
               )}
             </div>
+            )}
+
+            {adminSection === "users" && (
+            <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <h2 className="text-xl font-bold text-cyan-300">Active Users</h2>
+                  <p className="mt-1 text-sm text-slate-400">
+                    Discord users who have logged in to the site within the last 24 hours. Sorted by most recent login. Admin-only view.
+                  </p>
+                </div>
+                <div className="text-xs text-slate-500">
+                  {adminUsers?.fetchedAt
+                    ? `Updated ${formatTimeAgo(adminUsers.fetchedAt) || "just now"}`
+                    : ""}
+                </div>
+              </div>
+
+              {adminUsersLoading && (
+                <div className="mt-6 rounded-2xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">
+                  Loading active users…
+                </div>
+              )}
+
+              {!adminUsersLoading && adminUsersError && (
+                <div className="mt-6 rounded-2xl border border-rose-500/40 bg-rose-500/10 p-4 text-sm text-rose-200">
+                  {adminUsersError}
+                </div>
+              )}
+
+              {!adminUsersLoading && !adminUsersError && adminUsers && adminUsers.users.length === 0 && (
+                <div className="mt-6 rounded-2xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">
+                  No users have logged in within the last 24 hours.
+                </div>
+              )}
+
+              {!adminUsersLoading && !adminUsersError && adminUsers && adminUsers.users.length > 0 && (
+                <div className="mt-5 overflow-x-auto rounded-2xl border border-slate-700">
+                  <table className="w-full min-w-[480px] text-left text-sm md:min-w-0">
+                    <thead className="bg-slate-950 text-slate-300">
+                      <tr>
+                        <th className="px-4 py-3">Discord User</th>
+                        <th className="px-4 py-3">Last Login</th>
+                        <th className="px-4 py-3 text-right">When</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {adminUsers.users.map((u) => (
+                        <tr key={u.userId} className="border-t border-slate-800 bg-slate-900/40">
+                          <td className="px-4 py-3 font-semibold text-white">{u.username}</td>
+                          <td className="px-4 py-3 text-slate-300 whitespace-nowrap">
+                            {formatTimestamp(u.lastLoginAt)}
+                          </td>
+                          <td className="px-4 py-3 text-right text-slate-400 whitespace-nowrap">
+                            {formatTimeAgo(u.lastLoginAt) || "just now"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+            )}
           </div>
         )}
 

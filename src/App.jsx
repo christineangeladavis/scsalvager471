@@ -302,6 +302,34 @@ const style = `
   background-repeat: no-repeat;
   background-attachment: fixed;
 }
+
+/* --- MobiGlass-inspired tune: lit-edge panels + glowing cyan accents.
+   Targets the existing border-cyan utilities so layout/structure are
+   untouched; this is purely a visual paint pass. --- */
+
+/* Soft inner + outer cyan glow on every cyan-bordered panel.
+   Reads "lit from within" like the SC mobiGlass UI cards. */
+.rounded-3xl[class*="border-cyan"] {
+  box-shadow:
+    inset 0 0 28px rgba(34, 211, 238, 0.07),
+    0 0 22px rgba(34, 211, 238, 0.05);
+}
+.rounded-2xl[class*="border-cyan"] {
+  box-shadow:
+    inset 0 0 18px rgba(34, 211, 238, 0.05);
+}
+
+/* Section/card headers get the holographic-glow look. */
+h1.text-cyan-300, h1.text-cyan-200,
+h2.text-cyan-300, h2.text-cyan-200,
+h3.text-cyan-300, h3.text-cyan-200 {
+  text-shadow: 0 0 10px rgba(34, 211, 238, 0.35);
+}
+
+/* Active tab gets a brighter glow to look "powered on". */
+[role="tab"][aria-selected="true"] {
+  text-shadow: 0 0 8px rgba(34, 211, 238, 0.55);
+}
 `;
 
 function getSafeScuValue(value) {

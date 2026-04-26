@@ -16,6 +16,7 @@ Notable Changes:
 - Internal: bumped the release-announce GitHub Actions workflow to Node.js 24-native action versions, removing the Node 20 deprecation warnings.
 - Sell Estimate panel cleanup — dropped the redundant Region/System and Sell Price cards (the metric table beneath already shows the same numbers), renamed "Selected Sell Price" to "Reported Sale Price", and "Total From Base Yield" to "Profit".
 - Discord #releases now auto-announces incremental changelog bullets (not just full version bumps), posting silently without @everyone.
+- UI palette tuned toward the Star Citizen mobiGlass aesthetic — panels now have subtle lit-edge inner glows, cyan section headers carry a soft holographic shimmer, and the active tab visibly "powers on".
 
 UPDATE 4/25/2026 v2.2
 Notable Changes:

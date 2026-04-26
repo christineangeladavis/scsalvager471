@@ -471,6 +471,14 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [reportPriceInput, setReportPriceInput] = useState("");
   const [isSubmittingReport, setIsSubmittingReport] = useState(false);
   const [reportError, setReportError] = useState("");
+  // Ledger-side Report a Price widget — separate input/loading/error state
+  // from the home page widget so typing/loading in one doesn't affect the
+  // other. Both widgets share reportedPrices/reportedMeta so a successful
+  // submit anywhere updates the median that everyone (and the Sell
+  // Location dropdowns) sees.
+  const [reportPriceInputLedger, setReportPriceInputLedger] = useState("");
+  const [isSubmittingReportLedger, setIsSubmittingReportLedger] = useState(false);
+  const [reportErrorLedger, setReportErrorLedger] = useState("");
   const [isLoadingCommunityPrices, setIsLoadingCommunityPrices] = useState(true);
 
   // --- Ledger state ---
@@ -727,6 +735,32 @@ export default function StarCitizenSalvageGuideWebsite() {
     };
   }, []);
 
+  // Core: POST a price report and merge the response into the shared
+  // reportedPrices / reportedMeta state. Throws on failure so the
+  // per-widget wrappers can surface error messages.
+  const submitPriceReport = async (material, location, parsedPrice) => {
+    const reportKey = `${material}::${location}`;
+    const res = await fetch("/api/prices", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ material, location, price: parsedPrice }),
+    });
+    const info = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(info.error || `Could not submit report (HTTP ${res.status}).`);
+    }
+    setReportedPrices((prev) => ({ ...prev, [reportKey]: info.medianPrice }));
+    setReportedMeta((prev) => ({
+      ...prev,
+      [reportKey]: {
+        reportCount: info.reportCount || 0,
+        lastReportedAt: info.lastReportedAt || Date.now(),
+      },
+    }));
+    return info;
+  };
+
+  // Home page widget — operates on selectedSellMaterial / selectedSellPointName.
   const handleReportPrice = async () => {
     const parsed = parseFloat(reportPriceInput);
     if (!Number.isFinite(parsed) || parsed < 0) {
@@ -735,38 +769,34 @@ export default function StarCitizenSalvageGuideWebsite() {
     }
     setReportError("");
     setIsSubmittingReport(true);
-    const reportKey = `${selectedSellMaterial}::${selectedSellPointName}`;
     try {
-      const res = await fetch("/api/prices", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          material: selectedSellMaterial,
-          location: selectedSellPointName,
-          price: parsed,
-        }),
-      });
-      const info = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        setReportError(info.error || `Could not submit report (HTTP ${res.status}).`);
-        return;
-      }
-      setReportedPrices((prev) => ({
-        ...prev,
-        [reportKey]: info.medianPrice,
-      }));
-      setReportedMeta((prev) => ({
-        ...prev,
-        [reportKey]: {
-          reportCount: info.reportCount || 0,
-          lastReportedAt: info.lastReportedAt || Date.now(),
-        },
-      }));
+      await submitPriceReport(selectedSellMaterial, selectedSellPointName, parsed);
       setReportPriceInput("");
     } catch (e) {
-      setReportError("Network error. Try again.");
+      setReportError(e.message || "Network error. Try again.");
     } finally {
       setIsSubmittingReport(false);
+    }
+  };
+
+  // Ledger widget — operates on the order form's currently-selected
+  // material/location. Same backend, shared state — a successful report
+  // here updates the home Sell Location dropdown's median and vice versa.
+  const handleReportPriceLedger = async () => {
+    const parsed = parseFloat(reportPriceInputLedger);
+    if (!Number.isFinite(parsed) || parsed < 0) {
+      setReportErrorLedger("Enter a valid price.");
+      return;
+    }
+    setReportErrorLedger("");
+    setIsSubmittingReportLedger(true);
+    try {
+      await submitPriceReport(orderForm.material, orderForm.location, parsed);
+      setReportPriceInputLedger("");
+    } catch (e) {
+      setReportErrorLedger(e.message || "Network error. Try again.");
+    } finally {
+      setIsSubmittingReportLedger(false);
     }
   };
   const selectedShipImageFailed = Boolean(imageLoadErrors[selectedShip.name]);
@@ -2767,6 +2797,65 @@ export default function StarCitizenSalvageGuideWebsite() {
                     Log Sale
                   </button>
                 </div>
+
+                {orderForm.location !== PLAYER_SELL_POINT && (
+                  <div className="mt-5 rounded-2xl border border-cyan-500/30 bg-cyan-500/5 p-4">
+                    <div className="text-xs uppercase tracking-[0.2em] text-cyan-200">Report a Price</div>
+                    <p className="mt-1 text-xs text-slate-400">
+                      Seeing a different in-game price for <span className="font-semibold text-cyan-300">{orderForm.material}</span> at <span className="font-semibold text-cyan-300">{orderForm.location}</span>? Report it — the Sell Location list updates for everyone.
+                    </p>
+                    <div className="mt-3 flex items-stretch gap-2">
+                      <input
+                        type="number"
+                        min="0"
+                        step="1"
+                        placeholder="Reported aUEC/SCU"
+                        value={reportPriceInputLedger}
+                        onChange={(e) => { setReportPriceInputLedger(e.target.value); if (reportErrorLedger) setReportErrorLedger(""); }}
+                        onKeyDown={(e) => { if (e.key === "Enter" && !isSubmittingReportLedger) handleReportPriceLedger(); }}
+                        disabled={isSubmittingReportLedger || (!user && !import.meta.env.DEV)}
+                        className="min-w-0 flex-1 rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 outline-none focus:border-cyan-400 disabled:opacity-60"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleReportPriceLedger}
+                        disabled={isSubmittingReportLedger || (!user && !import.meta.env.DEV)}
+                        className="shrink-0 rounded-xl border border-cyan-400 bg-cyan-500/20 px-4 py-2 text-sm font-semibold text-cyan-200 transition hover:bg-cyan-500/30 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        {isSubmittingReportLedger ? "Reporting…" : "Report Price"}
+                      </button>
+                    </div>
+                    {reportErrorLedger && (
+                      <div className="mt-2 text-xs text-rose-300">{reportErrorLedger}</div>
+                    )}
+                    {(() => {
+                      const ledgerKey = `${orderForm.material}::${orderForm.location}`;
+                      const reported = reportedPrices[ledgerKey];
+                      const meta = reportedMeta[ledgerKey];
+                      if (isLoadingCommunityPrices) {
+                        return <div className="mt-3 text-xs text-slate-500">Loading community reports…</div>;
+                      }
+                      if (reported === undefined) {
+                        return <div className="mt-3 text-xs text-slate-500">No community reports yet — be the first!</div>;
+                      }
+                      return (
+                        <div className="mt-3 text-xs text-amber-200/90">
+                          <span className="font-semibold">★ Community median:</span>{" "}
+                          {reported.toLocaleString()} aUEC/SCU
+                          {meta && (
+                            <span className="text-slate-400">
+                              {" · "}
+                              {meta.reportCount} report{meta.reportCount === 1 ? "" : "s"}
+                              {meta.lastReportedAt
+                                ? ` · last ${formatTimeAgo(meta.lastReportedAt)}`
+                                : ""}
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })()}
+                  </div>
+                )}
 
                 <div className="mt-5">
                   <div className="text-xs uppercase tracking-[0.25em] text-cyan-300/80">Recent Sales · {recentSellOrders.length}</div>

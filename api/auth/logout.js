@@ -5,8 +5,8 @@ import { getRedis } from "../_lib/redis.js";
 import { parseCookies, deleteSession, buildCookie, SESSION_COOKIE } from "../_lib/session.js";
 
 export default async function handler(req, res) {
-  if (req.method !== "POST" && req.method !== "GET") {
-    res.setHeader("Allow", "GET, POST");
+  if (req.method !== "POST") {
+    res.setHeader("Allow", "POST");
     return res.status(405).json({ error: "Method not allowed" });
   }
 
@@ -22,10 +22,5 @@ export default async function handler(req, res) {
   }
 
   res.setHeader("Set-Cookie", buildCookie(SESSION_COOKIE, "", { maxAge: 0 }));
-
-  if (req.method === "POST") {
-    return res.status(200).json({ ok: true });
-  }
-  res.writeHead(302, { Location: "/" });
-  res.end();
+  return res.status(200).json({ ok: true });
 }

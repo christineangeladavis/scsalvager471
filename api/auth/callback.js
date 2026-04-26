@@ -42,7 +42,7 @@ export default async function handler(req, res) {
     redis = getRedis();
   } catch (e) {
     console.error("Redis unavailable on callback:", e.message);
-    return res.status(503).send("Storage unavailable: " + e.message);
+    return res.status(503).send("Storage unavailable. Please try again later.");
   }
 
   try {
@@ -63,18 +63,12 @@ export default async function handler(req, res) {
 
     res.setHeader("Set-Cookie", [
       buildCookie(STATE_COOKIE, "", { maxAge: 0 }),
-      buildCookie(SESSION_COOKIE, sessionToken, { maxAge: SESSION_TTL_SECONDS }),
+      buildCookie(SESSION_COOKIE, sessionToken, { maxAge: SESSION_TTL_SECONDS, sameSite: "Strict" }),
     ]);
     res.writeHead(302, { Location: "/" });
     res.end();
   } catch (e) {
     console.error("Auth callback error:", e && e.message ? e.message : e);
-    res
-      .status(500)
-      .send(
-        "Login failed: " +
-          (e && e.message ? e.message : "Unknown error") +
-          ". Please return to the home page and try again."
-      );
+    res.status(500).send("Login failed. Please return to the home page and try again.");
   }
 }

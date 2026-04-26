@@ -13,6 +13,7 @@ import { getRedis } from "../_lib/redis.js";
 import { getPrefs } from "../_lib/prefs.js";
 import { sendDirectMessage, explainDmFailure } from "../_lib/discordBot.js";
 import { verifyQstashSignature } from "../_lib/qstash.js";
+import { ledgerKey } from "../ledger.js";
 
 // Disable Vercel's automatic body parsing so we can read the raw bytes for
 // HMAC verification. (Parsed JSON would be re-stringified differently and
@@ -27,8 +28,6 @@ function readRawBody(req) {
     req.on("error", reject);
   });
 }
-
-const LEDGER_KEY_PREFIX = "ledger:";
 
 function buildJobMessage(job) {
   // The refinery output for Construction Salvage / Pieces / Rubble is always
@@ -86,10 +85,10 @@ export default async function handler(req, res) {
   }
 
   // Step 4: load the user's ledger and find the target job.
-  const ledgerKey = `${LEDGER_KEY_PREFIX}${userId}`;
+  const key = ledgerKey(userId);
   let ledger;
   try {
-    ledger = (await redis.get(ledgerKey)) || { refineryJobs: [], sellOrders: [] };
+    ledger = (await redis.get(key)) || { refineryJobs: [], sellOrders: [] };
   } catch (e) {
     console.error("deliver: ledger read failed:", e.message);
     return res.status(503).json({ error: "Storage error" });
@@ -129,7 +128,7 @@ export default async function handler(req, res) {
       notificationStatus: "skipped",
     };
     try {
-      await redis.set(ledgerKey, { ...ledger, refineryJobs });
+      await redis.set(key, { ...ledger, refineryJobs });
     } catch (e) {
       console.error("deliver: failed to mark job skipped:", e.message);
       // Even if the write fails, return 200 — the user explicitly disabled DMs.
@@ -149,7 +148,7 @@ export default async function handler(req, res) {
   };
   refineryJobs[jobIndex] = updatedJob;
   try {
-    await redis.set(ledgerKey, { ...ledger, refineryJobs });
+    await redis.set(key, { ...ledger, refineryJobs });
   } catch (e) {
     console.error("deliver: failed to mark job notified:", e.message);
     // The DM did go out (if result.ok). Don't return 5xx — that would cause

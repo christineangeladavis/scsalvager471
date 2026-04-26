@@ -31,6 +31,12 @@ export default async function handler(req, res) {
 
   res.setHeader("cache-control", "private, no-store");
 
+  const cooldownKey = `notif-test-cooldown:${session.userId}`;
+  const onCooldown = await redis.get(cooldownKey).catch(() => null);
+  if (onCooldown) {
+    return res.status(429).json({ ok: false, error: "Please wait a moment before sending another test." });
+  }
+
   const prefs = await getPrefs(redis, session.userId);
   if (!prefs.notificationLinkedAt) {
     return res
@@ -38,6 +44,7 @@ export default async function handler(req, res) {
       .json({ ok: false, error: "Discord notifications aren't connected yet. Click 'Connect Discord' first." });
   }
 
+  await redis.set(cooldownKey, 1, { ex: 60 }).catch(() => null);
   const result = await sendDirectMessage(session.userId, TEST_MESSAGE);
   if (result.ok) {
     return res.status(200).json({ ok: true });

@@ -19,6 +19,7 @@ Notable Changes:
 - UI palette tuned toward the Star Citizen mobiGlass aesthetic — panels now have subtle lit-edge inner glows, cyan section headers carry a soft holographic shimmer, and the active tab visibly "powers on".
 - Refinery time is now user-entered with Hours/Min/Sec fields on the Ledger's Submit Order and Edit Job forms (matches what the in-game refinery actually quotes you). The Home page Refinery Bonus Yield Calculator no longer shows an auto-estimated Time row — it's expected yield + cost only.
 - Report a Price now also lives on the Ledger, between the Sell Orders form and Recent Sales. It targets whatever sell point you're logging an order for, and shares its median with the Home page widget — so a report from either place updates the Sell Location dropdown for everyone.
+- Sell Location dropdowns (Home Sell Estimate + Ledger Sell Orders + Edit modal) are now grouped by system — Stanton / Pyro / Nyx — with each system sorted by best price first. Matches the Refinery Location dropdown's grouping. Also: a couple of label tidies — "Sell Point" → "Sell Location" on the Ledger, and "Material SCU" → "SCU Amount" on the Home Sell Estimate.
 
 UPDATE 4/25/2026 v2.2
 Notable Changes:

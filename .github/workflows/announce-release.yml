@@ -1,20 +1,25 @@
-# Posts the latest README changelog block to Discord #releases when a new
-# release is pushed to main.
+# Posts changelog updates to Discord #releases when README.md is pushed to
+# main. Two cases handled:
 #
-# Triggered by changes to README.md on main. The job extracts the topmost
-# "UPDATE ..." block from the changelog and compares its header line against
-# the previous commit's topmost UPDATE line. If unchanged (e.g. README was
-# edited for some non-release reason) the announce is skipped.
+#   1. Top "UPDATE" header is *new* vs. the previous commit:
+#      → post the entire top changelog block (full release announcement).
+#
+#   2. Top "UPDATE" header is unchanged but new bullets were appended under
+#      it: → post just the new bullets, prefixed with "**vX.Y update:**".
+#
+#   3. Neither: skip (e.g. README typo fix).
+#
+# Never tags @everyone — allowed_mentions.parse is locked to []. For
+# everyone-pings use the manual post-message.yml workflow.
 #
 # Required GitHub repo secret:
 #   DISCORD_BOT_TOKEN — same bot token used by the Vercel app
 #                       (Settings → Secrets and variables → Actions)
 #
-# The #releases channel ID is hard-coded below (DISCORD_RELEASES_CHANNEL_ID).
-# Channel IDs are public identifiers, not secrets — if the channel changes,
-# update this workflow.
+# Channel ID is hard-coded below (DISCORD_RELEASES_CHANNEL_ID); channel IDs
+# are public identifiers, not secrets.
 #
-# Bot must be a member of the server and have "Send Messages" in #releases.
+# Bot must be a member of the server with Send Messages in #releases.
 
 name: Announce release to Discord
 
@@ -36,56 +41,71 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Extract latest changelog block
+      - name: Detect changelog update and build message
         id: changelog
         run: |
           set -euo pipefail
-          start=$(grep -n '^UPDATE ' README.md | head -1 | cut -d: -f1 || true)
-          if [ -z "${start:-}" ]; then
-            echo "No UPDATE header found in README.md — nothing to announce."
+
+          # extract_top_block <file-content-on-stdin>
+          # Prints lines from the first "UPDATE " header up to (but not
+          # including) the next "UPDATE " header, stripped of trailing blanks.
+          extract_top_block() {
+            awk '
+              /^UPDATE /{ c++; if (c > 1) exit }
+              c == 1 { lines[++n] = $0 }
+              END {
+                while (n > 0 && lines[n] == "") n--
+                for (i = 1; i <= n; i++) print lines[i]
+              }
+            '
+          }
+
+          current_block=$(cat README.md | extract_top_block)
+          if [ -z "$current_block" ]; then
+            echo "No UPDATE header in README.md — nothing to announce."
             echo "skip=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+          current_header=$(printf '%s\n' "$current_block" | head -1)
 
-          end=$(awk -v start="$start" 'NR > start && /^UPDATE /{print NR; exit}' README.md)
-          if [ -z "${end:-}" ]; then
-            end=$(($(wc -l < README.md) + 1))
-          fi
+          prev_block=$(git show HEAD~1:README.md 2>/dev/null | extract_top_block || true)
+          prev_header=$(printf '%s\n' "$prev_block" | head -1 || true)
 
-          block=$(awk -v s="$start" -v e="$end" '
-            NR >= s && NR < e { lines[++n] = $0 }
-            END {
-              while (n > 0 && lines[n] == "") n--
-              for (i = 1; i <= n; i++) print lines[i]
-            }
-          ' README.md)
-
-          # Skip the unchanged-header guard when manually dispatched — the user
-          # explicitly wants this run to post. Otherwise (push trigger), only
-          # post when the topmost UPDATE header differs from the previous
-          # commit, so README typo fixes don't re-spam #releases.
-          if [ "${GITHUB_EVENT_NAME:-}" != "workflow_dispatch" ]; then
-            current_header=$(sed -n "${start}p" README.md)
-            prev_header=$(git show HEAD~1:README.md 2>/dev/null | grep '^UPDATE ' | head -1 || true)
-            if [ "$current_header" = "$prev_header" ]; then
-              echo "Top changelog header unchanged ($current_header) — skipping announce."
+          # Determine what to post.
+          if [ "$current_header" != "$prev_header" ]; then
+            # Case 1: new version → post the full block, header bolded.
+            body=$(printf '%s\n' "$current_block" | tail -n +2)
+            message=$(printf '**%s**\n%s' "$current_header" "$body")
+            kind="full-block"
+          else
+            # Case 2/3: same header — find newly-added lines.
+            new_lines=$(diff <(printf '%s\n' "$prev_block") <(printf '%s\n' "$current_block") \
+              | awk '/^>/ { sub(/^> /, ""); print }')
+            if [ -z "$new_lines" ]; then
+              echo "No new changelog content under $current_header — skipping."
               echo "skip=true" >> "$GITHUB_OUTPUT"
               exit 0
             fi
+            # Extract just "vX.Y" from the header for a tight prefix.
+            version=$(printf '%s' "$current_header" | grep -oE 'v[0-9]+(\.[0-9]+)*' | head -1 || echo "release")
+            message=$(printf '**%s update:**\n%s' "$version" "$new_lines")
+            kind="appended-bullets"
           fi
 
           {
             echo "skip=false"
-            echo "block<<CHANGELOG_EOF"
-            echo "$block"
-            echo "CHANGELOG_EOF"
+            echo "kind=$kind"
+            echo "message<<MESSAGE_EOF"
+            echo "$message"
+            echo "MESSAGE_EOF"
           } >> "$GITHUB_OUTPUT"
 
       - name: Post to Discord #releases
         if: steps.changelog.outputs.skip != 'true'
         env:
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
-          BLOCK: ${{ steps.changelog.outputs.block }}
+          MESSAGE: ${{ steps.changelog.outputs.message }}
+          KIND: ${{ steps.changelog.outputs.kind }}
         run: |
           set -euo pipefail
           if [ -z "${DISCORD_BOT_TOKEN:-}" ]; then
@@ -93,21 +113,17 @@ jobs:
             exit 0
           fi
 
-          # Prepend @everyone, then bold the changelog header line for readability.
-          # Discord caps message content at 2000 chars; truncate with an ellipsis if needed.
-          header=$(printf '%s' "$BLOCK" | head -1)
-          body=$(printf '%s' "$BLOCK" | tail -n +2)
-          formatted=$(printf '@everyone\n**%s**\n%s' "$header" "$body")
+          # Discord caps message content at 2000 chars.
+          formatted="$MESSAGE"
           if [ ${#formatted} -gt 1990 ]; then
             formatted="${formatted:0:1987}..."
           fi
 
-          # allowed_mentions.parse=["everyone"] tells Discord to actually ping
-          # @everyone (rather than render it as plain text). The bot still needs
-          # Mention Everyone permission in the channel — Administrator covers it.
+          # allowed_mentions.parse=[] guarantees no pings even if the bullet
+          # text mentions @everyone, @here, or a role/user.
           payload=$(jq -n --arg content "$formatted" '{
             content: $content,
-            allowed_mentions: { parse: ["everyone"] }
+            allowed_mentions: { parse: [] }
           }')
 
           http_status=$(curl -sS -o /tmp/discord_resp.json -w "%{http_code}" \
@@ -119,7 +135,7 @@ jobs:
             "https://discord.com/api/v10/channels/$DISCORD_RELEASES_CHANNEL_ID/messages")
 
           if [ "$http_status" -ge 200 ] && [ "$http_status" -lt 300 ]; then
-            echo "Posted v$(echo "$BLOCK" | head -1 | grep -oE 'v[0-9.]+' || echo 'release') to #releases."
+            echo "Posted ($KIND) to #releases."
           else
             echo "::error::Discord rejected announce (HTTP $http_status)"
             cat /tmp/discord_resp.json

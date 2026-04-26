@@ -451,6 +451,13 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [authLoading, setAuthLoading] = useState(true);
   const [ledgerSaveError, setLedgerSaveError] = useState("");
 
+  // --- Build / deploy version detection ---
+  // __BUILD_VERSION__ is replaced at compile time by vite.config.js with the
+  // current commit SHA (or VERCEL_GIT_COMMIT_SHA in prod). The site polls
+  // /version.json; if the served value drifts from what this bundle was
+  // built with, a banner asks the user to hard-refresh.
+  const [updateAvailable, setUpdateAvailable] = useState(false);
+
   // --- User preferences (loaded from /api/me/prefs after auth) ---
   const [prefs, setPrefs] = useState({
     discordNotifications: false,
@@ -711,6 +718,41 @@ export default function StarCitizenSalvageGuideWebsite() {
       });
     return () => { cancelled = true; };
   }, []);
+
+  // --- Deploy detection: poll /version.json and flip updateAvailable when it
+  // diverges from the version this bundle was built with. Active only for
+  // logged-in users (the dev-mode bypass is for local preview testing).
+  useEffect(() => {
+    if (updateAvailable) return; // already showing — nothing to do
+    if (!user && !import.meta.env.DEV) return;
+    const builtVersion =
+      typeof __BUILD_VERSION__ !== "undefined" ? __BUILD_VERSION__ : null;
+    if (!builtVersion) return;
+
+    let cancelled = false;
+    const check = async () => {
+      try {
+        const res = await fetch(`/version.json?_=${Date.now()}`, {
+          cache: "no-store",
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (cancelled) return;
+        if (data && data.version && data.version !== builtVersion) {
+          setUpdateAvailable(true);
+        }
+      } catch {
+        // network blip — try again next interval
+      }
+    };
+    check();
+    const intervalMs = import.meta.env.DEV ? 3000 : 60000;
+    const id = setInterval(check, intervalMs);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
+  }, [user, updateAvailable]);
 
   // --- Preferences: load from server when user changes ---
   useEffect(() => {
@@ -1359,6 +1401,28 @@ export default function StarCitizenSalvageGuideWebsite() {
 
       {/* Scrollable UI content */}
       <div className="relative mx-auto max-w-7xl px-4 py-8 md:px-8" style={{ zIndex: 10, flex: 1, display: "flex", flexDirection: "column", width: "100%" }}>
+        {updateAvailable && (
+          <div
+            role="status"
+            aria-live="polite"
+            className="mb-4 rounded-2xl border border-amber-400/60 bg-amber-500/15 px-4 py-3 text-sm shadow-lg shadow-amber-950/30"
+          >
+            <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+              <div className="text-amber-100">
+                <span className="font-bold">A new update has been released.</span>{" "}
+                <span className="text-amber-100/90">
+                  Press{" "}
+                  <kbd className="rounded border border-amber-300/60 bg-amber-500/20 px-1.5 py-0.5 font-mono text-xs text-amber-100">Ctrl</kbd>
+                  {" + "}
+                  <kbd className="rounded border border-amber-300/60 bg-amber-500/20 px-1.5 py-0.5 font-mono text-xs text-amber-100">Shift</kbd>
+                  {" + "}
+                  <kbd className="rounded border border-amber-300/60 bg-amber-500/20 px-1.5 py-0.5 font-mono text-xs text-amber-100">R</kbd>
+                  {" "}to hard-refresh and load the latest version.
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
         <header className="mb-8 rounded-3xl border border-cyan-500/30 bg-gradient-to-br from-slate-900 via-slate-950 to-blue-950 p-6 shadow-2xl shadow-cyan-950/40">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div className="flex items-center gap-4 md:gap-5">

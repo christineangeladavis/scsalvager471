@@ -5,6 +5,10 @@ Made by Chrissyy · Referral: STAR-CH2W-R73F
 
 ## What's in this build
 
+UPDATE 4/25/2026 v2.4
+Notable Changes:
+- Logged-in users now see an in-page banner when a new deployment goes live, prompting them to press Ctrl+Shift+R to hard-refresh and pick up the latest version. The site polls a tiny /version.json once a minute and only shows the banner when the served build differs from the bundle they loaded.
+
 UPDATE 4/25/2026 v2.3
 Notable Changes:
 - Removed "Sold to Player" from the Home page Sell Location dropdown — player sales now belong only on the Ledger tab where you can record the buyer and final aUEC.

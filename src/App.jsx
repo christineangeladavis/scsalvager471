@@ -3700,31 +3700,44 @@ export default function StarCitizenSalvageGuideWebsite() {
                     })()}
                   </div>
 
-                  <div className="grid gap-3 sm:grid-cols-3">
-                    {(() => {
-                      const p = adminPatches.patches.find((x) => x.version === selectedExportPatch);
-                      const enabled = Boolean(p && p.isReleased);
-                      const baseClass = "rounded-2xl border p-4 text-center text-sm font-semibold transition";
-                      const enabledClass = "border-cyan-400 bg-cyan-500/15 text-cyan-100 hover:bg-cyan-500/25";
-                      const disabledClass = "cursor-not-allowed border-slate-700 bg-slate-800/40 text-slate-500";
-                      const buttons = [
-                        { type: "refineries", label: "Refinery logs" },
-                        { type: "sales", label: "Sales" },
-                        { type: "logins", label: "Login events" },
-                      ];
-                      return buttons.map((b) => (
+                  {(() => {
+                    const p = adminPatches.patches.find((x) => x.version === selectedExportPatch);
+                    const enabled = Boolean(p && p.isReleased);
+                    const baseClass = "rounded-2xl border p-4 text-center text-sm font-semibold transition";
+                    const enabledClass = "border-cyan-400 bg-cyan-500/15 text-cyan-100 hover:bg-cyan-500/25";
+                    const enabledAllClass = "border-emerald-400 bg-emerald-500/15 text-emerald-100 hover:bg-emerald-500/25";
+                    const disabledClass = "cursor-not-allowed border-slate-700 bg-slate-800/40 text-slate-500";
+                    const buttons = [
+                      { type: "refineries", label: "Refinery logs" },
+                      { type: "sales", label: "Sales" },
+                      { type: "logins", label: "Login events" },
+                    ];
+                    return (
+                      <div className="space-y-3">
+                        <div className="grid gap-3 sm:grid-cols-3">
+                          {buttons.map((b) => (
+                            <button
+                              key={b.type}
+                              type="button"
+                              disabled={!enabled}
+                              onClick={() => setPendingExport({ type: b.type })}
+                              className={`${baseClass} ${enabled ? enabledClass : disabledClass}`}
+                            >
+                              ⬇ {b.label}
+                            </button>
+                          ))}
+                        </div>
                         <button
-                          key={b.type}
                           type="button"
                           disabled={!enabled}
-                          onClick={() => setPendingExport({ type: b.type })}
-                          className={`${baseClass} ${enabled ? enabledClass : disabledClass}`}
+                          onClick={() => setPendingExport({ type: "all" })}
+                          className={`w-full ${baseClass} ${enabled ? enabledAllClass : disabledClass}`}
                         >
-                          ⬇ {b.label}
+                          ⬇ Export All (Refinery + Sales + Logins)
                         </button>
-                      ));
-                    })()}
-                  </div>
+                      </div>
+                    );
+                  })()}
 
                   <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-3 text-xs text-slate-500">
                     Patches and their start dates are configured in <code className="text-slate-400">api/_lib/patches.js</code>. When a new patch goes live, edit that list to set its <code className="text-slate-400">startedAt</code> and add the next patch.
@@ -3756,13 +3769,28 @@ export default function StarCitizenSalvageGuideWebsite() {
                 {pendingExport.type === "refineries" && "Refinery logs"}
                 {pendingExport.type === "sales" && "Sales"}
                 {pendingExport.type === "logins" && "Login events"}
+                {pendingExport.type === "all" && "Refinery logs + Sales + Login events (combined)"}
                 {" · patch "}
                 <span className="font-semibold text-slate-200">{selectedExportPatch}</span>
               </p>
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
                 {[
-                  { format: "csv", label: "CSV", desc: "Plain text, opens anywhere." },
-                  { format: "xlsx", label: "Excel (.xlsx)", desc: "Native Excel workbook." },
+                  {
+                    format: "csv",
+                    label: "CSV",
+                    desc:
+                      pendingExport.type === "all"
+                        ? "Single file, three sections separated by ## headers."
+                        : "Plain text, opens anywhere.",
+                  },
+                  {
+                    format: "xlsx",
+                    label: "Excel (.xlsx)",
+                    desc:
+                      pendingExport.type === "all"
+                        ? "Single workbook, one sheet per dataset."
+                        : "Native Excel workbook.",
+                  },
                 ].map(({ format, label, desc }) => (
                   <a
                     key={format}

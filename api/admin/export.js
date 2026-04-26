@@ -1,4 +1,4 @@
-// GET /api/admin/export?type=<refineries|sales|logins>&patch=<vX.Y.Z>&format=<csv|xlsx>
+// GET /api/admin/export?type=<refineries|sales|logins|all>&patch=<vX.Y.Z>&format=<csv|xlsx>
 //
 // Admin-only. Streams a CSV or XLSX file scoped to a Star Citizen patch's
 // release cycle. Patch metadata lives in api/_lib/patches.js.
@@ -7,6 +7,10 @@
 //   refineries — every refinery job submitted in [from, to)
 //   sales      — every sell order submitted in [from, to)
 //   logins     — every login event recorded in [from, to)
+//   all        — all three combined into a single file
+//                  · xlsx: one workbook, 3 sheets
+//                  · csv: one file with 3 sections, each prefixed by a
+//                    "## <section name> ##" header row
 //
 // Format defaults to csv when not provided. xlsx uses the xlsx package
 // loaded on demand to keep cold-start size down.
@@ -239,20 +243,65 @@ export default async function handler(req, res) {
   const patchVersion = String(req.query?.patch || "");
   const format = (String(req.query?.format || "csv").toLowerCase() === "xlsx") ? "xlsx" : "csv";
 
-  const cfg = TYPE_CONFIG[type];
-  if (!cfg) {
-    return res.status(400).json({ error: "type must be 'refineries', 'sales', or 'logins'" });
-  }
-
   const range = patchRange(patchVersion);
   if (!range) {
     return res.status(400).json({ error: `Unknown or unreleased patch: ${patchVersion}` });
   }
 
-  const rows = await cfg.build(redis, range);
-
   const filenameSafe = patchVersion.replace(/[^0-9A-Za-z._-]/g, "_");
   const ext = format === "xlsx" ? "xlsx" : "csv";
+
+  // Combined export: all three types in a single file.
+  if (type === "all") {
+    const allTypes = ["refineries", "sales", "logins"];
+    const sections = [];
+    for (const t of allTypes) {
+      const cfg = TYPE_CONFIG[t];
+      sections.push({
+        type: t,
+        cfg,
+        rows: await cfg.build(redis, range),
+      });
+    }
+
+    const fname = `scsalvager_all_${filenameSafe}.${ext}`;
+    res.setHeader("content-disposition", `attachment; filename="${fname}"`);
+
+    if (format === "xlsx") {
+      const XLSX = await import("xlsx");
+      const wb = XLSX.utils.book_new();
+      for (const s of sections) {
+        const sheet = XLSX.utils.json_to_sheet(s.rows, { header: s.cfg.headers });
+        XLSX.utils.book_append_sheet(wb, sheet, s.cfg.sheetName.slice(0, 31));
+      }
+      const buffer = XLSX.write(wb, { type: "buffer", bookType: "xlsx" });
+      res.setHeader(
+        "content-type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      );
+      return res.status(200).send(buffer);
+    }
+
+    // CSV all-in-one: section header rows separate the three datasets.
+    // Not strictly "valid" CSV (the section markers are extra rows), but
+    // human-readable and importable as a single sheet.
+    const parts = sections.map(
+      (s) => `## ${s.cfg.sheetName} ##\r\n${toCsv(s.cfg.headers, s.rows)}`
+    );
+    const csv = parts.join("\r\n");
+    res.setHeader("content-type", "text/csv; charset=utf-8");
+    return res.status(200).send(csv);
+  }
+
+  // Single-type export.
+  const cfg = TYPE_CONFIG[type];
+  if (!cfg) {
+    return res.status(400).json({
+      error: "type must be 'refineries', 'sales', 'logins', or 'all'",
+    });
+  }
+
+  const rows = await cfg.build(redis, range);
   const fname = `scsalvager_${type}_${filenameSafe}.${ext}`;
 
   if (format === "xlsx") {

@@ -14,6 +14,7 @@ Notable Changes:
 - Mobile layout polish — wide data tables (Scraper Modules, Stock Components, 30-day history) now scroll inside themselves on small screens instead of dragging the whole page sideways, and the header CTAs/tabs lay out more cleanly on phones.
 - Replaced the header title block with a full-width SCSalvager.net banner; Discord, login, and Patch Verified buttons remain underneath.
 - Internal: bumped the release-announce GitHub Actions workflow to Node.js 24-native action versions, removing the Node 20 deprecation warnings.
+- Sell Estimate panel cleanup — dropped the redundant Region/System and Sell Price cards (the metric table beneath already shows the same numbers), renamed "Selected Sell Price" to "Reported Sale Price", and "Total From Base Yield" to "Profit".
 
 UPDATE 4/25/2026 v2.2
 Notable Changes:

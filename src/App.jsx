@@ -1943,23 +1943,6 @@ export default function StarCitizenSalvageGuideWebsite() {
                   )}
                 </div>
 
-                {!isPlayerEstimate && (
-                  <div className="grid gap-3 text-sm md:grid-cols-2">
-                    <div className="rounded-2xl border border-slate-700 bg-slate-950/70 p-4">
-                      <div className="text-slate-400">Region</div>
-                      <div className="mt-1 font-bold text-white">{selectedSellPoint.region}</div>
-                      <div className="mt-3 text-slate-400">System</div>
-                      <div className="mt-1 font-bold text-white">{selectedSellPoint.system}</div>
-                    </div>
-                    <div className="rounded-2xl border border-cyan-500/25 bg-cyan-500/10 p-4">
-                      <div className="text-slate-400">Sell Price</div>
-                      <div className="mt-1 text-xl font-black text-cyan-300">{displaySellPrice.toLocaleString()} aUEC/SCU</div>
-                      <div className="mt-3 text-slate-400">Base Yield Value</div>
-                      <div className="mt-1 text-xl font-black text-emerald-300">{Math.round(sellYieldTotal).toLocaleString()} aUEC</div>
-                    </div>
-                  </div>
-                )}
-
                 {isPlayerEstimate && (
                   <div className="rounded-2xl border border-cyan-500/25 bg-cyan-500/10 p-4 text-sm text-slate-300">
                     Player sales have no fixed price. Negotiate with the buyer and log the actual aUEC received in the Sell Orders form.
@@ -1981,11 +1964,11 @@ export default function StarCitizenSalvageGuideWebsite() {
                           <td className="px-4 py-3 font-bold text-amber-300">{sellYield.toFixed(1)} SCU</td>
                         </tr>
                         <tr className="border-t border-slate-800 bg-slate-900/40">
-                          <td className="px-4 py-3">Selected Sell Price</td>
+                          <td className="px-4 py-3">Reported Sale Price</td>
                           <td className="px-4 py-3 font-bold text-cyan-300">{displaySellPrice.toLocaleString()} aUEC/SCU</td>
                         </tr>
                         <tr className="border-t border-slate-800 bg-slate-900/40">
-                          <td className="px-4 py-3">Total From Base Yield</td>
+                          <td className="px-4 py-3">Profit</td>
                           <td className="px-4 py-3 font-bold text-emerald-300">{Math.round(sellYieldTotal).toLocaleString()} aUEC</td>
                         </tr>
                       </tbody>

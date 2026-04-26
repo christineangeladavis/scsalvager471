@@ -6,13 +6,13 @@
 # the previous commit's topmost UPDATE line. If unchanged (e.g. README was
 # edited for some non-release reason) the announce is skipped.
 #
-# Required GitHub repo secrets:
-#   DISCORD_BOT_TOKEN           — same bot token used by the Vercel app
-#                                 (Settings → Secrets and variables → Actions)
-#   DISCORD_RELEASES_CHANNEL_ID — numeric channel ID for #releases. Get it
-#                                 via Discord → User Settings → Advanced →
-#                                 Developer Mode → right-click the channel →
-#                                 Copy Channel ID.
+# Required GitHub repo secret:
+#   DISCORD_BOT_TOKEN — same bot token used by the Vercel app
+#                       (Settings → Secrets and variables → Actions)
+#
+# The #releases channel ID is hard-coded below (DISCORD_RELEASES_CHANNEL_ID).
+# Channel IDs are public identifiers, not secrets — if the channel changes,
+# update this workflow.
 #
 # Bot must be a member of the server and have "Send Messages" in #releases.
 
@@ -24,6 +24,9 @@ on:
     paths:
       - README.md
   workflow_dispatch:
+
+env:
+  DISCORD_RELEASES_CHANNEL_ID: "1497542109526233188"
 
 jobs:
   announce:
@@ -77,12 +80,11 @@ jobs:
         if: steps.changelog.outputs.skip != 'true'
         env:
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
-          DISCORD_RELEASES_CHANNEL_ID: ${{ secrets.DISCORD_RELEASES_CHANNEL_ID }}
           BLOCK: ${{ steps.changelog.outputs.block }}
         run: |
           set -euo pipefail
-          if [ -z "${DISCORD_BOT_TOKEN:-}" ] || [ -z "${DISCORD_RELEASES_CHANNEL_ID:-}" ]; then
-            echo "::warning::Missing DISCORD_BOT_TOKEN or DISCORD_RELEASES_CHANNEL_ID secret — skipping."
+          if [ -z "${DISCORD_BOT_TOKEN:-}" ]; then
+            echo "::warning::Missing DISCORD_BOT_TOKEN secret — skipping."
             exit 0
           fi
 

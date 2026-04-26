@@ -60,13 +60,18 @@ jobs:
             }
           ' README.md)
 
-          current_header=$(sed -n "${start}p" README.md)
-          prev_header=$(git show HEAD~1:README.md 2>/dev/null | grep '^UPDATE ' | head -1 || true)
-
-          if [ "$current_header" = "$prev_header" ]; then
-            echo "Top changelog header unchanged ($current_header) — skipping announce."
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-            exit 0
+          # Skip the unchanged-header guard when manually dispatched — the user
+          # explicitly wants this run to post. Otherwise (push trigger), only
+          # post when the topmost UPDATE header differs from the previous
+          # commit, so README typo fixes don't re-spam #releases.
+          if [ "${GITHUB_EVENT_NAME:-}" != "workflow_dispatch" ]; then
+            current_header=$(sed -n "${start}p" README.md)
+            prev_header=$(git show HEAD~1:README.md 2>/dev/null | grep '^UPDATE ' | head -1 || true)
+            if [ "$current_header" = "$prev_header" ]; then
+              echo "Top changelog header unchanged ($current_header) — skipping announce."
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
           fi
 
           {

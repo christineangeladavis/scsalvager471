@@ -1968,6 +1968,10 @@ export default function StarCitizenSalvageGuideWebsite() {
               : []),
           ].map((tab) => {
             const isActive = activeTab === tab.id;
+            // Ledger requires Discord login to actually do anything; show a
+            // small lock icon + native tooltip while logged out so the
+            // requirement is visible at a glance.
+            const showLedgerLock = tab.id === "ledger" && !user && !authLoading;
             return (
               <button
                 key={tab.id}
@@ -1975,13 +1979,24 @@ export default function StarCitizenSalvageGuideWebsite() {
                 role="tab"
                 aria-selected={isActive}
                 onClick={() => setActiveTab(tab.id)}
-                className={`-mb-px border-b-2 px-3 py-3 text-xs font-semibold uppercase tracking-wider transition sm:px-5 sm:text-sm sm:tracking-[0.2em] ${
+                title={showLedgerLock ? "Requires login" : undefined}
+                className={`-mb-px inline-flex items-center gap-1.5 border-b-2 px-3 py-3 text-xs font-semibold uppercase tracking-wider transition sm:px-5 sm:text-sm sm:tracking-[0.2em] ${
                   isActive
                     ? "border-cyan-400 text-cyan-200"
                     : "border-transparent text-slate-400 hover:border-cyan-500/40 hover:text-slate-200"
                 }`}
               >
                 {tab.label}
+                {showLedgerLock && (
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    aria-hidden="true"
+                    className="h-3 w-3 shrink-0 opacity-70"
+                  >
+                    <path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 1 1 6 0v3H9z" />
+                  </svg>
+                )}
               </button>
             );
           })}

@@ -96,14 +96,22 @@ jobs:
             exit 0
           fi
 
-          # Bold the header line (first line, "UPDATE ... vX.Y") for readability.
+          # Prepend @everyone, then bold the changelog header line for readability.
           # Discord caps message content at 2000 chars; truncate with an ellipsis if needed.
-          formatted=$(printf '%s' "$BLOCK" | awk 'NR==1{print "**" $0 "**"; next} {print}')
+          header=$(printf '%s' "$BLOCK" | head -1)
+          body=$(printf '%s' "$BLOCK" | tail -n +2)
+          formatted=$(printf '@everyone\n**%s**\n%s' "$header" "$body")
           if [ ${#formatted} -gt 1990 ]; then
             formatted="${formatted:0:1987}..."
           fi
 
-          payload=$(jq -n --arg content "$formatted" '{content: $content}')
+          # allowed_mentions.parse=["everyone"] tells Discord to actually ping
+          # @everyone (rather than render it as plain text). The bot still needs
+          # Mention Everyone permission in the channel — Administrator covers it.
+          payload=$(jq -n --arg content "$formatted" '{
+            content: $content,
+            allowed_mentions: { parse: ["everyone"] }
+          }')
 
           http_status=$(curl -sS -o /tmp/discord_resp.json -w "%{http_code}" \
             -X POST \

@@ -2417,7 +2417,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                 </div>
 
                 <div className="rounded-2xl border border-slate-700 bg-slate-950/70 p-4">
-                  <label className="mb-2 block text-sm text-slate-400">Material SCU</label>
+                  <label className="mb-2 block text-sm text-slate-400">SCU Amount</label>
                   <input
                     type="number"
                     min="0"

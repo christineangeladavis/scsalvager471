@@ -495,9 +495,11 @@ export default function StarCitizenSalvageGuideWebsite() {
     seconds: "",
   });
   const [isAnalyzingScreenshot, setIsAnalyzingScreenshot] = useState(false);
-  // Status of the latest screenshot analysis. Shape:
+  // Status of the latest refinery screenshot analysis. Shape:
   // { kind: "ok" | "error", text: string } | null
   const [analyzeFeedback, setAnalyzeFeedback] = useState(null);
+  const [isAnalyzingSellScreenshot, setIsAnalyzingSellScreenshot] = useState(false);
+  const [analyzeSellFeedback, setAnalyzeSellFeedback] = useState(null);
   const [orderForm, setOrderForm] = useState({
     material: SELL_MATERIALS[0],
     scu: "",
@@ -1722,6 +1724,159 @@ export default function StarCitizenSalvageGuideWebsite() {
       setIsAnalyzingScreenshot(false);
     }
     // file goes out of scope here; nothing is held in client memory.
+  };
+
+  // --- Sell-orders auto-fill: same shape as the refinery flow.
+  // Hits /api/sell/analyze, matches the result against the Sell Orders
+  // form's dropdowns, and also seeds the Report a Price input with the
+  // per-SCU price the screenshot showed (user still has to click Report
+  // Price to actually submit it).
+  const applyExtractionToSellForm = (extracted) => {
+    const matchedFields = [];
+    const skippedFields = [];
+    const next = { ...orderForm };
+
+    // Material match against the SCSalvager material list. Diamond / ore
+    // commodities won't match — that's expected; the user can pick.
+    if (extracted.materialName) {
+      const lower = extracted.materialName.toLowerCase();
+      const m = SELL_MATERIALS.find((s) => s.toLowerCase() === lower);
+      if (m) {
+        next.material = m;
+        matchedFields.push(`Material: ${m}`);
+      } else {
+        skippedFields.push(`Material ("${extracted.materialName}" — not in our list)`);
+      }
+    }
+
+    // Sell point match — substring either direction. The screenshot's
+    // "HUR-L1 Green Glade Station" matches our "HUR-L1" entry.
+    if (extracted.locationName) {
+      const lower = extracted.locationName.toLowerCase();
+      const candidates = sellPoints.filter(
+        (p) => lower.includes(p.name.toLowerCase()) || p.name.toLowerCase().includes(lower)
+      );
+      // If a material was matched, prefer a sell point that carries it;
+      // otherwise take the first match.
+      const sp =
+        candidates.find((p) => !next.material || p.material === next.material) || candidates[0];
+      if (sp) {
+        next.location = sp.name;
+        matchedFields.push(`Sell Location: ${sp.name}`);
+      } else {
+        skippedFields.push(`Sell Location ("${extracted.locationName}" — no match)`);
+      }
+    }
+
+    if (Number.isFinite(extracted.scu) && extracted.scu > 0) {
+      next.scu = String(Math.round(extracted.scu));
+      matchedFields.push(`SCU: ${next.scu}`);
+    }
+    if (Number.isFinite(extracted.totalAuec) && extracted.totalAuec > 0) {
+      next.aUEC = String(Math.round(extracted.totalAuec));
+      matchedFields.push(`aUEC: ${next.aUEC}`);
+    }
+
+    setOrderForm(next);
+
+    // Report a Price seed — fall back to totalAuec / scu when the model
+    // didn't pull pricePerScu directly.
+    let perScu = null;
+    if (Number.isFinite(extracted.pricePerScu) && extracted.pricePerScu > 0) {
+      perScu = Math.round(extracted.pricePerScu);
+    } else if (
+      Number.isFinite(extracted.totalAuec) &&
+      Number.isFinite(extracted.scu) &&
+      extracted.scu > 0
+    ) {
+      perScu = Math.round(extracted.totalAuec / extracted.scu);
+    }
+    if (perScu !== null && perScu > 0) {
+      setReportPriceInputLedger(String(perScu));
+      matchedFields.push(`Report Price: ${perScu.toLocaleString()} aUEC/SCU`);
+    }
+
+    return { matchedFields, skippedFields };
+  };
+
+  const handleSellScreenshotUpload = async (file) => {
+    if (!file) return;
+    if (file.size > 8 * 1024 * 1024) {
+      setAnalyzeSellFeedback({ kind: "error", text: "Image must be under 8 MB." });
+      return;
+    }
+    if (!/^image\/(png|jpeg|webp|gif)$/.test(file.type)) {
+      setAnalyzeSellFeedback({ kind: "error", text: "Unsupported image type." });
+      return;
+    }
+    setIsAnalyzingSellScreenshot(true);
+    setAnalyzeSellFeedback(null);
+
+    // Dev mock — values lifted from the example commodities screenshot
+    // (HUR-L1 Green Glade Station, Diamond, 256 SCU at 5,709/SCU = 1.461M).
+    const devMockSell = () => ({
+      locationName: "HUR-L1 Green Glade Station",
+      materialName: "Diamond",
+      scu: 256,
+      totalAuec: 1461000,
+      pricePerScu: 5709,
+    });
+
+    try {
+      const dataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(reader.error || new Error("File read error"));
+        reader.readAsDataURL(file);
+      });
+      const m = /^data:(image\/[^;]+);base64,(.+)$/.exec(String(dataUrl || ""));
+      if (!m) throw new Error("Could not encode image.");
+      const mediaType = m[1];
+      const imageBase64 = m[2];
+
+      let extracted;
+      try {
+        const res = await fetch("/api/sell/analyze", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ imageBase64, mediaType }),
+        });
+        if (!res.ok) {
+          const info = await res.json().catch(() => ({}));
+          if (import.meta.env.DEV && (res.status === 401 || res.status === 503 || res.status === 404)) {
+            extracted = devMockSell();
+          } else {
+            throw new Error(info.error || `HTTP ${res.status}`);
+          }
+        } else {
+          extracted = await res.json();
+        }
+      } catch (e) {
+        if (import.meta.env.DEV) {
+          extracted = devMockSell();
+        } else {
+          throw e;
+        }
+      }
+
+      const { matchedFields, skippedFields } = applyExtractionToSellForm(extracted);
+      const okText = matchedFields.length
+        ? `Auto-filled: ${matchedFields.join(", ")}`
+        : "Couldn't pull any usable fields from that image.";
+      const skipText = skippedFields.length ? ` · skipped: ${skippedFields.join(", ")}` : "";
+      setAnalyzeSellFeedback({
+        kind: matchedFields.length ? "ok" : "error",
+        text: okText + skipText,
+      });
+    } catch (e) {
+      setAnalyzeSellFeedback({
+        kind: "error",
+        text: e && e.message ? e.message : "Could not analyze screenshot.",
+      });
+    } finally {
+      setIsAnalyzingSellScreenshot(false);
+    }
   };
 
   // --- Ledger: handlers ---
@@ -2992,6 +3147,44 @@ export default function StarCitizenSalvageGuideWebsite() {
               <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
                 <h2 className="text-xl font-bold text-cyan-300">Sell Orders</h2>
                 <p className="mt-1 text-sm text-slate-400">Log a sale for your lifetime aUEC total.</p>
+
+                <div className="mt-4 rounded-2xl border border-cyan-500/30 bg-cyan-500/5 p-4">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+                    <div>
+                      <div className="text-xs uppercase tracking-[0.2em] text-cyan-200">Auto-fill from screenshot</div>
+                      <p className="mt-1 text-xs text-slate-400">
+                        Drop in a screenshot of your in-game Commodities / Trading Console and we'll fill the sale below — plus seed Report a Price with the per-SCU value. The image is analyzed once and never stored.
+                      </p>
+                    </div>
+                    <label className={`shrink-0 cursor-pointer rounded-xl border border-cyan-400 bg-cyan-500/20 px-4 py-2 text-sm font-semibold text-cyan-200 transition hover:bg-cyan-500/30 ${
+                      isAnalyzingSellScreenshot || (!user && !import.meta.env.DEV)
+                        ? "cursor-not-allowed opacity-60"
+                        : ""
+                    }`}>
+                      {isAnalyzingSellScreenshot ? "Analyzing…" : "📷 Upload screenshot"}
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp,image/gif"
+                        className="hidden"
+                        disabled={isAnalyzingSellScreenshot || (!user && !import.meta.env.DEV)}
+                        onChange={(e) => {
+                          const file = e.target.files && e.target.files[0];
+                          e.target.value = "";
+                          if (file) handleSellScreenshotUpload(file);
+                        }}
+                      />
+                    </label>
+                  </div>
+                  {analyzeSellFeedback && (
+                    <div
+                      className={`mt-3 text-xs ${
+                        analyzeSellFeedback.kind === "ok" ? "text-emerald-300" : "text-rose-300"
+                      }`}
+                    >
+                      {analyzeSellFeedback.text}
+                    </div>
+                  )}
+                </div>
 
                 <div className="mt-4 grid gap-3 rounded-2xl border border-slate-700 bg-slate-950/70 p-4">
                   <div>

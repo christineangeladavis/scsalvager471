@@ -494,6 +494,10 @@ export default function StarCitizenSalvageGuideWebsite() {
     minutes: "",
     seconds: "",
   });
+  const [isAnalyzingScreenshot, setIsAnalyzingScreenshot] = useState(false);
+  // Status of the latest screenshot analysis. Shape:
+  // { kind: "ok" | "error", text: string } | null
+  const [analyzeFeedback, setAnalyzeFeedback] = useState(null);
   const [orderForm, setOrderForm] = useState({
     material: SELL_MATERIALS[0],
     scu: "",
@@ -1569,6 +1573,157 @@ export default function StarCitizenSalvageGuideWebsite() {
     [editForm.materialScu, editForm.material, editForm.method, editForm.location]
   );
 
+  // --- Screenshot auto-fill: read a file, ship to /api/refinery/analyze,
+  // best-effort-match the response against our dropdowns, populate jobForm.
+  // The image is kept in memory only — never persisted, never logged. It
+  // gets dropped the moment this function returns.
+  const applyExtractionToJobForm = (extracted) => {
+    const matchedFields = [];
+    const skippedFields = [];
+    const next = { ...jobForm };
+
+    // Location: find a refineryLocation whose .name appears as substring
+    // (or supersequence) of the extracted location.
+    if (extracted.locationName) {
+      const lower = extracted.locationName.toLowerCase();
+      const loc = refineryLocations.find(
+        (l) => lower.includes(l.name.toLowerCase()) || l.name.toLowerCase().includes(lower)
+      );
+      if (loc) {
+        next.location = loc.name;
+        matchedFields.push(`Location: ${loc.name}`);
+      } else {
+        skippedFields.push(`Location ("${extracted.locationName}" — no match)`);
+      }
+    }
+
+    // Method: case-insensitive exact or prefix match.
+    if (extracted.methodName) {
+      const lower = extracted.methodName.toLowerCase();
+      const m = refineryMethods.find(
+        (rm) =>
+          rm.name.toLowerCase() === lower ||
+          rm.name.toLowerCase().startsWith(lower) ||
+          lower.startsWith(rm.name.toLowerCase())
+      );
+      if (m) {
+        next.method = m.name;
+        matchedFields.push(`Method: ${m.name}`);
+      } else {
+        skippedFields.push(`Method ("${extracted.methodName}" — no match)`);
+      }
+    }
+
+    // Material: case-insensitive exact match against the salvage materials.
+    // Mining/ore materials from a non-salvage refinery screenshot won't
+    // match — that's expected; user can pick from the dropdown.
+    if (extracted.rawMaterialName) {
+      const lower = extracted.rawMaterialName.toLowerCase();
+      const r = refineryMaterials.find((m) => m.name.toLowerCase() === lower);
+      if (r) {
+        next.material = r.name;
+        matchedFields.push(`Material: ${r.name}`);
+      } else {
+        skippedFields.push(`Material ("${extracted.rawMaterialName}" — not a salvage material)`);
+      }
+    }
+
+    if (Number.isFinite(extracted.totalSCU) && extracted.totalSCU > 0) {
+      next.materialScu = String(Math.round(extracted.totalSCU));
+      matchedFields.push(`SCU: ${next.materialScu}`);
+    }
+
+    if (Number.isFinite(extracted.processingTimeSeconds) && extracted.processingTimeSeconds > 0) {
+      const total = Math.round(extracted.processingTimeSeconds);
+      next.hours = String(Math.floor(total / 3600));
+      next.minutes = String(Math.floor((total % 3600) / 60));
+      next.seconds = String(total % 60);
+      matchedFields.push(
+        `Time: ${next.hours}h ${next.minutes}m ${next.seconds}s`
+      );
+    }
+
+    setJobForm(next);
+    return { matchedFields, skippedFields };
+  };
+
+  const handleScreenshotUpload = async (file) => {
+    if (!file) return;
+    if (file.size > 8 * 1024 * 1024) {
+      setAnalyzeFeedback({ kind: "error", text: "Image must be under 8 MB." });
+      return;
+    }
+    if (!/^image\/(png|jpeg|webp|gif)$/.test(file.type)) {
+      setAnalyzeFeedback({ kind: "error", text: "Unsupported image type." });
+      return;
+    }
+    setIsAnalyzingScreenshot(true);
+    setAnalyzeFeedback(null);
+
+    // Dev mock — example data lifted from the in-game refinery screen.
+    const devMockExtraction = () => ({
+      locationName: "ARC-L2 Lively Pathway Station",
+      methodName: "XCR Reaction",
+      rawMaterialName: "Iron (Ore)",
+      totalSCU: 921,
+      processingTimeSeconds: 271,
+    });
+
+    try {
+      const dataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(reader.error || new Error("File read error"));
+        reader.readAsDataURL(file);
+      });
+      const m = /^data:(image\/[^;]+);base64,(.+)$/.exec(String(dataUrl || ""));
+      if (!m) throw new Error("Could not encode image.");
+      const mediaType = m[1];
+      const imageBase64 = m[2];
+
+      let extracted;
+      try {
+        const res = await fetch("/api/refinery/analyze", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ imageBase64, mediaType }),
+        });
+        if (!res.ok) {
+          const info = await res.json().catch(() => ({}));
+          if (import.meta.env.DEV && (res.status === 401 || res.status === 503 || res.status === 404)) {
+            extracted = devMockExtraction();
+          } else {
+            throw new Error(info.error || `HTTP ${res.status}`);
+          }
+        } else {
+          extracted = await res.json();
+        }
+      } catch (e) {
+        if (import.meta.env.DEV) {
+          extracted = devMockExtraction();
+        } else {
+          throw e;
+        }
+      }
+
+      const { matchedFields, skippedFields } = applyExtractionToJobForm(extracted);
+      const okText = matchedFields.length
+        ? `Auto-filled: ${matchedFields.join(", ")}`
+        : "Couldn't pull any usable fields from that image.";
+      const skipText = skippedFields.length ? ` · skipped: ${skippedFields.join(", ")}` : "";
+      setAnalyzeFeedback({ kind: matchedFields.length ? "ok" : "error", text: okText + skipText });
+    } catch (e) {
+      setAnalyzeFeedback({
+        kind: "error",
+        text: e && e.message ? e.message : "Could not analyze screenshot.",
+      });
+    } finally {
+      setIsAnalyzingScreenshot(false);
+    }
+    // file goes out of scope here; nothing is held in client memory.
+  };
+
   // --- Ledger: handlers ---
   const submitJob = () => {
     if (!isJobFormValid) return;
@@ -2604,6 +2759,45 @@ export default function StarCitizenSalvageGuideWebsite() {
               <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
                 <h2 className="text-xl font-bold text-cyan-300">Refinery Job Orders</h2>
                 <p className="mt-1 text-sm text-slate-400">Log a new refinery job. It will move to Ready for Pickup when the timer finishes.</p>
+
+                <div className="mt-4 rounded-2xl border border-cyan-500/30 bg-cyan-500/5 p-4">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+                    <div>
+                      <div className="text-xs uppercase tracking-[0.2em] text-cyan-200">Auto-fill from screenshot</div>
+                      <p className="mt-1 text-xs text-slate-400">
+                        Drop in a screenshot of your in-game refinery setup screen and we'll fill the form below from it. The image is analyzed once and never stored.
+                      </p>
+                    </div>
+                    <label className={`shrink-0 cursor-pointer rounded-xl border border-cyan-400 bg-cyan-500/20 px-4 py-2 text-sm font-semibold text-cyan-200 transition hover:bg-cyan-500/30 ${
+                      isAnalyzingScreenshot || (!user && !import.meta.env.DEV)
+                        ? "cursor-not-allowed opacity-60"
+                        : ""
+                    }`}>
+                      {isAnalyzingScreenshot ? "Analyzing…" : "📷 Upload screenshot"}
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp,image/gif"
+                        className="hidden"
+                        disabled={isAnalyzingScreenshot || (!user && !import.meta.env.DEV)}
+                        onChange={(e) => {
+                          const file = e.target.files && e.target.files[0];
+                          // Reset value so re-uploading the same file fires onChange.
+                          e.target.value = "";
+                          if (file) handleScreenshotUpload(file);
+                        }}
+                      />
+                    </label>
+                  </div>
+                  {analyzeFeedback && (
+                    <div
+                      className={`mt-3 text-xs ${
+                        analyzeFeedback.kind === "ok" ? "text-emerald-300" : "text-rose-300"
+                      }`}
+                    >
+                      {analyzeFeedback.text}
+                    </div>
+                  )}
+                </div>
 
                 <div className="mt-4 grid gap-3 rounded-2xl border border-slate-700 bg-slate-950/70 p-4">
                   <div>

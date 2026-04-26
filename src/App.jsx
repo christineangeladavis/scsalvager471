@@ -2836,7 +2836,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs text-slate-400">Sell Point</label>
+                    <label className="mb-1 block text-xs text-slate-400">Sell Location</label>
                     <select
                       value={orderForm.location}
                       onChange={(e) => setOrderForm({ ...orderForm, location: e.target.value, playerName: "" })}
@@ -3258,7 +3258,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                           />
                         </div>
                         <div>
-                          <label className="mb-1 block text-xs text-slate-400">Sell Point</label>
+                          <label className="mb-1 block text-xs text-slate-400">Sell Location</label>
                           <select
                             value={editForm.location || ""}
                             onChange={(e) => setEditForm({ ...editForm, location: e.target.value, playerName: "" })}

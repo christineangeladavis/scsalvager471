@@ -572,7 +572,7 @@ export default function StarCitizenSalvageGuideWebsite() {
   const sellYieldTotal = sellYield * selectedSellPointPrice;
   const displaySellPrice = sellYield > 0 ? selectedSellPointPrice : 0;
 
-  const buildSortedSellPointEntries = (material) => {
+  const buildSortedSellPointEntries = (material, { includePlayer = true } = {}) => {
     const filtered = sellPoints
       .filter((p) => p.material === material)
       .map((point) => {
@@ -587,6 +587,7 @@ export default function StarCitizenSalvageGuideWebsite() {
         (a, b) =>
           b.effectivePrice - a.effectivePrice || a.name.localeCompare(b.name)
       );
+    if (!includePlayer) return filtered;
     return [
       ...filtered,
       {
@@ -603,7 +604,7 @@ export default function StarCitizenSalvageGuideWebsite() {
   };
 
   const sortedSellPointEntries = useMemo(
-    () => buildSortedSellPointEntries(selectedSellMaterial),
+    () => buildSortedSellPointEntries(selectedSellMaterial, { includePlayer: false }),
     [reportedPrices, selectedSellMaterial]
   );
 
@@ -862,6 +863,20 @@ export default function StarCitizenSalvageGuideWebsite() {
     hydratedForUserRef.current = null;
     setLedgerSaveError("");
     if (!user) {
+      if (import.meta.env.DEV) {
+        try {
+          const raw = localStorage.getItem("__dev_ledger__");
+          const data = raw ? JSON.parse(raw) : {};
+          setRefineryJobs(Array.isArray(data.refineryJobs) ? data.refineryJobs : []);
+          setSellOrders(Array.isArray(data.sellOrders) ? data.sellOrders : []);
+        } catch {
+          setRefineryJobs([]);
+          setSellOrders([]);
+        }
+        hydratedForUserRef.current = "__dev__";
+        setIsLedgerLoading(false);
+        return;
+      }
       // Logged out: empty ledger, no server calls.
       setRefineryJobs([]);
       setSellOrders([]);
@@ -898,7 +913,19 @@ export default function StarCitizenSalvageGuideWebsite() {
   // ever happen as a direct result of a user-triggered mutation after hydration
   // has completed for the current user.
   const saveLedger = async (nextRefineryJobs, nextSellOrders) => {
-    if (!user) return;
+    if (!user) {
+      if (import.meta.env.DEV && hydratedForUserRef.current === "__dev__") {
+        try {
+          localStorage.setItem(
+            "__dev_ledger__",
+            JSON.stringify({ refineryJobs: nextRefineryJobs, sellOrders: nextSellOrders })
+          );
+        } catch {
+          // ignore quota errors
+        }
+      }
+      return;
+    }
     if (hydratedForUserRef.current !== user.id) return;
     try {
       const res = await fetch("/api/ledger", {
@@ -973,7 +1000,7 @@ export default function StarCitizenSalvageGuideWebsite() {
       .filter((j) => j.pickedUpAt && j.pickedUpAt >= historyCutoff)
       .map((j) => {
         const parts = [];
-        if (j.location) parts.push(`At ${j.location}`);
+        if (j.location) parts.push(j.location);
         if (j.cost > 0) parts.push(`Cost: ${Number(j.cost).toLocaleString()} aUEC`);
         else parts.push("No refinery cost");
         return {
@@ -1000,7 +1027,7 @@ export default function StarCitizenSalvageGuideWebsite() {
           type: "Sold",
           ts: o.submittedAt,
           primary: `${Number(o.scu).toLocaleString()} SCU ${materialLabel} → ${Number(o.aUEC).toLocaleString()} aUEC`,
-          secondary: `At ${locationLabel}`,
+          secondary: locationLabel,
         };
       });
     return [...refinery, ...sells].sort((a, b) => b.ts - a.ts);
@@ -1009,14 +1036,14 @@ export default function StarCitizenSalvageGuideWebsite() {
   // --- Ledger: form validity (requires login + load complete + all fields valid) ---
   // Cost and time are auto-derived from materialScu + method, so no need to validate them.
   const isJobFormValid =
-    Boolean(user) &&
+    (Boolean(user) || import.meta.env.DEV) &&
     !isLedgerLoading &&
     Boolean(jobForm.material) &&
     Boolean(jobForm.location) &&
     Boolean(jobForm.method) &&
     Number(jobForm.materialScu) > 0;
   const isOrderFormValid =
-    Boolean(user) &&
+    (Boolean(user) || import.meta.env.DEV) &&
     !isLedgerLoading &&
     Number(orderForm.scu) > 0 &&
     Boolean(orderForm.location) &&
@@ -2024,7 +2051,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <select
                       value={jobForm.location}
                       onChange={(e) => setJobForm({ ...jobForm, location: e.target.value })}
-                      disabled={!user}
+                      disabled={!user && !import.meta.env.DEV}
                       className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       <optgroup label="Stanton">
@@ -2049,7 +2076,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <select
                       value={jobForm.material}
                       onChange={(e) => setJobForm({ ...jobForm, material: e.target.value })}
-                      disabled={!user}
+                      disabled={!user && !import.meta.env.DEV}
                       className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {refineryMaterials.map((r) => (
@@ -2062,7 +2089,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <select
                       value={jobForm.method}
                       onChange={(e) => setJobForm({ ...jobForm, method: e.target.value })}
-                      disabled={!user}
+                      disabled={!user && !import.meta.env.DEV}
                       className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {refineryMethods.map((m) => (
@@ -2082,7 +2109,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                       placeholder="0"
                       value={jobForm.materialScu}
                       onChange={(e) => setJobForm({ ...jobForm, materialScu: e.target.value })}
-                      disabled={!user}
+                      disabled={!user && !import.meta.env.DEV}
                       className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
                     />
                   </div>
@@ -2206,7 +2233,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                           playerName: "",
                         });
                       }}
-                      disabled={!user}
+                      disabled={!user && !import.meta.env.DEV}
                       className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {SELL_MATERIALS.map((m) => (
@@ -2223,7 +2250,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                       placeholder="0"
                       value={orderForm.scu}
                       onChange={(e) => setOrderForm({ ...orderForm, scu: e.target.value })}
-                      disabled={!user}
+                      disabled={!user && !import.meta.env.DEV}
                       className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
                     />
                   </div>
@@ -2232,7 +2259,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <select
                       value={orderForm.location}
                       onChange={(e) => setOrderForm({ ...orderForm, location: e.target.value, playerName: "" })}
-                      disabled={!user}
+                      disabled={!user && !import.meta.env.DEV}
                       className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {orderSellPointEntries.map((p) => (
@@ -2252,7 +2279,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                         placeholder="Enter player handle"
                         value={orderForm.playerName}
                         onChange={(e) => setOrderForm({ ...orderForm, playerName: e.target.value })}
-                        disabled={!user}
+                        disabled={!user && !import.meta.env.DEV}
                         className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
                       />
                     </div>
@@ -2266,7 +2293,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                       placeholder="0"
                       value={orderForm.aUEC}
                       onChange={(e) => setOrderForm({ ...orderForm, aUEC: e.target.value })}
-                      disabled={!user}
+                      disabled={!user && !import.meta.env.DEV}
                       className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
                     />
                   </div>

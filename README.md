@@ -5,6 +5,11 @@ Made by Chrissyy · Referral: STAR-CH2W-R73F
 
 ## What's in this build
 
+UPDATE 4/25/2026 v2.3
+Notable Changes:
+- Removed "Sold to Player" from the Home page Sell Location dropdown — player sales now belong only on the Ledger tab where you can record the buyer and final aUEC.
+- Cleaned up the 30-day history notes column: dropped the redundant "At" prefix from refinery and sell-order entries (e.g. "Levski · Cost: 1,152 aUEC", "Sold to Player (Denavago)").
+
 UPDATE 4/25/2026 v2.2
 Notable Changes:
 - Users can now opt-in to receive Discord DM's from SCSalvager bot to notify them of completed refinery jobs. with the response: "Your Refinery Job for {Amount}SCU of Construction Material is ready for pickup at {Location}.

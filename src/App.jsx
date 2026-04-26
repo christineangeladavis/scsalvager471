@@ -146,45 +146,90 @@ const ships = [
   },
 ];
 
+const SELL_MATERIALS = ["Construction Material", "Recycle Material Composite"];
+const PLAYER_SELL_POINT = "Sold to Player";
+
 const sellPoints = [
+  // === CONSTRUCTION MATERIAL ===
   // 16,000 aUEC/SCU
-  { name: "ARC-L4",                    region: "ArcCorp Lagrange Point 4",          system: "Stanton", pricePerScu: 16000 },
-  { name: "HUR-L1",                    region: "Hurston Lagrange Point 1",           system: "Stanton", pricePerScu: 16000 },
+  { name: "ARC-L4",                    region: "ArcCorp Lagrange Point 4",          system: "Stanton", pricePerScu: 16000, material: "Construction Material" },
+  { name: "HUR-L1",                    region: "Hurston Lagrange Point 1",           system: "Stanton", pricePerScu: 16000, material: "Construction Material" },
   // 15,000 aUEC/SCU
-  { name: "ARC-L1",                    region: "ArcCorp Lagrange Point 1",           system: "Stanton", pricePerScu: 15000 },
-  { name: "ARC-L2",                    region: "ArcCorp Lagrange Point 2",           system: "Stanton", pricePerScu: 15000 },
-  { name: "ARC-L3",                    region: "ArcCorp Lagrange Point 3",           system: "Stanton", pricePerScu: 15000 },
-  { name: "ARC-L5",                    region: "ArcCorp Lagrange Point 5",           system: "Stanton", pricePerScu: 15000 },
-  { name: "CBD Lorville",              region: "Hurston",                            system: "Stanton", pricePerScu: 15000 },
-  { name: "CRU-L4",                    region: "Crusader Lagrange Point 4",          system: "Stanton", pricePerScu: 15000 },
-  { name: "Everus Harbor",             region: "Hurston",                            system: "Stanton", pricePerScu: 15000 },
-  { name: "HUR-L3",                    region: "Hurston Lagrange Point 3",           system: "Stanton", pricePerScu: 15000 },
-  { name: "HUR-L4",                    region: "Hurston Lagrange Point 4",           system: "Stanton", pricePerScu: 15000 },
-  { name: "MIC-L1",                    region: "microTech Lagrange Point 1",         system: "Stanton", pricePerScu: 15000 },
-  { name: "MIC-L2",                    region: "microTech Lagrange Point 2",         system: "Stanton", pricePerScu: 15000 },
-  { name: "MIC-L4",                    region: "microTech Lagrange Point 4",         system: "Stanton", pricePerScu: 15000 },
-  { name: "MIC-L5",                    region: "microTech Lagrange Point 5",         system: "Stanton", pricePerScu: 15000 },
-  { name: "Port Tressler",             region: "MicroTech",                          system: "Stanton", pricePerScu: 15000 },
-  { name: "TDD Area 18",               region: "ArcCorp",                            system: "Stanton", pricePerScu: 15000 },
-  { name: "TDD New Babbage",           region: "MicroTech",                          system: "Stanton", pricePerScu: 15000 },
+  { name: "ARC-L1",                    region: "ArcCorp Lagrange Point 1",           system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
+  { name: "ARC-L2",                    region: "ArcCorp Lagrange Point 2",           system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
+  { name: "ARC-L3",                    region: "ArcCorp Lagrange Point 3",           system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
+  { name: "ARC-L5",                    region: "ArcCorp Lagrange Point 5",           system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
+  { name: "CBD Lorville",              region: "Hurston",                            system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
+  { name: "CRU-L4",                    region: "Crusader Lagrange Point 4",          system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
+  { name: "Everus Harbor",             region: "Hurston",                            system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
+  { name: "HUR-L3",                    region: "Hurston Lagrange Point 3",           system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
+  { name: "HUR-L4",                    region: "Hurston Lagrange Point 4",           system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
+  { name: "MIC-L1",                    region: "microTech Lagrange Point 1",         system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
+  { name: "MIC-L2",                    region: "microTech Lagrange Point 2",         system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
+  { name: "MIC-L4",                    region: "microTech Lagrange Point 4",         system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
+  { name: "MIC-L5",                    region: "microTech Lagrange Point 5",         system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
+  { name: "Port Tressler",             region: "MicroTech",                          system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
+  { name: "TDD Area 18",               region: "ArcCorp",                            system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
+  { name: "TDD New Babbage",           region: "MicroTech",                          system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
   // 14,000 aUEC/SCU
-  { name: "Checkmate",                 region: "Monox Lagrange Point 4",             system: "Pyro",    pricePerScu: 14000 },
-  { name: "Dunboro",                   region: "MicroTech",                          system: "Stanton", pricePerScu: 14000 },
-  { name: "Megumi",                    region: "Pyro VI Lagrange Point 5",           system: "Pyro",    pricePerScu: 14000 },
-  { name: "Nyx Gateway (Stanton)",     region: "Nyx Gateway (Stanton system)",       system: "Stanton", pricePerScu: 14000 },
-  { name: "Orbituary",                 region: "Bloom",                              system: "Pyro",    pricePerScu: 14000 },
-  { name: "Pickers Field",             region: "Hurston",                            system: "Stanton", pricePerScu: 14000 },
-  { name: "Pyro Gateway (Nyx)",        region: "Pyro Gateway (Nyx system)",          system: "Nyx",     pricePerScu: 14000 },
-  { name: "Pyro Gateway (Stanton)",    region: "Pyro Gateway (Stanton system)",      system: "Stanton", pricePerScu: 14000 },
-  { name: "Rappel",                    region: "Hurston",                            system: "Stanton", pricePerScu: 14000 },
-  { name: "Ruin Station",              region: "Terminus",                           system: "Pyro",    pricePerScu: 14000 },
-  { name: "Stanton Gateway (Pyro)",    region: "Stanton Gateway (Pyro system)",      system: "Pyro",    pricePerScu: 14000 },
-  { name: "TDD Orison",               region: "Crusader",                           system: "Stanton", pricePerScu: 14000 },
+  { name: "Checkmate",                 region: "Monox Lagrange Point 4",             system: "Pyro",    pricePerScu: 14000, material: "Construction Material" },
+  { name: "Dunboro",                   region: "MicroTech",                          system: "Stanton", pricePerScu: 14000, material: "Construction Material" },
+  { name: "Megumi",                    region: "Pyro VI Lagrange Point 5",           system: "Pyro",    pricePerScu: 14000, material: "Construction Material" },
+  { name: "Nyx Gateway (Stanton)",     region: "Nyx Gateway (Stanton system)",       system: "Stanton", pricePerScu: 14000, material: "Construction Material" },
+  { name: "Orbituary",                 region: "Bloom",                              system: "Pyro",    pricePerScu: 14000, material: "Construction Material" },
+  { name: "Pickers Field",             region: "Hurston",                            system: "Stanton", pricePerScu: 14000, material: "Construction Material" },
+  { name: "Pyro Gateway (Nyx)",        region: "Pyro Gateway (Nyx system)",          system: "Nyx",     pricePerScu: 14000, material: "Construction Material" },
+  { name: "Pyro Gateway (Stanton)",    region: "Pyro Gateway (Stanton system)",      system: "Stanton", pricePerScu: 14000, material: "Construction Material" },
+  { name: "Rappel",                    region: "Hurston",                            system: "Stanton", pricePerScu: 14000, material: "Construction Material" },
+  { name: "Ruin Station",              region: "Terminus",                           system: "Pyro",    pricePerScu: 14000, material: "Construction Material" },
+  { name: "Stanton Gateway (Pyro)",    region: "Stanton Gateway (Pyro system)",      system: "Pyro",    pricePerScu: 14000, material: "Construction Material" },
+  { name: "TDD Orison",                region: "Crusader",                           system: "Stanton", pricePerScu: 14000, material: "Construction Material" },
   // 12,000 aUEC/SCU
-  { name: "GrimHEX",                  region: "Crusader",                           system: "Stanton", pricePerScu: 12000 },
-  { name: "Reclamation Orinth",        region: "Hurston",                            system: "Stanton", pricePerScu: 12000 },
+  { name: "GrimHEX",                   region: "Crusader",                           system: "Stanton", pricePerScu: 12000, material: "Construction Material" },
+  { name: "Reclamation Orinth",        region: "Hurston",                            system: "Stanton", pricePerScu: 12000, material: "Construction Material" },
   // 11,000 aUEC/SCU
-  { name: "CRU-L5 Maintenance",        region: "Crusader Lagrange Point 5",          system: "Stanton", pricePerScu: 11000 },
+  { name: "CRU-L5 Maintenance",        region: "Crusader Lagrange Point 5",          system: "Stanton", pricePerScu: 11000, material: "Construction Material" },
+
+  // === RECYCLE MATERIAL COMPOSITE === (UEX, Star Citizen 4.7.2)
+  // 8,500 aUEC/SCU
+  { name: "Seer's Canyon",             region: "Pyro V",                             system: "Pyro",    pricePerScu: 8500,  material: "Recycle Material Composite" },
+  // 8,200 aUEC/SCU
+  { name: "Terra Mills Hydrofarm",     region: "Crusader",                           system: "Stanton", pricePerScu: 8200,  material: "Recycle Material Composite" },
+  // 7,700 aUEC/SCU
+  { name: "TDD Orison",                region: "Crusader",                           system: "Stanton", pricePerScu: 7700,  material: "Recycle Material Composite" },
+  { name: "Rod's Fuel & Supplies",     region: "Pyro V Lagrange Point 4",            system: "Pyro",    pricePerScu: 7700,  material: "Recycle Material Composite" },
+  { name: "Patch City",                region: "Bloom Lagrange Point 3",             system: "Pyro",    pricePerScu: 7700,  material: "Recycle Material Composite" },
+  { name: "Starlight Service Station", region: "Bloom Lagrange Point 1",             system: "Pyro",    pricePerScu: 7700,  material: "Recycle Material Composite" },
+  { name: "Endgame",                   region: "Pyro VI Lagrange Point 3",           system: "Pyro",    pricePerScu: 7700,  material: "Recycle Material Composite" },
+  { name: "Gaslight",                  region: "Pyro V Lagrange Point 2",            system: "Pyro",    pricePerScu: 7700,  material: "Recycle Material Composite" },
+  { name: "Rat's Nest",                region: "Pyro V Lagrange Point 5",            system: "Pyro",    pricePerScu: 7700,  material: "Recycle Material Composite" },
+  { name: "Ashland",                   region: "Pyro V",                             system: "Pyro",    pricePerScu: 7700,  material: "Recycle Material Composite" },
+  { name: "Dudley & Daughters",        region: "Pyro VI Lagrange Point 4",           system: "Pyro",    pricePerScu: 7700,  material: "Recycle Material Composite" },
+  { name: "Last Landings",             region: "Terminus",                           system: "Pyro",    pricePerScu: 7700,  material: "Recycle Material Composite" },
+  { name: "Rustville",                 region: "Pyro I",                             system: "Pyro",    pricePerScu: 7700,  material: "Recycle Material Composite" },
+  { name: "Fallow Field",              region: "Pyro V",                             system: "Pyro",    pricePerScu: 7700,  material: "Recycle Material Composite" },
+  { name: "The Golden Riviera",        region: "Bloom",                              system: "Pyro",    pricePerScu: 7700,  material: "Recycle Material Composite" },
+  // 7,200 aUEC/SCU
+  { name: "Ruin Station",              region: "Terminus",                           system: "Pyro",    pricePerScu: 7200,  material: "Recycle Material Composite" },
+  { name: "GrimHEX",                   region: "Crusader",                           system: "Stanton", pricePerScu: 7200,  material: "Recycle Material Composite" },
+  // 7,100 aUEC/SCU
+  { name: "Pyro Gateway (Nyx)",        region: "Pyro Gateway (Nyx system)",          system: "Nyx",     pricePerScu: 7100,  material: "Recycle Material Composite" },
+  // 6,500 aUEC/SCU
+  { name: "Levski",                    region: "Delamar",                            system: "Nyx",     pricePerScu: 6500,  material: "Recycle Material Composite" },
+  // 6,400 aUEC/SCU
+  { name: "Samson & Son's Salvage",    region: "ArcCorp",                            system: "Stanton", pricePerScu: 6400,  material: "Recycle Material Composite" },
+  // 6,200 aUEC/SCU
+  { name: "Reclamation Orinth",        region: "Hurston",                            system: "Stanton", pricePerScu: 6200,  material: "Recycle Material Composite" },
+  // 6,000 aUEC/SCU
+  { name: "CBD Lorville",              region: "Hurston",                            system: "Stanton", pricePerScu: 6000,  material: "Recycle Material Composite" },
+  { name: "TDD Area 18",               region: "ArcCorp",                            system: "Stanton", pricePerScu: 6000,  material: "Recycle Material Composite" },
+  { name: "TDD New Babbage",           region: "MicroTech",                          system: "Stanton", pricePerScu: 6000,  material: "Recycle Material Composite" },
+  // 5,700 aUEC/SCU
+  { name: "CRU-L5 Maintenance",        region: "Crusader Lagrange Point 5",          system: "Stanton", pricePerScu: 5700,  material: "Recycle Material Composite" },
+  // 5,500 aUEC/SCU
+  { name: "Brio's Breaker Yard",       region: "Crusader",                           system: "Stanton", pricePerScu: 5500,  material: "Recycle Material Composite" },
+  // 5,000 aUEC/SCU
+  { name: "Devlin Scrap & Salvage",    region: "MicroTech",                          system: "Stanton", pricePerScu: 5000,  material: "Recycle Material Composite" },
 ];
 
 const salvageHeads = [
@@ -365,6 +410,8 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [scuInput, setScuInput] = useState("0");
   const [search, setSearch] = useState("");
   const [imageLoadErrors, setImageLoadErrors] = useState({});
+  const [selectedSellMaterial, setSelectedSellMaterial] = useState(SELL_MATERIALS[0]);
+  const [estimatePlayerName, setEstimatePlayerName] = useState("");
   const [selectedSellPointName, setSelectedSellPointName] = useState(sellPoints[0].name);
   const [sellYieldInput, setSellYieldInput] = useState("0");
   const [reportedPrices, setReportedPrices] = useState({});
@@ -384,7 +431,13 @@ export default function StarCitizenSalvageGuideWebsite() {
     method: refineryMethods[0].name,
     materialScu: "",
   });
-  const [orderForm, setOrderForm] = useState({ scu: "", location: sellPoints[0].name, aUEC: "" });
+  const [orderForm, setOrderForm] = useState({
+    material: SELL_MATERIALS[0],
+    scu: "",
+    location: sellPoints[0].name,
+    playerName: "",
+    aUEC: "",
+  });
   const [tick, setTick] = useState(0);
   const [isLedgerLoading, setIsLedgerLoading] = useState(true);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
@@ -456,12 +509,13 @@ export default function StarCitizenSalvageGuideWebsite() {
   }, [filteredShips, selectedShip.name]);
 
   useEffect(() => {
-    const selectedSellPointStillExists = sellPoints.some((point) => point.name === selectedSellPointName);
-
-    if (!selectedSellPointStillExists) {
-      setSelectedSellPointName(sellPoints[0].name);
+    if (selectedSellPointName === PLAYER_SELL_POINT) return;
+    const visible = sellPoints.filter((p) => p.material === selectedSellMaterial);
+    const stillExists = visible.some((p) => p.name === selectedSellPointName);
+    if (!stillExists) {
+      setSelectedSellPointName(visible[0]?.name ?? PLAYER_SELL_POINT);
     }
-  }, [selectedSellPointName]);
+  }, [selectedSellPointName, selectedSellMaterial]);
 
   const selectedRefineryLocationData = useMemo(() => {
     return (
@@ -474,8 +528,18 @@ export default function StarCitizenSalvageGuideWebsite() {
     selectedRefineryLocationData.bonuses[selectedMaterial] ?? 0;
 
   const selectedSellPoint = useMemo(() => {
-    return sellPoints.find((point) => point.name === selectedSellPointName) ?? sellPoints[0];
-  }, [selectedSellPointName]);
+    if (selectedSellPointName === PLAYER_SELL_POINT) {
+      return { name: PLAYER_SELL_POINT, region: "—", system: "—", pricePerScu: 0, material: selectedSellMaterial };
+    }
+    const match = sellPoints.find(
+      (point) => point.name === selectedSellPointName && point.material === selectedSellMaterial
+    );
+    if (match) return match;
+    const fallback = sellPoints.find((point) => point.material === selectedSellMaterial);
+    return fallback ?? sellPoints[0];
+  }, [selectedSellPointName, selectedSellMaterial]);
+
+  const isPlayerEstimate = selectedSellPointName === PLAYER_SELL_POINT;
 
   const scu = getSafeScuValue(scuInput);
 
@@ -499,24 +563,61 @@ export default function StarCitizenSalvageGuideWebsite() {
   const methodTimeSeconds = refineryResult.timeSeconds;
 
   const sellYield = getSafeScuValue(sellYieldInput);
-  const selectedSellPointPrice =
-    reportedPrices[selectedSellPointName] ?? selectedSellPoint.pricePerScu;
-  const isSelectedSellPointReported = reportedPrices[selectedSellPointName] !== undefined;
+  const isCmatEstimate = selectedSellMaterial === "Construction Material" && !isPlayerEstimate;
+  const selectedSellPointPrice = isPlayerEstimate
+    ? 0
+    : isCmatEstimate
+      ? reportedPrices[selectedSellPointName] ?? selectedSellPoint.pricePerScu
+      : selectedSellPoint.pricePerScu;
+  const isSelectedSellPointReported =
+    isCmatEstimate && reportedPrices[selectedSellPointName] !== undefined;
   const sellYieldTotal = sellYield * selectedSellPointPrice;
   const displaySellPrice = sellYield > 0 ? selectedSellPointPrice : 0;
 
-  const sortedSellPointEntries = useMemo(() => {
-    return [...sellPoints]
+  const buildSortedSellPointEntries = (material) => {
+    const isCmat = material === "Construction Material";
+    const filtered = sellPoints
+      .filter((p) => p.material === material)
       .map((point) => ({
         ...point,
-        effectivePrice: reportedPrices[point.name] ?? point.pricePerScu,
-        isReported: reportedPrices[point.name] !== undefined,
+        effectivePrice: isCmat
+          ? reportedPrices[point.name] ?? point.pricePerScu
+          : point.pricePerScu,
+        isReported: isCmat && reportedPrices[point.name] !== undefined,
       }))
       .sort(
         (a, b) =>
           b.effectivePrice - a.effectivePrice || a.name.localeCompare(b.name)
       );
-  }, [reportedPrices]);
+    return [
+      ...filtered,
+      {
+        name: PLAYER_SELL_POINT,
+        region: "—",
+        system: "—",
+        pricePerScu: 0,
+        effectivePrice: 0,
+        isReported: false,
+        isPlayer: true,
+        material,
+      },
+    ];
+  };
+
+  const sortedSellPointEntries = useMemo(
+    () => buildSortedSellPointEntries(selectedSellMaterial),
+    [reportedPrices, selectedSellMaterial]
+  );
+
+  const orderSellPointEntries = useMemo(
+    () => buildSortedSellPointEntries(orderForm.material),
+    [reportedPrices, orderForm.material]
+  );
+
+  const editSellPointEntries = useMemo(
+    () => buildSortedSellPointEntries(editForm.material || "Construction Material"),
+    [reportedPrices, editForm.material]
+  );
 
   // Fetch community price reports on mount
   useEffect(() => {
@@ -884,14 +985,21 @@ export default function StarCitizenSalvageGuideWebsite() {
       });
     const sells = sellOrders
       .filter((o) => o.submittedAt && o.submittedAt >= historyCutoff)
-      .map((o) => ({
-        id: o.id,
-        source: "sell",
-        type: "Sold",
-        ts: o.submittedAt,
-        primary: `${Number(o.scu).toLocaleString()} SCU → ${Number(o.aUEC).toLocaleString()} aUEC`,
-        secondary: `At ${o.location}`,
-      }));
+      .map((o) => {
+        const materialLabel = o.material || "Construction Material";
+        const isPlayer = o.location === PLAYER_SELL_POINT;
+        const locationLabel = isPlayer && o.playerName
+          ? `${o.location} (${o.playerName})`
+          : o.location;
+        return {
+          id: o.id,
+          source: "sell",
+          type: "Sold",
+          ts: o.submittedAt,
+          primary: `${Number(o.scu).toLocaleString()} SCU ${materialLabel} → ${Number(o.aUEC).toLocaleString()} aUEC`,
+          secondary: `At ${locationLabel}`,
+        };
+      });
     return [...refinery, ...sells].sort((a, b) => b.ts - a.ts);
   }, [refineryJobs, sellOrders, historyCutoff]);
 
@@ -909,7 +1017,8 @@ export default function StarCitizenSalvageGuideWebsite() {
     !isLedgerLoading &&
     Number(orderForm.scu) > 0 &&
     Boolean(orderForm.location) &&
-    Number(orderForm.aUEC) > 0;
+    Number(orderForm.aUEC) > 0 &&
+    (orderForm.location !== PLAYER_SELL_POINT || orderForm.playerName.trim().length > 0);
 
   // Auto-derived cost/time/yield for the new-job form preview.
   const jobFormPreview = useMemo(
@@ -986,16 +1095,25 @@ export default function StarCitizenSalvageGuideWebsite() {
   const submitSellOrder = () => {
     if (!isOrderFormValid) return;
     const submittedAt = Date.now();
+    const isPlayer = orderForm.location === PLAYER_SELL_POINT;
     const newOrder = {
       id: `sell_${submittedAt}_${Math.random().toString(36).slice(2, 8)}`,
+      material: orderForm.material,
       scu: Number(orderForm.scu),
       location: orderForm.location,
+      playerName: isPlayer ? orderForm.playerName.trim() : "",
       aUEC: Number(orderForm.aUEC),
       submittedAt,
     };
     const nextOrders = [newOrder, ...sellOrders];
     setSellOrders(nextOrders);
-    setOrderForm({ scu: "", location: orderForm.location, aUEC: "" });
+    setOrderForm({
+      material: orderForm.material,
+      scu: "",
+      location: orderForm.location,
+      playerName: "",
+      aUEC: "",
+    });
     saveLedger(refineryJobs, nextOrders);
   };
 
@@ -1032,8 +1150,10 @@ export default function StarCitizenSalvageGuideWebsite() {
       if (!o) return;
       setEditingEntry(entry);
       setEditForm({
+        material: o.material || "Construction Material",
         scu: String(o.scu ?? ""),
         location: o.location,
+        playerName: o.playerName || "",
         aUEC: String(o.aUEC ?? ""),
       });
     }
@@ -1058,7 +1178,8 @@ export default function StarCitizenSalvageGuideWebsite() {
       return (
         Number(editForm.scu) > 0 &&
         Boolean(editForm.location) &&
-        Number(editForm.aUEC) > 0
+        Number(editForm.aUEC) > 0 &&
+        (editForm.location !== PLAYER_SELL_POINT || (editForm.playerName || "").trim().length > 0)
       );
     }
     return false;
@@ -1096,12 +1217,15 @@ export default function StarCitizenSalvageGuideWebsite() {
       setRefineryJobs(nextJobs);
       saveLedger(nextJobs, sellOrders);
     } else if (editingEntry.source === "sell") {
+      const isPlayer = editForm.location === PLAYER_SELL_POINT;
       const nextOrders = sellOrders.map((o) =>
         o.id === editingEntry.id
           ? {
               ...o,
+              material: editForm.material || o.material || "Construction Material",
               scu: Number(editForm.scu),
               location: editForm.location,
+              playerName: isPlayer ? (editForm.playerName || "").trim() : "",
               aUEC: Number(editForm.aUEC),
             }
           : o
@@ -1667,11 +1791,30 @@ export default function StarCitizenSalvageGuideWebsite() {
 
           <div className="flex h-full flex-col">
             <div className="flex flex-1 flex-col rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
-              <h2 className="text-xl font-bold text-cyan-300">CMAT Sell Estimate</h2>
+              <h2 className="text-xl font-bold text-cyan-300">Sell Estimate</h2>
               <p className="mt-1 text-sm text-slate-400">Enter your yield amount and select a sell location to calculate your total aUEC value.</p>
               <div className="mt-4 space-y-4">
                 <div className="rounded-2xl border border-slate-700 bg-slate-950/70 p-4">
-                  <label className="mb-2 block text-sm text-slate-400">CMAT SCU</label>
+                  <label className="mb-2 block text-sm text-slate-400">Material</label>
+                  <select
+                    value={selectedSellMaterial}
+                    onChange={(e) => {
+                      const next = e.target.value;
+                      setSelectedSellMaterial(next);
+                      const firstForMat = sellPoints.find((p) => p.material === next);
+                      setSelectedSellPointName(firstForMat?.name ?? PLAYER_SELL_POINT);
+                      setEstimatePlayerName("");
+                    }}
+                    className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 outline-none focus:border-cyan-400"
+                  >
+                    {SELL_MATERIALS.map((m) => (
+                      <option key={m} value={m}>{m}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="rounded-2xl border border-slate-700 bg-slate-950/70 p-4">
+                  <label className="mb-2 block text-sm text-slate-400">Material SCU</label>
                   <input
                     type="number"
                     min="0"
@@ -1691,52 +1834,77 @@ export default function StarCitizenSalvageGuideWebsite() {
                   >
                     {sortedSellPointEntries.map((point) => (
                       <option key={point.name} value={point.name}>
-                        {point.name} · {point.effectivePrice.toLocaleString()} aUEC/SCU{point.isReported ? " ★" : ""}
+                        {point.isPlayer
+                          ? point.name
+                          : `${point.name} · ${point.effectivePrice.toLocaleString()} aUEC/SCU${point.isReported ? " ★" : ""}`}
                       </option>
                     ))}
                   </select>
+                  {isPlayerEstimate && (
+                    <div className="mt-3">
+                      <label className="mb-1 block text-xs text-slate-400">Player Name</label>
+                      <input
+                        type="text"
+                        placeholder="Enter player handle"
+                        value={estimatePlayerName}
+                        onChange={(e) => setEstimatePlayerName(e.target.value)}
+                        className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400"
+                      />
+                    </div>
+                  )}
                 </div>
 
-                <div className="grid gap-3 text-sm md:grid-cols-2">
-                  <div className="rounded-2xl border border-slate-700 bg-slate-950/70 p-4">
-                    <div className="text-slate-400">Region</div>
-                    <div className="mt-1 font-bold text-white">{selectedSellPoint.region}</div>
-                    <div className="mt-3 text-slate-400">System</div>
-                    <div className="mt-1 font-bold text-white">{selectedSellPoint.system}</div>
+                {!isPlayerEstimate && (
+                  <div className="grid gap-3 text-sm md:grid-cols-2">
+                    <div className="rounded-2xl border border-slate-700 bg-slate-950/70 p-4">
+                      <div className="text-slate-400">Region</div>
+                      <div className="mt-1 font-bold text-white">{selectedSellPoint.region}</div>
+                      <div className="mt-3 text-slate-400">System</div>
+                      <div className="mt-1 font-bold text-white">{selectedSellPoint.system}</div>
+                    </div>
+                    <div className="rounded-2xl border border-cyan-500/25 bg-cyan-500/10 p-4">
+                      <div className="text-slate-400">Sell Price</div>
+                      <div className="mt-1 text-xl font-black text-cyan-300">{displaySellPrice.toLocaleString()} aUEC/SCU</div>
+                      <div className="mt-3 text-slate-400">Base Yield Value</div>
+                      <div className="mt-1 text-xl font-black text-emerald-300">{Math.round(sellYieldTotal).toLocaleString()} aUEC</div>
+                    </div>
                   </div>
-                  <div className="rounded-2xl border border-cyan-500/25 bg-cyan-500/10 p-4">
-                    <div className="text-slate-400">Sell Price</div>
-                    <div className="mt-1 text-xl font-black text-cyan-300">{displaySellPrice.toLocaleString()} aUEC/SCU</div>
-                    <div className="mt-3 text-slate-400">Base Yield Value</div>
-                    <div className="mt-1 text-xl font-black text-emerald-300">{Math.round(sellYieldTotal).toLocaleString()} aUEC</div>
+                )}
+
+                {isPlayerEstimate && (
+                  <div className="rounded-2xl border border-cyan-500/25 bg-cyan-500/10 p-4 text-sm text-slate-300">
+                    Player sales have no fixed price. Negotiate with the buyer and log the actual aUEC received in the Sell Orders form.
                   </div>
-                </div>
+                )}
 
-                <div className="overflow-hidden rounded-2xl border border-slate-700">
-                  <table className="w-full text-left text-sm">
-                    <thead className="bg-slate-950 text-slate-300">
-                      <tr>
-                        <th className="px-4 py-3">Metric</th>
-                        <th className="px-4 py-3">Value</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr className="border-t border-slate-800 bg-slate-900/40">
-                        <td className="px-4 py-3">Base Yield</td>
-                        <td className="px-4 py-3 font-bold text-amber-300">{sellYield.toFixed(1)} SCU</td>
-                      </tr>
-                      <tr className="border-t border-slate-800 bg-slate-900/40">
-                        <td className="px-4 py-3">Selected Sell Price</td>
-                        <td className="px-4 py-3 font-bold text-cyan-300">{displaySellPrice.toLocaleString()} aUEC/SCU</td>
-                      </tr>
-                      <tr className="border-t border-slate-800 bg-slate-900/40">
-                        <td className="px-4 py-3">Total From Base Yield</td>
-                        <td className="px-4 py-3 font-bold text-emerald-300">{Math.round(sellYieldTotal).toLocaleString()} aUEC</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+                {!isPlayerEstimate && (
+                  <div className="overflow-hidden rounded-2xl border border-slate-700">
+                    <table className="w-full text-left text-sm">
+                      <thead className="bg-slate-950 text-slate-300">
+                        <tr>
+                          <th className="px-4 py-3">Metric</th>
+                          <th className="px-4 py-3">Value</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="border-t border-slate-800 bg-slate-900/40">
+                          <td className="px-4 py-3">Base Yield</td>
+                          <td className="px-4 py-3 font-bold text-amber-300">{sellYield.toFixed(1)} SCU</td>
+                        </tr>
+                        <tr className="border-t border-slate-800 bg-slate-900/40">
+                          <td className="px-4 py-3">Selected Sell Price</td>
+                          <td className="px-4 py-3 font-bold text-cyan-300">{displaySellPrice.toLocaleString()} aUEC/SCU</td>
+                        </tr>
+                        <tr className="border-t border-slate-800 bg-slate-900/40">
+                          <td className="px-4 py-3">Total From Base Yield</td>
+                          <td className="px-4 py-3 font-bold text-emerald-300">{Math.round(sellYieldTotal).toLocaleString()} aUEC</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                )}
 
+                {isCmatEstimate && (
                 <div className="rounded-2xl border border-cyan-500/30 bg-cyan-500/5 p-4">
                   <div className="text-xs uppercase tracking-[0.2em] text-cyan-200">Report a Price</div>
                   <p className="mt-1 text-xs text-slate-400">
@@ -1786,6 +1954,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <div className="mt-3 text-xs text-slate-500">No community reports yet — be the first!</div>
                   )}
                 </div>
+                )}
               </div>
             </div>
           </div>
@@ -2016,12 +2185,34 @@ export default function StarCitizenSalvageGuideWebsite() {
 
               {/* SELL ORDERS */}
               <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
-                <h2 className="text-xl font-bold text-cyan-300">CMAT Sell Orders</h2>
+                <h2 className="text-xl font-bold text-cyan-300">Sell Orders</h2>
                 <p className="mt-1 text-sm text-slate-400">Log a sale for your lifetime aUEC total.</p>
 
                 <div className="mt-4 grid gap-3 rounded-2xl border border-slate-700 bg-slate-950/70 p-4">
                   <div>
-                    <label className="mb-1 block text-xs text-slate-400">CMAT SCU Amount</label>
+                    <label className="mb-1 block text-xs text-slate-400">Material</label>
+                    <select
+                      value={orderForm.material}
+                      onChange={(e) => {
+                        const next = e.target.value;
+                        const firstForMat = sellPoints.find((p) => p.material === next);
+                        setOrderForm({
+                          ...orderForm,
+                          material: next,
+                          location: firstForMat?.name ?? PLAYER_SELL_POINT,
+                          playerName: "",
+                        });
+                      }}
+                      disabled={!user}
+                      className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {SELL_MATERIALS.map((m) => (
+                        <option key={m} value={m}>{m}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs text-slate-400">SCU Amount</label>
                     <input
                       type="number"
                       min="0"
@@ -2037,17 +2228,32 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <label className="mb-1 block text-xs text-slate-400">Sell Point</label>
                     <select
                       value={orderForm.location}
-                      onChange={(e) => setOrderForm({ ...orderForm, location: e.target.value })}
+                      onChange={(e) => setOrderForm({ ...orderForm, location: e.target.value, playerName: "" })}
                       disabled={!user}
                       className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      {sortedSellPointEntries.map((p) => (
+                      {orderSellPointEntries.map((p) => (
                         <option key={p.name} value={p.name}>
-                          {p.name} · {p.effectivePrice.toLocaleString()} aUEC/SCU{p.isReported ? " ★" : ""}
+                          {p.isPlayer
+                            ? p.name
+                            : `${p.name} · ${p.effectivePrice.toLocaleString()} aUEC/SCU${p.isReported ? " ★" : ""}`}
                         </option>
                       ))}
                     </select>
                   </div>
+                  {orderForm.location === PLAYER_SELL_POINT && (
+                    <div>
+                      <label className="mb-1 block text-xs text-slate-400">Player Name</label>
+                      <input
+                        type="text"
+                        placeholder="Enter player handle"
+                        value={orderForm.playerName}
+                        onChange={(e) => setOrderForm({ ...orderForm, playerName: e.target.value })}
+                        disabled={!user}
+                        className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+                      />
+                    </div>
+                  )}
                   <div>
                     <label className="mb-1 block text-xs text-slate-400">aUEC Amount Received</label>
                     <input
@@ -2086,7 +2292,14 @@ export default function StarCitizenSalvageGuideWebsite() {
                           <div className="flex items-start justify-between gap-2">
                             <div className="min-w-0">
                               <div className="font-semibold text-emerald-300">{Number(o.aUEC).toLocaleString()} aUEC</div>
-                              <div className="text-xs text-slate-400">{Number(o.scu).toLocaleString()} SCU at {o.location}</div>
+                              <div className="text-xs text-slate-400">
+                                {Number(o.scu).toLocaleString()} SCU
+                                {o.material ? ` ${o.material}` : ""}
+                                {" "}at{" "}
+                                {o.location === PLAYER_SELL_POINT && o.playerName
+                                  ? `${o.location} (${o.playerName})`
+                                  : o.location}
+                              </div>
                               <div className="text-xs text-slate-500">{formatTimestamp(o.submittedAt)}</div>
                             </div>
                             {(now - o.submittedAt) < 30000 && (
@@ -2319,7 +2532,28 @@ export default function StarCitizenSalvageGuideWebsite() {
                     ) : (
                       <>
                         <div>
-                          <label className="mb-1 block text-xs text-slate-400">CMAT SCU Amount</label>
+                          <label className="mb-1 block text-xs text-slate-400">Material</label>
+                          <select
+                            value={editForm.material || "Construction Material"}
+                            onChange={(e) => {
+                              const next = e.target.value;
+                              const firstForMat = sellPoints.find((p) => p.material === next);
+                              setEditForm({
+                                ...editForm,
+                                material: next,
+                                location: firstForMat?.name ?? PLAYER_SELL_POINT,
+                                playerName: "",
+                              });
+                            }}
+                            className="w-full rounded-xl border border-cyan-500/25 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-cyan-400"
+                          >
+                            {SELL_MATERIALS.map((m) => (
+                              <option key={m} value={m}>{m}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="mb-1 block text-xs text-slate-400">SCU Amount</label>
                           <input
                             type="number"
                             min="0"
@@ -2333,16 +2567,30 @@ export default function StarCitizenSalvageGuideWebsite() {
                           <label className="mb-1 block text-xs text-slate-400">Sell Point</label>
                           <select
                             value={editForm.location || ""}
-                            onChange={(e) => setEditForm({ ...editForm, location: e.target.value })}
+                            onChange={(e) => setEditForm({ ...editForm, location: e.target.value, playerName: "" })}
                             className="w-full rounded-xl border border-cyan-500/25 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-cyan-400"
                           >
-                            {sortedSellPointEntries.map((p) => (
+                            {editSellPointEntries.map((p) => (
                               <option key={p.name} value={p.name}>
-                                {p.name} · {p.effectivePrice.toLocaleString()} aUEC/SCU{p.isReported ? " ★" : ""}
+                                {p.isPlayer
+                                  ? p.name
+                                  : `${p.name} · ${p.effectivePrice.toLocaleString()} aUEC/SCU${p.isReported ? " ★" : ""}`}
                               </option>
                             ))}
                           </select>
                         </div>
+                        {editForm.location === PLAYER_SELL_POINT && (
+                          <div>
+                            <label className="mb-1 block text-xs text-slate-400">Player Name</label>
+                            <input
+                              type="text"
+                              placeholder="Enter player handle"
+                              value={editForm.playerName || ""}
+                              onChange={(e) => setEditForm({ ...editForm, playerName: e.target.value })}
+                              className="w-full rounded-xl border border-cyan-500/25 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-cyan-400"
+                            />
+                          </div>
+                        )}
                         <div>
                           <label className="mb-1 block text-xs text-slate-400">aUEC Amount Received</label>
                           <input

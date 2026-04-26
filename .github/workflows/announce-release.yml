@@ -1,16 +1,17 @@
-# Posts changelog updates to Discord #releases when README.md is pushed to
-# main. Two cases handled:
+# Posts changelog updates to Discord #releases when manually dispatched.
+# The job extracts the top "UPDATE" block from README.md and:
 #
-#   1. Top "UPDATE" header is *new* vs. the previous commit:
-#      → post the entire top changelog block (full release announcement).
+#   1. If the top header differs from HEAD~1: posts the whole block.
+#   2. If the top header is unchanged but new bullets were appended:
+#      posts just the new bullets, prefixed with "**vX.Y update:**".
+#   3. Otherwise: skips with a status message.
 #
-#   2. Top "UPDATE" header is unchanged but new bullets were appended under
-#      it: → post just the new bullets, prefixed with "**vX.Y update:**".
-#
-#   3. Neither: skip (e.g. README typo fix).
+# Manual-dispatch only — auto-fire on push has been intentionally removed.
+# Discord posts are gated on explicit user approval per the project's
+# discord-permission policy. See post-message.yml for free-form posts.
 #
 # Never tags @everyone — allowed_mentions.parse is locked to []. For
-# everyone-pings use the manual post-message.yml workflow.
+# everyone-pings use post-message.yml.
 #
 # Required GitHub repo secret:
 #   DISCORD_BOT_TOKEN — same bot token used by the Vercel app
@@ -24,10 +25,6 @@
 name: Announce release to Discord
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - README.md
   workflow_dispatch:
 
 env:

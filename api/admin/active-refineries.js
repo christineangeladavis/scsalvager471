@@ -1,8 +1,10 @@
 // GET /api/admin/active-refineries
 //
-// Admin-only. Returns every active refinery job (not yet picked up,
-// submittedAt within the last 7 days) across every user who has ever
-// logged in to the site, grouped by Discord display name.
+// Admin-only. Returns every refinery job AND every sell order submitted
+// in the last 7 days (excluding soft-deleted entries) across every user
+// who has ever logged in to the site, grouped by Discord display name.
+// The endpoint name is historical — originally only returned in-flight
+// jobs; it now backs the broader "Recent Activity" admin view.
 //
 // Auth model:
 //   - Caller must be logged in.
@@ -76,12 +78,11 @@ export default async function handler(req, res) {
     }
 
     const allJobs = Array.isArray(ledger.refineryJobs) ? ledger.refineryJobs : [];
-    const activeJobs = allJobs
+    const jobs = allJobs
       .filter((j) =>
         j &&
         Number.isFinite(j.submittedAt) &&
         j.submittedAt >= cutoff &&
-        !j.pickedUpAt &&
         !j.deletedAt
       )
       .map((j) => ({
@@ -92,25 +93,47 @@ export default async function handler(req, res) {
         method: j.method,
         submittedAt: j.submittedAt,
         completesAt: j.completesAt,
+        pickedUpAt: j.pickedUpAt || null,
         notificationStatus: j.notificationStatus || null,
       }));
 
-    if (activeJobs.length === 0) continue;
+    const allSales = Array.isArray(ledger.sellOrders) ? ledger.sellOrders : [];
+    const sales = allSales
+      .filter((o) =>
+        o &&
+        Number.isFinite(o.submittedAt) &&
+        o.submittedAt >= cutoff &&
+        !o.deletedAt
+      )
+      .map((o) => ({
+        id: o.id,
+        material: o.material,
+        scu: o.scu,
+        aUEC: o.aUEC,
+        location: o.location,
+        playerName: o.playerName || "",
+        submittedAt: o.submittedAt,
+      }));
+
+    if (jobs.length === 0 && sales.length === 0) continue;
 
     const meta = await getUserMeta(redis, userId);
     users.push({
       userId,
       username: (meta && meta.username) || "Unknown",
-      jobs: activeJobs,
+      jobs,
+      sales,
     });
   }
 
-  // Sort users by their earliest in-progress job so the most-recent activity
-  // is easy to find at the top.
+  // Sort users by their most recent event so the freshest activity bubbles
+  // to the top of the table.
   users.sort((a, b) => {
-    const aMin = Math.min(...a.jobs.map((j) => j.completesAt));
-    const bMin = Math.min(...b.jobs.map((j) => j.completesAt));
-    return aMin - bMin;
+    const latest = (u) => {
+      const all = [...u.jobs, ...u.sales].map((e) => e.submittedAt);
+      return all.length ? Math.max(...all) : 0;
+    };
+    return latest(b) - latest(a);
   });
 
   return res.status(200).json({

@@ -851,6 +851,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                 method: "Cormack Method",
                 submittedAt: now - 35 * min,
                 completesAt: now + 25 * min,
+                pickedUpAt: null,
               },
               {
                 id: "mock_a2",
@@ -860,6 +861,28 @@ export default function StarCitizenSalvageGuideWebsite() {
                 method: "Dinyx Solventation",
                 submittedAt: now - 2 * hour,
                 completesAt: now - 5 * min,
+                pickedUpAt: null,
+              },
+              {
+                id: "mock_a3",
+                material: "Construction Salvage",
+                materialScu: 180,
+                location: "Levski",
+                method: "Kazen Winnowing",
+                submittedAt: now - 3 * day,
+                completesAt: now - 3 * day + 90 * min,
+                pickedUpAt: now - 3 * day + 100 * min,
+              },
+            ],
+            sales: [
+              {
+                id: "mock_s1",
+                material: "Construction Material",
+                scu: 36,
+                aUEC: 540000,
+                location: "ARC-L4",
+                playerName: "",
+                submittedAt: now - 3 * day + 110 * min,
               },
             ],
           },
@@ -875,6 +898,18 @@ export default function StarCitizenSalvageGuideWebsite() {
                 method: "Pyrometric Chromalysis",
                 submittedAt: now - 6 * day,
                 completesAt: now + 4 * hour,
+                pickedUpAt: null,
+              },
+            ],
+            sales: [
+              {
+                id: "mock_s2",
+                material: "Recycle Material Composite",
+                scu: 12,
+                aUEC: 120000,
+                location: "Sold to Player",
+                playerName: "Chrissyy",
+                submittedAt: now - 5 * day,
               },
             ],
           },
@@ -890,8 +925,10 @@ export default function StarCitizenSalvageGuideWebsite() {
                 method: "Kazen Winnowing",
                 submittedAt: now - 12 * hour,
                 completesAt: now + 18 * hour,
+                pickedUpAt: null,
               },
             ],
+            sales: [],
           },
         ],
       };
@@ -3357,7 +3394,7 @@ export default function StarCitizenSalvageGuideWebsite() {
             {/* Admin sub-nav */}
             <div className="flex flex-wrap gap-1 border-b border-cyan-500/20" role="tablist" aria-label="Admin sections">
               {[
-                { id: "refineries", label: "Active Refineries" },
+                { id: "refineries", label: "7-Day History" },
                 { id: "users", label: "Active Users" },
                 { id: "exports", label: "Patch Exports" },
               ].map((sec) => {
@@ -3385,9 +3422,9 @@ export default function StarCitizenSalvageGuideWebsite() {
             <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                 <div>
-                  <h2 className="text-xl font-bold text-cyan-300">Active Refineries</h2>
+                  <h2 className="text-xl font-bold text-cyan-300">7-Day History</h2>
                   <p className="mt-1 text-sm text-slate-400">
-                    All in-flight refinery jobs across every signed-in user, submitted in the last 7 days. Admin-only view.
+                    Every refinery job and sale logged across every signed-in user in the last 7 days. Admin-only view.
                   </p>
                 </div>
                 <div className="text-xs text-slate-500">
@@ -3399,7 +3436,7 @@ export default function StarCitizenSalvageGuideWebsite() {
 
               {adminRefineriesLoading && (
                 <div className="mt-6 rounded-2xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">
-                  Loading active refineries…
+                  Loading 7-day history…
                 </div>
               )}
 
@@ -3411,63 +3448,143 @@ export default function StarCitizenSalvageGuideWebsite() {
 
               {!adminRefineriesLoading && !adminRefineriesError && adminRefineries && adminRefineries.users.length === 0 && (
                 <div className="mt-6 rounded-2xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">
-                  No active refinery jobs across any user in the last 7 days.
+                  No activity across any user in the last 7 days.
                 </div>
               )}
 
-              {!adminRefineriesLoading && !adminRefineriesError && adminRefineries && adminRefineries.users.length > 0 && (
-                <div className="mt-5 overflow-x-auto rounded-2xl border border-slate-700">
-                  <table className="w-full min-w-[720px] text-left text-sm md:min-w-0">
-                    <thead className="bg-slate-950 text-slate-300">
-                      <tr>
-                        <th className="px-4 py-3">User</th>
-                        <th className="px-4 py-3">Material</th>
-                        <th className="px-4 py-3 text-right">SCU</th>
-                        <th className="px-4 py-3">Location</th>
-                        <th className="px-4 py-3">Submitted</th>
-                        <th className="px-4 py-3">Completes</th>
-                        <th className="px-4 py-3">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {adminRefineries.users.flatMap((u) =>
-                        u.jobs.map((j) => {
-                          const ready = j.completesAt && j.completesAt <= Date.now();
-                          return (
-                            <tr key={`${u.userId}_${j.id}`} className="border-t border-slate-800 bg-slate-900/40">
-                              <td className="px-4 py-3 font-semibold text-white">{u.username}</td>
-                              <td className="px-4 py-3 text-slate-200">{j.material}</td>
-                              <td className="px-4 py-3 text-right font-bold text-amber-300">
-                                {Number.isFinite(j.materialScu) ? j.materialScu.toLocaleString() : "—"}
-                              </td>
-                              <td className="px-4 py-3 text-slate-300">{j.location || "—"}</td>
-                              <td className="px-4 py-3 text-slate-400 whitespace-nowrap">
-                                {formatTimeAgo(j.submittedAt) || "just now"}
-                              </td>
-                              <td className="px-4 py-3 whitespace-nowrap">
-                                <span className={ready ? "font-bold text-emerald-300" : "text-cyan-200"}>
-                                  {ready
-                                    ? `Ready ${formatTimeAgo(j.completesAt) || "now"}`
-                                    : `in ${formatRefineryDuration(Math.max(0, Math.round((j.completesAt - Date.now()) / 1000)))}`}
-                                </span>
-                              </td>
-                              <td className="px-4 py-3">
-                                <span className={`rounded-lg px-2 py-1 text-xs font-semibold ${
-                                  ready
+              {!adminRefineriesLoading && !adminRefineriesError && adminRefineries && adminRefineries.users.length > 0 && (() => {
+                const allJobs = adminRefineries.users.flatMap((u) =>
+                  (u.jobs || []).map((j) => ({ ...j, _username: u.username, _userId: u.userId }))
+                );
+                const allSales = adminRefineries.users.flatMap((u) =>
+                  (u.sales || []).map((o) => ({ ...o, _username: u.username, _userId: u.userId }))
+                );
+                allJobs.sort((a, b) => b.submittedAt - a.submittedAt);
+                allSales.sort((a, b) => b.submittedAt - a.submittedAt);
+                return (
+                  <div className="mt-5 space-y-6">
+                    {/* Refinery jobs */}
+                    <div>
+                      <div className="mb-2 text-xs uppercase tracking-[0.25em] text-cyan-300/80">
+                        Refinery jobs · {allJobs.length}
+                      </div>
+                      {allJobs.length === 0 ? (
+                        <div className="rounded-2xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">
+                          No refinery jobs in the last 7 days.
+                        </div>
+                      ) : (
+                        <div className="overflow-x-auto rounded-2xl border border-slate-700">
+                          <table className="w-full min-w-[760px] text-left text-sm md:min-w-0">
+                            <thead className="bg-slate-950 text-slate-300">
+                              <tr>
+                                <th className="px-4 py-3">User</th>
+                                <th className="px-4 py-3">Material</th>
+                                <th className="px-4 py-3 text-right">SCU</th>
+                                <th className="px-4 py-3">Location</th>
+                                <th className="px-4 py-3">Submitted</th>
+                                <th className="px-4 py-3">Completes</th>
+                                <th className="px-4 py-3">Status</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {allJobs.map((j) => {
+                                const nowTs = Date.now();
+                                const isPicked = Boolean(j.pickedUpAt);
+                                const isReady = !isPicked && j.completesAt && j.completesAt <= nowTs;
+                                const status = isPicked ? "Picked up" : isReady ? "Ready" : "In progress";
+                                const statusClass = isPicked
+                                  ? "bg-slate-500/15 text-slate-300"
+                                  : isReady
                                     ? "bg-emerald-500/15 text-emerald-200"
-                                    : "bg-cyan-500/15 text-cyan-200"
-                                }`}>
-                                  {ready ? "Ready" : "In progress"}
-                                </span>
-                              </td>
-                            </tr>
-                          );
-                        })
+                                    : "bg-cyan-500/15 text-cyan-200";
+                                const completesText = isPicked
+                                  ? `Picked ${formatTimeAgo(j.pickedUpAt) || "just now"}`
+                                  : isReady
+                                    ? `Ready ${formatTimeAgo(j.completesAt) || "now"}`
+                                    : `in ${formatRefineryDuration(Math.max(0, Math.round((j.completesAt - nowTs) / 1000)))}`;
+                                return (
+                                  <tr key={`${j._userId}_${j.id}`} className="border-t border-slate-800 bg-slate-900/40">
+                                    <td className="px-4 py-3 font-semibold text-white">{j._username}</td>
+                                    <td className="px-4 py-3 text-slate-200">{j.material}</td>
+                                    <td className="px-4 py-3 text-right font-bold text-amber-300">
+                                      {Number.isFinite(j.materialScu) ? j.materialScu.toLocaleString() : "—"}
+                                    </td>
+                                    <td className="px-4 py-3 text-slate-300">{j.location || "—"}</td>
+                                    <td className="px-4 py-3 text-slate-400 whitespace-nowrap">
+                                      {formatTimeAgo(j.submittedAt) || "just now"}
+                                    </td>
+                                    <td className="px-4 py-3 whitespace-nowrap">
+                                      <span className={isPicked ? "text-slate-400" : isReady ? "font-bold text-emerald-300" : "text-cyan-200"}>
+                                        {completesText}
+                                      </span>
+                                    </td>
+                                    <td className="px-4 py-3">
+                                      <span className={`rounded-lg px-2 py-1 text-xs font-semibold ${statusClass}`}>
+                                        {status}
+                                      </span>
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
                       )}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+                    </div>
+
+                    {/* Sales */}
+                    <div>
+                      <div className="mb-2 text-xs uppercase tracking-[0.25em] text-cyan-300/80">
+                        Sales · {allSales.length}
+                      </div>
+                      {allSales.length === 0 ? (
+                        <div className="rounded-2xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">
+                          No sales in the last 7 days.
+                        </div>
+                      ) : (
+                        <div className="overflow-x-auto rounded-2xl border border-slate-700">
+                          <table className="w-full min-w-[720px] text-left text-sm md:min-w-0">
+                            <thead className="bg-slate-950 text-slate-300">
+                              <tr>
+                                <th className="px-4 py-3">User</th>
+                                <th className="px-4 py-3">Material</th>
+                                <th className="px-4 py-3 text-right">SCU</th>
+                                <th className="px-4 py-3 text-right">aUEC</th>
+                                <th className="px-4 py-3">Location</th>
+                                <th className="px-4 py-3">Submitted</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {allSales.map((o) => {
+                                const playerSuffix =
+                                  o.location === PLAYER_SELL_POINT && o.playerName
+                                    ? ` (${o.playerName})`
+                                    : "";
+                                return (
+                                  <tr key={`${o._userId}_${o.id}`} className="border-t border-slate-800 bg-slate-900/40">
+                                    <td className="px-4 py-3 font-semibold text-white">{o._username}</td>
+                                    <td className="px-4 py-3 text-slate-200">{o.material || "—"}</td>
+                                    <td className="px-4 py-3 text-right font-bold text-amber-300">
+                                      {Number.isFinite(o.scu) ? o.scu.toLocaleString() : "—"}
+                                    </td>
+                                    <td className="px-4 py-3 text-right font-bold text-emerald-300">
+                                      {Number.isFinite(o.aUEC) ? o.aUEC.toLocaleString() : "—"}
+                                    </td>
+                                    <td className="px-4 py-3 text-slate-300">{(o.location || "—") + playerSuffix}</td>
+                                    <td className="px-4 py-3 text-slate-400 whitespace-nowrap">
+                                      {formatTimeAgo(o.submittedAt) || "just now"}
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
             )}
 

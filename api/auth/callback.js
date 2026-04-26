@@ -16,6 +16,7 @@ import {
   fetchDiscordUser,
   getCallbackUri,
 } from "../_lib/discord.js";
+import { recordUserLogin } from "../_lib/userIndex.js";
 
 export default async function handler(req, res) {
   const code = req.query && req.query.code;
@@ -55,10 +56,18 @@ export default async function handler(req, res) {
     });
     const discordUser = await fetchDiscordUser(tokenResponse.access_token);
 
+    const displayName = discordUser.global_name || discordUser.username || "Unknown";
     const sessionToken = await createSession(redis, {
       id: String(discordUser.id),
-      username: discordUser.global_name || discordUser.username || "Unknown",
+      username: displayName,
       avatar: discordUser.avatar || null,
+    });
+
+    // Index this login so admin views can list every known user. Best-effort —
+    // failure here doesn't block the login flow.
+    await recordUserLogin(redis, {
+      id: String(discordUser.id),
+      username: displayName,
     });
 
     res.setHeader("Set-Cookie", [

@@ -513,6 +513,11 @@ export default function StarCitizenSalvageGuideWebsite() {
   // built with, a banner asks the user to hard-refresh.
   const [updateAvailable, setUpdateAvailable] = useState(false);
 
+  // --- Admin "Active Refineries" tab data ---
+  const [adminRefineries, setAdminRefineries] = useState(null);
+  const [adminRefineriesLoading, setAdminRefineriesLoading] = useState(false);
+  const [adminRefineriesError, setAdminRefineriesError] = useState("");
+
   // --- User preferences (loaded from /api/me/prefs after auth) ---
   const [prefs, setPrefs] = useState({
     discordNotifications: false,
@@ -773,6 +778,125 @@ export default function StarCitizenSalvageGuideWebsite() {
       });
     return () => { cancelled = true; };
   }, []);
+
+  // --- Admin Active Refineries: load when the admin tab is opened.
+  // In dev (no auth, no Redis), fall back to mock data so the table can be
+  // exercised in the local preview. The dev branch is dead-code-eliminated by
+  // vite build, so production never sees the mock.
+  useEffect(() => {
+    if (activeTab !== "admin") return;
+    if (!(user?.isAdmin || import.meta.env.DEV)) return;
+    let cancelled = false;
+    setAdminRefineriesLoading(true);
+    setAdminRefineriesError("");
+
+    const devMock = () => {
+      const now = Date.now();
+      const min = 60 * 1000;
+      const hour = 60 * min;
+      const day = 24 * hour;
+      return {
+        fetchedAt: now,
+        users: [
+          {
+            userId: "dev-1",
+            username: "Chrissyy",
+            jobs: [
+              {
+                id: "mock_a1",
+                material: "Construction Salvage",
+                materialScu: 240,
+                location: "Levski",
+                method: "Cormack Method",
+                submittedAt: now - 35 * min,
+                completesAt: now + 25 * min,
+              },
+              {
+                id: "mock_a2",
+                material: "Construction Pieces",
+                materialScu: 90,
+                location: "Levski",
+                method: "Dinyx Solventation",
+                submittedAt: now - 2 * hour,
+                completesAt: now - 5 * min,
+              },
+            ],
+          },
+          {
+            userId: "dev-2",
+            username: "Denavago",
+            jobs: [
+              {
+                id: "mock_b1",
+                material: "Construction Rubble",
+                materialScu: 480,
+                location: "Levski",
+                method: "Pyrometric Chromalysis",
+                submittedAt: now - 6 * day,
+                completesAt: now + 4 * hour,
+              },
+            ],
+          },
+          {
+            userId: "dev-3",
+            username: "TestPilot42",
+            jobs: [
+              {
+                id: "mock_c1",
+                material: "Construction Salvage",
+                materialScu: 60,
+                location: "Levski",
+                method: "Kazen Winnowing",
+                submittedAt: now - 12 * hour,
+                completesAt: now + 18 * hour,
+              },
+            ],
+          },
+        ],
+      };
+    };
+
+    fetch("/api/admin/active-refineries", { credentials: "same-origin" })
+      .then((res) => {
+        if (res.status === 401 || res.status === 403) {
+          if (import.meta.env.DEV) {
+            return { __useMock: true };
+          }
+          throw new Error(
+            res.status === 401
+              ? "Not signed in."
+              : "You don't have admin access."
+          );
+        }
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        if (cancelled) return;
+        if (data && data.__useMock) {
+          setAdminRefineries(devMock());
+        } else {
+          setAdminRefineries(data);
+        }
+        setAdminRefineriesLoading(false);
+      })
+      .catch((e) => {
+        if (cancelled) return;
+        // In dev the API always 404/HTML-fallbacks because /api isn't served.
+        // Fall back to mock data so the preview always shows something.
+        if (import.meta.env.DEV) {
+          setAdminRefineries(devMock());
+          setAdminRefineriesLoading(false);
+          return;
+        }
+        setAdminRefineriesError(e.message || "Could not load.");
+        setAdminRefineriesLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab, user]);
 
   // --- Deploy detection: poll /version.json and flip updateAvailable when it
   // diverges from the version this bundle was built with. Active only for
@@ -1609,6 +1733,12 @@ export default function StarCitizenSalvageGuideWebsite() {
             { id: "home", label: "Home" },
             { id: "ships", label: "Ship Details" },
             { id: "ledger", label: "Ledger" },
+            // Admin-only Active Refineries view: visible to the configured
+            // admin Discord user, plus always in dev so the tab can be
+            // exercised in the local preview without auth.
+            ...(user?.isAdmin || import.meta.env.DEV
+              ? [{ id: "admin", label: "Admin Panel" }]
+              : []),
           ].map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -2918,6 +3048,98 @@ export default function StarCitizenSalvageGuideWebsite() {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {activeTab === "admin" && (user?.isAdmin || import.meta.env.DEV) && (
+          <div className="space-y-6">
+            <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <h2 className="text-xl font-bold text-cyan-300">Active Refineries</h2>
+                  <p className="mt-1 text-sm text-slate-400">
+                    All in-flight refinery jobs across every signed-in user, submitted in the last 7 days. Admin-only view.
+                  </p>
+                </div>
+                <div className="text-xs text-slate-500">
+                  {adminRefineries?.fetchedAt
+                    ? `Updated ${formatTimeAgo(adminRefineries.fetchedAt) || "just now"}`
+                    : ""}
+                </div>
+              </div>
+
+              {adminRefineriesLoading && (
+                <div className="mt-6 rounded-2xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">
+                  Loading active refineries…
+                </div>
+              )}
+
+              {!adminRefineriesLoading && adminRefineriesError && (
+                <div className="mt-6 rounded-2xl border border-rose-500/40 bg-rose-500/10 p-4 text-sm text-rose-200">
+                  {adminRefineriesError}
+                </div>
+              )}
+
+              {!adminRefineriesLoading && !adminRefineriesError && adminRefineries && adminRefineries.users.length === 0 && (
+                <div className="mt-6 rounded-2xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">
+                  No active refinery jobs across any user in the last 7 days.
+                </div>
+              )}
+
+              {!adminRefineriesLoading && !adminRefineriesError && adminRefineries && adminRefineries.users.length > 0 && (
+                <div className="mt-5 overflow-x-auto rounded-2xl border border-slate-700">
+                  <table className="w-full min-w-[720px] text-left text-sm md:min-w-0">
+                    <thead className="bg-slate-950 text-slate-300">
+                      <tr>
+                        <th className="px-4 py-3">User</th>
+                        <th className="px-4 py-3">Material</th>
+                        <th className="px-4 py-3 text-right">SCU</th>
+                        <th className="px-4 py-3">Location</th>
+                        <th className="px-4 py-3">Submitted</th>
+                        <th className="px-4 py-3">Completes</th>
+                        <th className="px-4 py-3">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {adminRefineries.users.flatMap((u) =>
+                        u.jobs.map((j) => {
+                          const ready = j.completesAt && j.completesAt <= Date.now();
+                          return (
+                            <tr key={`${u.userId}_${j.id}`} className="border-t border-slate-800 bg-slate-900/40">
+                              <td className="px-4 py-3 font-semibold text-white">{u.username}</td>
+                              <td className="px-4 py-3 text-slate-200">{j.material}</td>
+                              <td className="px-4 py-3 text-right font-bold text-amber-300">
+                                {Number.isFinite(j.materialScu) ? j.materialScu.toLocaleString() : "—"}
+                              </td>
+                              <td className="px-4 py-3 text-slate-300">{j.location || "—"}</td>
+                              <td className="px-4 py-3 text-slate-400 whitespace-nowrap">
+                                {formatTimeAgo(j.submittedAt) || "just now"}
+                              </td>
+                              <td className="px-4 py-3 whitespace-nowrap">
+                                <span className={ready ? "font-bold text-emerald-300" : "text-cyan-200"}>
+                                  {ready
+                                    ? `Ready ${formatTimeAgo(j.completesAt) || "now"}`
+                                    : `in ${formatRefineryDuration(Math.max(0, Math.round((j.completesAt - Date.now()) / 1000)))}`}
+                                </span>
+                              </td>
+                              <td className="px-4 py-3">
+                                <span className={`rounded-lg px-2 py-1 text-xs font-semibold ${
+                                  ready
+                                    ? "bg-emerald-500/15 text-emerald-200"
+                                    : "bg-cyan-500/15 text-cyan-200"
+                                }`}>
+                                  {ready ? "Ready" : "In progress"}
+                                </span>
+                              </td>
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
           </div>
         )}
 

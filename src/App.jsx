@@ -1356,20 +1356,27 @@ export default function StarCitizenSalvageGuideWebsite() {
     return null;
   };
 
-  const inProgressJobs = refineryJobs.filter((j) => jobStatus(j) === "in_progress");
-  const readyJobs = refineryJobs.filter((j) => jobStatus(j) === "ready");
+  // Soft-deleted jobs and orders stay in the underlying arrays so the admin
+  // export endpoint can include them as cancelled/deleted rows for audit
+  // purposes. The user-facing UI works off the visible* views which strip
+  // them out so they never appear in counts, lifetime stats, or history.
+  const visibleRefineryJobs = refineryJobs.filter((j) => !j.deletedAt);
+  const visibleSellOrders = sellOrders.filter((o) => !o.deletedAt);
+
+  const inProgressJobs = visibleRefineryJobs.filter((j) => jobStatus(j) === "in_progress");
+  const readyJobs = visibleRefineryJobs.filter((j) => jobStatus(j) === "ready");
   const activeJobsCount = inProgressJobs.length + readyJobs.length;
-  const lifetimeRefinedSCU = refineryJobs
+  const lifetimeRefinedSCU = visibleRefineryJobs
     .filter((j) => j.pickedUpAt)
     .reduce((sum, j) => sum + (Number(j.yield) || 0), 0);
-  const lifetimeRefineryCost = refineryJobs
+  const lifetimeRefineryCost = visibleRefineryJobs
     .reduce((sum, j) => sum + (Number(j.cost) || 0), 0);
-  const lifetimeAUEC = sellOrders.reduce((sum, o) => sum + (Number(o.aUEC) || 0), 0);
+  const lifetimeAUEC = visibleSellOrders.reduce((sum, o) => sum + (Number(o.aUEC) || 0), 0);
 
   const historyCutoff = now - 30 * 24 * 60 * 60 * 1000;
   const historyEntries = useMemo(() => {
     const refinery = refineryJobs
-      .filter((j) => j.pickedUpAt && j.pickedUpAt >= historyCutoff)
+      .filter((j) => !j.deletedAt && j.pickedUpAt && j.pickedUpAt >= historyCutoff)
       .map((j) => {
         const parts = [];
         if (j.location) parts.push(j.location);
@@ -1386,7 +1393,7 @@ export default function StarCitizenSalvageGuideWebsite() {
         };
       });
     const sells = sellOrders
-      .filter((o) => o.submittedAt && o.submittedAt >= historyCutoff)
+      .filter((o) => !o.deletedAt && o.submittedAt && o.submittedAt >= historyCutoff)
       .map((o) => {
         const materialLabel = o.material || "Construction Material";
         const isPlayer = o.location === PLAYER_SELL_POINT;
@@ -1498,7 +1505,12 @@ export default function StarCitizenSalvageGuideWebsite() {
   };
 
   const deleteJob = (id) => {
-    const nextJobs = refineryJobs.filter((j) => j.id !== id);
+    // Soft-delete: mark with deletedAt so admin exports can audit
+    // cancelled jobs. The user-facing UI filters out deletedAt entries
+    // via visibleRefineryJobs, so this is invisible to the user.
+    const nextJobs = refineryJobs.map((j) =>
+      j.id === id ? { ...j, deletedAt: Date.now() } : j
+    );
     setRefineryJobs(nextJobs);
     saveLedger(nextJobs, sellOrders);
   };
@@ -1529,16 +1541,25 @@ export default function StarCitizenSalvageGuideWebsite() {
   };
 
   const deleteSellOrder = (id) => {
-    const nextOrders = sellOrders.filter((o) => o.id !== id);
+    // Soft-delete: see deleteJob comment.
+    const nextOrders = sellOrders.map((o) =>
+      o.id === id ? { ...o, deletedAt: Date.now() } : o
+    );
     setSellOrders(nextOrders);
     saveLedger(refineryJobs, nextOrders);
   };
 
   const clearAllHistory = () => {
-    setRefineryJobs([]);
-    setSellOrders([]);
+    // Soft-delete everything so the audit log retains the history. The
+    // user-facing UI filters !deletedAt so this looks identical to a hard
+    // wipe from their perspective.
+    const ts = Date.now();
+    const nextJobs = refineryJobs.map((j) => (j.deletedAt ? j : { ...j, deletedAt: ts }));
+    const nextOrders = sellOrders.map((o) => (o.deletedAt ? o : { ...o, deletedAt: ts }));
+    setRefineryJobs(nextJobs);
+    setSellOrders(nextOrders);
     setShowClearConfirm(false);
-    saveLedger([], []);
+    saveLedger(nextJobs, nextOrders);
   };
 
   // --- History entry editing ---
@@ -2723,12 +2744,12 @@ export default function StarCitizenSalvageGuideWebsite() {
                 </div>
 
                 <div className="mt-5">
-                  <div className="text-xs uppercase tracking-[0.25em] text-cyan-300/80">Recent Sales · {sellOrders.length}</div>
-                  {sellOrders.length === 0 ? (
+                  <div className="text-xs uppercase tracking-[0.25em] text-cyan-300/80">Recent Sales · {visibleSellOrders.length}</div>
+                  {visibleSellOrders.length === 0 ? (
                     <div className="mt-2 rounded-xl border border-dashed border-slate-700 p-4 text-center text-xs text-slate-500">No sales logged yet.</div>
                   ) : (
                     <div className="mt-2 max-h-96 space-y-2 overflow-y-auto rounded-xl border border-slate-800 bg-slate-950/40 p-2 pr-3">
-                      {sellOrders.map((o) => (
+                      {visibleSellOrders.map((o) => (
                         <div key={o.id} className="rounded-xl border border-slate-700 bg-slate-950/60 p-3 text-sm">
                           <div className="flex items-start justify-between gap-2">
                             <div className="min-w-0">
@@ -2789,7 +2810,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                       </button>
                     </>
                   )}
-                  {user && (refineryJobs.length > 0 || sellOrders.length > 0) && (
+                  {user && (visibleRefineryJobs.length > 0 || visibleSellOrders.length > 0) && (
                     <button
                       type="button"
                       onClick={() => setShowClearConfirm(true)}

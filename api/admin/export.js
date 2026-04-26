@@ -54,8 +54,21 @@ function isoOrEmpty(ms) {
   return new Date(ms).toISOString();
 }
 
+// "Status" derived from job timestamps:
+//   cancelled — user discarded/deleted the job (deletedAt set)
+//   picked_up — user collected the refined material (pickedUpAt set)
+//   ready     — timer elapsed, awaiting pickup
+//   in_progress — timer still running
+function refineryJobStatus(j, now) {
+  if (j.deletedAt) return "cancelled";
+  if (j.pickedUpAt) return "picked_up";
+  if (Number.isFinite(j.completesAt) && j.completesAt <= now) return "ready";
+  return "in_progress";
+}
+
 async function buildRefineryRows(redis, range) {
   const userIds = await listUserIds(redis);
+  const now = Date.now();
   const rows = [];
   for (const userId of userIds) {
     let ledger;
@@ -74,6 +87,7 @@ async function buildRefineryRows(redis, range) {
         username,
         userId,
         jobId: j.id || "",
+        status: refineryJobStatus(j, now),
         material: j.material || "",
         materialScu: Number.isFinite(j.materialScu) ? j.materialScu : "",
         location: j.location || "",
@@ -83,6 +97,7 @@ async function buildRefineryRows(redis, range) {
         submittedAt: isoOrEmpty(j.submittedAt),
         completesAt: isoOrEmpty(j.completesAt),
         pickedUpAt: isoOrEmpty(j.pickedUpAt),
+        deletedAt: isoOrEmpty(j.deletedAt),
         notificationStatus: j.notificationStatus || "",
       });
     }
@@ -111,12 +126,14 @@ async function buildSalesRows(redis, range) {
         username,
         userId,
         orderId: o.id || "",
+        status: o.deletedAt ? "deleted" : "active",
         material: o.material || "",
         scu: Number.isFinite(o.scu) ? o.scu : "",
         aUEC: Number.isFinite(o.aUEC) ? o.aUEC : "",
         location: o.location || "",
         playerName: o.playerName || "",
         submittedAt: isoOrEmpty(o.submittedAt),
+        deletedAt: isoOrEmpty(o.deletedAt),
       });
     }
   }
@@ -147,6 +164,7 @@ const TYPE_CONFIG = {
       "username",
       "userId",
       "jobId",
+      "status",
       "material",
       "materialScu",
       "location",
@@ -156,6 +174,7 @@ const TYPE_CONFIG = {
       "submittedAt",
       "completesAt",
       "pickedUpAt",
+      "deletedAt",
       "notificationStatus",
     ],
     sheetName: "Refinery Jobs",
@@ -166,12 +185,14 @@ const TYPE_CONFIG = {
       "username",
       "userId",
       "orderId",
+      "status",
       "material",
       "scu",
       "aUEC",
       "location",
       "playerName",
       "submittedAt",
+      "deletedAt",
     ],
     sheetName: "Sell Orders",
     build: buildSalesRows,

@@ -81,7 +81,8 @@ export default async function handler(req, res) {
         j &&
         Number.isFinite(j.submittedAt) &&
         j.submittedAt >= cutoff &&
-        !j.pickedUpAt
+        !j.pickedUpAt &&
+        !j.deletedAt
       )
       .map((j) => ({
         id: j.id,

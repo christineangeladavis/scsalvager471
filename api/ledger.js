@@ -31,6 +31,11 @@ export function sanitizeRefineryJob(j) {
     submittedAt: Number(j.submittedAt),
     completesAt: Number(j.completesAt),
     pickedUpAt: j.pickedUpAt ? Number(j.pickedUpAt) : null,
+    // Soft-delete marker. When the user clicks Discard/Delete in the UI,
+    // we set deletedAt instead of removing the record so admin exports can
+    // include cancelled jobs in the audit log. Client-side views filter
+    // these out.
+    deletedAt: j.deletedAt ? Number(j.deletedAt) : null,
     // Notification bookkeeping (set by the deliver endpoint, never by the client).
     notifiedAt: j.notifiedAt ? Number(j.notifiedAt) : null,
     notificationStatus: j.notificationStatus
@@ -46,6 +51,7 @@ export function sanitizeRefineryJob(j) {
   if (!Number.isFinite(out.yield) || !Number.isFinite(out.cost)) return null;
   if (!Number.isFinite(out.submittedAt) || !Number.isFinite(out.completesAt)) return null;
   if (out.pickedUpAt !== null && !Number.isFinite(out.pickedUpAt)) out.pickedUpAt = null;
+  if (out.deletedAt !== null && !Number.isFinite(out.deletedAt)) out.deletedAt = null;
   if (out.notifiedAt !== null && !Number.isFinite(out.notifiedAt)) out.notifiedAt = null;
   if (out.location === undefined) delete out.location;
   if (out.method === undefined) delete out.method;
@@ -57,14 +63,23 @@ export function sanitizeSellOrder(o) {
   if (!o || typeof o !== "object") return null;
   const out = {
     id: String(o.id || "").slice(0, 80),
+    // Material defaults to Construction Material for legacy entries written
+    // before the field was tracked.
+    material: o.material ? String(o.material).slice(0, 80) : "Construction Material",
     scu: Number(o.scu),
     location: String(o.location || "").slice(0, 120),
+    // Player name only meaningful when the location is the player-sale
+    // sentinel; we still store it raw so admin exports can audit it.
+    playerName: o.playerName ? String(o.playerName).slice(0, 80) : "",
     aUEC: Number(o.aUEC),
     submittedAt: Number(o.submittedAt),
+    // Soft-delete marker — same role as on refinery jobs.
+    deletedAt: o.deletedAt ? Number(o.deletedAt) : null,
   };
   if (!out.id || !out.location) return null;
   if (!Number.isFinite(out.scu) || !Number.isFinite(out.aUEC)) return null;
   if (!Number.isFinite(out.submittedAt)) return null;
+  if (out.deletedAt !== null && !Number.isFinite(out.deletedAt)) out.deletedAt = null;
   return out;
 }
 

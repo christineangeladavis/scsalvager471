@@ -122,11 +122,17 @@ async function buildSalesRows(redis, range) {
     for (const o of orders) {
       if (!Number.isFinite(o?.submittedAt)) continue;
       if (o.submittedAt < range.from || o.submittedAt >= range.to) continue;
+      // Status precedence: full delete wins over dismiss-from-recent.
+      const status = o.deletedAt
+        ? "deleted"
+        : o.dismissedFromRecentAt
+          ? "dismissed_from_recent"
+          : "active";
       rows.push({
         username,
         userId,
         orderId: o.id || "",
-        status: o.deletedAt ? "deleted" : "active",
+        status,
         material: o.material || "",
         scu: Number.isFinite(o.scu) ? o.scu : "",
         aUEC: Number.isFinite(o.aUEC) ? o.aUEC : "",
@@ -134,6 +140,7 @@ async function buildSalesRows(redis, range) {
         playerName: o.playerName || "",
         submittedAt: isoOrEmpty(o.submittedAt),
         deletedAt: isoOrEmpty(o.deletedAt),
+        dismissedFromRecentAt: isoOrEmpty(o.dismissedFromRecentAt),
       });
     }
   }
@@ -193,6 +200,7 @@ const TYPE_CONFIG = {
       "playerName",
       "submittedAt",
       "deletedAt",
+      "dismissedFromRecentAt",
     ],
     sheetName: "Sell Orders",
     build: buildSalesRows,

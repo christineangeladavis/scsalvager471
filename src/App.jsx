@@ -1363,6 +1363,18 @@ export default function StarCitizenSalvageGuideWebsite() {
   const visibleRefineryJobs = refineryJobs.filter((j) => !j.deletedAt);
   const visibleSellOrders = sellOrders.filter((o) => !o.deletedAt);
 
+  // Recent Sales card is a 7-day rolling window; orders the user has
+  // explicitly dismissed-from-recent are also hidden here. They still
+  // appear in the 30-day history and lifetime totals because the
+  // dismiss action is "hide from this feed" rather than "delete".
+  const recentSalesCutoff = now - 7 * 24 * 60 * 60 * 1000;
+  const recentSellOrders = visibleSellOrders.filter(
+    (o) =>
+      !o.dismissedFromRecentAt &&
+      Number.isFinite(o.submittedAt) &&
+      o.submittedAt >= recentSalesCutoff
+  );
+
   const inProgressJobs = visibleRefineryJobs.filter((j) => jobStatus(j) === "in_progress");
   const readyJobs = visibleRefineryJobs.filter((j) => jobStatus(j) === "ready");
   const activeJobsCount = inProgressJobs.length + readyJobs.length;
@@ -1541,9 +1553,22 @@ export default function StarCitizenSalvageGuideWebsite() {
   };
 
   const deleteSellOrder = (id) => {
-    // Soft-delete: see deleteJob comment.
+    // Soft-delete: see deleteJob comment. Used by the 30-day history's
+    // delete action — the order disappears everywhere (Recent Sales,
+    // history, lifetime stats) but is preserved for admin export.
     const nextOrders = sellOrders.map((o) =>
       o.id === id ? { ...o, deletedAt: Date.now() } : o
+    );
+    setSellOrders(nextOrders);
+    saveLedger(refineryJobs, nextOrders);
+  };
+
+  const dismissSellOrderFromRecent = (id) => {
+    // Soft-dismiss: order is hidden from the Recent Sales card only —
+    // the 30-day history and lifetime stats still count it. Lets the user
+    // prune the recent-sales feed without losing the underlying record.
+    const nextOrders = sellOrders.map((o) =>
+      o.id === id ? { ...o, dismissedFromRecentAt: Date.now() } : o
     );
     setSellOrders(nextOrders);
     saveLedger(refineryJobs, nextOrders);
@@ -2744,12 +2769,13 @@ export default function StarCitizenSalvageGuideWebsite() {
                 </div>
 
                 <div className="mt-5">
-                  <div className="text-xs uppercase tracking-[0.25em] text-cyan-300/80">Recent Sales · {visibleSellOrders.length}</div>
-                  {visibleSellOrders.length === 0 ? (
-                    <div className="mt-2 rounded-xl border border-dashed border-slate-700 p-4 text-center text-xs text-slate-500">No sales logged yet.</div>
+                  <div className="text-xs uppercase tracking-[0.25em] text-cyan-300/80">Recent Sales · {recentSellOrders.length}</div>
+                  <div className="mt-1 text-[11px] text-slate-500">Last 7 days. Dismissing here keeps the sale in your 30-day history.</div>
+                  {recentSellOrders.length === 0 ? (
+                    <div className="mt-2 rounded-xl border border-dashed border-slate-700 p-4 text-center text-xs text-slate-500">No sales in the last 7 days.</div>
                   ) : (
                     <div className="mt-2 max-h-96 space-y-2 overflow-y-auto rounded-xl border border-slate-800 bg-slate-950/40 p-2 pr-3">
-                      {visibleSellOrders.map((o) => (
+                      {recentSellOrders.map((o) => (
                         <div key={o.id} className="rounded-xl border border-slate-700 bg-slate-950/60 p-3 text-sm">
                           <div className="flex items-start justify-between gap-2">
                             <div className="min-w-0">
@@ -2764,15 +2790,14 @@ export default function StarCitizenSalvageGuideWebsite() {
                               </div>
                               <div className="text-xs text-slate-500">{formatTimestamp(o.submittedAt)}</div>
                             </div>
-                            {(now - o.submittedAt) < 30000 && (
-                              <button
-                                type="button"
-                                onClick={() => deleteSellOrder(o.id)}
-                                className="shrink-0 text-xs text-slate-500 underline-offset-2 hover:text-rose-300 hover:underline"
-                              >
-                                Delete
-                              </button>
-                            )}
+                            <button
+                              type="button"
+                              onClick={() => dismissSellOrderFromRecent(o.id)}
+                              className="shrink-0 text-xs text-slate-500 underline-offset-2 hover:text-rose-300 hover:underline"
+                              title="Hide from Recent Sales — stays in your 30-day history"
+                            >
+                              Dismiss
+                            </button>
                           </div>
                         </div>
                       ))}

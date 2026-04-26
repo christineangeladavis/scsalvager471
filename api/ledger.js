@@ -73,13 +73,24 @@ export function sanitizeSellOrder(o) {
     playerName: o.playerName ? String(o.playerName).slice(0, 80) : "",
     aUEC: Number(o.aUEC),
     submittedAt: Number(o.submittedAt),
-    // Soft-delete marker — same role as on refinery jobs.
+    // Soft-delete marker — hides the order everywhere (Recent Sales, the
+    // 30-day history list, and the user's running totals).
     deletedAt: o.deletedAt ? Number(o.deletedAt) : null,
+    // Dismiss-from-Recent marker — the user clicked "Delete" on the
+    // Recent Sales card. The order is hidden from Recent Sales but is
+    // STILL counted in the 30-day history and lifetime stats. Lets the
+    // user prune the recent-sales feed without losing history.
+    dismissedFromRecentAt: o.dismissedFromRecentAt
+      ? Number(o.dismissedFromRecentAt)
+      : null,
   };
   if (!out.id || !out.location) return null;
   if (!Number.isFinite(out.scu) || !Number.isFinite(out.aUEC)) return null;
   if (!Number.isFinite(out.submittedAt)) return null;
   if (out.deletedAt !== null && !Number.isFinite(out.deletedAt)) out.deletedAt = null;
+  if (out.dismissedFromRecentAt !== null && !Number.isFinite(out.dismissedFromRecentAt)) {
+    out.dismissedFromRecentAt = null;
+  }
   return out;
 }
 

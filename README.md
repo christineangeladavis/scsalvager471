@@ -22,4 +22,4 @@ RELEASE V1.0
 - Median-of-recent-reports makes displayed prices resistant to single bad submissions
 - **Ledger tab** — personal refinery job / sell order tracker with live timers, pickup flow, lifetime stats, and a 30-day history
 - **Discord login** — users sign in with Discord to sync their Ledger across devices
-- Scroll-optimized animated space background
+- Scroll-optimized animated space background 

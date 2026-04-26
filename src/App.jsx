@@ -563,28 +563,26 @@ export default function StarCitizenSalvageGuideWebsite() {
   const methodTimeSeconds = refineryResult.timeSeconds;
 
   const sellYield = getSafeScuValue(sellYieldInput);
-  const isCmatEstimate = selectedSellMaterial === "Construction Material" && !isPlayerEstimate;
+  const selectedSellPriceKey = `${selectedSellMaterial}::${selectedSellPointName}`;
   const selectedSellPointPrice = isPlayerEstimate
     ? 0
-    : isCmatEstimate
-      ? reportedPrices[selectedSellPointName] ?? selectedSellPoint.pricePerScu
-      : selectedSellPoint.pricePerScu;
+    : reportedPrices[selectedSellPriceKey] ?? selectedSellPoint.pricePerScu;
   const isSelectedSellPointReported =
-    isCmatEstimate && reportedPrices[selectedSellPointName] !== undefined;
+    !isPlayerEstimate && reportedPrices[selectedSellPriceKey] !== undefined;
   const sellYieldTotal = sellYield * selectedSellPointPrice;
   const displaySellPrice = sellYield > 0 ? selectedSellPointPrice : 0;
 
   const buildSortedSellPointEntries = (material) => {
-    const isCmat = material === "Construction Material";
     const filtered = sellPoints
       .filter((p) => p.material === material)
-      .map((point) => ({
-        ...point,
-        effectivePrice: isCmat
-          ? reportedPrices[point.name] ?? point.pricePerScu
-          : point.pricePerScu,
-        isReported: isCmat && reportedPrices[point.name] !== undefined,
-      }))
+      .map((point) => {
+        const key = `${material}::${point.name}`;
+        return {
+          ...point,
+          effectivePrice: reportedPrices[key] ?? point.pricePerScu,
+          isReported: reportedPrices[key] !== undefined,
+        };
+      })
       .sort(
         (a, b) =>
           b.effectivePrice - a.effectivePrice || a.name.localeCompare(b.name)
@@ -659,11 +657,16 @@ export default function StarCitizenSalvageGuideWebsite() {
     }
     setReportError("");
     setIsSubmittingReport(true);
+    const reportKey = `${selectedSellMaterial}::${selectedSellPointName}`;
     try {
       const res = await fetch("/api/prices", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ location: selectedSellPointName, price: parsed }),
+        body: JSON.stringify({
+          material: selectedSellMaterial,
+          location: selectedSellPointName,
+          price: parsed,
+        }),
       });
       const info = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -672,11 +675,11 @@ export default function StarCitizenSalvageGuideWebsite() {
       }
       setReportedPrices((prev) => ({
         ...prev,
-        [selectedSellPointName]: info.medianPrice,
+        [reportKey]: info.medianPrice,
       }));
       setReportedMeta((prev) => ({
         ...prev,
-        [selectedSellPointName]: {
+        [reportKey]: {
           reportCount: info.reportCount || 0,
           lastReportedAt: info.lastReportedAt || Date.now(),
         },
@@ -1904,11 +1907,11 @@ export default function StarCitizenSalvageGuideWebsite() {
                   </div>
                 )}
 
-                {isCmatEstimate && (
+                {!isPlayerEstimate && (
                 <div className="rounded-2xl border border-cyan-500/30 bg-cyan-500/5 p-4">
                   <div className="text-xs uppercase tracking-[0.2em] text-cyan-200">Report a Price</div>
                   <p className="mt-1 text-xs text-slate-400">
-                    Seeing a different in-game price at <span className="font-semibold text-cyan-300">{selectedSellPointName}</span>? Report it — the Sell Location list updates for everyone.
+                    Seeing a different in-game price for <span className="font-semibold text-cyan-300">{selectedSellMaterial}</span> at <span className="font-semibold text-cyan-300">{selectedSellPointName}</span>? Report it — the Sell Location list updates for everyone.
                   </p>
                   <div className="mt-3 flex items-stretch gap-2">
                     <input
@@ -1939,13 +1942,13 @@ export default function StarCitizenSalvageGuideWebsite() {
                   ) : isSelectedSellPointReported ? (
                     <div className="mt-3 text-xs text-amber-200/90">
                       <span className="font-semibold">★ Community median:</span>{" "}
-                      {reportedPrices[selectedSellPointName].toLocaleString()} aUEC/SCU
-                      {reportedMeta[selectedSellPointName] && (
+                      {reportedPrices[selectedSellPriceKey].toLocaleString()} aUEC/SCU
+                      {reportedMeta[selectedSellPriceKey] && (
                         <span className="text-slate-400">
                           {" · "}
-                          {reportedMeta[selectedSellPointName].reportCount} report{reportedMeta[selectedSellPointName].reportCount === 1 ? "" : "s"}
-                          {reportedMeta[selectedSellPointName].lastReportedAt
-                            ? ` · last ${formatTimeAgo(reportedMeta[selectedSellPointName].lastReportedAt)}`
+                          {reportedMeta[selectedSellPriceKey].reportCount} report{reportedMeta[selectedSellPriceKey].reportCount === 1 ? "" : "s"}
+                          {reportedMeta[selectedSellPriceKey].lastReportedAt
+                            ? ` · last ${formatTimeAgo(reportedMeta[selectedSellPriceKey].lastReportedAt)}`
                             : ""}
                         </span>
                       )}

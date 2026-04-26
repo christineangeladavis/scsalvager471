@@ -2528,6 +2528,32 @@ export default function StarCitizenSalvageGuideWebsite() {
 
                 <div className="mt-4 grid gap-3 rounded-2xl border border-slate-700 bg-slate-950/70 p-4">
                   <div>
+                    <label className="mb-1 block text-xs text-slate-400">Material</label>
+                    <select
+                      value={jobForm.material}
+                      onChange={(e) => setJobForm({ ...jobForm, material: e.target.value })}
+                      disabled={!user && !import.meta.env.DEV}
+                      className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {refineryMaterials.map((r) => (
+                        <option key={r.name} value={r.name}>{r.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs text-slate-400">Material (SCU)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      placeholder="0"
+                      value={jobForm.materialScu}
+                      onChange={(e) => setJobForm({ ...jobForm, materialScu: e.target.value })}
+                      disabled={!user && !import.meta.env.DEV}
+                      className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+                    />
+                  </div>
+                  <div>
                     <label className="mb-1 block text-xs text-slate-400">Refinery Location</label>
                     <select
                       value={jobForm.location}
@@ -2553,19 +2579,6 @@ export default function StarCitizenSalvageGuideWebsite() {
                     </select>
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs text-slate-400">Material</label>
-                    <select
-                      value={jobForm.material}
-                      onChange={(e) => setJobForm({ ...jobForm, material: e.target.value })}
-                      disabled={!user && !import.meta.env.DEV}
-                      className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      {refineryMaterials.map((r) => (
-                        <option key={r.name} value={r.name}>{r.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
                     <label className="mb-1 block text-xs text-slate-400">Refinery Method</label>
                     <select
                       value={jobForm.method}
@@ -2580,19 +2593,6 @@ export default function StarCitizenSalvageGuideWebsite() {
                       ))}
                     </select>
                     <p className="mt-1 text-[11px] text-slate-500">Speed / Cost / Yield · H=High, M=Moderate, L=Low, V=Very Low</p>
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-xs text-slate-400">Material (SCU)</label>
-                    <input
-                      type="number"
-                      min="0"
-                      step="1"
-                      placeholder="0"
-                      value={jobForm.materialScu}
-                      onChange={(e) => setJobForm({ ...jobForm, materialScu: e.target.value })}
-                      disabled={!user && !import.meta.env.DEV}
-                      className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
-                    />
                   </div>
                   <div>
                     <label className="mb-1 block text-xs text-slate-400">Refinery Time</label>

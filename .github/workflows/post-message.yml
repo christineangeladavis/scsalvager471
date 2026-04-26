@@ -16,6 +16,7 @@ on:
         description: "Message body. Markdown supported. Use literal \\n for line breaks."
         required: true
         type: string
+        default: '**UPDATE 4/25/2026 v2.3**\nNotable Changes:\n- Removed "Sold to Player" from the Home page Sell Location dropdown — player sales now belong only on the Ledger tab where you can record the buyer and final aUEC.\n- Cleaned up the 30-day history notes column: dropped the redundant "At" prefix from refinery and sell-order entries (e.g. "Levski · Cost: 1,152 aUEC", "Sold to Player (PlayerName)").\n- Refinery completion DMs now report the refined yield (the SCU you actually pick up) instead of the raw input SCU you fed into the refinery.'
       mention_everyone:
         description: "Prepend @everyone and ping the server"
         required: false

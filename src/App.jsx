@@ -514,13 +514,17 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [updateAvailable, setUpdateAvailable] = useState(false);
 
   // --- Admin Panel data ---
-  const [adminSection, setAdminSection] = useState("refineries"); // "refineries" | "users"
+  const [adminSection, setAdminSection] = useState("refineries"); // "refineries" | "users" | "exports"
   const [adminRefineries, setAdminRefineries] = useState(null);
   const [adminRefineriesLoading, setAdminRefineriesLoading] = useState(false);
   const [adminRefineriesError, setAdminRefineriesError] = useState("");
   const [adminUsers, setAdminUsers] = useState(null);
   const [adminUsersLoading, setAdminUsersLoading] = useState(false);
   const [adminUsersError, setAdminUsersError] = useState("");
+  const [adminPatches, setAdminPatches] = useState(null);
+  const [adminPatchesLoading, setAdminPatchesLoading] = useState(false);
+  const [adminPatchesError, setAdminPatchesError] = useState("");
+  const [selectedExportPatch, setSelectedExportPatch] = useState("");
 
   // --- User preferences (loaded from /api/me/prefs after auth) ---
   const [prefs, setPrefs] = useState({
@@ -960,6 +964,84 @@ export default function StarCitizenSalvageGuideWebsite() {
       cancelled = true;
     };
   }, [activeTab, adminSection, user]);
+
+  // --- Admin Patch Exports: load the patch list when the exports sub-tab
+  // is opened. Same dev-mock fallback pattern.
+  useEffect(() => {
+    if (activeTab !== "admin") return;
+    if (adminSection !== "exports") return;
+    if (!(user?.isAdmin || import.meta.env.DEV)) return;
+    let cancelled = false;
+    setAdminPatchesLoading(true);
+    setAdminPatchesError("");
+
+    const devMockPatches = () => {
+      const now = Date.now();
+      const day = 24 * 60 * 60 * 1000;
+      return {
+        patches: [
+          {
+            version: "4.8",
+            startedAt: null,
+            from: null,
+            to: null,
+            isCurrent: false,
+            isReleased: false,
+          },
+          {
+            version: "4.7.2",
+            startedAt: now - 42 * day,
+            from: now - 42 * day,
+            to: now,
+            isCurrent: true,
+            isReleased: true,
+          },
+        ],
+      };
+    };
+
+    fetch("/api/admin/patches", { credentials: "same-origin" })
+      .then((res) => {
+        if (res.status === 401 || res.status === 403) {
+          if (import.meta.env.DEV) return { __useMock: true };
+          throw new Error(
+            res.status === 401 ? "Not signed in." : "You don't have admin access."
+          );
+        }
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        if (cancelled) return;
+        const final = data && data.__useMock ? devMockPatches() : data;
+        setAdminPatches(final);
+        // Default to the most-recent released patch.
+        const firstReleased = final.patches.find((p) => p.isReleased);
+        if (firstReleased && !selectedExportPatch) {
+          setSelectedExportPatch(firstReleased.version);
+        }
+        setAdminPatchesLoading(false);
+      })
+      .catch((e) => {
+        if (cancelled) return;
+        if (import.meta.env.DEV) {
+          const mock = devMockPatches();
+          setAdminPatches(mock);
+          const firstReleased = mock.patches.find((p) => p.isReleased);
+          if (firstReleased && !selectedExportPatch) {
+            setSelectedExportPatch(firstReleased.version);
+          }
+          setAdminPatchesLoading(false);
+          return;
+        }
+        setAdminPatchesError(e.message || "Could not load.");
+        setAdminPatchesLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab, adminSection, user, selectedExportPatch]);
 
   // --- Deploy detection: poll /version.json and flip updateAvailable when it
   // diverges from the version this bundle was built with. Active only for
@@ -3121,6 +3203,7 @@ export default function StarCitizenSalvageGuideWebsite() {
               {[
                 { id: "refineries", label: "Active Refineries" },
                 { id: "users", label: "Active Users" },
+                { id: "exports", label: "Patch Exports" },
               ].map((sec) => {
                 const isActive = adminSection === sec.id;
                 return (
@@ -3290,6 +3373,101 @@ export default function StarCitizenSalvageGuideWebsite() {
                       ))}
                     </tbody>
                   </table>
+                </div>
+              )}
+            </div>
+            )}
+
+            {adminSection === "exports" && (
+            <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
+              <div>
+                <h2 className="text-xl font-bold text-cyan-300">Patch Exports</h2>
+                <p className="mt-1 text-sm text-slate-400">
+                  Download a CSV of every refinery job submitted, or every login event recorded, during a Star Citizen patch's release cycle. Admin-only view.
+                </p>
+              </div>
+
+              {adminPatchesLoading && (
+                <div className="mt-6 rounded-2xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">
+                  Loading patches…
+                </div>
+              )}
+
+              {!adminPatchesLoading && adminPatchesError && (
+                <div className="mt-6 rounded-2xl border border-rose-500/40 bg-rose-500/10 p-4 text-sm text-rose-200">
+                  {adminPatchesError}
+                </div>
+              )}
+
+              {!adminPatchesLoading && !adminPatchesError && adminPatches && (
+                <div className="mt-5 space-y-4">
+                  <div className="rounded-2xl border border-slate-700 bg-slate-950/60 p-4">
+                    <label className="mb-2 block text-xs uppercase tracking-wider text-slate-400">Patch</label>
+                    <select
+                      value={selectedExportPatch}
+                      onChange={(e) => setSelectedExportPatch(e.target.value)}
+                      className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400"
+                    >
+                      {adminPatches.patches.map((p) => (
+                        <option key={p.version} value={p.version} disabled={!p.isReleased}>
+                          {p.version}
+                          {p.isCurrent ? " (current)" : ""}
+                          {!p.isReleased ? " — not yet released" : ""}
+                        </option>
+                      ))}
+                    </select>
+                    {(() => {
+                      const p = adminPatches.patches.find((x) => x.version === selectedExportPatch);
+                      if (!p || !p.isReleased) return null;
+                      return (
+                        <div className="mt-3 text-xs text-slate-400">
+                          Cycle: {formatTimestamp(p.from)} → {p.isCurrent ? "now" : formatTimestamp(p.to)}
+                        </div>
+                      );
+                    })()}
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {(() => {
+                      const p = adminPatches.patches.find((x) => x.version === selectedExportPatch);
+                      const enabled = Boolean(p && p.isReleased);
+                      const refineriesHref = enabled
+                        ? `/api/admin/export?type=refineries&patch=${encodeURIComponent(selectedExportPatch)}`
+                        : "#";
+                      const loginsHref = enabled
+                        ? `/api/admin/export?type=logins&patch=${encodeURIComponent(selectedExportPatch)}`
+                        : "#";
+                      const baseClass = "block rounded-2xl border p-4 text-center text-sm font-semibold transition";
+                      const enabledClass = "border-cyan-400 bg-cyan-500/15 text-cyan-100 hover:bg-cyan-500/25";
+                      const disabledClass = "cursor-not-allowed border-slate-700 bg-slate-800/40 text-slate-500";
+                      return (
+                        <>
+                          <a
+                            href={refineriesHref}
+                            download={enabled ? `scsalvager_refineries_${selectedExportPatch}.csv` : undefined}
+                            onClick={(e) => { if (!enabled) e.preventDefault(); }}
+                            aria-disabled={!enabled}
+                            className={`${baseClass} ${enabled ? enabledClass : disabledClass}`}
+                          >
+                            ⬇ Download refinery logs (CSV)
+                          </a>
+                          <a
+                            href={loginsHref}
+                            download={enabled ? `scsalvager_logins_${selectedExportPatch}.csv` : undefined}
+                            onClick={(e) => { if (!enabled) e.preventDefault(); }}
+                            aria-disabled={!enabled}
+                            className={`${baseClass} ${enabled ? enabledClass : disabledClass}`}
+                          >
+                            ⬇ Download login events (CSV)
+                          </a>
+                        </>
+                      );
+                    })()}
+                  </div>
+
+                  <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-3 text-xs text-slate-500">
+                    Patches and their start dates are configured in <code className="text-slate-400">api/_lib/patches.js</code>. When a new patch goes live, edit that list to set its <code className="text-slate-400">startedAt</code> and add the next patch.
+                  </div>
                 </div>
               )}
             </div>

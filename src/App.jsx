@@ -1631,8 +1631,12 @@ export default function StarCitizenSalvageGuideWebsite() {
     }
 
     if (Number.isFinite(extracted.totalSCU) && extracted.totalSCU > 0) {
-      next.materialScu = String(Math.round(extracted.totalSCU));
-      matchedFields.push(`SCU: ${next.materialScu}`);
+      // Refinery server returns SCU already converted from cSCU (1 SCU =
+      // 100 cSCU). Two decimal places is exactly representable; trim
+      // trailing zeros for the input string.
+      const fixed = (Math.round(extracted.totalSCU * 100) / 100).toString();
+      next.materialScu = fixed;
+      matchedFields.push(`SCU: ${fixed}`);
     }
 
     if (Number.isFinite(extracted.processingTimeSeconds) && extracted.processingTimeSeconds > 0) {
@@ -1663,11 +1667,14 @@ export default function StarCitizenSalvageGuideWebsite() {
     setAnalyzeFeedback(null);
 
     // Dev mock — example data lifted from the in-game refinery screen.
+    // The screen prints quantities in cSCU; the production server divides
+    // by 100 in its response, so the mock value here is already the
+    // converted SCU (921 cSCU on screen -> 9.21 SCU here).
     const devMockExtraction = () => ({
       locationName: "ARC-L2 Lively Pathway Station",
       methodName: "XCR Reaction",
       rawMaterialName: "Iron (Ore)",
-      totalSCU: 921,
+      totalSCU: 9.21,
       processingTimeSeconds: 271,
     });
 
@@ -2973,7 +2980,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <input
                       type="number"
                       min="0"
-                      step="1"
+                      step="0.01"
                       placeholder="0"
                       value={jobForm.materialScu}
                       onChange={(e) => setJobForm({ ...jobForm, materialScu: e.target.value })}
@@ -3569,7 +3576,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                           <input
                             type="number"
                             min="0"
-                            step="1"
+                            step="0.01"
                             value={editForm.materialScu || ""}
                             onChange={(e) => setEditForm({ ...editForm, materialScu: e.target.value })}
                             className="w-full rounded-xl border border-cyan-500/25 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-cyan-400"

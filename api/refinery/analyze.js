@@ -38,7 +38,7 @@ Fields:
 - locationName: the refinery station name shown at the top of the screen (string). Examples: "ARC-L2 Lively Pathway Station", "Levski", "HUR-L1".
 - methodName: the processing/refinery method shown under "PROCESSING SELECTION, YIELD AND COSTS" (string). Examples: "XCR Reaction", "Cormack Method", "Dinyx Solventation".
 - rawMaterialName: the primary raw material being refined. If multiple materials are listed, return the one with the highest QTY. Include the parenthetical suffix as shown. Examples: "Iron (Ore)", "Construction Salvage".
-- totalSCU: the "TO REFINE" total quantity, OR if not visible, the sum of all the QTY values shown (integer).
+- totalSCU: the "TO REFINE" total quantity AS PRINTED on the screen (integer). The in-game refinery setup screen lists quantities in cSCU (1 SCU = 100 cSCU); just return the raw on-screen number — the server divides by 100 to get SCU.
 - processingTimeSeconds: the processing time converted to total seconds (integer). E.g. "4m 31s" -> 271, "1h 30m" -> 5400.
 
 Return ONLY the JSON object on a single line. No prose, no markdown fences.`;
@@ -168,14 +168,22 @@ export default async function handler(req, res) {
   }
 
   // Coerce types and clamp ranges.
+  // The model is asked to return totalSCU as the raw on-screen number;
+  // the in-game refinery screen shows quantities in cSCU (1 SCU = 100
+  // cSCU), so divide by 100 here to land on canonical SCU. Keep two
+  // decimal places — the underlying data is integer cSCU so this is
+  // exactly representable.
+  const rawTotal = Number(parsed.totalSCU);
+  const totalSCU =
+    Number.isFinite(rawTotal) && rawTotal >= 0
+      ? Math.round(rawTotal) / 100
+      : null;
+
   const out = {
     locationName: typeof parsed.locationName === "string" ? parsed.locationName : null,
     methodName: typeof parsed.methodName === "string" ? parsed.methodName : null,
     rawMaterialName: typeof parsed.rawMaterialName === "string" ? parsed.rawMaterialName : null,
-    totalSCU:
-      Number.isFinite(Number(parsed.totalSCU)) && Number(parsed.totalSCU) >= 0
-        ? Math.round(Number(parsed.totalSCU))
-        : null,
+    totalSCU,
     processingTimeSeconds:
       Number.isFinite(Number(parsed.processingTimeSeconds)) &&
       Number(parsed.processingTimeSeconds) >= 0

@@ -4,6 +4,7 @@
 
 import { getRedis } from "../_lib/redis.js";
 import { getSession } from "../_lib/session.js";
+import { isAdminSession } from "../_lib/admin.js";
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {
@@ -19,13 +20,12 @@ export default async function handler(req, res) {
     if (!session) {
       return res.status(200).json({ user: null });
     }
-    const adminId = process.env.ADMIN_DISCORD_ID || "";
     return res.status(200).json({
       user: {
         id: session.userId,
         username: session.discordUsername,
         avatar: session.discordAvatar,
-        isAdmin: Boolean(adminId) && String(session.userId) === String(adminId),
+        isAdmin: isAdminSession(session),
       },
     });
   } catch (e) {

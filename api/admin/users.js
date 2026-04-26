@@ -17,6 +17,7 @@
 
 import { getRedis } from "../_lib/redis.js";
 import { getSession } from "../_lib/session.js";
+import { isAdminSession } from "../_lib/admin.js";
 import { listUserIds, getUserMeta } from "../_lib/userIndex.js";
 
 const ACTIVE_WINDOW_MS = 24 * 60 * 60 * 1000;
@@ -40,8 +41,7 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: "Not authenticated" });
   }
 
-  const adminId = process.env.ADMIN_DISCORD_ID || "";
-  if (!adminId || String(session.userId) !== String(adminId)) {
+  if (!isAdminSession(session)) {
     return res.status(403).json({ error: "Admin access required" });
   }
 

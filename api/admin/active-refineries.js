@@ -8,7 +8,7 @@
 //
 // Auth model:
 //   - Caller must be logged in.
-//   - Caller's session.userId must equal process.env.ADMIN_DISCORD_ID.
+//   - isAdminSession(session) must be true (env var or fallback ID list).
 //
 // Response shape:
 //   {
@@ -31,6 +31,7 @@
 
 import { getRedis } from "../_lib/redis.js";
 import { getSession } from "../_lib/session.js";
+import { isAdminSession } from "../_lib/admin.js";
 import { listUserIds, getUserMeta } from "../_lib/userIndex.js";
 import { ledgerKey } from "../ledger.js";
 
@@ -55,8 +56,7 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: "Not authenticated" });
   }
 
-  const adminId = process.env.ADMIN_DISCORD_ID || "";
-  if (!adminId || String(session.userId) !== String(adminId)) {
+  if (!isAdminSession(session)) {
     return res.status(403).json({ error: "Admin access required" });
   }
 

@@ -1,0 +1,81 @@
+# Post an arbitrary message to Discord #releases on demand.
+#
+# Manually triggered (workflow_dispatch). Use this for hotfix notes, hype
+# announcements, or anything you don't want in the versioned README
+# changelog. For versioned releases, edit README.md instead — that flows
+# through announce-release.yml automatically.
+#
+# Required GitHub repo secret: DISCORD_BOT_TOKEN (same one used by announce-release).
+
+name: Post message to Discord #releases
+
+on:
+  workflow_dispatch:
+    inputs:
+      message:
+        description: "Message body. Markdown supported. Use literal \\n for line breaks."
+        required: true
+        type: string
+      mention_everyone:
+        description: "Prepend @everyone and ping the server"
+        required: false
+        default: false
+        type: boolean
+
+env:
+  DISCORD_RELEASES_CHANNEL_ID: "1497542109526233188"
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post to Discord #releases
+        env:
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          MESSAGE: ${{ inputs.message }}
+          MENTION_EVERYONE: ${{ inputs.mention_everyone }}
+        run: |
+          set -euo pipefail
+          if [ -z "${DISCORD_BOT_TOKEN:-}" ]; then
+            echo "::error::Missing DISCORD_BOT_TOKEN secret."
+            exit 1
+          fi
+
+          # workflow_dispatch inputs are single-line. Interpret literal \n
+          # in the user's message as actual newlines.
+          formatted=$(printf '%b' "$MESSAGE")
+
+          if [ "$MENTION_EVERYONE" = "true" ]; then
+            formatted="@everyone"$'\n'"$formatted"
+            allowed_mentions='{"parse":["everyone"]}'
+          else
+            # Lock down mentions when @everyone wasn't explicitly requested,
+            # so a stray @everyone or @here in the message body can't ping.
+            allowed_mentions='{"parse":[]}'
+          fi
+
+          if [ ${#formatted} -gt 1990 ]; then
+            formatted="${formatted:0:1987}..."
+          fi
+
+          payload=$(jq -n \
+            --arg content "$formatted" \
+            --argjson am "$allowed_mentions" \
+            '{content: $content, allowed_mentions: $am}')
+
+          http_status=$(curl -sS -o /tmp/discord_resp.json -w "%{http_code}" \
+            -X POST \
+            -H "Authorization: Bot $DISCORD_BOT_TOKEN" \
+            -H "Content-Type: application/json" \
+            -H "User-Agent: scsalvager-message-poster (+https://scsalvager.net)" \
+            -d "$payload" \
+            "https://discord.com/api/v10/channels/$DISCORD_RELEASES_CHANNEL_ID/messages")
+
+          if [ "$http_status" -ge 200 ] && [ "$http_status" -lt 300 ]; then
+            echo "Posted message to #releases."
+          else
+            echo "::error::Discord rejected post (HTTP $http_status)"
+            cat /tmp/discord_resp.json
+            exit 1
+          fi

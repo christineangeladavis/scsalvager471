@@ -5,6 +5,12 @@ Made by Chrissyy · Referral: STAR-CH2W-R73F
 
 ## What's in this build
 
+UPDATE 4/26/2026 v2.4
+Notable Changes:
+- Refinery Job Orders: new "Upload screenshot" button. Drop in a screenshot of the in-game refinery setup screen and the Refinery Location, Method, SCU, and Refinery Time fields auto-fill (cSCU values from the in-game screen are converted to SCU automatically — 1 SCU = 100 cSCU).
+- Sell Orders: same flow. Drop in a screenshot of the in-game Commodities / Trading Console and Sell Location, SCU, and aUEC fields auto-fill — plus the Report a Price input is seeded with the per-SCU value from the screenshot.
+- Both upload flows analyze the image once via vision AI and discard it immediately. Nothing is stored on the server.
+
 UPDATE 4/25/2026 v2.3
 Notable Changes:
 - Removed "Sold to Player" from the Home page Sell Location dropdown — player sales now belong only on the Ledger tab where you can record the buyer and final aUEC.

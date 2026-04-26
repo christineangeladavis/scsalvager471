@@ -327,10 +327,14 @@ function formatTimeAgo(ts) {
 }
 
 function DesktopGrid({ columns, className, children }) {
+  // [&>*]:min-w-0 lets grid items shrink below their content's intrinsic
+  // width, so any overflow-x-auto wrapper inside (e.g. wide data tables) can
+  // actually scroll horizontally instead of pushing the whole page sideways
+  // on narrow viewports.
   return (
     <>
-      <div className={`grid gap-4 md:hidden ${className}`}>{children}</div>
-      <div className={`hidden gap-4 md:grid ${className}`} style={{ gridTemplateColumns: columns }}>
+      <div className={`grid gap-4 md:hidden [&>*]:min-w-0 ${className}`}>{children}</div>
+      <div className={`hidden gap-4 md:grid [&>*]:min-w-0 ${className}`} style={{ gridTemplateColumns: columns }}>
         {children}
       </div>
     </>
@@ -354,8 +358,8 @@ function StockComponentsTable({ stockComponents }) {
       <h3 className="mb-3 text-sm font-bold uppercase tracking-wider text-cyan-300">
         Stock Components
       </h3>
-      <div className="overflow-hidden rounded-lg border border-slate-700/60">
-        <table className="w-full text-left text-xs text-slate-300">
+      <div className="overflow-x-auto rounded-lg border border-slate-700/60">
+        <table className="w-full min-w-[480px] text-left text-xs text-slate-300 md:min-w-0">
           <thead className="bg-slate-800/60 text-[11px] uppercase tracking-wider text-slate-400">
             <tr>
               <th className="px-3 py-2 font-semibold">Qty</th>
@@ -1452,7 +1456,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                 </p>
               </div>
             </div>
-            <div className="flex flex-col items-end gap-3">
+            <div className="flex flex-row items-center justify-between gap-3 md:flex-col md:items-end md:justify-start">
               <div className="flex items-center gap-2">
                 {authLoading ? (
                   <div className="rounded-lg border border-slate-700 bg-slate-800/50 px-3 py-1.5 text-xs text-slate-500">Loading…</div>
@@ -1552,7 +1556,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                 role="tab"
                 aria-selected={isActive}
                 onClick={() => setActiveTab(tab.id)}
-                className={`-mb-px border-b-2 px-5 py-3 text-sm font-semibold uppercase tracking-[0.2em] transition ${
+                className={`-mb-px border-b-2 px-3 py-3 text-xs font-semibold uppercase tracking-wider transition sm:px-5 sm:text-sm sm:tracking-[0.2em] ${
                   isActive
                     ? "border-cyan-400 text-cyan-200"
                     : "border-transparent text-slate-400 hover:border-cyan-500/40 hover:text-slate-200"
@@ -1838,8 +1842,8 @@ export default function StarCitizenSalvageGuideWebsite() {
               <p className="mt-1 text-sm text-slate-400">All modules manufactured by Greycat Industrial. Data sourced from CStone Universal Item Finder.</p>
 
               {/* Comparison table */}
-              <div className="mt-4 overflow-hidden rounded-2xl border border-slate-700">
-                <table className="w-full text-left text-sm">
+              <div className="mt-4 overflow-x-auto rounded-2xl border border-slate-700">
+                <table className="w-full min-w-[600px] text-left text-sm md:min-w-0">
                   <thead className="bg-slate-950 text-slate-300">
                     <tr>
                       <th className="px-3 py-3">Module</th>
@@ -1972,7 +1976,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                 )}
 
                 {!isPlayerEstimate && (
-                  <div className="overflow-hidden rounded-2xl border border-slate-700">
+                  <div className="overflow-x-auto rounded-2xl border border-slate-700">
                     <table className="w-full text-left text-sm">
                       <thead className="bg-slate-950 text-slate-300">
                         <tr>
@@ -2460,8 +2464,8 @@ export default function StarCitizenSalvageGuideWebsite() {
                   Nothing in your 30-day history yet. Collect a refinery job or log a sale to get started.
                 </div>
               ) : (
-                <div className="mt-4 overflow-hidden rounded-2xl border border-slate-700">
-                  <table className="w-full text-left text-sm">
+                <div className="mt-4 overflow-x-auto rounded-2xl border border-slate-700">
+                  <table className="w-full min-w-[640px] text-left text-sm md:min-w-0">
                     <thead className="bg-slate-950 text-slate-300">
                       <tr>
                         <th className="px-4 py-3">Date</th>

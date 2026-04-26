@@ -1686,7 +1686,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                         />
                         <div
                           role="menu"
-                          className="absolute right-0 top-full z-50 mt-1 w-44 overflow-hidden rounded-lg border border-cyan-500/25 bg-slate-900 shadow-xl shadow-cyan-950/40"
+                          className="absolute right-0 bottom-full z-50 mb-1 w-44 overflow-hidden rounded-lg border border-cyan-500/25 bg-slate-900 shadow-xl shadow-cyan-950/40"
                         >
                           <button
                             type="button"

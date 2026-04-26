@@ -525,6 +525,8 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [adminPatchesLoading, setAdminPatchesLoading] = useState(false);
   const [adminPatchesError, setAdminPatchesError] = useState("");
   const [selectedExportPatch, setSelectedExportPatch] = useState("");
+  // Pending format-prompt: shape { type: "refineries" | "sales" | "logins" } or null.
+  const [pendingExport, setPendingExport] = useState(null);
 
   // --- User preferences (loaded from /api/me/prefs after auth) ---
   const [prefs, setPrefs] = useState({
@@ -977,23 +979,27 @@ export default function StarCitizenSalvageGuideWebsite() {
 
     const devMockPatches = () => {
       const now = Date.now();
-      const day = 24 * 60 * 60 * 1000;
+      // Mirror the real dates from api/_lib/patches.js so the dev preview
+      // shows the same dropdown the production admin sees.
+      const v472Start = Date.UTC(2026, 3, 22); // 2026-04-22
+      const v48Start = Date.UTC(2026, 4, 14); // 2026-05-14
+      const v48Released = v48Start <= now;
       return {
         patches: [
           {
             version: "4.8",
-            startedAt: null,
-            from: null,
-            to: null,
-            isCurrent: false,
-            isReleased: false,
+            startedAt: v48Start,
+            from: v48Released ? v48Start : null,
+            to: v48Released ? now : null,
+            isCurrent: v48Released,
+            isReleased: v48Released,
           },
           {
             version: "4.7.2",
-            startedAt: now - 42 * day,
-            from: now - 42 * day,
-            to: now,
-            isCurrent: true,
+            startedAt: v472Start,
+            from: v472Start,
+            to: v48Released ? v48Start : now,
+            isCurrent: !v48Released,
             isReleased: true,
           },
         ],
@@ -3427,41 +3433,29 @@ export default function StarCitizenSalvageGuideWebsite() {
                     })()}
                   </div>
 
-                  <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="grid gap-3 sm:grid-cols-3">
                     {(() => {
                       const p = adminPatches.patches.find((x) => x.version === selectedExportPatch);
                       const enabled = Boolean(p && p.isReleased);
-                      const refineriesHref = enabled
-                        ? `/api/admin/export?type=refineries&patch=${encodeURIComponent(selectedExportPatch)}`
-                        : "#";
-                      const loginsHref = enabled
-                        ? `/api/admin/export?type=logins&patch=${encodeURIComponent(selectedExportPatch)}`
-                        : "#";
-                      const baseClass = "block rounded-2xl border p-4 text-center text-sm font-semibold transition";
+                      const baseClass = "rounded-2xl border p-4 text-center text-sm font-semibold transition";
                       const enabledClass = "border-cyan-400 bg-cyan-500/15 text-cyan-100 hover:bg-cyan-500/25";
                       const disabledClass = "cursor-not-allowed border-slate-700 bg-slate-800/40 text-slate-500";
-                      return (
-                        <>
-                          <a
-                            href={refineriesHref}
-                            download={enabled ? `scsalvager_refineries_${selectedExportPatch}.csv` : undefined}
-                            onClick={(e) => { if (!enabled) e.preventDefault(); }}
-                            aria-disabled={!enabled}
-                            className={`${baseClass} ${enabled ? enabledClass : disabledClass}`}
-                          >
-                            ⬇ Download refinery logs (CSV)
-                          </a>
-                          <a
-                            href={loginsHref}
-                            download={enabled ? `scsalvager_logins_${selectedExportPatch}.csv` : undefined}
-                            onClick={(e) => { if (!enabled) e.preventDefault(); }}
-                            aria-disabled={!enabled}
-                            className={`${baseClass} ${enabled ? enabledClass : disabledClass}`}
-                          >
-                            ⬇ Download login events (CSV)
-                          </a>
-                        </>
-                      );
+                      const buttons = [
+                        { type: "refineries", label: "Refinery logs" },
+                        { type: "sales", label: "Sales" },
+                        { type: "logins", label: "Login events" },
+                      ];
+                      return buttons.map((b) => (
+                        <button
+                          key={b.type}
+                          type="button"
+                          disabled={!enabled}
+                          onClick={() => setPendingExport({ type: b.type })}
+                          className={`${baseClass} ${enabled ? enabledClass : disabledClass}`}
+                        >
+                          ⬇ {b.label}
+                        </button>
+                      ));
                     })()}
                   </div>
 
@@ -3472,6 +3466,57 @@ export default function StarCitizenSalvageGuideWebsite() {
               )}
             </div>
             )}
+          </div>
+        )}
+
+        {/* --- Admin export format prompt --- */}
+        {pendingExport && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+            onClick={() => setPendingExport(null)}
+          >
+            <div
+              className="mx-4 w-full max-w-sm rounded-3xl border border-cyan-500/30 bg-slate-900 p-6 shadow-2xl shadow-cyan-950/40"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="export-format-title"
+            >
+              <h3 id="export-format-title" className="text-lg font-bold text-cyan-300">
+                Choose export format
+              </h3>
+              <p className="mt-1 text-sm text-slate-400">
+                {pendingExport.type === "refineries" && "Refinery logs"}
+                {pendingExport.type === "sales" && "Sales"}
+                {pendingExport.type === "logins" && "Login events"}
+                {" · patch "}
+                <span className="font-semibold text-slate-200">{selectedExportPatch}</span>
+              </p>
+              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                {[
+                  { format: "csv", label: "CSV", desc: "Plain text, opens anywhere." },
+                  { format: "xlsx", label: "Excel (.xlsx)", desc: "Native Excel workbook." },
+                ].map(({ format, label, desc }) => (
+                  <a
+                    key={format}
+                    href={`/api/admin/export?type=${encodeURIComponent(pendingExport.type)}&patch=${encodeURIComponent(selectedExportPatch)}&format=${format}`}
+                    download={`scsalvager_${pendingExport.type}_${selectedExportPatch}.${format}`}
+                    onClick={() => setPendingExport(null)}
+                    className="block rounded-2xl border border-cyan-400 bg-cyan-500/15 p-4 text-center transition hover:bg-cyan-500/25"
+                  >
+                    <div className="text-sm font-bold text-cyan-100">{label}</div>
+                    <div className="mt-1 text-xs text-slate-400">{desc}</div>
+                  </a>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => setPendingExport(null)}
+                className="mt-4 w-full rounded-xl border border-slate-700 px-3 py-2 text-xs text-slate-400 hover:border-slate-500 hover:text-slate-200"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         )}
 

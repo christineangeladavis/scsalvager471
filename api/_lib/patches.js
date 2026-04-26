@@ -15,12 +15,11 @@
 // this list at runtime.
 
 export const PATCHES = [
-  // 4.8 has not been released yet; admin should set startedAt to the
-  // exact ms when it goes live and add the next patch above this entry.
-  { version: "4.8", startedAt: null },
-  // 4.7.2 is the current live patch. Approximate start date — adjust
-  // if a more precise timestamp matters for an export.
-  { version: "4.7.2", startedAt: Date.UTC(2026, 2, 15) /* 2026-03-15 */ },
+  // Newest first. When a future-dated patch goes live, its startedAt is
+  // already correct — patchRange() naturally treats it as released once
+  // Date.now() crosses startedAt.
+  { version: "4.8", startedAt: Date.UTC(2026, 4, 14) /* 2026-05-14 */ },
+  { version: "4.7.2", startedAt: Date.UTC(2026, 3, 22) /* 2026-04-22 */ },
 ];
 
 /**
@@ -36,13 +35,18 @@ export function patchRange(version) {
   if (idx === -1) return null;
   const patch = PATCHES[idx];
   if (!patch.startedAt) return null;
+  // Future-dated patches haven't started yet; nothing to range over.
+  if (patch.startedAt > Date.now()) return null;
 
   // PATCHES is ordered newest-first, so the *previous* index is the
-  // patch that comes after this one chronologically.
+  // patch that comes after this one chronologically. Skip patches whose
+  // startedAt is in the future — they don't end this cycle yet.
+  const now = Date.now();
   let nextStartedAt = null;
   for (let i = idx - 1; i >= 0; i--) {
-    if (PATCHES[i].startedAt) {
-      nextStartedAt = PATCHES[i].startedAt;
+    const candidate = PATCHES[i].startedAt;
+    if (candidate && candidate <= now) {
+      nextStartedAt = candidate;
       break;
     }
   }
@@ -50,7 +54,7 @@ export function patchRange(version) {
   return {
     version: patch.version,
     from: patch.startedAt,
-    to: nextStartedAt || Date.now(),
+    to: nextStartedAt || now,
     isCurrent: nextStartedAt === null,
   };
 }

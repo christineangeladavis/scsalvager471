@@ -30,6 +30,7 @@ export default async function handler(req, res) {
     return res.status(403).json({ error: "Admin access required" });
   }
 
+  const now = Date.now();
   const patches = PATCHES.map((p) => {
     const r = patchRange(p.version);
     return {
@@ -38,7 +39,10 @@ export default async function handler(req, res) {
       from: r ? r.from : null,
       to: r ? r.to : null,
       isCurrent: r ? r.isCurrent : false,
-      isReleased: Boolean(p.startedAt),
+      // Released = startedAt is set AND not in the future. Patches with a
+      // future startedAt are surfaced in the dropdown (so admins see what's
+      // coming) but disabled.
+      isReleased: Boolean(p.startedAt) && p.startedAt <= now,
     };
   });
 

@@ -1427,36 +1427,27 @@ export default function StarCitizenSalvageGuideWebsite() {
             </div>
           </div>
         )}
-        <header className="mb-8 rounded-3xl border border-cyan-500/30 bg-gradient-to-br from-slate-900 via-slate-950 to-blue-950 p-6 shadow-2xl shadow-cyan-950/40">
-          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div className="flex items-center gap-4 md:gap-5">
-              <img
-                src="/scsalvager_logo.png"
-                alt="SC Salvager"
-                className="h-16 w-16 shrink-0 md:h-20 md:w-20"
-                style={{ filter: "drop-shadow(0 4px 12px rgba(8, 47, 73, 0.5))" }}
-              />
-              <div>
-                <p className="text-sm uppercase tracking-[0.35em] text-cyan-300/80">Quick Reference · Accurate Data · Maximize Profits</p>
-                <h1 className="mt-2 text-3xl font-black tracking-tight text-white md:text-5xl">SC Salvager</h1>
-                <a
-                  href="https://discord.gg/BrAtUj2k6q"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mt-3 inline-flex items-center gap-2 rounded-lg border border-indigo-400/40 bg-indigo-500/15 px-3 py-1.5 text-sm font-semibold text-indigo-100 hover:bg-indigo-500/25"
-                >
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4" aria-hidden="true">
-                    <path d="M20.317 4.369A19.79 19.79 0 0 0 16.558 3a.074.074 0 0 0-.079.037c-.34.607-.719 1.396-.984 2.013a18.27 18.27 0 0 0-5.487 0 12.51 12.51 0 0 0-1-2.013.077.077 0 0 0-.078-.037 19.736 19.736 0 0 0-3.76 1.369.07.07 0 0 0-.032.027C2.533 8.046 1.864 11.625 2.193 15.16a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.105 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.371-.291a.074.074 0 0 1 .077-.01c3.927 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.009c.12.099.245.198.372.292a.077.077 0 0 1-.006.128 12.3 12.3 0 0 1-1.873.891.077.077 0 0 0-.041.106 15.86 15.86 0 0 0 1.226 1.993.076.076 0 0 0 .084.029 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-4.087-.838-7.638-3.549-10.787a.06.06 0 0 0-.031-.028zM8.02 13.331c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.974 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
-                  </svg>
-                  Join our Discord
-                </a>
-                <p className="mt-3 max-w-3xl text-sm text-slate-300 md:text-base">
-                  Interactive companion site based on your infographic. Browse salvage ship capacities, compare disintegration types,
-                  check refinery bonuses, and calculate yield instantly.
-                </p>
-              </div>
-            </div>
-            <div className="flex flex-row items-center justify-between gap-3 md:flex-col md:items-end md:justify-start">
+        <header className="mb-8 overflow-hidden rounded-3xl border border-cyan-500/30 shadow-2xl shadow-cyan-950/40">
+          <img
+            src="/scsalvager_banner.jpg"
+            alt="SCSalvager.net — Salvage · Recover · Profit"
+            className="block w-full"
+            width="1600"
+            height="565"
+          />
+          <div className="flex flex-col gap-3 bg-gradient-to-br from-slate-900 via-slate-950 to-blue-950 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-5">
+            <a
+              href="https://discord.gg/BrAtUj2k6q"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-indigo-400/40 bg-indigo-500/15 px-3 py-1.5 text-sm font-semibold text-indigo-100 hover:bg-indigo-500/25 sm:self-center"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4" aria-hidden="true">
+                <path d="M20.317 4.369A19.79 19.79 0 0 0 16.558 3a.074.074 0 0 0-.079.037c-.34.607-.719 1.396-.984 2.013a18.27 18.27 0 0 0-5.487 0 12.51 12.51 0 0 0-1-2.013.077.077 0 0 0-.078-.037 19.736 19.736 0 0 0-3.76 1.369.07.07 0 0 0-.032.027C2.533 8.046 1.864 11.625 2.193 15.16a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.105 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.371-.291a.074.074 0 0 1 .077-.01c3.927 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.009c.12.099.245.198.372.292a.077.077 0 0 1-.006.128 12.3 12.3 0 0 1-1.873.891.077.077 0 0 0-.041.106 15.86 15.86 0 0 0 1.226 1.993.076.076 0 0 0 .084.029 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-4.087-.838-7.638-3.549-10.787a.06.06 0 0 0-.031-.028zM8.02 13.331c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.974 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+              </svg>
+              Join our Discord
+            </a>
+            <div className="flex flex-row items-center justify-between gap-3 sm:justify-end">
               <div className="flex items-center gap-2">
                 {authLoading ? (
                   <div className="rounded-lg border border-slate-700 bg-slate-800/50 px-3 py-1.5 text-xs text-slate-500">Loading…</div>

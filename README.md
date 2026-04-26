@@ -12,6 +12,7 @@ Notable Changes:
 - Refinery completion DMs now report the refined yield (the SCU you actually pick up) instead of the raw input SCU you fed into the refinery.
 - Logged-in users now see an in-page banner when a new deployment goes live, prompting them to press Ctrl+Shift+R to hard-refresh and pick up the latest version.
 - Mobile layout polish — wide data tables (Scraper Modules, Stock Components, 30-day history) now scroll inside themselves on small screens instead of dragging the whole page sideways, and the header CTAs/tabs lay out more cleanly on phones.
+- Replaced the header title block with a full-width SCSalvager.net banner; Discord, login, and Patch Verified buttons remain underneath.
 
 UPDATE 4/25/2026 v2.2
 Notable Changes:

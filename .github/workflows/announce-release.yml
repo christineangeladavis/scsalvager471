@@ -79,8 +79,13 @@ jobs:
             kind="full-block"
           else
             # Case 2/3: same header — find newly-added lines.
-            new_lines=$(diff <(printf '%s\n' "$prev_block") <(printf '%s\n' "$current_block") \
-              | awk '/^>/ { sub(/^> /, ""); print }')
+            # Pure awk avoids `diff`'s "exit 1 when files differ" tripping
+            # set -e + pipefail; load prev into a set, print current's lines
+            # that aren't in it (preserves order, dedupes by content).
+            new_lines=$(awk '
+              NR == FNR { prev[$0] = 1; next }
+              !($0 in prev)
+            ' <(printf '%s\n' "$prev_block") <(printf '%s\n' "$current_block"))
             if [ -z "$new_lines" ]; then
               echo "No new changelog content under $current_header — skipping."
               echo "skip=true" >> "$GITHUB_OUTPUT"

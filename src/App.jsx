@@ -1038,10 +1038,10 @@ export default function StarCitizenSalvageGuideWebsite() {
         fetchedAt: now,
         activeWindowMs: 24 * hour,
         users: [
-          { userId: "dev-1", username: "Chrissyy", lastLoginAt: now - 4 * min },
-          { userId: "dev-2", username: "Denavago", lastLoginAt: now - 95 * min },
-          { userId: "dev-3", username: "TestPilot42", lastLoginAt: now - 11 * hour },
-          { userId: "dev-4", username: "RefiningQueen", lastLoginAt: now - 22 * hour },
+          { userId: "dev-1", username: "Chrissyy", lastLoginAt: now - 4 * min, dmsEnabled: true },
+          { userId: "dev-2", username: "Denavago", lastLoginAt: now - 95 * min, dmsEnabled: false },
+          { userId: "dev-3", username: "TestPilot42", lastLoginAt: now - 11 * hour, dmsEnabled: true },
+          { userId: "dev-4", username: "RefiningQueen", lastLoginAt: now - 22 * hour, dmsEnabled: false },
         ],
       };
     };
@@ -4068,10 +4068,11 @@ export default function StarCitizenSalvageGuideWebsite() {
 
               {!adminUsersLoading && !adminUsersError && adminUsers && adminUsers.users.length > 0 && (
                 <div className="mt-5 overflow-x-auto rounded-2xl border border-slate-700">
-                  <table className="w-full min-w-[480px] text-left text-sm md:min-w-0">
+                  <table className="w-full min-w-[560px] text-left text-sm md:min-w-0">
                     <thead className="bg-slate-950 text-slate-300">
                       <tr>
                         <th className="px-4 py-3">Discord User</th>
+                        <th className="px-4 py-3">DM Notifications</th>
                         <th className="px-4 py-3">Last Login</th>
                         <th className="px-4 py-3 text-right">When</th>
                       </tr>
@@ -4080,6 +4081,15 @@ export default function StarCitizenSalvageGuideWebsite() {
                       {adminUsers.users.map((u) => (
                         <tr key={u.userId} className="border-t border-slate-800 bg-slate-900/40">
                           <td className="px-4 py-3 font-semibold text-white">{u.username}</td>
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <span className={`rounded-lg px-2 py-1 text-xs font-semibold ${
+                              u.dmsEnabled
+                                ? "bg-emerald-500/15 text-emerald-200"
+                                : "bg-rose-500/15 text-rose-300"
+                            }`}>
+                              {u.dmsEnabled ? "On" : "Off"}
+                            </span>
+                          </td>
                           <td className="px-4 py-3 text-slate-300 whitespace-nowrap">
                             {formatTimestamp(u.lastLoginAt)}
                           </td>

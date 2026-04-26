@@ -19,6 +19,7 @@ import { getRedis } from "../_lib/redis.js";
 import { getSession } from "../_lib/session.js";
 import { isAdminSession } from "../_lib/admin.js";
 import { listUserIds, getUserMeta } from "../_lib/userIndex.js";
+import { getPrefs } from "../_lib/prefs.js";
 
 const ACTIVE_WINDOW_MS = 24 * 60 * 60 * 1000;
 
@@ -53,10 +54,18 @@ export default async function handler(req, res) {
     const meta = await getUserMeta(redis, userId);
     if (!meta || !meta.lastLoginAt) continue;
     if (meta.lastLoginAt < cutoff) continue;
+    // DMs count as "on" when the user is opted in AND has completed the
+    // notification-link OAuth flow. Either side missing means we'd have
+    // nowhere to deliver, so it's effectively off.
+    const prefs = await getPrefs(redis, userId);
+    const dmsEnabled = Boolean(
+      prefs && prefs.discordNotifications && prefs.notificationLinkedAt
+    );
     users.push({
       userId,
       username: meta.username,
       lastLoginAt: meta.lastLoginAt,
+      dmsEnabled,
     });
   }
 

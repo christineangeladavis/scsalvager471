@@ -69,6 +69,7 @@ export async function fetchDiscordUser(accessToken) {
 }
 
 export function getOrigin(req) {
+  if (process.env.SITE_URL) return process.env.SITE_URL;
   const host = req.headers["x-forwarded-host"] || req.headers.host;
   const proto = req.headers["x-forwarded-proto"] || (host && host.startsWith("localhost") ? "http" : "https");
   return `${proto}://${host}`;

@@ -13,46 +13,15 @@
 //   - Price must be within [MIN_PRICE, MAX_PRICE]
 //   - Location name capped at 100 chars
 
-import { Redis } from "@upstash/redis";
+import { getRedis } from "./_lib/redis.js";
+import { getSession } from "./_lib/session.js";
 
 const MASTER_KEY = "cmat-prices:all";
 const MAX_REPORTS_PER_LOCATION = 50;
 const MIN_PRICE = 100;
 const MAX_PRICE = 200000;
 
-// Lazy Redis client — initialized on first request.
-// If Upstash env vars are missing, we return a clear error instead of crashing.
-let redisInstance = null;
-let redisInitError = null;
-
-function getRedis() {
-  if (redisInstance) return redisInstance;
-  if (redisInitError) throw redisInitError;
-
-  const url =
-    process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
-  const token =
-    process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
-
-  if (!url || !token) {
-    redisInitError = new Error(
-      "Upstash Redis is not configured. In your Vercel project, go to Storage → Create Database → Upstash for Redis, connect it to the project, then redeploy."
-    );
-    throw redisInitError;
-  }
-
-  try {
-    redisInstance = new Redis({ url, token });
-    return redisInstance;
-  } catch (e) {
-    redisInitError = new Error(
-      "Failed to initialize Upstash Redis client: " + (e && e.message ? e.message : String(e))
-    );
-    throw redisInitError;
-  }
-}
-
-function median(nums) {
+export function median(nums) {
   if (!nums.length) return 0;
   const sorted = [...nums].sort((a, b) => a - b);
   const mid = Math.floor(sorted.length / 2);
@@ -61,7 +30,7 @@ function median(nums) {
     : sorted[mid];
 }
 
-function buildPublicView(dataMap) {
+export function buildPublicView(dataMap) {
   const result = {};
   for (const [name, entry] of Object.entries(dataMap || {})) {
     if (!entry || !Array.isArray(entry.reports) || !entry.reports.length) continue;
@@ -105,6 +74,11 @@ export default async function handler(req, res) {
   }
 
   if (req.method === "POST") {
+    const session = await getSession(req, redis);
+    if (!session) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+
     let body = req.body;
     if (typeof body === "string") {
       try { body = JSON.parse(body); } catch { body = null; }
@@ -115,7 +89,7 @@ export default async function handler(req, res) {
 
     const rawLocation = typeof body.location === "string" ? body.location.trim() : "";
     const location = rawLocation.slice(0, 100);
-    const priceNum = typeof body.price === "number" ? body.price : parseFloat(body.price);
+    const priceNum = Number(body.price);
 
     if (!location) {
       return res.status(400).json({ error: "Missing location" });

@@ -13,11 +13,11 @@ import { getOrigin } from "./_lib/discord.js";
 const MAX_REFINERY_JOBS = 500;
 const MAX_SELL_ORDERS = 500;
 
-function ledgerKey(userId) {
+export function ledgerKey(userId) {
   return `ledger:${userId}`;
 }
 
-function sanitizeRefineryJob(j) {
+export function sanitizeRefineryJob(j) {
   if (!j || typeof j !== "object") return null;
   const out = {
     id: String(j.id || "").slice(0, 80),
@@ -53,7 +53,7 @@ function sanitizeRefineryJob(j) {
   return out;
 }
 
-function sanitizeSellOrder(o) {
+export function sanitizeSellOrder(o) {
   if (!o || typeof o !== "object") return null;
   const out = {
     id: String(o.id || "").slice(0, 80),
@@ -89,8 +89,12 @@ export default async function handler(req, res) {
     try {
       const data = (await redis.get(key)) || { refineryJobs: [], sellOrders: [] };
       return res.status(200).json({
-        refineryJobs: Array.isArray(data.refineryJobs) ? data.refineryJobs : [],
-        sellOrders: Array.isArray(data.sellOrders) ? data.sellOrders : [],
+        refineryJobs: Array.isArray(data.refineryJobs)
+          ? data.refineryJobs.map(sanitizeRefineryJob).filter(Boolean)
+          : [],
+        sellOrders: Array.isArray(data.sellOrders)
+          ? data.sellOrders.map(sanitizeSellOrder).filter(Boolean)
+          : [],
       });
     } catch (e) {
       console.error("GET /api/ledger failed:", e && e.message ? e.message : e);

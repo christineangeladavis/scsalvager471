@@ -28,7 +28,8 @@ export default async function handler(req, res) {
   try {
     redis = getRedis();
   } catch (e) {
-    return res.status(503).send("Storage unavailable: " + e.message);
+    console.error("notifications-link redis error:", e.message);
+    return res.status(503).send("Storage unavailable. Please try again later.");
   }
 
   const session = await getSession(req, redis);

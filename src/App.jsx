@@ -340,6 +340,26 @@ function getSafeScuValue(value) {
   return Math.max(0, parsed);
 }
 
+// User enters refinery time as separate hours/minutes/seconds string fields;
+// this collapses them into a single non-negative second count, treating any
+// blank or non-numeric field as zero.
+function hmsToSeconds(form) {
+  const h = Math.max(0, Number(form.hours) || 0);
+  const m = Math.max(0, Number(form.minutes) || 0);
+  const s = Math.max(0, Number(form.seconds) || 0);
+  return Math.round(h * 3600 + m * 60 + s);
+}
+
+// Inverse for populating edit form fields from a stored job's duration.
+function secondsToHms(totalSeconds) {
+  const total = Math.max(0, Math.round(Number(totalSeconds) || 0));
+  return {
+    hours: String(Math.floor(total / 3600)),
+    minutes: String(Math.floor((total % 3600) / 60)),
+    seconds: String(total % 60),
+  };
+}
+
 function formatTimeAgo(ts) {
   if (!ts || typeof ts !== "number") return null;
   const diff = Date.now() - ts;
@@ -462,6 +482,9 @@ export default function StarCitizenSalvageGuideWebsite() {
     location: "Levski",
     method: refineryMethods[0].name,
     materialScu: "",
+    hours: "",
+    minutes: "",
+    seconds: "",
   });
   const [orderForm, setOrderForm] = useState({
     material: SELL_MATERIALS[0],
@@ -1115,7 +1138,8 @@ export default function StarCitizenSalvageGuideWebsite() {
     Boolean(jobForm.material) &&
     Boolean(jobForm.location) &&
     Boolean(jobForm.method) &&
-    Number(jobForm.materialScu) > 0;
+    Number(jobForm.materialScu) > 0 &&
+    hmsToSeconds(jobForm) > 0;
   const isOrderFormValid =
     (Boolean(user) || import.meta.env.DEV) &&
     !isLedgerLoading &&
@@ -1155,8 +1179,11 @@ export default function StarCitizenSalvageGuideWebsite() {
       methodName: jobForm.method,
       locationName: jobForm.location,
     });
-    const timeMinutes = secondsToMinutes(result.timeSeconds);
-    const timeMs = timeMinutes * 60 * 1000;
+    // Refinery time now comes from the user's H/M/S fields rather than the
+    // method's auto-computed duration. Yield + cost still derive from
+    // SCU + method.
+    const timeSeconds = hmsToSeconds(jobForm);
+    const timeMs = timeSeconds * 1000;
     const submittedAt = Date.now();
     const newJob = {
       id: `job_${submittedAt}_${Math.random().toString(36).slice(2, 8)}`,
@@ -1168,7 +1195,9 @@ export default function StarCitizenSalvageGuideWebsite() {
       // history display). Computed at submit time from method × material rate.
       yield: result.totalYield,
       cost: Math.round(result.cost),
-      timeMinutes,
+      // Keep timeMinutes for legacy reads; new completesAt is the authoritative
+      // value (it reflects the user's exact H/M/S input).
+      timeMinutes: timeSeconds / 60,
       submittedAt,
       completesAt: submittedAt + timeMs,
       pickedUpAt: null,
@@ -1180,6 +1209,9 @@ export default function StarCitizenSalvageGuideWebsite() {
       location: jobForm.location,
       method: jobForm.method,
       materialScu: "",
+      hours: "",
+      minutes: "",
+      seconds: "",
     });
     saveLedger(nextJobs, sellOrders);
   };
@@ -1240,6 +1272,12 @@ export default function StarCitizenSalvageGuideWebsite() {
       const j = refineryJobs.find((x) => x.id === entry.id);
       if (!j) return;
       setEditingEntry(entry);
+      // Recover the original H/M/S from the job's actual duration so the
+      // edit form's time inputs reflect what the user originally entered.
+      const totalSec = j.completesAt && j.submittedAt
+        ? Math.max(0, Math.round((j.completesAt - j.submittedAt) / 1000))
+        : Math.round((Number(j.timeMinutes) || 0) * 60);
+      const hms = secondsToHms(totalSec);
       setEditForm({
         material: j.material,
         location: j.location || "Levski",
@@ -1248,6 +1286,7 @@ export default function StarCitizenSalvageGuideWebsite() {
         method: j.method || refineryMethods[0].name,
         materialScu: String(j.materialScu ?? ""),
         cost: String(j.cost ?? ""),
+        ...hms,
       });
     } else if (entry.source === "sell") {
       const o = sellOrders.find((x) => x.id === entry.id);
@@ -1275,7 +1314,8 @@ export default function StarCitizenSalvageGuideWebsite() {
         Boolean(editForm.material) &&
         Boolean(editForm.location) &&
         Boolean(editForm.method) &&
-        Number(editForm.materialScu) > 0
+        Number(editForm.materialScu) > 0 &&
+        hmsToSeconds(editForm) > 0
       );
     }
     if (editingEntry.source === "sell") {
@@ -1298,7 +1338,10 @@ export default function StarCitizenSalvageGuideWebsite() {
         methodName: editForm.method,
         locationName: editForm.location,
       });
-      const newTimeMinutes = secondsToMinutes(result.timeSeconds);
+      // User-entered H/M/S now controls the job's duration; method's auto-
+      // computed time is no longer used.
+      const newTimeSeconds = hmsToSeconds(editForm);
+      const newTimeMinutes = newTimeSeconds / 60;
       const nextJobs = refineryJobs.map((j) =>
         j.id === editingEntry.id
           ? {
@@ -1314,7 +1357,7 @@ export default function StarCitizenSalvageGuideWebsite() {
               // in-app countdown and the scheduled DM both reflect the edit.
               // The server detects this change and reschedules the QStash
               // callback; the original DM (if any) is cancelled.
-              completesAt: j.submittedAt + newTimeMinutes * 60 * 1000,
+              completesAt: j.submittedAt + newTimeSeconds * 1000,
             }
           : j
       );
@@ -1840,10 +1883,6 @@ export default function StarCitizenSalvageGuideWebsite() {
                       <span className="font-bold text-amber-300">{Math.round(methodCost).toLocaleString()} aUEC</span>
                     </div>
                     <div className="flex items-center justify-between rounded-xl bg-slate-950/60 px-4 py-3">
-                      <span className="text-slate-400">Time</span>
-                      <span className="font-bold text-amber-300">{formatRefineryDuration(methodTimeSeconds)}</span>
-                    </div>
-                    <div className="flex items-center justify-between rounded-xl bg-slate-950/60 px-4 py-3">
                       <span className="text-slate-400">Base Yield</span>
                       <span className="font-bold text-amber-300">{baseYield.toFixed(1)} SCU</span>
                     </div>
@@ -2183,7 +2222,32 @@ export default function StarCitizenSalvageGuideWebsite() {
                       className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
                     />
                   </div>
-                  <div className="grid grid-cols-3 gap-2 rounded-xl border border-slate-800 bg-slate-900/40 p-3">
+                  <div>
+                    <label className="mb-1 block text-xs text-slate-400">Refinery Time</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { key: "hours", label: "Hours" },
+                        { key: "minutes", label: "Min" },
+                        { key: "seconds", label: "Sec" },
+                      ].map(({ key, label }) => (
+                        <div key={key}>
+                          <input
+                            type="number"
+                            min="0"
+                            step="1"
+                            placeholder={label}
+                            aria-label={`Refinery time — ${label}`}
+                            value={jobForm[key]}
+                            onChange={(e) => setJobForm({ ...jobForm, [key]: e.target.value })}
+                            disabled={!user && !import.meta.env.DEV}
+                            className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+                          />
+                          <div className="mt-1 text-center text-[10px] uppercase tracking-wider text-slate-500">{label}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 rounded-xl border border-slate-800 bg-slate-900/40 p-3">
                     <div>
                       <div className="text-[11px] uppercase tracking-wider text-slate-500">Expected Yield</div>
                       <div className="mt-0.5 text-sm font-bold text-emerald-300">{jobFormPreview.totalYield.toFixed(1)} SCU</div>
@@ -2191,10 +2255,6 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <div>
                       <div className="text-[11px] uppercase tracking-wider text-slate-500">Cost</div>
                       <div className="mt-0.5 text-sm font-bold text-amber-300">{Math.round(jobFormPreview.cost).toLocaleString()} aUEC</div>
-                    </div>
-                    <div>
-                      <div className="text-[11px] uppercase tracking-wider text-slate-500">Time</div>
-                      <div className="mt-0.5 text-sm font-bold text-amber-300">{formatRefineryDuration(jobFormPreview.timeSeconds)}</div>
                     </div>
                   </div>
                   <button
@@ -2614,7 +2674,31 @@ export default function StarCitizenSalvageGuideWebsite() {
                             className="w-full rounded-xl border border-cyan-500/25 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-cyan-400"
                           />
                         </div>
-                        <div className="grid grid-cols-3 gap-2 rounded-xl border border-slate-800 bg-slate-900/40 p-3">
+                        <div>
+                          <label className="mb-1 block text-xs text-slate-400">Refinery Time</label>
+                          <div className="grid grid-cols-3 gap-2">
+                            {[
+                              { key: "hours", label: "Hours" },
+                              { key: "minutes", label: "Min" },
+                              { key: "seconds", label: "Sec" },
+                            ].map(({ key, label }) => (
+                              <div key={key}>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  step="1"
+                                  placeholder={label}
+                                  aria-label={`Refinery time — ${label}`}
+                                  value={editForm[key] || ""}
+                                  onChange={(e) => setEditForm({ ...editForm, [key]: e.target.value })}
+                                  className="w-full rounded-xl border border-cyan-500/25 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-cyan-400"
+                                />
+                                <div className="mt-1 text-center text-[10px] uppercase tracking-wider text-slate-500">{label}</div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 rounded-xl border border-slate-800 bg-slate-900/40 p-3">
                           <div>
                             <div className="text-[11px] uppercase tracking-wider text-slate-500">Expected Yield</div>
                             <div className="mt-0.5 text-sm font-bold text-emerald-300">{editFormPreview.totalYield.toFixed(1)} SCU</div>
@@ -2622,10 +2706,6 @@ export default function StarCitizenSalvageGuideWebsite() {
                           <div>
                             <div className="text-[11px] uppercase tracking-wider text-slate-500">Cost</div>
                             <div className="mt-0.5 text-sm font-bold text-amber-300">{Math.round(editFormPreview.cost).toLocaleString()} aUEC</div>
-                          </div>
-                          <div>
-                            <div className="text-[11px] uppercase tracking-wider text-slate-500">Time</div>
-                            <div className="mt-0.5 text-sm font-bold text-amber-300">{formatRefineryDuration(editFormPreview.timeSeconds)}</div>
                           </div>
                         </div>
                       </>

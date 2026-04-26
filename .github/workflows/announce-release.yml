@@ -1,0 +1,112 @@
+# Posts the latest README changelog block to Discord #releases when a new
+# release is pushed to main.
+#
+# Triggered by changes to README.md on main. The job extracts the topmost
+# "UPDATE ..." block from the changelog and compares its header line against
+# the previous commit's topmost UPDATE line. If unchanged (e.g. README was
+# edited for some non-release reason) the announce is skipped.
+#
+# Required GitHub repo secrets:
+#   DISCORD_BOT_TOKEN           — same bot token used by the Vercel app
+#                                 (Settings → Secrets and variables → Actions)
+#   DISCORD_RELEASES_CHANNEL_ID — numeric channel ID for #releases. Get it
+#                                 via Discord → User Settings → Advanced →
+#                                 Developer Mode → right-click the channel →
+#                                 Copy Channel ID.
+#
+# Bot must be a member of the server and have "Send Messages" in #releases.
+
+name: Announce release to Discord
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - README.md
+  workflow_dispatch:
+
+jobs:
+  announce:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Extract latest changelog block
+        id: changelog
+        run: |
+          set -euo pipefail
+          start=$(grep -n '^UPDATE ' README.md | head -1 | cut -d: -f1 || true)
+          if [ -z "${start:-}" ]; then
+            echo "No UPDATE header found in README.md — nothing to announce."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          end=$(awk -v start="$start" 'NR > start && /^UPDATE /{print NR; exit}' README.md)
+          if [ -z "${end:-}" ]; then
+            end=$(($(wc -l < README.md) + 1))
+          fi
+
+          block=$(awk -v s="$start" -v e="$end" '
+            NR >= s && NR < e { lines[++n] = $0 }
+            END {
+              while (n > 0 && lines[n] == "") n--
+              for (i = 1; i <= n; i++) print lines[i]
+            }
+          ' README.md)
+
+          current_header=$(sed -n "${start}p" README.md)
+          prev_header=$(git show HEAD~1:README.md 2>/dev/null | grep '^UPDATE ' | head -1 || true)
+
+          if [ "$current_header" = "$prev_header" ]; then
+            echo "Top changelog header unchanged ($current_header) — skipping announce."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          {
+            echo "skip=false"
+            echo "block<<CHANGELOG_EOF"
+            echo "$block"
+            echo "CHANGELOG_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Post to Discord #releases
+        if: steps.changelog.outputs.skip != 'true'
+        env:
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          DISCORD_RELEASES_CHANNEL_ID: ${{ secrets.DISCORD_RELEASES_CHANNEL_ID }}
+          BLOCK: ${{ steps.changelog.outputs.block }}
+        run: |
+          set -euo pipefail
+          if [ -z "${DISCORD_BOT_TOKEN:-}" ] || [ -z "${DISCORD_RELEASES_CHANNEL_ID:-}" ]; then
+            echo "::warning::Missing DISCORD_BOT_TOKEN or DISCORD_RELEASES_CHANNEL_ID secret — skipping."
+            exit 0
+          fi
+
+          # Bold the header line (first line, "UPDATE ... vX.Y") for readability.
+          # Discord caps message content at 2000 chars; truncate with an ellipsis if needed.
+          formatted=$(printf '%s' "$BLOCK" | awk 'NR==1{print "**" $0 "**"; next} {print}')
+          if [ ${#formatted} -gt 1990 ]; then
+            formatted="${formatted:0:1987}..."
+          fi
+
+          payload=$(jq -n --arg content "$formatted" '{content: $content}')
+
+          http_status=$(curl -sS -o /tmp/discord_resp.json -w "%{http_code}" \
+            -X POST \
+            -H "Authorization: Bot $DISCORD_BOT_TOKEN" \
+            -H "Content-Type: application/json" \
+            -H "User-Agent: scsalvager-release-announcer (+https://scsalvager.net)" \
+            -d "$payload" \
+            "https://discord.com/api/v10/channels/$DISCORD_RELEASES_CHANNEL_ID/messages")
+
+          if [ "$http_status" -ge 200 ] && [ "$http_status" -lt 300 ]; then
+            echo "Posted v$(echo "$BLOCK" | head -1 | grep -oE 'v[0-9.]+' || echo 'release') to #releases."
+          else
+            echo "::error::Discord rejected announce (HTTP $http_status)"
+            cat /tmp/discord_resp.json
+            exit 1
+          fi

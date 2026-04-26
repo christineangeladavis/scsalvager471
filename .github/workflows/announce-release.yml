@@ -27,15 +27,12 @@ on:
 
 env:
   DISCORD_RELEASES_CHANNEL_ID: "1497542109526233188"
-  # Opt JS actions (e.g. actions/checkout) into Node.js 24 ahead of the
-  # June 2026 forced cutover. Silences the Node 20 deprecation warning.
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
   announce:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 2
 

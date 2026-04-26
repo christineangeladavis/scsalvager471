@@ -13,6 +13,7 @@ Notable Changes:
 - Logged-in users now see an in-page banner when a new deployment goes live, prompting them to press Ctrl+Shift+R to hard-refresh and pick up the latest version.
 - Mobile layout polish — wide data tables (Scraper Modules, Stock Components, 30-day history) now scroll inside themselves on small screens instead of dragging the whole page sideways, and the header CTAs/tabs lay out more cleanly on phones.
 - Replaced the header title block with a full-width SCSalvager.net banner; Discord, login, and Patch Verified buttons remain underneath.
+- Internal: bumped the release-announce GitHub Actions workflow to Node.js 24-native action versions, removing the Node 20 deprecation warnings.
 
 UPDATE 4/25/2026 v2.2
 Notable Changes:

@@ -572,9 +572,23 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [rsiVerifyFeedback, setRsiVerifyFeedback] = useState(null);
   const [rsiTokenCopied, setRsiTokenCopied] = useState(false);
 
+  // Account-deletion flow state. The UI walks the user through two
+  // explicit confirmation panels before firing the irreversible POST.
+  //   0          — collapsed, just the "Delete my account" button
+  //   1          — first warning panel ("you'll lose your ledger…")
+  //   2          — second warning panel ("last chance…")
+  //   "deleting" — POST in flight; buttons disabled
+  const [deleteAccountStep, setDeleteAccountStep] = useState(0);
+  const [deleteAccountError, setDeleteAccountError] = useState("");
+
   // --- UI state for the user menu and Settings modal ---
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  // Privacy Policy modal — opens from the footer link. Stays decoupled
+  // from auth state so anonymous visitors can read it too.
+  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
+  // Terms of Service modal — same deal, also reachable by anyone.
+  const [isTermsOpen, setIsTermsOpen] = useState(false);
 
   // Transient feedback for notification actions (test DM result, disconnect, etc.)
   // Shape: { kind: "success" | "error" | "info", text: string } | null
@@ -1642,6 +1656,71 @@ export default function StarCitizenSalvageGuideWebsite() {
     setRsiVerifyFeedback(null);
     setRsiTokenCopied(false);
   }, [prefs.rsiHandle, prefs.rsiHandleToken, isSettingsOpen]);
+
+  // Reset the account-deletion confirmation state whenever the modal
+  // closes/reopens. Otherwise reopening Settings could land the user
+  // mid-flow on the "Last chance" panel they had no memory of.
+  useEffect(() => {
+    setDeleteAccountStep(0);
+    setDeleteAccountError("");
+  }, [isSettingsOpen]);
+
+  // --- Permanently delete the caller's account ---
+  // Posts to /api/me/delete-account with the explicit confirmation
+  // sentinel the server requires. On success the server has already
+  // wiped every key tied to this user AND cleared the session cookie,
+  // so we just drop the local user state and reload the page back to
+  // the anonymous home view.
+  const deleteAccount = async () => {
+    setDeleteAccountStep("deleting");
+    setDeleteAccountError("");
+    try {
+      const res = await fetch("/api/me/delete-account", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ confirm: "DELETE_MY_ACCOUNT" }),
+      });
+      let data = null;
+      try { data = await res.json(); } catch {}
+      if (!res.ok) {
+        // Dev fallback: simulate a successful delete locally so the
+        // flow is exercisable in `vite dev` without the API.
+        if (
+          import.meta.env.DEV &&
+          (res.status === 401 || res.status === 404 || res.status === 503)
+        ) {
+          setIsSettingsOpen(false);
+          setUser(null);
+          alert("(dev preview) Account deleted. In production this would log you out and wipe your data.");
+          setDeleteAccountStep(0);
+          return;
+        }
+        throw new Error((data && data.error) || `HTTP ${res.status}`);
+      }
+      // Success: close the modal, drop the user, reload so any cached
+      // ledger state is cleared and the anonymous-visitor experience
+      // takes over cleanly.
+      setIsSettingsOpen(false);
+      setUser(null);
+      // Reload to flush any in-memory state hydrated under the old
+      // session — simpler than walking every state slice and clearing
+      // it by hand, and the page is small enough that the reload cost
+      // is invisible.
+      window.location.reload();
+    } catch (e) {
+      if (import.meta.env.DEV) {
+        // Same dev-mode mock path for thrown fetch errors.
+        setIsSettingsOpen(false);
+        setUser(null);
+        alert("(dev preview) Account deleted. In production this would log you out and wipe your data.");
+        setDeleteAccountStep(0);
+        return;
+      }
+      setDeleteAccountError(e && e.message ? e.message : "Could not delete account.");
+      setDeleteAccountStep(2); // back to the last-chance panel so they can retry
+    }
+  };
 
   // --- Detect return from notifications OAuth on mount ---
   // /api/auth/notifications-callback redirects here with one of:
@@ -5312,6 +5391,91 @@ export default function StarCitizenSalvageGuideWebsite() {
                   )}
                 </div>
               </section>
+
+              {/* Danger Zone — account deletion.
+                  Two-step confirmation flow:
+                    step 0: collapsed, just the "Delete my account" button
+                    step 1: first warning panel
+                    step 2: last-chance warning panel
+                    step "deleting": POST in flight, buttons disabled */}
+              <section className="mt-6">
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-rose-400">Danger Zone</h4>
+                <div className="mt-3 rounded-xl border border-rose-500/30 bg-rose-500/5 p-4">
+                  {deleteAccountStep === 0 && (
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div className="flex-1 min-w-[180px]">
+                        <p className="text-sm font-semibold text-rose-200">Delete my account</p>
+                        <p className="mt-1 text-xs text-slate-400">Permanently removes your account, ledger, and any data we've stored about you. This cannot be undone.</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setDeleteAccountError("");
+                          setDeleteAccountStep(1);
+                        }}
+                        className="rounded-md border border-rose-500/40 bg-rose-500/15 px-3 py-1.5 text-xs font-semibold text-rose-100 hover:bg-rose-500/25"
+                      >
+                        Delete my account
+                      </button>
+                    </div>
+                  )}
+
+                  {deleteAccountStep === 1 && (
+                    <div>
+                      <p className="text-sm font-semibold text-rose-100">
+                        You will lose any and all data on your ledger if you wish to delete your account. Are you sure you wish to do this?
+                      </p>
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setDeleteAccountStep(2)}
+                          className="rounded-md border border-rose-500/50 bg-rose-500/20 px-3 py-1.5 text-xs font-semibold text-rose-100 hover:bg-rose-500/30"
+                        >
+                          Yes, continue
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDeleteAccountStep(0)}
+                          className="rounded-md border border-slate-700 bg-slate-800/60 px-3 py-1.5 text-xs text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {(deleteAccountStep === 2 || deleteAccountStep === "deleting") && (
+                    <div>
+                      <p className="text-sm font-semibold text-rose-100">
+                        Last chance, are you sure you wish to delete your account?
+                      </p>
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={deleteAccount}
+                          disabled={deleteAccountStep === "deleting"}
+                          className="rounded-md border border-rose-500/60 bg-rose-500/30 px-3 py-1.5 text-xs font-semibold text-rose-50 hover:bg-rose-500/40 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          {deleteAccountStep === "deleting" ? "Deleting…" : "Permanently delete account"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDeleteAccountStep(0)}
+                          disabled={deleteAccountStep === "deleting"}
+                          className="rounded-md border border-slate-700 bg-slate-800/60 px-3 py-1.5 text-xs text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                      {deleteAccountError && (
+                        <p className="mt-3 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+                          {deleteAccountError}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </section>
             </div>
           </div>
         )}
@@ -5320,12 +5484,298 @@ export default function StarCitizenSalvageGuideWebsite() {
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <span>
               <span className="font-semibold text-slate-200">Made by Chrissyy</span> · Data verified for patch 4.7.2
+              {" · "}
+              <button
+                type="button"
+                onClick={() => setIsPrivacyOpen(true)}
+                className="text-cyan-300 underline-offset-2 hover:underline hover:text-cyan-200"
+              >
+                Privacy Policy
+              </button>
+              {" · "}
+              <button
+                type="button"
+                onClick={() => setIsTermsOpen(true)}
+                className="text-cyan-300 underline-offset-2 hover:underline hover:text-cyan-200"
+              >
+                Terms of Service
+              </button>
             </span>
             <span className="rounded-xl border border-cyan-500/25 bg-cyan-500/10 px-4 py-2 font-mono tracking-widest text-cyan-300">
               STAR CITIZEN REFERRAL CODE: <span className="font-bold text-white">STAR-CH2W-R73F</span>
             </span>
           </div>
         </footer>
+
+        {/* Privacy Policy modal — also lives in the repo at PRIVACY.md.
+            Updating this content? Update both. */}
+        {isPrivacyOpen && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+            onClick={() => setIsPrivacyOpen(false)}
+          >
+            <div
+              className="w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-3xl border border-cyan-500/30 bg-slate-900 p-6 shadow-2xl shadow-cyan-950/40"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="privacy-title"
+            >
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 id="privacy-title" className="text-lg font-bold text-cyan-300">Privacy Policy</h3>
+                  <p className="mt-1 text-xs text-slate-500">Last updated: April 27, 2026</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsPrivacyOpen(false)}
+                  aria-label="Close privacy policy"
+                  className="rounded-md border border-slate-700 bg-slate-800/60 px-2 py-1 text-xs text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="mt-5 space-y-6 text-sm text-slate-300 leading-relaxed">
+                <p>
+                  SCSalvager.net is a community salvage companion for Star Citizen. This page explains exactly what we store about you, why, where it lives, who else can see it, and what you can do about it.
+                </p>
+
+                <section>
+                  <h4 className="text-cyan-300 text-xs font-semibold uppercase tracking-wider">What we collect</h4>
+                  <ul className="mt-2 list-disc pl-5 space-y-2 text-slate-400">
+                    <li>
+                      <strong className="text-slate-200">Discord handle (display name)</strong> — required to identify you to other salvagers.
+                    </li>
+                    <li>
+                      <strong className="text-slate-200">RSI handle (optional)</strong> — the Roberts Space Industries citizen handle you choose to link for in-game identity verification.
+                    </li>
+                    <li>
+                      <strong className="text-slate-200">Session data (IP address, user-agent)</strong> — retained only while your session is active to prevent unauthorised access.
+                    </li>
+                  </ul>
+                  <p className="mt-3 text-slate-400">
+                    Anything else you see on the site is content you've authored yourself (ledger entries, community price reports, your preference toggles) — we keep it associated with your Discord handle so it's there the next time you sign in, and you can wipe all of it via Settings → Danger Zone at any time.
+                  </p>
+                  <p className="mt-3 text-slate-400">
+                    Screenshots you upload to auto-fill refinery or sell orders are sent once to a vision AI service for parsing and immediately discarded — they are never written to disk, stored in Redis, or logged.
+                  </p>
+                </section>
+
+                <section>
+                  <h4 className="text-cyan-300 text-xs font-semibold uppercase tracking-wider">Why we collect it</h4>
+                  <p className="mt-2 text-slate-400">We collect only what is needed to operate the service:</p>
+                  <ul className="mt-2 list-disc pl-5 space-y-2 text-slate-400">
+                    <li>Only your Discord handle is required to create and authenticate your account.</li>
+                    <li>RSI handle is collected solely to verify your in-game identity when you choose to do so. Verification is optional.</li>
+                    <li>Session data (IP, user-agent) is retained only while your session is active to prevent unauthorised access.</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h4 className="text-cyan-300 text-xs font-semibold uppercase tracking-wider">How it is stored</h4>
+                  <ul className="mt-2 list-disc pl-5 space-y-1 text-slate-400">
+                    <li>All account data — sessions, ledgers, preferences, login events, user index — lives in <strong className="text-slate-200">Upstash Redis</strong>, a hosted Redis service.</li>
+                    <li>Session cookies (<code className="rounded bg-slate-800 px-1 text-cyan-200">scs_session</code>) are <strong className="text-slate-200">HTTP-only</strong>, marked <code className="rounded bg-slate-800 px-1 text-cyan-200">Secure</code> in production, and expire <strong className="text-slate-200">7 days</strong> after issue.</li>
+                    <li>The global login event log is capped at <strong className="text-slate-200">100,000 entries</strong>; older entries are trimmed automatically.</li>
+                    <li><strong className="text-slate-200">Screenshots are not stored.</strong> They exist only in server memory for the duration of the single vision-API call, then are released to be garbage-collected. They never reach Redis or any log.</li>
+                    <li>The site is hosted on <strong className="text-slate-200">Vercel</strong>, which runs the serverless API.</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h4 className="text-cyan-300 text-xs font-semibold uppercase tracking-wider">Third party disclosure</h4>
+                  <p className="mt-2 text-slate-400">We share data only with the services required for the site to function:</p>
+                  <ul className="mt-2 list-disc pl-5 space-y-1 text-slate-400">
+                    <li><strong className="text-slate-200">Discord</strong> — OAuth login provider. Discord knows you've authorized this app. If you opt in to refinery-completion DMs, we deliver those messages through Discord's API.</li>
+                    <li><strong className="text-slate-200">Anthropic</strong> — when you upload a screenshot, the image is sent once to Anthropic's Claude API for parsing. Under Anthropic's commercial terms, API inputs are not used to train models and are not retained beyond the request.</li>
+                    <li><strong className="text-slate-200">Roberts Space Industries</strong> — when you click "Verify Now" on your RSI handle, our server fetches your public RSI profile page (<code className="rounded bg-slate-800 px-1 text-cyan-200">robertsspaceindustries.com/citizens/&#123;handle&#125;</code>). RSI sees a request from our server's IP address; we do not send any of your data to RSI.</li>
+                    <li><strong className="text-slate-200">Upstash</strong> — operates the Redis instance where your account data lives.</li>
+                    <li><strong className="text-slate-200">Vercel</strong> — hosts the application and serverless functions. Server logs may include standard request metadata (IP, user agent, path).</li>
+                  </ul>
+                  <p className="mt-3 text-slate-400">
+                    We do <strong className="text-slate-200">not</strong> sell, rent, or trade your data to anyone, ever.
+                  </p>
+                </section>
+
+                <section>
+                  <h4 className="text-cyan-300 text-xs font-semibold uppercase tracking-wider">Your rights</h4>
+                  <p className="mt-2 text-slate-400">You can:</p>
+                  <ul className="mt-2 list-disc pl-5 space-y-1 text-slate-400">
+                    <li><strong className="text-slate-200">View your data</strong> at any time — your full Ledger is on the Ledger tab; your preferences and RSI handle state are in Settings.</li>
+                    <li><strong className="text-slate-200">Opt out of Discord DMs</strong> at any time in Settings — delivery stops immediately.</li>
+                    <li><strong className="text-slate-200">Disconnect Discord notifications</strong> without losing your account.</li>
+                    <li>
+                      <strong className="text-slate-200">Permanently delete your account</strong> via Settings → Danger Zone. The flow walks through two explicit confirmation prompts and then wipes:
+                      <ul className="mt-1 list-disc pl-5 space-y-1">
+                        <li>your ledger (refinery jobs + sell orders)</li>
+                        <li>your preferences (RSI handle, verification, DM opt-in)</li>
+                        <li>your user index entry, username mirror, and login event history</li>
+                        <li>every active session across every device you've signed in on</li>
+                        <li>your contributions to the site-wide Statistics aggregations</li>
+                      </ul>
+                      <p className="mt-1">Account deletion is irreversible and we keep no backup tied to your identity.</p>
+                    </li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h4 className="text-cyan-300 text-xs font-semibold uppercase tracking-wider">Contact</h4>
+                  <p className="mt-2 text-slate-400">
+                    Questions, concerns, or data requests:{" "}
+                    <a
+                      href="https://discord.gg/GkQU7AbfBS"
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className="text-cyan-300 underline hover:text-cyan-200"
+                    >
+                      Discord community
+                    </a>
+                  </p>
+                </section>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Terms of Service modal — also lives in the repo at TERMS.md.
+            Updating this content? Update both. */}
+        {isTermsOpen && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+            onClick={() => setIsTermsOpen(false)}
+          >
+            <div
+              className="w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-3xl border border-cyan-500/30 bg-slate-900 p-6 shadow-2xl shadow-cyan-950/40"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="terms-title"
+            >
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 id="terms-title" className="text-lg font-bold text-cyan-300">Terms of Service</h3>
+                  <p className="mt-1 text-xs text-slate-500">Last updated: April 27, 2026</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsTermsOpen(false)}
+                  aria-label="Close terms of service"
+                  className="rounded-md border border-slate-700 bg-slate-800/60 px-2 py-1 text-xs text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="mt-5 space-y-6 text-sm text-slate-300 leading-relaxed">
+                <p>
+                  SCSalvager.net ("the site", "we", "us") is a free community tool for Star Citizen players. By using the site you agree to the terms below. If any of them don't work for you, please don't use the site.
+                </p>
+
+                <section>
+                  <h4 className="text-cyan-300 text-xs font-semibold uppercase tracking-wider">Who can use SCSalvager.net</h4>
+                  <ul className="mt-2 list-disc pl-5 space-y-1 text-slate-400">
+                    <li>You must be at least 13 years old, or the minimum age Discord requires in your country — whichever is higher.</li>
+                    <li>You sign in with a Discord account, so the same conduct rules Discord applies to you apply here too.</li>
+                    <li>You're responsible for keeping your Discord login secure. Anyone who can log into your Discord can log into your SCSalvager account.</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h4 className="text-cyan-300 text-xs font-semibold uppercase tracking-wider">What you can do here</h4>
+                  <ul className="mt-2 list-disc pl-5 space-y-1 text-slate-400">
+                    <li>Track your refinery jobs and sell orders in your personal Ledger.</li>
+                    <li>Submit anonymous community price reports that go into the site's median pricing.</li>
+                    <li>Verify your RSI handle to display it on the Statistics leaderboard.</li>
+                    <li>Opt in to Discord DMs for refinery-completion notifications.</li>
+                    <li>Delete your account at any time via Settings → Danger Zone.</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h4 className="text-cyan-300 text-xs font-semibold uppercase tracking-wider">What you can't do here</h4>
+                  <p className="mt-2 text-slate-400">Don't use the site to:</p>
+                  <ul className="mt-2 list-disc pl-5 space-y-1 text-slate-400">
+                    <li><strong className="text-slate-200">Impersonate</strong> another player. Verification exists for a reason; trying to bypass it is a violation.</li>
+                    <li><strong className="text-slate-200">Submit fake or misleading data</strong> — bogus price reports, fabricated ledger entries to game the Statistics leaderboard, or anything intended to mislead other users.</li>
+                    <li><strong className="text-slate-200">Abuse the API</strong> — automated scraping, hammering endpoints, evading rate limits, or running anything that puts unreasonable load on the service.</li>
+                    <li><strong className="text-slate-200">Attempt to break the site.</strong> Reporting a vulnerability you discover via the Discord community is welcome. Exploiting one is not.</li>
+                    <li><strong className="text-slate-200">Harass or threaten</strong> other users via Discord DMs we send on your behalf, or in any other context tied to your SCSalvager account.</li>
+                    <li><strong className="text-slate-200">Use the service for anything illegal</strong> in your country or ours.</li>
+                  </ul>
+                  <p className="mt-3 text-slate-400">
+                    We may suspend or permanently ban any account that violates these rules. Severe abuse (impersonation, harassment, exploitation) may also be reported to Discord Trust &amp; Safety.
+                  </p>
+                </section>
+
+                <section>
+                  <h4 className="text-cyan-300 text-xs font-semibold uppercase tracking-wider">Your content</h4>
+                  <ul className="mt-2 list-disc pl-5 space-y-2 text-slate-400">
+                    <li><strong className="text-slate-200">Ledger entries</strong> (refinery jobs, sell orders) belong to you. We don't share them with anyone except as described in the Privacy Policy. Deleting your account wipes them.</li>
+                    <li><strong className="text-slate-200">Community price reports</strong> are stored anonymously, with no link to your user ID. By submitting a report, you grant SCSalvager.net a perpetual, non-exclusive license to display and aggregate that report as part of the community price data. Because the report carries no identifier, deleting your account does not retract reports you previously submitted — they are already irreversibly anonymous and continue to inform the community median.</li>
+                    <li>You are responsible for the content you submit. Don't submit anything you don't have the right to.</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h4 className="text-cyan-300 text-xs font-semibold uppercase tracking-wider">Service availability</h4>
+                  <ul className="mt-2 list-disc pl-5 space-y-1 text-slate-400">
+                    <li>The site is provided <strong className="text-slate-200">as-is</strong>, with <strong className="text-slate-200">no uptime guarantee</strong>. It's a free tool maintained by a small team (currently one person).</li>
+                    <li>We may change, suspend, or shut down the site or any feature at any time, with or without notice.</li>
+                    <li>We may rate-limit, throttle, or block traffic we believe is harmful to the service or other users.</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h4 className="text-cyan-300 text-xs font-semibold uppercase tracking-wider">No warranties, no liability</h4>
+                  <ul className="mt-2 list-disc pl-5 space-y-1 text-slate-400">
+                    <li>All numbers on the site — refinery yields, sell-point prices, profit estimates, completion times — are <strong className="text-slate-200">best-effort</strong> values pulled from community reports and patch data. They are not authoritative; verify in-game before making decisions you can't undo.</li>
+                    <li>We are <strong className="text-slate-200">not liable</strong> for losses you experience from relying on the site, including (but not limited to) bad price estimates, missed refinery pickups, lost ledger data during outages, or DMs that didn't deliver.</li>
+                    <li>SCSalvager.net is a Star Citizen helper tool. It is not financial, legal, or professional advice of any kind.</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h4 className="text-cyan-300 text-xs font-semibold uppercase tracking-wider">Star Citizen and Roberts Space Industries</h4>
+                  <p className="mt-2 text-slate-400">
+                    SCSalvager.net is <strong className="text-slate-200">not affiliated with, endorsed by, or sponsored by</strong> Cloud Imperium Games or Roberts Space Industries. "Star Citizen", "Squadron 42", and all related game assets and trademarks are property of Cloud Imperium Games. We reference Star Citizen content (refinery locations, refining methods, materials, ship classes, sell points) only to help players play Star Citizen.
+                  </p>
+                </section>
+
+                <section>
+                  <h4 className="text-cyan-300 text-xs font-semibold uppercase tracking-wider">Termination</h4>
+                  <ul className="mt-2 list-disc pl-5 space-y-1 text-slate-400">
+                    <li>You can delete your account at any time via Settings → Danger Zone. The deletion flow walks through two confirmation prompts before wiping your data.</li>
+                    <li>We may suspend or terminate your account if you violate these terms or if the site shuts down.</li>
+                    <li>Account deletion wipes your ledger, preferences, login history, and active sessions per the Privacy Policy. We don't keep a backup tied to your identity.</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h4 className="text-cyan-300 text-xs font-semibold uppercase tracking-wider">Changes to these terms</h4>
+                  <p className="mt-2 text-slate-400">
+                    We may update these terms when site features change. Material updates will appear in the changelog and (where appropriate) in #releases on the Discord community. Continued use of the site after a change means you accept the updated terms.
+                  </p>
+                </section>
+
+                <section>
+                  <h4 className="text-cyan-300 text-xs font-semibold uppercase tracking-wider">Contact</h4>
+                  <p className="mt-2 text-slate-400">
+                    Questions, abuse reports, vulnerability disclosures, or anything else:{" "}
+                    <a
+                      href="https://discord.gg/GkQU7AbfBS"
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className="text-cyan-300 underline hover:text-cyan-200"
+                    >
+                      Discord community
+                    </a>
+                  </p>
+                </section>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

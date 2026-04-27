@@ -12,6 +12,9 @@ Added:
 - Settings → RSI Handle: enter your Star Citizen handle to display under that name on the Statistics leaderboard instead of your Discord username.
 - Settings → RSI Handle verification: prove ownership of your handle by pasting a one-time verification code into your RSI Short Bio. Once we see it, your handle gets a check mark next to it on the Statistics leaderboard. You can remove the code from your bio after we verify.
 - Statistics leaderboard now displays your RSI handle only once it's been verified. Saving a handle without verifying still shows your Discord username — verification is what unlocks the swap (and prevents impersonation by someone typing in your handle).
+- Settings → Danger Zone: you can now permanently delete your account. The flow walks through two confirmation prompts and then wipes your ledger, prefs, login history, and every active session. The deletion also drops your contributions out of the Statistics aggregations.
+- Privacy Policy: new "Privacy Policy" link in the site footer opens a full policy explaining what we collect, why, how it's stored, who it's shared with, and what you can do about it. Canonical copy also lives at PRIVACY.md in the repo. Contact channel for questions / data requests is the [Discord community](https://discord.gg/GkQU7AbfBS).
+- Terms of Service: companion "Terms of Service" link next to Privacy Policy in the footer covers eligibility, acceptable use, account suspension, content licensing for community price reports, no-warranty disclaimers, and the explicit non-affiliation with Cloud Imperium Games / Roberts Space Industries. Canonical copy at TERMS.md.
 
 UPDATE 4/26/2026 v2.4
 

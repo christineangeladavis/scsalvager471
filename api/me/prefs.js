@@ -6,7 +6,12 @@
 
 import { getRedis } from "../_lib/redis.js";
 import { getSession } from "../_lib/session.js";
-import { getPrefs, updatePrefs, sanitizePrefsUpdate } from "../_lib/prefs.js";
+import {
+  getPrefs,
+  updatePrefs,
+  sanitizePrefsUpdate,
+  generateRsiHandleToken,
+} from "../_lib/prefs.js";
 
 export default async function handler(req, res) {
   let redis;
@@ -53,6 +58,20 @@ export default async function handler(req, res) {
     }
 
     try {
+      // If the RSI handle is changing, reset verification + issue a fresh
+      // verification token. The token is what the user pastes into their
+      // RSI Short Bio; binding a new token to a new handle prevents stale
+      // tokens being reused after a handle swap. When the handle is
+      // cleared we drop the token entirely.
+      if ("rsiHandle" in update) {
+        const current = await getPrefs(redis, session.userId);
+        if (update.rsiHandle !== current.rsiHandle) {
+          update.rsiHandleVerified = false;
+          update.rsiHandleVerifiedAt = null;
+          update.rsiHandleToken = update.rsiHandle ? generateRsiHandleToken() : "";
+        }
+      }
+
       const prefs = await updatePrefs(redis, session.userId, update);
       return res.status(200).json({ prefs });
     } catch (e) {

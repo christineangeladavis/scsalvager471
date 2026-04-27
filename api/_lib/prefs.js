@@ -10,17 +10,41 @@
 //                                        set, this displays in place of their
 //                                        Discord username on the Statistics
 //                                        leaderboard. Empty string means unset.
+//   rsiHandleToken         : string    — per-user verification token. The user
+//                                        pastes this into their RSI Short Bio,
+//                                        we fetch the public profile page, and
+//                                        substring-match for the token. Server-
+//                                        managed: regenerated when the handle
+//                                        changes, cleared when handle is wiped.
+//   rsiHandleVerified      : boolean   — true once the RSI profile fetch found
+//                                        the token in the bio. Resets to false
+//                                        whenever the handle changes.
+//   rsiHandleVerifiedAt    : number    — ms timestamp of last successful verify;
+//                                        null when never verified.
+
+import crypto from "node:crypto";
 
 // RSI handles are 3–24 chars, alphanumeric + dash + underscore per RSI's own
 // validator. We're permissive on length and only enforce a sane upper cap so
 // nobody jams a novel into the field.
 const RSI_HANDLE_MAX_LEN = 32;
 
+// 8 hex chars = 32 bits of entropy, plenty for our purposes (collision odds
+// at our user count are trivial and the token is just a "did the user paste
+// this string into their bio" check, not a security primitive). Hex avoids
+// the 0/O/1/I/l confusables that bite users when they hand-copy.
+export function generateRsiHandleToken() {
+  return "SCSV-" + crypto.randomBytes(4).toString("hex").toUpperCase();
+}
+
 export function defaultPrefs() {
   return {
     discordNotifications: false,
     notificationLinkedAt: null,
     rsiHandle: "",
+    rsiHandleToken: "",
+    rsiHandleVerified: false,
+    rsiHandleVerifiedAt: null,
   };
 }
 
@@ -95,5 +119,16 @@ export async function markNotificationsUnlinked(redis, userId) {
   return updatePrefs(redis, userId, {
     notificationLinkedAt: null,
     discordNotifications: false,
+  });
+}
+
+/**
+ * Server-only: mark the user's RSI handle as verified. Called by the
+ * verify endpoint after a successful profile fetch + token match.
+ */
+export async function markRsiHandleVerified(redis, userId) {
+  return updatePrefs(redis, userId, {
+    rsiHandleVerified: true,
+    rsiHandleVerifiedAt: Date.now(),
   });
 }

@@ -565,6 +565,12 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [rsiHandleDraft, setRsiHandleDraft] = useState("");
   const [rsiHandleSaving, setRsiHandleSaving] = useState(false);
   const [rsiHandleSaved, setRsiHandleSaved] = useState(false);
+  // RSI Short-Bio verification flow state. `feedback` is a transient
+  // banner shown after the most recent verify attempt; cleared whenever
+  // the handle changes or the modal is reopened.
+  const [rsiVerifying, setRsiVerifying] = useState(false);
+  const [rsiVerifyFeedback, setRsiVerifyFeedback] = useState(null);
+  const [rsiTokenCopied, setRsiTokenCopied] = useState(false);
 
   // --- UI state for the user menu and Settings modal ---
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -867,18 +873,37 @@ export default function StarCitizenSalvageGuideWebsite() {
   const selectedShipImageFailed = Boolean(imageLoadErrors[selectedShip.name]);
 
   // --- Auth: fetch current user on mount ---
+  // In `vite dev` the API isn't reachable and /api/auth/me will return
+  // null (or fail). To make the local preview useful we synthesize a
+  // logged-in admin user in DEV — every gated feature (Ledger,
+  // Statistics, Admin Panel, Settings prefs, etc.) checks either
+  // `user?.isAdmin` or `import.meta.env.DEV`, but the user *object*
+  // itself needs to be present for the header avatar, the user-menu
+  // dropdown, the Settings modal greeting, and the prefs effect to
+  // light up. This is preview-only — it never runs in a production
+  // bundle (Vite strips the branch via `import.meta.env.DEV`).
   useEffect(() => {
     let cancelled = false;
+    const devMockUser = () => ({
+      id: "dev-admin",
+      username: "DevAdmin",
+      avatar: null,
+      isAdmin: true,
+    });
     fetch("/api/auth/me", { credentials: "same-origin" })
       .then((res) => res.json())
       .then((data) => {
         if (cancelled) return;
-        setUser(data && data.user ? data.user : null);
+        let nextUser = data && data.user ? data.user : null;
+        if (!nextUser && import.meta.env.DEV) {
+          nextUser = devMockUser();
+        }
+        setUser(nextUser);
         setAuthLoading(false);
       })
       .catch(() => {
         if (cancelled) return;
-        setUser(null);
+        setUser(import.meta.env.DEV ? devMockUser() : null);
         setAuthLoading(false);
       });
     return () => { cancelled = true; };
@@ -961,11 +986,11 @@ export default function StarCitizenSalvageGuideWebsite() {
       refinedConstructionPieces: 4185.0,
       refinedConstructionRubble: 2810.75,
       topSalvagers: [
-        { username: "Chrissyy", scuRefined: 6210.4, profitAuec: 9_840_000 },
-        { username: "Denavago", scuRefined: 4180.2, profitAuec: 6_312_500 },
-        { username: "TestPilot42", scuRefined: 3050.6, profitAuec: 4_905_000 },
-        { username: "RefiningQueen", scuRefined: 2840.0, profitAuec: 4_220_300 },
-        { username: "ScrapKing", scuRefined: 1420.8, profitAuec: 2_180_500 },
+        { username: "Chrissyy", scuRefined: 6210.4, profitAuec: 9_840_000, verified: true },
+        { username: "Denavago", scuRefined: 4180.2, profitAuec: 6_312_500, verified: false },
+        { username: "TestPilot42", scuRefined: 3050.6, profitAuec: 4_905_000, verified: true },
+        { username: "RefiningQueen", scuRefined: 2840.0, profitAuec: 4_220_300, verified: false },
+        { username: "ScrapKing", scuRefined: 1420.8, profitAuec: 2_180_500, verified: false },
       ],
     });
 
@@ -1174,10 +1199,10 @@ export default function StarCitizenSalvageGuideWebsite() {
         onlineWindowMs: 90 * 1000,
         // Two users online (heartbeat within ~90s), two offline.
         users: [
-          { userId: "dev-1", username: "Chrissyy",     rsiHandle: "Chrissyy",      lastLoginAt: now - 4 * min,   lastSeenAt: now - 8 * 1000,   isOnline: true,  dmsEnabled: true },
-          { userId: "dev-3", username: "TestPilot42",  rsiHandle: "TP_FortyTwo",   lastLoginAt: now - 11 * hour, lastSeenAt: now - 45 * 1000,  isOnline: true,  dmsEnabled: true },
-          { userId: "dev-2", username: "Denavago",     rsiHandle: "",              lastLoginAt: now - 95 * min,  lastSeenAt: now - 30 * min,   isOnline: false, dmsEnabled: false },
-          { userId: "dev-4", username: "RefiningQueen", rsiHandle: "RefineQueen-X", lastLoginAt: now - 22 * hour, lastSeenAt: now - 18 * hour,  isOnline: false, dmsEnabled: false },
+          { userId: "dev-1", username: "Chrissyy",     rsiHandle: "Chrissyy",      rsiHandleVerified: true,  lastLoginAt: now - 4 * min,   lastSeenAt: now - 8 * 1000,   isOnline: true,  dmsEnabled: true },
+          { userId: "dev-3", username: "TestPilot42",  rsiHandle: "TP_FortyTwo",   rsiHandleVerified: true,  lastLoginAt: now - 11 * hour, lastSeenAt: now - 45 * 1000,  isOnline: true,  dmsEnabled: true },
+          { userId: "dev-2", username: "Denavago",     rsiHandle: "",              rsiHandleVerified: false, lastLoginAt: now - 95 * min,  lastSeenAt: now - 30 * min,   isOnline: false, dmsEnabled: false },
+          { userId: "dev-4", username: "RefiningQueen", rsiHandle: "RefineQueen-X", rsiHandleVerified: false, lastLoginAt: now - 22 * hour, lastSeenAt: now - 18 * hour,  isOnline: false, dmsEnabled: false },
         ],
       };
     };
@@ -1380,12 +1405,32 @@ export default function StarCitizenSalvageGuideWebsite() {
     setPrefsError("");
     if (!user) {
       // Logged out: reset to defaults, no server call.
-      setPrefs({ discordNotifications: false, notificationLinkedAt: null, rsiHandle: "" });
+      setPrefs({
+        discordNotifications: false,
+        notificationLinkedAt: null,
+        rsiHandle: "",
+        rsiHandleToken: "",
+        rsiHandleVerified: false,
+        rsiHandleVerifiedAt: null,
+      });
       setRsiHandleDraft("");
       setPrefsLoading(false);
       return;
     }
     setPrefsLoading(true);
+    // In `vite dev` /api/me/prefs isn't reachable; fall back to a mock
+    // so the Settings modal (and the RSI Handle verification UI) is
+    // exercisable in the preview. The mock seeds an unverified handle
+    // with a token so the user can click "Verify Now" and watch the
+    // request flight even though the verify endpoint will 503 too.
+    const devMockPrefs = () => ({
+      discordNotifications: false,
+      notificationLinkedAt: null,
+      rsiHandle: "",
+      rsiHandleToken: "",
+      rsiHandleVerified: false,
+      rsiHandleVerifiedAt: null,
+    });
     fetch("/api/me/prefs", { credentials: "same-origin" })
       .then(async (res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -1401,6 +1446,13 @@ export default function StarCitizenSalvageGuideWebsite() {
       })
       .catch((e) => {
         if (cancelled) return;
+        if (import.meta.env.DEV) {
+          const mock = devMockPrefs();
+          setPrefs(mock);
+          setRsiHandleDraft(mock.rsiHandle || "");
+          setPrefsLoading(false);
+          return;
+        }
         setPrefsError(e && e.message ? e.message : "Could not load preferences");
         setPrefsLoading(false);
       });
@@ -1447,6 +1499,28 @@ export default function StarCitizenSalvageGuideWebsite() {
     const previous = prefs;
     setPrefs({ ...prefs, rsiHandle: next });
     setRsiHandleDraft(next);
+    // In dev preview the API isn't reachable. Simulate the server's
+    // side effects locally so the verification UI is exercisable: if
+    // the handle is changing, generate a fake token and reset the
+    // verified state. Production users hit the real backend below.
+    const devMockSave = () => {
+      const fakeToken = next
+        ? "SCSV-" +
+          Math.random().toString(16).slice(2, 10).toUpperCase().padEnd(8, "0")
+        : "";
+      const handleChanged = next !== (previous.rsiHandle || "");
+      const mocked = {
+        ...previous,
+        rsiHandle: next,
+        rsiHandleToken: handleChanged ? fakeToken : previous.rsiHandleToken || "",
+        rsiHandleVerified: handleChanged ? false : previous.rsiHandleVerified,
+        rsiHandleVerifiedAt: handleChanged ? null : previous.rsiHandleVerifiedAt,
+      };
+      setPrefs(mocked);
+      setRsiHandleDraft(mocked.rsiHandle || "");
+      setRsiHandleSaved(true);
+      setTimeout(() => setRsiHandleSaved(false), 2000);
+    };
     try {
       const res = await fetch("/api/me/prefs", {
         method: "POST",
@@ -1454,7 +1528,13 @@ export default function StarCitizenSalvageGuideWebsite() {
         credentials: "same-origin",
         body: JSON.stringify({ rsiHandle: next }),
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) {
+        if (import.meta.env.DEV && (res.status === 401 || res.status === 404 || res.status === 503)) {
+          devMockSave();
+          return;
+        }
+        throw new Error(`HTTP ${res.status}`);
+      }
       const data = await res.json();
       if (data && data.prefs) {
         setPrefs(data.prefs);
@@ -1465,6 +1545,10 @@ export default function StarCitizenSalvageGuideWebsite() {
       // permanently sit on screen.
       setTimeout(() => setRsiHandleSaved(false), 2000);
     } catch (e) {
+      if (import.meta.env.DEV) {
+        devMockSave();
+        return;
+      }
       setPrefs(previous);
       setRsiHandleDraft(previous.rsiHandle || "");
       setPrefsError(e && e.message ? e.message : "Could not save RSI handle");
@@ -1472,6 +1556,92 @@ export default function StarCitizenSalvageGuideWebsite() {
       setRsiHandleSaving(false);
     }
   };
+
+  // --- Verify the RSI handle by checking the user's Short Bio ---
+  // POSTs to /api/me/rsi-verify which fetches the public RSI profile
+  // page and substring-matches `prefs.rsiHandleToken` against the body.
+  // Renders a transient feedback banner with the outcome.
+  const verifyRsiHandle = async () => {
+    setRsiVerifying(true);
+    setRsiVerifyFeedback(null);
+    // Dev preview: simulate a successful verify so the UI flow is
+    // exercisable without the API. The real backend does the actual
+    // RSI Short-Bio fetch + token-substring check; here we just set the
+    // flag locally.
+    const devMockVerify = () => {
+      const next = {
+        ...prefs,
+        rsiHandleVerified: true,
+        rsiHandleVerifiedAt: Date.now(),
+      };
+      setPrefs(next);
+      setRsiVerifyFeedback({
+        kind: "success",
+        text: "Verified! (dev preview — no real RSI fetch). Your RSI handle now displays a check mark on the leaderboard.",
+      });
+    };
+    try {
+      const res = await fetch("/api/me/rsi-verify", {
+        method: "POST",
+        credentials: "same-origin",
+      });
+      let data = null;
+      try { data = await res.json(); } catch {}
+      if (res.ok && data && data.verified) {
+        if (data.prefs) {
+          setPrefs(data.prefs);
+          setRsiHandleDraft(typeof data.prefs.rsiHandle === "string" ? data.prefs.rsiHandle : "");
+        }
+        setRsiVerifyFeedback({
+          kind: "success",
+          text: "Verified! Your RSI handle now displays a check mark on the leaderboard.",
+        });
+        return;
+      }
+      if (
+        import.meta.env.DEV &&
+        (res.status === 401 || res.status === 404 || res.status === 503)
+      ) {
+        devMockVerify();
+        return;
+      }
+      // Map the structured `reason` from the server to a user-facing
+      // message. Anything we don't recognize falls through to a generic
+      // "couldn't verify" so we never show raw error codes.
+      const reason = (data && data.reason) || "fetch_error";
+      const reasonText = {
+        no_match: "We couldn't find your verification code in your RSI Short Bio. Make sure you saved the bio on RSI's site, then try again.",
+        handle_not_found: "RSI doesn't have a profile for that handle. Double-check the spelling in your settings.",
+        no_handle: "Save an RSI handle first.",
+        no_token: "Save the handle again to issue a verification code.",
+        rate_limited: "Too many attempts in a short window. Wait a moment and try again.",
+        fetch_error: "Couldn't reach RSI right now. Try again in a moment.",
+      };
+      setRsiVerifyFeedback({
+        kind: "error",
+        text: reasonText[reason] || reasonText.fetch_error,
+      });
+    } catch (e) {
+      if (import.meta.env.DEV) {
+        devMockVerify();
+        return;
+      }
+      setRsiVerifyFeedback({
+        kind: "error",
+        text: e && e.message ? e.message : "Couldn't reach the server.",
+      });
+    } finally {
+      setRsiVerifying(false);
+    }
+  };
+
+  // Clear stale verify feedback whenever the handle changes underneath
+  // us (e.g. user typed a new value or the modal reopened with a fresh
+  // prefs object). Avoids "Verified!" lingering after a re-edit.
+  useEffect(() => {
+    setRsiVerifyFeedback(null);
+    setRsiTokenCopied(false);
+  }, [prefs.rsiHandle, prefs.rsiHandleToken, isSettingsOpen]);
 
   // --- Detect return from notifications OAuth on mount ---
   // /api/auth/notifications-callback redirects here with one of:
@@ -4230,7 +4400,22 @@ export default function StarCitizenSalvageGuideWebsite() {
                             {statsData.topSalvagers.map((u, idx) => (
                               <tr key={`${u.username}-${idx}`} className="border-t border-slate-800 bg-slate-900/40">
                                 <td className="px-4 py-3 font-bold text-cyan-300">{idx + 1}</td>
-                                <td className="px-4 py-3 font-semibold text-white">{u.username}</td>
+                                <td className="px-4 py-3 font-semibold text-white">
+                                  <span className="inline-flex items-center gap-1.5">
+                                    {u.username}
+                                    {u.verified ? (
+                                      <span
+                                        className="inline-flex items-center text-emerald-400"
+                                        title="Verified RSI handle"
+                                        aria-label="Verified RSI handle"
+                                      >
+                                        <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                        </svg>
+                                      </span>
+                                    ) : null}
+                                  </span>
+                                </td>
                                 <td className="px-4 py-3 text-right font-bold text-amber-300">
                                   {Number(u.scuRefined).toLocaleString(undefined, { maximumFractionDigits: 2 })} SCU
                                 </td>
@@ -4524,7 +4709,24 @@ export default function StarCitizenSalvageGuideWebsite() {
                         <tr key={u.userId} className="border-t border-slate-800 bg-slate-900/40">
                           <td className="px-4 py-3 font-semibold text-white">{u.username}</td>
                           <td className="px-4 py-3 text-slate-300">
-                            {u.rsiHandle ? u.rsiHandle : <span className="text-slate-600">—</span>}
+                            {u.rsiHandle ? (
+                              <span className="inline-flex items-center gap-1.5">
+                                {u.rsiHandle}
+                                {u.rsiHandleVerified ? (
+                                  <span
+                                    className="inline-flex items-center text-emerald-400"
+                                    title="Verified via RSI Short Bio"
+                                    aria-label="Verified RSI handle"
+                                  >
+                                    <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                    </svg>
+                                  </span>
+                                ) : null}
+                              </span>
+                            ) : (
+                              <span className="text-slate-600">—</span>
+                            )}
                           </td>
                           <td className="px-4 py-3 whitespace-nowrap">
                             <span className={`inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-semibold ${
@@ -5007,6 +5209,107 @@ export default function StarCitizenSalvageGuideWebsite() {
                       <span className="text-xs text-emerald-300">Saved</span>
                     )}
                   </div>
+
+                  {/* RSI handle verification.
+                      Three rendering branches:
+                       (a) no handle saved          → nothing
+                       (b) handle saved, verified   → green confirmation row
+                       (c) handle saved, unverified → token + instructions + Verify button */}
+                  {prefs.rsiHandle && prefs.rsiHandleVerified && (
+                    <div className="mt-4 flex items-center justify-between gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/5 px-3 py-2">
+                      <span className="flex items-center gap-2 text-xs text-emerald-200">
+                        <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        <span>
+                          <span className="font-semibold">Verified</span>
+                          {prefs.rsiHandleVerifiedAt ? (
+                            <span className="ml-1 text-emerald-300/80">
+                              · {new Date(prefs.rsiHandleVerifiedAt).toLocaleDateString()}
+                            </span>
+                          ) : null}
+                        </span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={verifyRsiHandle}
+                        disabled={rsiVerifying}
+                        className="rounded-md border border-slate-700 bg-slate-800/60 px-2 py-1 text-xs text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200 disabled:cursor-not-allowed disabled:opacity-50"
+                        title="Re-check your bio against your verification code"
+                      >
+                        {rsiVerifying ? "Checking…" : "Re-verify"}
+                      </button>
+                    </div>
+                  )}
+
+                  {prefs.rsiHandle && !prefs.rsiHandleVerified && (
+                    <div className="mt-4 rounded-lg border border-amber-500/30 bg-amber-500/5 p-3">
+                      <p className="text-xs font-semibold text-amber-200">Verify ownership of this handle</p>
+                      <ol className="mt-2 list-decimal space-y-1 pl-4 text-xs text-slate-400">
+                        <li>
+                          Open your{" "}
+                          <a
+                            href="https://robertsspaceindustries.com/account/profile"
+                            target="_blank"
+                            rel="noreferrer noopener"
+                            className="text-cyan-300 underline hover:text-cyan-200"
+                          >
+                            RSI account profile
+                          </a>{" "}
+                          and edit your <span className="font-semibold text-slate-300">Short Bio</span>.
+                        </li>
+                        <li>Paste this code anywhere in the bio and save:</li>
+                      </ol>
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <code className="select-all rounded-md border border-cyan-500/30 bg-slate-950 px-3 py-1.5 text-sm font-mono tracking-wider text-cyan-200">
+                          {prefs.rsiHandleToken || "—"}
+                        </code>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            if (!prefs.rsiHandleToken) return;
+                            try {
+                              await navigator.clipboard.writeText(prefs.rsiHandleToken);
+                              setRsiTokenCopied(true);
+                              setTimeout(() => setRsiTokenCopied(false), 2000);
+                            } catch {
+                              // Clipboard might be blocked (insecure context, etc).
+                              // The code is still selectable so this is non-fatal.
+                            }
+                          }}
+                          disabled={!prefs.rsiHandleToken}
+                          className="rounded-md border border-slate-700 bg-slate-800/60 px-2 py-1 text-xs text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          {rsiTokenCopied ? "Copied" : "Copy"}
+                        </button>
+                      </div>
+                      <p className="mt-2 text-[11px] text-slate-500">
+                        You can remove the code from your bio after we verify — we only need to see it once.
+                      </p>
+                      <div className="mt-3">
+                        <button
+                          type="button"
+                          onClick={verifyRsiHandle}
+                          disabled={rsiVerifying || !prefs.rsiHandleToken}
+                          className="rounded-md border border-cyan-400/40 bg-cyan-500/15 px-3 py-1.5 text-xs font-semibold text-cyan-100 hover:bg-cyan-500/25 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          {rsiVerifying ? "Checking RSI…" : "Verify Now"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {rsiVerifyFeedback && (
+                    <p
+                      className={`mt-3 rounded-lg border px-3 py-2 text-xs ${
+                        rsiVerifyFeedback.kind === "success"
+                          ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-200"
+                          : "border-rose-500/30 bg-rose-500/10 text-rose-200"
+                      }`}
+                    >
+                      {rsiVerifyFeedback.text}
+                    </p>
+                  )}
                 </div>
               </section>
             </div>

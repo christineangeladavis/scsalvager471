@@ -36,9 +36,13 @@
 //     refinedConstructionPieces:  number,
 //     refinedConstructionRubble:  number,
 //     topSalvagers: [
-//       { username: string, scuRefined: number, profitAuec: number }
+//       { username: string, scuRefined: number, profitAuec: number, verified: boolean }
 //     ]
 //   }
+//
+// `verified` is true only when the user has set an RSI handle AND that
+// handle has been confirmed via the RSI Short-Bio token check. The flag
+// always reads false when we're falling back to a Discord username.
 
 import { getRedis } from "./_lib/redis.js";
 import { getSession } from "./_lib/session.js";
@@ -135,15 +139,20 @@ export default async function handler(req, res) {
       const prefs = await getPrefs(redis, userId);
       // Prefer the user's RSI handle on the leaderboard — that's the name
       // they go by in-game. Fall back to their Discord username when no
-      // handle is set.
+      // handle is set. The `verified` flag is only meaningful when the
+      // displayed name actually IS the RSI handle (verifying a handle
+      // and then displaying the Discord name would be misleading).
       const rsiHandle = prefs && typeof prefs.rsiHandle === "string"
         ? prefs.rsiHandle.trim()
         : "";
+      const usingRsiHandle = Boolean(rsiHandle);
       const displayName = rsiHandle || (meta && meta.username) || "Unknown";
+      const verified = Boolean(usingRsiHandle && prefs && prefs.rsiHandleVerified);
       perUser.push({
         username: displayName,
         scuRefined: userScu,
         profitAuec: userProfit,
+        verified,
       });
     }
   }
@@ -180,6 +189,7 @@ export default async function handler(req, res) {
       username: u.username,
       scuRefined: Math.round(u.scuRefined * 100) / 100,
       profitAuec: Math.round(u.profitAuec),
+      verified: Boolean(u.verified),
     })),
   });
 }

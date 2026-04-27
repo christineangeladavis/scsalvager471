@@ -16,7 +16,9 @@ Added:
 Fixes:
 - Sell-order screenshot auto-fill no longer guesses a location when the result is ambiguous (e.g. "Pyro Gateway" matches both the Stanton and Nyx ends of the gate) — it surfaces the candidates and lets you pick.
 - Material renamed: "Recycle Material Composite" → "Recycled Material Composite" to match the in-game name. Existing community price reports roll forward; old- and new-name reports merge into a single median.
-- Location and Refinery Method dropdowns now default to "(Select a Location)" / "(Select a Method)" — you have to pick before the Home Sell Estimate shows a result.
+- All Material, Refinery Method, and Sell Location dropdowns default to a "(Select a …)" placeholder. Forms now require an explicit pick before submitting; "Material Type" is just "Material" everywhere for consistency.
+- Sell Location only appears on the Home Sell Estimate and Ledger Sell Orders forms after a material has been picked — keeps the form flow in the right order (material first, location second).
+- "Sold to Player" sits at the top of the Ledger Sell Orders' Sell Location dropdown (directly under the placeholder) instead of being buried beneath the system groups.
 
 UPDATE 4/25/2026 v2.3
 

@@ -15,6 +15,7 @@ Added:
 - Settings → Danger Zone: you can now permanently delete your account. The flow walks through two confirmation prompts and then wipes your ledger, prefs, login history, and every active session. The deletion also drops your contributions out of the Statistics aggregations.
 - Privacy Policy: new "Privacy Policy" link in the site footer opens a full policy explaining what we collect, why, how it's stored, who it's shared with, and what you can do about it. Canonical copy also lives at PRIVACY.md in the repo. Contact channel for questions / data requests is the [Discord community](https://discord.gg/GkQU7AbfBS).
 - Terms of Service: companion "Terms of Service" link next to Privacy Policy in the footer covers eligibility, acceptable use, account suspension, content licensing for community price reports, no-warranty disclaimers, and the explicit non-affiliation with Cloud Imperium Games / Roberts Space Industries. Canonical copy at TERMS.md.
+- What's New: new footer link opens an in-app changelog covering every release back to v1.0, with user-facing summaries of each release's added features and improvements.
 
 UPDATE 4/26/2026 v2.4
 

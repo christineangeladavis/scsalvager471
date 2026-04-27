@@ -589,6 +589,11 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
   // Terms of Service modal — same deal, also reachable by anyone.
   const [isTermsOpen, setIsTermsOpen] = useState(false);
+  // What's New modal — user-facing changelog. The bullets here are a
+  // reformatted, less-internal version of README.md's UPDATE blocks
+  // (Added/Removed reads roughly the same; Fixes is condensed to
+  // user-relevant summaries instead of "renamed X to Y" specifics).
+  const [isWhatsNewOpen, setIsWhatsNewOpen] = useState(false);
 
   // Transient feedback for notification actions (test DM result, disconnect, etc.)
   // Shape: { kind: "success" | "error" | "info", text: string } | null
@@ -5487,6 +5492,14 @@ export default function StarCitizenSalvageGuideWebsite() {
               {" · "}
               <button
                 type="button"
+                onClick={() => setIsWhatsNewOpen(true)}
+                className="text-cyan-300 underline-offset-2 hover:underline hover:text-cyan-200"
+              >
+                What's New
+              </button>
+              {" · "}
+              <button
+                type="button"
                 onClick={() => setIsPrivacyOpen(true)}
                 className="text-cyan-300 underline-offset-2 hover:underline hover:text-cyan-200"
               >
@@ -5772,6 +5785,137 @@ export default function StarCitizenSalvageGuideWebsite() {
                     </a>
                   </p>
                 </section>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* What's New modal — user-facing changelog.
+            Reformatted from README.md: Added/Removed entries stay
+            informative since users want to know about new features;
+            Fixes are condensed to user-relevant summaries instead of
+            implementation specifics. When shipping a new release,
+            update this AND README.md together. */}
+        {isWhatsNewOpen && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+            onClick={() => setIsWhatsNewOpen(false)}
+          >
+            <div
+              className="w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-3xl border border-cyan-500/30 bg-slate-900 p-6 shadow-2xl shadow-cyan-950/40"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="whatsnew-title"
+            >
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 id="whatsnew-title" className="text-lg font-bold text-cyan-300">What's New</h3>
+                  <p className="mt-1 text-xs text-slate-500">Recent changes to SCSalvager.net.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsWhatsNewOpen(false)}
+                  aria-label="Close what's new"
+                  className="rounded-md border border-slate-700 bg-slate-800/60 px-2 py-1 text-xs text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="mt-5 space-y-7 text-sm text-slate-300 leading-relaxed">
+
+                <section>
+                  <h4 className="text-cyan-300 text-base font-bold">v2.5 — April 27, 2026</h4>
+                  <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li>New <strong>Statistics</strong> tab (logged-in only) — site-wide totals (SCU refined, profit, refinery fees), most-used refinery and method, per-material refined totals, plus a Top 5 Salvagers leaderboard.</li>
+                    <li>Settings → <strong>RSI Handle</strong> — link your Star Citizen handle to display under that name on the leaderboard.</li>
+                    <li>Settings → <strong>RSI Handle verification</strong> — paste a one-time code into your RSI Short Bio to prove ownership. Verified handles get a check mark on the leaderboard, and the handle only displays once verified (so nobody can impersonate you by typing your handle into Settings).</li>
+                    <li>Settings → <strong>Danger Zone</strong> — permanently delete your account with a two-step confirmation. Wipes your ledger, preferences, login history, and active sessions, and drops you from Statistics aggregations.</li>
+                    <li>New <strong>Privacy Policy</strong> and <strong>Terms of Service</strong> in the footer covering what we collect, why, how it's stored, and your rights.</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h4 className="text-cyan-300 text-base font-bold">v2.4 — April 26, 2026</h4>
+                  <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li><strong>Upload screenshot</strong> on Refinery Job Orders — drop in a screenshot of the in-game refinery setup screen and the Location, Method, SCU, and Time fields auto-fill.</li>
+                    <li><strong>Upload screenshot</strong> on Sell Orders — same flow for the Commodities/Trading Console; auto-fills Location, SCU, and aUEC, and seeds the Report a Price input.</li>
+                    <li>Both screenshot flows analyze the image once via vision AI and discard it immediately — nothing is stored on the server.</li>
+                    <li>Anonymous visitors see a one-time login prompt explaining what signing in unlocks. Dismissible with a 24-hour cooldown.</li>
+                  </ul>
+                  <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Fixes</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li>Smarter location detection on screenshot uploads when the result is ambiguous.</li>
+                    <li>Material naming aligned with in-game labels.</li>
+                    <li>Cleaner dropdown defaults — explicit picks now required before forms submit.</li>
+                    <li>Improved form flow: material first, then sell location.</li>
+                    <li>Player sales sit at the top of the Ledger Sell Orders dropdown.</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h4 className="text-cyan-300 text-base font-bold">v2.3 — April 25, 2026</h4>
+                  <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li>Logged-in users see an in-page banner when a new deployment goes live.</li>
+                    <li>Discord #releases auto-announces incremental changelog updates (silent, no @everyone).</li>
+                    <li>Report a Price now also lives on the Ledger between Sell Orders and Recent Sales — same median as the Home page widget.</li>
+                    <li>Refinery time is now user-entered with Hours/Min/Sec fields on the Submit Order and Edit Job forms.</li>
+                    <li>Full-width SCSalvager.net banner at the top of the page.</li>
+                    <li>UI tuned toward the Star Citizen mobiGlass aesthetic — subtle inner glows, holographic shimmer on section headers, an "active" tab effect.</li>
+                    <li>Sell Location dropdowns grouped by system (Stanton / Pyro / Nyx) and sorted by best price first.</li>
+                  </ul>
+                  <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Removed</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li>"Sold to Player" from the Home page Sell Location dropdown — player sales now belong only on the Ledger.</li>
+                    <li>Auto-estimated Time row from the Home Refinery Bonus Yield Calculator.</li>
+                    <li>Redundant cards from the Sell Estimate panel.</li>
+                  </ul>
+                  <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Fixes</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li>Cleaner notes in the 30-day history.</li>
+                    <li>Refinery completion DMs now report the refined yield (the SCU you actually pick up).</li>
+                    <li>Mobile layout improvements — wide tables now scroll inside themselves on small screens, and the header lays out more cleanly on phones.</li>
+                    <li>Clearer field labels throughout the site.</li>
+                    <li>Reliability and tooling updates.</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h4 className="text-cyan-300 text-base font-bold">v2.2 — April 25, 2026</h4>
+                  <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li>Discord DM opt-in for refinery completion notifications.</li>
+                    <li>"Join our Discord" button in the header.</li>
+                    <li>New "Ship Details" tab.</li>
+                    <li>Stock component list for all 5 ships.</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h4 className="text-cyan-300 text-base font-bold">v2.1 — April 24, 2026</h4>
+                  <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li>Refinery method dropdowns in both the Ledger and Home calculator — picks expected yield, cost, and time for you.</li>
+                  </ul>
+                </section>
+
+                <section>
+                  <h4 className="text-cyan-300 text-base font-bold">v1.0 — Initial release</h4>
+                  <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li>Refinery Bonus Yield Calculator (Stanton / Pyro / Nyx).</li>
+                    <li>Scraper Module Performance reference.</li>
+                    <li>CMAT Sell Estimate panel with a community-driven Report a Price field, with median-of-recent-reports keeping prices resistant to single bad submissions.</li>
+                    <li>Ledger tab — personal refinery and sell tracker with live timers, pickup flow, lifetime stats, and 30-day history.</li>
+                    <li>Discord login.</li>
+                    <li>Animated space background.</li>
+                  </ul>
+                </section>
+
               </div>
             </div>
           </div>

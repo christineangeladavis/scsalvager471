@@ -10,10 +10,15 @@
 //   {
 //     fetchedAt: <ms>,
 //     activeWindowMs: 86400000,
+//     onlineWindowMs: 90000,
 //     users: [
-//       { userId, username, lastLoginAt }
+//       { userId, username, lastLoginAt, lastSeenAt, isOnline, dmsEnabled }
 //     ]
 //   }
+//
+// isOnline is derived from lastSeenAt — true when the heartbeat fired
+// within the last ~90 seconds (covers a missed beat at the default 30s
+// interval without false-flagging actual disconnects).
 
 import { getRedis } from "../_lib/redis.js";
 import { getSession } from "../_lib/session.js";
@@ -22,6 +27,9 @@ import { listUserIds, getUserMeta } from "../_lib/userIndex.js";
 import { getPrefs } from "../_lib/prefs.js";
 
 const ACTIVE_WINDOW_MS = 24 * 60 * 60 * 1000;
+// Heartbeat fires every ~30s while the user has the tab open. 90s is
+// 3 missed beats — beyond that we call them offline.
+const ONLINE_WINDOW_MS = 90 * 1000;
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {
@@ -46,7 +54,9 @@ export default async function handler(req, res) {
     return res.status(403).json({ error: "Admin access required" });
   }
 
-  const cutoff = Date.now() - ACTIVE_WINDOW_MS;
+  const now = Date.now();
+  const cutoff = now - ACTIVE_WINDOW_MS;
+  const onlineCutoff = now - ONLINE_WINDOW_MS;
   const userIds = await listUserIds(redis);
 
   const users = [];
@@ -61,19 +71,28 @@ export default async function handler(req, res) {
     const dmsEnabled = Boolean(
       prefs && prefs.discordNotifications && prefs.notificationLinkedAt
     );
+    const isOnline = Boolean(meta.lastSeenAt && meta.lastSeenAt >= onlineCutoff);
     users.push({
       userId,
       username: meta.username,
       lastLoginAt: meta.lastLoginAt,
+      lastSeenAt: meta.lastSeenAt || null,
+      isOnline,
       dmsEnabled,
     });
   }
 
-  users.sort((a, b) => b.lastLoginAt - a.lastLoginAt);
+  // Sort: online users first (so admins can see who's actively on the
+  // site at a glance), then by most recent login.
+  users.sort((a, b) => {
+    if (a.isOnline !== b.isOnline) return a.isOnline ? -1 : 1;
+    return b.lastLoginAt - a.lastLoginAt;
+  });
 
   return res.status(200).json({
     fetchedAt: Date.now(),
     activeWindowMs: ACTIVE_WINDOW_MS,
+    onlineWindowMs: ONLINE_WINDOW_MS,
     users,
   });
 }

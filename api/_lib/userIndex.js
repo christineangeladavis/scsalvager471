@@ -3,10 +3,13 @@
 //
 // Layout:
 //   Set "users:index"        — every userId that has logged in at least once
-//   Hash "user:<userId>"     — { username, lastLoginAt }
+//   Hash "user:<userId>"     — { username, lastLoginAt, lastSeenAt }
 //
 // Username mirror keeps the admin view from having to hold open every
-// session just to render display names.
+// session just to render display names. lastSeenAt is bumped by the
+// /api/me/heartbeat endpoint while a user has the site open; admin
+// presence (online/offline) is derived by comparing lastSeenAt to a
+// short freshness window.
 
 export const USERS_INDEX_KEY = "users:index";
 // Sorted set of login events. Score = timestampMs, member =
@@ -114,9 +117,29 @@ export async function getUserMeta(redis, userId) {
     return {
       username: meta.username,
       lastLoginAt: Number(meta.lastLoginAt) || null,
+      lastSeenAt: Number(meta.lastSeenAt) || null,
     };
   } catch (e) {
     console.error("getUserMeta failed:", e && e.message ? e.message : e);
     return null;
+  }
+}
+
+/**
+ * Bump the user's lastSeenAt to now. Best-effort — heartbeat failures
+ * shouldn't surface to the user. Also re-asserts the user-index
+ * membership in case it was somehow purged.
+ */
+export async function recordUserHeartbeat(redis, userId) {
+  if (!redis || !userId) return;
+  const id = String(userId);
+  try {
+    await redis.sadd(USERS_INDEX_KEY, id);
+    await redis.hset(userMetaKey(id), { lastSeenAt: Date.now() });
+  } catch (e) {
+    console.error(
+      "recordUserHeartbeat failed:",
+      e && e.message ? e.message : e
+    );
   }
 }

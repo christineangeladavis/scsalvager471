@@ -871,6 +871,34 @@ export default function StarCitizenSalvageGuideWebsite() {
     return () => { cancelled = true; };
   }, []);
 
+  // --- Presence heartbeat: while a user is logged in and the tab is
+  // visible, POST /api/me/heartbeat every 30s so the admin Active Users
+  // view can show who's actually online right now (vs just "logged in
+  // within 24h"). Pauses when the tab is hidden to keep idle traffic
+  // quiet, and fires immediately on focus-back so the user shows up as
+  // online again without waiting for the next interval.
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    const HEARTBEAT_MS = 30 * 1000;
+    const beat = () => {
+      if (cancelled) return;
+      if (typeof document !== "undefined" && document.visibilityState === "hidden") return;
+      fetch("/api/me/heartbeat", { method: "POST", credentials: "same-origin" }).catch(() => {});
+    };
+    beat(); // immediate first beat so the user shows online right away
+    const id = setInterval(beat, HEARTBEAT_MS);
+    const onVis = () => {
+      if (document.visibilityState === "visible") beat();
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+      document.removeEventListener("visibilitychange", onVis);
+    };
+  }, [user]);
+
   // --- Admin Active Refineries: load when the admin tab + refineries
   // sub-section are opened. In dev (no auth, no Redis), fall back to mock
   // data so the table can be exercised in the local preview. The dev branch
@@ -1045,11 +1073,13 @@ export default function StarCitizenSalvageGuideWebsite() {
       return {
         fetchedAt: now,
         activeWindowMs: 24 * hour,
+        onlineWindowMs: 90 * 1000,
+        // Two users online (heartbeat within ~90s), two offline.
         users: [
-          { userId: "dev-1", username: "Chrissyy", lastLoginAt: now - 4 * min, dmsEnabled: true },
-          { userId: "dev-2", username: "Denavago", lastLoginAt: now - 95 * min, dmsEnabled: false },
-          { userId: "dev-3", username: "TestPilot42", lastLoginAt: now - 11 * hour, dmsEnabled: true },
-          { userId: "dev-4", username: "RefiningQueen", lastLoginAt: now - 22 * hour, dmsEnabled: false },
+          { userId: "dev-1", username: "Chrissyy",     lastLoginAt: now - 4 * min,   lastSeenAt: now - 8 * 1000,   isOnline: true,  dmsEnabled: true },
+          { userId: "dev-3", username: "TestPilot42",  lastLoginAt: now - 11 * hour, lastSeenAt: now - 45 * 1000,  isOnline: true,  dmsEnabled: true },
+          { userId: "dev-2", username: "Denavago",     lastLoginAt: now - 95 * min,  lastSeenAt: now - 30 * min,   isOnline: false, dmsEnabled: false },
+          { userId: "dev-4", username: "RefiningQueen", lastLoginAt: now - 22 * hour, lastSeenAt: now - 18 * hour,  isOnline: false, dmsEnabled: false },
         ],
       };
     };
@@ -4165,10 +4195,11 @@ export default function StarCitizenSalvageGuideWebsite() {
 
               {!adminUsersLoading && !adminUsersError && adminUsers && adminUsers.users.length > 0 && (
                 <div className="mt-5 overflow-x-auto rounded-2xl border border-slate-700">
-                  <table className="w-full min-w-[560px] text-left text-sm md:min-w-0">
+                  <table className="w-full min-w-[640px] text-left text-sm md:min-w-0">
                     <thead className="bg-slate-950 text-slate-300">
                       <tr>
                         <th className="px-4 py-3">Discord User</th>
+                        <th className="px-4 py-3">Status</th>
                         <th className="px-4 py-3">DM Notifications</th>
                         <th className="px-4 py-3">Last Login</th>
                         <th className="px-4 py-3 text-right">When</th>
@@ -4178,6 +4209,21 @@ export default function StarCitizenSalvageGuideWebsite() {
                       {adminUsers.users.map((u) => (
                         <tr key={u.userId} className="border-t border-slate-800 bg-slate-900/40">
                           <td className="px-4 py-3 font-semibold text-white">{u.username}</td>
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <span className={`inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-semibold ${
+                              u.isOnline
+                                ? "bg-emerald-500/15 text-emerald-200"
+                                : "bg-slate-500/15 text-slate-400"
+                            }`}>
+                              <span
+                                aria-hidden="true"
+                                className={`h-2 w-2 rounded-full ${
+                                  u.isOnline ? "bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.7)]" : "bg-slate-500"
+                                }`}
+                              />
+                              {u.isOnline ? "Online" : "Offline"}
+                            </span>
+                          </td>
                           <td className="px-4 py-3 whitespace-nowrap">
                             <span className={`rounded-lg px-2 py-1 text-xs font-semibold ${
                               u.dmsEnabled

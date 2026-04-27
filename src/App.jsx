@@ -146,7 +146,7 @@ const ships = [
   },
 ];
 
-const SELL_MATERIALS = ["Construction Material", "Recycle Material Composite"];
+const SELL_MATERIALS = ["Construction Material", "Recycled Material Composite"];
 const PLAYER_SELL_POINT = "Sold to Player";
 
 const sellPoints = [
@@ -192,44 +192,44 @@ const sellPoints = [
 
   // === RECYCLE MATERIAL COMPOSITE === (UEX, Star Citizen 4.7.2)
   // 8,500 aUEC/SCU
-  { name: "Seer's Canyon",             region: "Pyro V",                             system: "Pyro",    pricePerScu: 8500,  material: "Recycle Material Composite" },
+  { name: "Seer's Canyon",             region: "Pyro V",                             system: "Pyro",    pricePerScu: 8500,  material: "Recycled Material Composite" },
   // 8,200 aUEC/SCU
-  { name: "Terra Mills Hydrofarm",     region: "Crusader",                           system: "Stanton", pricePerScu: 8200,  material: "Recycle Material Composite" },
+  { name: "Terra Mills Hydrofarm",     region: "Crusader",                           system: "Stanton", pricePerScu: 8200,  material: "Recycled Material Composite" },
   // 7,700 aUEC/SCU
-  { name: "TDD Orison",                region: "Crusader",                           system: "Stanton", pricePerScu: 7700,  material: "Recycle Material Composite" },
-  { name: "Rod's Fuel & Supplies",     region: "Pyro V Lagrange Point 4",            system: "Pyro",    pricePerScu: 7700,  material: "Recycle Material Composite" },
-  { name: "Patch City",                region: "Bloom Lagrange Point 3",             system: "Pyro",    pricePerScu: 7700,  material: "Recycle Material Composite" },
-  { name: "Starlight Service Station", region: "Bloom Lagrange Point 1",             system: "Pyro",    pricePerScu: 7700,  material: "Recycle Material Composite" },
-  { name: "Endgame",                   region: "Pyro VI Lagrange Point 3",           system: "Pyro",    pricePerScu: 7700,  material: "Recycle Material Composite" },
-  { name: "Gaslight",                  region: "Pyro V Lagrange Point 2",            system: "Pyro",    pricePerScu: 7700,  material: "Recycle Material Composite" },
-  { name: "Rat's Nest",                region: "Pyro V Lagrange Point 5",            system: "Pyro",    pricePerScu: 7700,  material: "Recycle Material Composite" },
-  { name: "Ashland",                   region: "Pyro V",                             system: "Pyro",    pricePerScu: 7700,  material: "Recycle Material Composite" },
-  { name: "Dudley & Daughters",        region: "Pyro VI Lagrange Point 4",           system: "Pyro",    pricePerScu: 7700,  material: "Recycle Material Composite" },
-  { name: "Last Landings",             region: "Terminus",                           system: "Pyro",    pricePerScu: 7700,  material: "Recycle Material Composite" },
-  { name: "Rustville",                 region: "Pyro I",                             system: "Pyro",    pricePerScu: 7700,  material: "Recycle Material Composite" },
-  { name: "Fallow Field",              region: "Pyro V",                             system: "Pyro",    pricePerScu: 7700,  material: "Recycle Material Composite" },
-  { name: "The Golden Riviera",        region: "Bloom",                              system: "Pyro",    pricePerScu: 7700,  material: "Recycle Material Composite" },
+  { name: "TDD Orison",                region: "Crusader",                           system: "Stanton", pricePerScu: 7700,  material: "Recycled Material Composite" },
+  { name: "Rod's Fuel & Supplies",     region: "Pyro V Lagrange Point 4",            system: "Pyro",    pricePerScu: 7700,  material: "Recycled Material Composite" },
+  { name: "Patch City",                region: "Bloom Lagrange Point 3",             system: "Pyro",    pricePerScu: 7700,  material: "Recycled Material Composite" },
+  { name: "Starlight Service Station", region: "Bloom Lagrange Point 1",             system: "Pyro",    pricePerScu: 7700,  material: "Recycled Material Composite" },
+  { name: "Endgame",                   region: "Pyro VI Lagrange Point 3",           system: "Pyro",    pricePerScu: 7700,  material: "Recycled Material Composite" },
+  { name: "Gaslight",                  region: "Pyro V Lagrange Point 2",            system: "Pyro",    pricePerScu: 7700,  material: "Recycled Material Composite" },
+  { name: "Rat's Nest",                region: "Pyro V Lagrange Point 5",            system: "Pyro",    pricePerScu: 7700,  material: "Recycled Material Composite" },
+  { name: "Ashland",                   region: "Pyro V",                             system: "Pyro",    pricePerScu: 7700,  material: "Recycled Material Composite" },
+  { name: "Dudley & Daughters",        region: "Pyro VI Lagrange Point 4",           system: "Pyro",    pricePerScu: 7700,  material: "Recycled Material Composite" },
+  { name: "Last Landings",             region: "Terminus",                           system: "Pyro",    pricePerScu: 7700,  material: "Recycled Material Composite" },
+  { name: "Rustville",                 region: "Pyro I",                             system: "Pyro",    pricePerScu: 7700,  material: "Recycled Material Composite" },
+  { name: "Fallow Field",              region: "Pyro V",                             system: "Pyro",    pricePerScu: 7700,  material: "Recycled Material Composite" },
+  { name: "The Golden Riviera",        region: "Bloom",                              system: "Pyro",    pricePerScu: 7700,  material: "Recycled Material Composite" },
   // 7,200 aUEC/SCU
-  { name: "Ruin Station",              region: "Terminus",                           system: "Pyro",    pricePerScu: 7200,  material: "Recycle Material Composite" },
-  { name: "GrimHEX",                   region: "Crusader",                           system: "Stanton", pricePerScu: 7200,  material: "Recycle Material Composite" },
+  { name: "Ruin Station",              region: "Terminus",                           system: "Pyro",    pricePerScu: 7200,  material: "Recycled Material Composite" },
+  { name: "GrimHEX",                   region: "Crusader",                           system: "Stanton", pricePerScu: 7200,  material: "Recycled Material Composite" },
   // 7,100 aUEC/SCU
-  { name: "Pyro Gateway (Nyx)",        region: "Pyro Gateway (Nyx system)",          system: "Nyx",     pricePerScu: 7100,  material: "Recycle Material Composite" },
+  { name: "Pyro Gateway (Nyx)",        region: "Pyro Gateway (Nyx system)",          system: "Nyx",     pricePerScu: 7100,  material: "Recycled Material Composite" },
   // 6,500 aUEC/SCU
-  { name: "Levski",                    region: "Delamar",                            system: "Nyx",     pricePerScu: 6500,  material: "Recycle Material Composite" },
+  { name: "Levski",                    region: "Delamar",                            system: "Nyx",     pricePerScu: 6500,  material: "Recycled Material Composite" },
   // 6,400 aUEC/SCU
-  { name: "Samson & Son's Salvage",    region: "ArcCorp",                            system: "Stanton", pricePerScu: 6400,  material: "Recycle Material Composite" },
+  { name: "Samson & Son's Salvage",    region: "ArcCorp",                            system: "Stanton", pricePerScu: 6400,  material: "Recycled Material Composite" },
   // 6,200 aUEC/SCU
-  { name: "Reclamation Orinth",        region: "Hurston",                            system: "Stanton", pricePerScu: 6200,  material: "Recycle Material Composite" },
+  { name: "Reclamation Orinth",        region: "Hurston",                            system: "Stanton", pricePerScu: 6200,  material: "Recycled Material Composite" },
   // 6,000 aUEC/SCU
-  { name: "CBD Lorville",              region: "Hurston",                            system: "Stanton", pricePerScu: 6000,  material: "Recycle Material Composite" },
-  { name: "TDD Area 18",               region: "ArcCorp",                            system: "Stanton", pricePerScu: 6000,  material: "Recycle Material Composite" },
-  { name: "TDD New Babbage",           region: "MicroTech",                          system: "Stanton", pricePerScu: 6000,  material: "Recycle Material Composite" },
+  { name: "CBD Lorville",              region: "Hurston",                            system: "Stanton", pricePerScu: 6000,  material: "Recycled Material Composite" },
+  { name: "TDD Area 18",               region: "ArcCorp",                            system: "Stanton", pricePerScu: 6000,  material: "Recycled Material Composite" },
+  { name: "TDD New Babbage",           region: "MicroTech",                          system: "Stanton", pricePerScu: 6000,  material: "Recycled Material Composite" },
   // 5,700 aUEC/SCU
-  { name: "CRU-L5 Maintenance",        region: "Crusader Lagrange Point 5",          system: "Stanton", pricePerScu: 5700,  material: "Recycle Material Composite" },
+  { name: "CRU-L5 Maintenance",        region: "Crusader Lagrange Point 5",          system: "Stanton", pricePerScu: 5700,  material: "Recycled Material Composite" },
   // 5,500 aUEC/SCU
-  { name: "Brio's Breaker Yard",       region: "Crusader",                           system: "Stanton", pricePerScu: 5500,  material: "Recycle Material Composite" },
+  { name: "Brio's Breaker Yard",       region: "Crusader",                           system: "Stanton", pricePerScu: 5500,  material: "Recycled Material Composite" },
   // 5,000 aUEC/SCU
-  { name: "Devlin Scrap & Salvage",    region: "MicroTech",                          system: "Stanton", pricePerScu: 5000,  material: "Recycle Material Composite" },
+  { name: "Devlin Scrap & Salvage",    region: "MicroTech",                          system: "Stanton", pricePerScu: 5000,  material: "Recycled Material Composite" },
 ];
 
 const salvageHeads = [
@@ -535,6 +535,9 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [adminUsers, setAdminUsers] = useState(null);
   const [adminUsersLoading, setAdminUsersLoading] = useState(false);
   const [adminUsersError, setAdminUsersError] = useState("");
+  const [showForceLogoutConfirm, setShowForceLogoutConfirm] = useState(false);
+  const [isForceLogoutInFlight, setIsForceLogoutInFlight] = useState(false);
+  const [forceLogoutFeedback, setForceLogoutFeedback] = useState(null);
   const [adminPatches, setAdminPatches] = useState(null);
   const [adminPatchesLoading, setAdminPatchesLoading] = useState(false);
   const [adminPatchesError, setAdminPatchesError] = useState("");
@@ -948,7 +951,7 @@ export default function StarCitizenSalvageGuideWebsite() {
             sales: [
               {
                 id: "mock_s2",
-                material: "Recycle Material Composite",
+                material: "Recycled Material Composite",
                 scu: 12,
                 aUEC: 120000,
                 location: "Sold to Player",
@@ -1077,6 +1080,49 @@ export default function StarCitizenSalvageGuideWebsite() {
       cancelled = true;
     };
   }, [activeTab, adminSection, user]);
+
+  // --- Admin force-logout: nuke every active session in Redis except
+  // the caller's. The dev branch fakes a count for preview testing.
+  const performForceLogoutAll = async () => {
+    setIsForceLogoutInFlight(true);
+    setForceLogoutFeedback(null);
+    try {
+      const res = await fetch("/api/admin/force-logout-all", {
+        method: "POST",
+        credentials: "same-origin",
+      });
+      if (!res.ok) {
+        const info = await res.json().catch(() => ({}));
+        if (import.meta.env.DEV && (res.status === 401 || res.status === 403 || res.status === 404 || res.status === 503)) {
+          const fakeCount = adminUsers?.users?.length || 0;
+          setForceLogoutFeedback({ kind: "ok", text: `(dev mock) Would invalidate ${fakeCount} session${fakeCount === 1 ? "" : "s"}.` });
+        } else {
+          throw new Error(info.error || `HTTP ${res.status}`);
+        }
+      } else {
+        const data = await res.json();
+        const n = Number(data?.invalidated) || 0;
+        setForceLogoutFeedback({ kind: "ok", text: `Invalidated ${n} session${n === 1 ? "" : "s"}. Affected users will be signed out on their next request.` });
+      }
+      setShowForceLogoutConfirm(false);
+      // Refresh the active users list so the panel reflects the post-
+      // logout state (the 24h activity window doesn't change but the
+      // user picks up the implicit hint that the action ran).
+      // Re-derive by toggling the section state to force the effect.
+      // Simpler: just nudge a re-render by re-fetching directly.
+      try {
+        const fresh = await fetch("/api/admin/users", { credentials: "same-origin" });
+        if (fresh.ok) {
+          const data = await fresh.json();
+          setAdminUsers(data);
+        }
+      } catch {}
+    } catch (e) {
+      setForceLogoutFeedback({ kind: "error", text: e.message || "Could not force-logout." });
+    } finally {
+      setIsForceLogoutInFlight(false);
+    }
+  };
 
   // --- Admin Patch Exports: load the patch list when the exports sub-tab
   // is opened. Same dev-mock fallback pattern.
@@ -1757,19 +1803,26 @@ export default function StarCitizenSalvageGuideWebsite() {
     }
 
     // Sell point match — substring either direction. The screenshot's
-    // "HUR-L1 Green Glade Station" matches our "HUR-L1" entry.
+    // "HUR-L1 Green Glade Station" matches our "HUR-L1" entry exactly, but
+    // a bare "Pyro Gateway" matches both "Pyro Gateway (Stanton)" and
+    // "Pyro Gateway (Nyx)". When the match is ambiguous we leave the
+    // dropdown alone and tell the user to pick — guessing the wrong half
+    // of the gate is worse than not auto-filling.
     if (extracted.locationName) {
       const lower = extracted.locationName.toLowerCase();
       const candidates = sellPoints.filter(
         (p) => lower.includes(p.name.toLowerCase()) || p.name.toLowerCase().includes(lower)
       );
-      // If a material was matched, prefer a sell point that carries it;
-      // otherwise take the first match.
-      const sp =
-        candidates.find((p) => !next.material || p.material === next.material) || candidates[0];
-      if (sp) {
-        next.location = sp.name;
-        matchedFields.push(`Sell Location: ${sp.name}`);
+      // Dedupe by name — sell points appear twice in the list (one per
+      // material variant); same physical place, only one location string.
+      const uniqueNames = Array.from(new Set(candidates.map((c) => c.name)));
+      if (uniqueNames.length === 1) {
+        next.location = uniqueNames[0];
+        matchedFields.push(`Sell Location: ${uniqueNames[0]}`);
+      } else if (uniqueNames.length > 1) {
+        skippedFields.push(
+          `Sell Location ("${extracted.locationName}" — ambiguous: ${uniqueNames.join(" / ")}; pick manually)`
+        );
       } else {
         skippedFields.push(`Sell Location ("${extracted.locationName}" — no match)`);
       }
@@ -2560,6 +2613,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     onChange={(e) => setSelectedRefineryLocation(e.target.value)}
                     className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 outline-none focus:border-cyan-400"
                   >
+                    <option value="">(Select a Location)</option>
                     <optgroup label="Stanton">
                       {refineryLocations
                         .filter((loc) => loc.system === "Stanton")
@@ -2752,6 +2806,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     onChange={(e) => setSelectedSellPointName(e.target.value)}
                     className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 outline-none focus:border-cyan-400"
                   >
+                    <option value="">(Select a Location)</option>
                     {groupSellPointEntriesBySystem(sortedSellPointEntries).map((group) => (
                       <optgroup key={group.system} label={group.system}>
                         {group.entries.map((point) => (
@@ -2996,6 +3051,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                       disabled={!user && !import.meta.env.DEV}
                       className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
                     >
+                      <option value="">(Select a Location)</option>
                       <optgroup label="Stanton">
                         {refineryLocations.filter((loc) => loc.system === "Stanton").map((loc) => (
                           <option key={loc.name} value={loc.name}>{loc.name}</option>
@@ -3237,6 +3293,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                       disabled={!user && !import.meta.env.DEV}
                       className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
                     >
+                      <option value="">(Select a Location)</option>
                       {groupSellPointEntriesBySystem(orderSellPointEntries).map((group) => (
                         <optgroup key={group.system} label={group.system}>
                           {group.entries.map((p) => (
@@ -3528,6 +3585,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                             onChange={(e) => setEditForm({ ...editForm, location: e.target.value })}
                             className="w-full rounded-xl border border-cyan-500/25 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-cyan-400"
                           >
+                            <option value="">(Select a Location)</option>
                             <optgroup label="Stanton">
                               {refineryLocations.filter((loc) => loc.system === "Stanton").map((loc) => (
                                 <option key={loc.name} value={loc.name}>{loc.name}</option>
@@ -3658,6 +3716,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                             onChange={(e) => setEditForm({ ...editForm, location: e.target.value, playerName: "" })}
                             className="w-full rounded-xl border border-cyan-500/25 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-cyan-400"
                           >
+                            <option value="">(Select a Location)</option>
                             {groupSellPointEntriesBySystem(editSellPointEntries).map((group) => (
                               <optgroup key={group.system} label={group.system}>
                                 {group.entries.map((p) => (
@@ -4034,19 +4093,42 @@ export default function StarCitizenSalvageGuideWebsite() {
 
             {adminSection === "users" && (
             <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                   <h2 className="text-xl font-bold text-cyan-300">Active Users</h2>
                   <p className="mt-1 text-sm text-slate-400">
                     Discord users who have logged in to the site within the last 24 hours. Sorted by most recent login. Admin-only view.
                   </p>
                 </div>
-                <div className="text-xs text-slate-500">
-                  {adminUsers?.fetchedAt
-                    ? `Updated ${formatTimeAgo(adminUsers.fetchedAt) || "just now"}`
-                    : ""}
+                <div className="flex items-center gap-3">
+                  <div className="text-xs text-slate-500">
+                    {adminUsers?.fetchedAt
+                      ? `Updated ${formatTimeAgo(adminUsers.fetchedAt) || "just now"}`
+                      : ""}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setForceLogoutFeedback(null);
+                      setShowForceLogoutConfirm(true);
+                    }}
+                    disabled={isForceLogoutInFlight}
+                    className="shrink-0 rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-200 hover:border-rose-400/70 hover:bg-rose-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Force Logout All
+                  </button>
                 </div>
               </div>
+
+              {forceLogoutFeedback && (
+                <div className={`mt-3 rounded-2xl border p-3 text-xs ${
+                  forceLogoutFeedback.kind === "ok"
+                    ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-200"
+                    : "border-rose-500/40 bg-rose-500/10 text-rose-200"
+                }`}>
+                  {forceLogoutFeedback.text}
+                </div>
+              )}
 
               {adminUsersLoading && (
                 <div className="mt-6 rounded-2xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">
@@ -4200,6 +4282,50 @@ export default function StarCitizenSalvageGuideWebsite() {
               )}
             </div>
             )}
+          </div>
+        )}
+
+        {/* --- Force Logout All confirmation modal --- */}
+        {showForceLogoutConfirm && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+            onClick={() => !isForceLogoutInFlight && setShowForceLogoutConfirm(false)}
+          >
+            <div
+              className="mx-4 max-w-md rounded-3xl border border-rose-500/40 bg-slate-900 p-6 shadow-2xl shadow-rose-950/40"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="force-logout-title"
+            >
+              <h3 id="force-logout-title" className="text-lg font-bold text-rose-200">
+                Force-logout every active user?
+              </h3>
+              <p className="mt-3 text-sm text-slate-300">
+                Every active session in Redis will be invalidated. Affected users will be signed out on their next request and will need to log in again. Your own session is preserved so the admin panel keeps working.
+              </p>
+              <p className="mt-2 text-xs text-slate-500">
+                This is irreversible. Already-saved ledger data is not affected.
+              </p>
+              <div className="mt-5 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowForceLogoutConfirm(false)}
+                  disabled={isForceLogoutInFlight}
+                  className="rounded-xl border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-slate-500 hover:bg-slate-700 disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={performForceLogoutAll}
+                  disabled={isForceLogoutInFlight}
+                  className="rounded-xl border border-rose-400 bg-rose-500 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-rose-950/50 hover:bg-rose-600 disabled:opacity-50"
+                >
+                  {isForceLogoutInFlight ? "Logging out…" : "Force Logout All"}
+                </button>
+              </div>
+            </div>
           </div>
         )}
 

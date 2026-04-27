@@ -28,14 +28,27 @@ const MAX_REPORTS_PER_LOCATION = 50;
 const MIN_PRICE = 100;
 const MAX_PRICE = 200000;
 const DEFAULT_MATERIAL = "Construction Material";
+// Old name -> new name. We accept the old name on write (so stale clients
+// don't error) and normalize it to the new name before keying. On read
+// we merge old-keyed entries into the new key.
+const MATERIAL_RENAMES = {
+  "Recycle Material Composite": "Recycled Material Composite",
+};
 const ALLOWED_MATERIALS = new Set([
   "Construction Material",
+  "Recycled Material Composite",
+  // Legacy alias — accepted from stale clients, normalized to the new
+  // name before the storage key is built.
   "Recycle Material Composite",
 ]);
 const KEY_SEP = "::";
 
+function canonicalMaterial(material) {
+  return MATERIAL_RENAMES[material] || material;
+}
+
 function buildKey(material, location) {
-  return `${material}${KEY_SEP}${location}`;
+  return `${canonicalMaterial(material)}${KEY_SEP}${location}`;
 }
 
 function normalizeLegacyKey(rawKey) {
@@ -43,8 +56,13 @@ function normalizeLegacyKey(rawKey) {
   // and represents a Construction Material report (the only material the app
   // tracked at the time those entries were written).
   if (typeof rawKey !== "string") return null;
-  if (rawKey.includes(KEY_SEP)) return rawKey;
-  return buildKey(DEFAULT_MATERIAL, rawKey);
+  if (!rawKey.includes(KEY_SEP)) return buildKey(DEFAULT_MATERIAL, rawKey);
+  // Already material-namespaced — but might be under a renamed material.
+  // Rewrite the material half so old entries roll up under the new name.
+  const idx = rawKey.indexOf(KEY_SEP);
+  const material = rawKey.slice(0, idx);
+  const location = rawKey.slice(idx + KEY_SEP.length);
+  return buildKey(material, location);
 }
 
 export function median(nums) {
@@ -57,16 +75,25 @@ export function median(nums) {
 }
 
 export function buildPublicView(dataMap) {
-  const result = {};
+  // Two storage keys can canonicalize to the same public key (e.g. an old
+  // "Recycle Material Composite::HUR-L1" entry and a new "Recycled Material
+  // Composite::HUR-L1" entry roll up to the same view). Merge their reports
+  // first, then compute the median once.
+  const merged = {};
   for (const [rawKey, entry] of Object.entries(dataMap || {})) {
     if (!entry || !Array.isArray(entry.reports) || !entry.reports.length) continue;
-    const prices = entry.reports
+    const publicKey = normalizeLegacyKey(rawKey);
+    if (!publicKey) continue;
+    if (!merged[publicKey]) merged[publicKey] = [];
+    merged[publicKey].push(...entry.reports);
+  }
+  const result = {};
+  for (const [publicKey, reports] of Object.entries(merged)) {
+    const prices = reports
       .map((r) => (r && typeof r.price === "number" ? r.price : null))
       .filter((p) => p !== null);
     if (!prices.length) continue;
-    const timestamps = entry.reports.map((r) => (r && r.ts) || 0);
-    const publicKey = normalizeLegacyKey(rawKey);
-    if (!publicKey) continue;
+    const timestamps = reports.map((r) => (r && r.ts) || 0);
     result[publicKey] = {
       medianPrice: Math.round(median(prices)),
       reportCount: prices.length,
@@ -138,6 +165,7 @@ export default async function handler(req, res) {
       });
     }
 
+    const canonical = canonicalMaterial(material);
     const storageKey = buildKey(material, location);
 
     try {
@@ -146,17 +174,26 @@ export default async function handler(req, res) {
       // for this location, seed the prefixed entry with its reports so the new
       // report extends history rather than restarting it.
       let existing = data[storageKey];
-      if (!existing && material === DEFAULT_MATERIAL && data[location]) {
+      if (!existing && canonical === DEFAULT_MATERIAL && data[location]) {
         existing = data[location];
       }
-      existing = existing || { material, location, reports: [] };
+      // Backward compat: if this material was renamed, also try the old key
+      // so the new entry inherits prior reports rather than starting empty.
+      if (!existing) {
+        for (const [oldName, newName] of Object.entries(MATERIAL_RENAMES)) {
+          if (newName !== canonical) continue;
+          const oldKey = `${oldName}${KEY_SEP}${location}`;
+          if (data[oldKey]) { existing = data[oldKey]; break; }
+        }
+      }
+      existing = existing || { material: canonical, location, reports: [] };
 
       const nextReports = [
         ...(Array.isArray(existing.reports) ? existing.reports : []),
         { price: Math.round(priceNum), ts: Date.now() },
       ].slice(-MAX_REPORTS_PER_LOCATION);
 
-      data[storageKey] = { material, location, reports: nextReports };
+      data[storageKey] = { material: canonical, location, reports: nextReports };
       await redis.set(MASTER_KEY, data);
 
       const prices = nextReports.map((r) => r.price);

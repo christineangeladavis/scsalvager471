@@ -35,7 +35,7 @@ Extract the following fields from the image and return them as a single JSON obj
 
 Fields:
 - locationName: the trading station name shown at the top of the "YOUR INVENTORIES" panel (string). Examples: "HUR-L1 Green Glade Station", "ARC-L4", "Levski".
-- materialName: the commodity being sold under "IN DEMAND". Use the name as printed (string). Examples: "Diamond", "Construction Material", "Recycle Material Composite".
+- materialName: the commodity being sold under "IN DEMAND". Use the name as printed (string). Examples: "Diamond", "Construction Material", "Recycled Material Composite".
 - scu: the quantity being sold in SCU (integer). Use the largest highlighted "AVAILABLE CARGO SIZE" the user has selected, or the totals row.
 - totalAuec: the total aUEC the player will receive for this transaction (integer). Convert any M / K suffixes — "1.461M" -> 1461000, "12.5K" -> 12500.
 - pricePerScu: the unit price shown next to the commodity (integer aUEC per SCU). Convert any M / K suffixes — "5.70900011K/SCU" -> 5709.

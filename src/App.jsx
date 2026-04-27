@@ -520,6 +520,10 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [authLoading, setAuthLoading] = useState(true);
   const [ledgerSaveError, setLedgerSaveError] = useState("");
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  // --- Statistics tab data ---
+  const [statsData, setStatsData] = useState(null);
+  const [statsLoading, setStatsLoading] = useState(false);
+  const [statsError, setStatsError] = useState("");
 
   // --- Build / deploy version detection ---
   // __BUILD_VERSION__ is replaced at compile time by vite.config.js with the
@@ -550,9 +554,17 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [prefs, setPrefs] = useState({
     discordNotifications: false,
     notificationLinkedAt: null,
+    rsiHandle: "",
   });
   const [prefsLoading, setPrefsLoading] = useState(false);
   const [prefsError, setPrefsError] = useState("");
+  // Local draft of the RSI handle input — separated from `prefs.rsiHandle`
+  // so typing doesn't fire a server save on every keystroke. We commit on
+  // blur (or when the user clicks Save), and reseed the draft from prefs
+  // whenever they're (re)loaded from the server.
+  const [rsiHandleDraft, setRsiHandleDraft] = useState("");
+  const [rsiHandleSaving, setRsiHandleSaving] = useState(false);
+  const [rsiHandleSaved, setRsiHandleSaved] = useState(false);
 
   // --- UI state for the user menu and Settings modal ---
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -928,6 +940,63 @@ export default function StarCitizenSalvageGuideWebsite() {
     };
   }, [user]);
 
+  // --- Statistics tab: site-wide aggregate stats + top salvagers leaderboard.
+  // Loads when the user opens the Statistics tab while logged in. Dev mock
+  // backs the layout when the API isn't reachable.
+  useEffect(() => {
+    if (activeTab !== "stats") return;
+    if (!(user || import.meta.env.DEV)) return;
+    let cancelled = false;
+    setStatsLoading(true);
+    setStatsError("");
+
+    const devMockStats = () => ({
+      fetchedAt: Date.now(),
+      totalScuRefined: 18432.55,
+      totalProfitAuec: 28_745_300,
+      totalRefineryFeesAuec: 1_204_750,
+      mostUsedRefineryLocation: { name: "Levski", count: 47 },
+      mostUsedMethod: { name: "Cormack Method", count: 31 },
+      refinedConstructionSalvage: 6420.5,
+      refinedConstructionPieces: 4185.0,
+      refinedConstructionRubble: 2810.75,
+      topSalvagers: [
+        { username: "Chrissyy", scuRefined: 6210.4, profitAuec: 9_840_000 },
+        { username: "Denavago", scuRefined: 4180.2, profitAuec: 6_312_500 },
+        { username: "TestPilot42", scuRefined: 3050.6, profitAuec: 4_905_000 },
+        { username: "RefiningQueen", scuRefined: 2840.0, profitAuec: 4_220_300 },
+        { username: "ScrapKing", scuRefined: 1420.8, profitAuec: 2_180_500 },
+      ],
+    });
+
+    fetch("/api/stats", { credentials: "same-origin" })
+      .then((res) => {
+        if (res.status === 401 || res.status === 403) {
+          if (import.meta.env.DEV) return { __useMock: true };
+          throw new Error("Not signed in.");
+        }
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        if (cancelled) return;
+        setStatsData(data && data.__useMock ? devMockStats() : data);
+        setStatsLoading(false);
+      })
+      .catch((e) => {
+        if (cancelled) return;
+        if (import.meta.env.DEV) {
+          setStatsData(devMockStats());
+          setStatsLoading(false);
+          return;
+        }
+        setStatsError(e.message || "Could not load stats.");
+        setStatsLoading(false);
+      });
+
+    return () => { cancelled = true; };
+  }, [activeTab, user]);
+
   // --- Admin Active Refineries: load when the admin tab + refineries
   // sub-section are opened. In dev (no auth, no Redis), fall back to mock
   // data so the table can be exercised in the local preview. The dev branch
@@ -1105,10 +1174,10 @@ export default function StarCitizenSalvageGuideWebsite() {
         onlineWindowMs: 90 * 1000,
         // Two users online (heartbeat within ~90s), two offline.
         users: [
-          { userId: "dev-1", username: "Chrissyy",     lastLoginAt: now - 4 * min,   lastSeenAt: now - 8 * 1000,   isOnline: true,  dmsEnabled: true },
-          { userId: "dev-3", username: "TestPilot42",  lastLoginAt: now - 11 * hour, lastSeenAt: now - 45 * 1000,  isOnline: true,  dmsEnabled: true },
-          { userId: "dev-2", username: "Denavago",     lastLoginAt: now - 95 * min,  lastSeenAt: now - 30 * min,   isOnline: false, dmsEnabled: false },
-          { userId: "dev-4", username: "RefiningQueen", lastLoginAt: now - 22 * hour, lastSeenAt: now - 18 * hour,  isOnline: false, dmsEnabled: false },
+          { userId: "dev-1", username: "Chrissyy",     rsiHandle: "Chrissyy",      lastLoginAt: now - 4 * min,   lastSeenAt: now - 8 * 1000,   isOnline: true,  dmsEnabled: true },
+          { userId: "dev-3", username: "TestPilot42",  rsiHandle: "TP_FortyTwo",   lastLoginAt: now - 11 * hour, lastSeenAt: now - 45 * 1000,  isOnline: true,  dmsEnabled: true },
+          { userId: "dev-2", username: "Denavago",     rsiHandle: "",              lastLoginAt: now - 95 * min,  lastSeenAt: now - 30 * min,   isOnline: false, dmsEnabled: false },
+          { userId: "dev-4", username: "RefiningQueen", rsiHandle: "RefineQueen-X", lastLoginAt: now - 22 * hour, lastSeenAt: now - 18 * hour,  isOnline: false, dmsEnabled: false },
         ],
       };
     };
@@ -1311,7 +1380,8 @@ export default function StarCitizenSalvageGuideWebsite() {
     setPrefsError("");
     if (!user) {
       // Logged out: reset to defaults, no server call.
-      setPrefs({ discordNotifications: false, notificationLinkedAt: null });
+      setPrefs({ discordNotifications: false, notificationLinkedAt: null, rsiHandle: "" });
+      setRsiHandleDraft("");
       setPrefsLoading(false);
       return;
     }
@@ -1323,7 +1393,10 @@ export default function StarCitizenSalvageGuideWebsite() {
       })
       .then((data) => {
         if (cancelled) return;
-        if (data && data.prefs) setPrefs(data.prefs);
+        if (data && data.prefs) {
+          setPrefs(data.prefs);
+          setRsiHandleDraft(typeof data.prefs.rsiHandle === "string" ? data.prefs.rsiHandle : "");
+        }
         setPrefsLoading(false);
       })
       .catch((e) => {
@@ -1353,6 +1426,50 @@ export default function StarCitizenSalvageGuideWebsite() {
     } catch (e) {
       setPrefs(previous);
       setPrefsError(e && e.message ? e.message : "Could not save preferences");
+    }
+  };
+
+  // --- Save the RSI handle draft ---
+  // No-op when the draft matches what's already stored. Trims and caps to
+  // 32 chars on the server too, but we trim here as well so the user sees
+  // exactly what gets saved.
+  const saveRsiHandle = async () => {
+    const next = (rsiHandleDraft || "").trim().slice(0, 32);
+    if (next === (prefs.rsiHandle || "")) {
+      // Reflect the canonical (trimmed) value in the input so the user
+      // sees what's stored even when there's nothing to save.
+      setRsiHandleDraft(next);
+      return;
+    }
+    setRsiHandleSaving(true);
+    setRsiHandleSaved(false);
+    setPrefsError("");
+    const previous = prefs;
+    setPrefs({ ...prefs, rsiHandle: next });
+    setRsiHandleDraft(next);
+    try {
+      const res = await fetch("/api/me/prefs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ rsiHandle: next }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (data && data.prefs) {
+        setPrefs(data.prefs);
+        setRsiHandleDraft(typeof data.prefs.rsiHandle === "string" ? data.prefs.rsiHandle : "");
+      }
+      setRsiHandleSaved(true);
+      // Clear the "saved" tick after a couple seconds so it doesn't
+      // permanently sit on screen.
+      setTimeout(() => setRsiHandleSaved(false), 2000);
+    } catch (e) {
+      setPrefs(previous);
+      setRsiHandleDraft(previous.rsiHandle || "");
+      setPrefsError(e && e.message ? e.message : "Could not save RSI handle");
+    } finally {
+      setRsiHandleSaving(false);
     }
   };
 
@@ -2469,6 +2586,7 @@ export default function StarCitizenSalvageGuideWebsite() {
             { id: "home", label: "Home" },
             { id: "ships", label: "Ship Details" },
             { id: "ledger", label: "Ledger" },
+            { id: "stats", label: "Statistics" },
             // Admin-only Active Refineries view: visible to the configured
             // admin Discord user, plus always in dev so the tab can be
             // exercised in the local preview without auth.
@@ -2477,10 +2595,10 @@ export default function StarCitizenSalvageGuideWebsite() {
               : []),
           ].map((tab) => {
             const isActive = activeTab === tab.id;
-            // Ledger requires Discord login to actually do anything; show a
-            // small lock icon + native tooltip while logged out so the
-            // requirement is visible at a glance.
-            const showLedgerLock = tab.id === "ledger" && !user && !authLoading;
+            // Ledger and Statistics both require Discord login to do
+            // anything useful; show a small lock icon + tooltip while
+            // logged out so the requirement is visible at a glance.
+            const showLedgerLock = (tab.id === "ledger" || tab.id === "stats") && !user && !authLoading;
             return (
               <button
                 key={tab.id}
@@ -3983,6 +4101,155 @@ export default function StarCitizenSalvageGuideWebsite() {
           </div>
         )}
 
+        {activeTab === "stats" && (
+          <div className="space-y-6">
+            {!user && !import.meta.env.DEV ? (
+              <div className="rounded-3xl border border-indigo-400/40 bg-indigo-500/10 p-5">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <div className="text-base font-bold text-indigo-100">Log in to view Statistics</div>
+                    <div className="mt-1 text-sm text-indigo-200/80">Site-wide aggregate stats and the top-salvagers leaderboard are available to signed-in users only.</div>
+                  </div>
+                  <a
+                    href="/api/auth/login"
+                    className="shrink-0 rounded-xl border border-indigo-300/60 bg-indigo-500/30 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500/50"
+                  >
+                    Log in with Discord
+                  </a>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                      <h2 className="text-xl font-bold text-cyan-300">Statistics</h2>
+                      <p className="mt-1 text-sm text-slate-400">
+                        Site-wide totals across every signed-in user's ledger, plus the top 5 salvagers leaderboard.
+                      </p>
+                    </div>
+                    <div className="text-xs text-slate-500">
+                      {statsData?.fetchedAt
+                        ? `Updated ${formatTimeAgo(statsData.fetchedAt) || "just now"}`
+                        : ""}
+                    </div>
+                  </div>
+
+                  {statsLoading && (
+                    <div className="mt-6 rounded-2xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">
+                      Loading statistics…
+                    </div>
+                  )}
+
+                  {!statsLoading && statsError && (
+                    <div className="mt-6 rounded-2xl border border-rose-500/40 bg-rose-500/10 p-4 text-sm text-rose-200">
+                      {statsError}
+                    </div>
+                  )}
+
+                  {!statsLoading && !statsError && statsData && (
+                    <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                      <div className="rounded-2xl border border-cyan-500/25 bg-slate-950/70 p-4">
+                        <div className="text-xs uppercase tracking-[0.25em] text-cyan-300/80">Total SCU Refined</div>
+                        <div className="mt-2 text-2xl font-black text-amber-300">{Number(statsData.totalScuRefined || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })} SCU</div>
+                      </div>
+                      <div className="rounded-2xl border border-cyan-500/25 bg-slate-950/70 p-4">
+                        <div className="text-xs uppercase tracking-[0.25em] text-cyan-300/80">Total Profit</div>
+                        <div className="mt-2 text-2xl font-black text-emerald-300">{Number(statsData.totalProfitAuec || 0).toLocaleString()} aUEC</div>
+                      </div>
+                      <div className="rounded-2xl border border-cyan-500/25 bg-slate-950/70 p-4">
+                        <div className="text-xs uppercase tracking-[0.25em] text-cyan-300/80">Total Refinery Fees</div>
+                        <div className="mt-2 text-2xl font-black text-rose-300">{Number(statsData.totalRefineryFeesAuec || 0).toLocaleString()} aUEC</div>
+                      </div>
+                      <div className="rounded-2xl border border-cyan-500/25 bg-slate-950/70 p-4">
+                        <div className="text-xs uppercase tracking-[0.25em] text-cyan-300/80">Refinery Most Used</div>
+                        <div className="mt-2 text-2xl font-black text-cyan-200">
+                          {statsData.mostUsedRefineryLocation?.name || "—"}
+                        </div>
+                        {statsData.mostUsedRefineryLocation?.count ? (
+                          <div className="mt-0.5 text-xs text-slate-500">
+                            {statsData.mostUsedRefineryLocation.count} job{statsData.mostUsedRefineryLocation.count === 1 ? "" : "s"}
+                          </div>
+                        ) : null}
+                      </div>
+                      <div className="rounded-2xl border border-cyan-500/25 bg-slate-950/70 p-4">
+                        <div className="text-xs uppercase tracking-[0.25em] text-cyan-300/80">Most Used Method</div>
+                        <div className="mt-2 text-2xl font-black text-cyan-200">
+                          {statsData.mostUsedMethod?.name || "—"}
+                        </div>
+                        {statsData.mostUsedMethod?.count ? (
+                          <div className="mt-0.5 text-xs text-slate-500">
+                            {statsData.mostUsedMethod.count} job{statsData.mostUsedMethod.count === 1 ? "" : "s"}
+                          </div>
+                        ) : null}
+                      </div>
+                      <div className="rounded-2xl border border-cyan-500/25 bg-slate-950/70 p-4">
+                        <div className="text-xs uppercase tracking-[0.25em] text-cyan-300/80">Total Refined Const. Salvage</div>
+                        <div className="mt-2 text-2xl font-black text-amber-300">
+                          {Number(statsData.refinedConstructionSalvage || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })} SCU
+                        </div>
+                      </div>
+                      <div className="rounded-2xl border border-cyan-500/25 bg-slate-950/70 p-4">
+                        <div className="text-xs uppercase tracking-[0.25em] text-cyan-300/80">Total Refined Const. Pieces</div>
+                        <div className="mt-2 text-2xl font-black text-amber-300">
+                          {Number(statsData.refinedConstructionPieces || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })} SCU
+                        </div>
+                      </div>
+                      <div className="rounded-2xl border border-cyan-500/25 bg-slate-950/70 p-4">
+                        <div className="text-xs uppercase tracking-[0.25em] text-cyan-300/80">Total Refined Const. Rubble</div>
+                        <div className="mt-2 text-2xl font-black text-amber-300">
+                          {Number(statsData.refinedConstructionRubble || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })} SCU
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {!statsLoading && !statsError && statsData && (
+                  <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
+                    <div>
+                      <h2 className="text-xl font-bold text-cyan-300">Top 5 Salvagers</h2>
+                      <p className="mt-1 text-sm text-slate-400">Sorted by total SCU refined.</p>
+                    </div>
+                    {statsData.topSalvagers.length === 0 ? (
+                      <div className="mt-5 rounded-2xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">
+                        No salvager activity recorded yet.
+                      </div>
+                    ) : (
+                      <div className="mt-5 overflow-x-auto rounded-2xl border border-slate-700">
+                        <table className="w-full min-w-[480px] text-left text-sm md:min-w-0">
+                          <thead className="bg-slate-950 text-slate-300">
+                            <tr>
+                              <th className="px-4 py-3">#</th>
+                              <th className="px-4 py-3">Salvager</th>
+                              <th className="px-4 py-3 text-right">SCU Refined</th>
+                              <th className="px-4 py-3 text-right">Total Profit</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {statsData.topSalvagers.map((u, idx) => (
+                              <tr key={`${u.username}-${idx}`} className="border-t border-slate-800 bg-slate-900/40">
+                                <td className="px-4 py-3 font-bold text-cyan-300">{idx + 1}</td>
+                                <td className="px-4 py-3 font-semibold text-white">{u.username}</td>
+                                <td className="px-4 py-3 text-right font-bold text-amber-300">
+                                  {Number(u.scuRefined).toLocaleString(undefined, { maximumFractionDigits: 2 })} SCU
+                                </td>
+                                <td className="px-4 py-3 text-right font-bold text-emerald-300">
+                                  {Number(u.profitAuec).toLocaleString()} aUEC
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
+
         {activeTab === "admin" && (user?.isAdmin || import.meta.env.DEV) && (
           <div className="space-y-6">
             {/* Admin sub-nav */}
@@ -4241,10 +4508,11 @@ export default function StarCitizenSalvageGuideWebsite() {
 
               {!adminUsersLoading && !adminUsersError && adminUsers && adminUsers.users.length > 0 && (
                 <div className="mt-5 overflow-x-auto rounded-2xl border border-slate-700">
-                  <table className="w-full min-w-[640px] text-left text-sm md:min-w-0">
+                  <table className="w-full min-w-[720px] text-left text-sm md:min-w-0">
                     <thead className="bg-slate-950 text-slate-300">
                       <tr>
                         <th className="px-4 py-3">Discord User</th>
+                        <th className="px-4 py-3">RSI Handle</th>
                         <th className="px-4 py-3">Status</th>
                         <th className="px-4 py-3">DM Notifications</th>
                         <th className="px-4 py-3">Last Login</th>
@@ -4255,6 +4523,9 @@ export default function StarCitizenSalvageGuideWebsite() {
                       {adminUsers.users.map((u) => (
                         <tr key={u.userId} className="border-t border-slate-800 bg-slate-900/40">
                           <td className="px-4 py-3 font-semibold text-white">{u.username}</td>
+                          <td className="px-4 py-3 text-slate-300">
+                            {u.rsiHandle ? u.rsiHandle : <span className="text-slate-600">—</span>}
+                          </td>
                           <td className="px-4 py-3 whitespace-nowrap">
                             <span className={`inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-semibold ${
                               u.isOnline
@@ -4687,6 +4958,55 @@ export default function StarCitizenSalvageGuideWebsite() {
                       {prefsError}
                     </p>
                   )}
+                </div>
+              </section>
+
+              {/* RSI Handle section
+                  When set, this overrides the user's Discord username on
+                  the Statistics leaderboard so they show up as their
+                  in-game identity. */}
+              <section className="mt-6">
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">RSI Handle</h4>
+                <div className="mt-3 rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+                  <p className="text-xs text-slate-400">
+                    Your Star Citizen handle. When set, this is what shows up next to you on the Statistics leaderboard. Leave blank to use your Discord username.
+                  </p>
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <input
+                      type="text"
+                      value={rsiHandleDraft}
+                      onChange={(e) => {
+                        setRsiHandleDraft(e.target.value);
+                        if (rsiHandleSaved) setRsiHandleSaved(false);
+                      }}
+                      onBlur={saveRsiHandle}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          saveRsiHandle();
+                        }
+                      }}
+                      maxLength={32}
+                      placeholder="e.g. Chrissyy"
+                      disabled={prefsLoading || rsiHandleSaving}
+                      className="flex-1 min-w-[160px] rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-100 placeholder-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-1 focus:ring-cyan-400/40 disabled:cursor-not-allowed disabled:opacity-50"
+                    />
+                    <button
+                      type="button"
+                      onClick={saveRsiHandle}
+                      disabled={
+                        prefsLoading ||
+                        rsiHandleSaving ||
+                        (rsiHandleDraft || "").trim() === (prefs.rsiHandle || "")
+                      }
+                      className="rounded-md border border-cyan-400/30 bg-cyan-500/10 px-3 py-1.5 text-xs font-semibold text-cyan-200 hover:bg-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      {rsiHandleSaving ? "Saving…" : "Save"}
+                    </button>
+                    {rsiHandleSaved && !rsiHandleSaving && (
+                      <span className="text-xs text-emerald-300">Saved</span>
+                    )}
+                  </div>
                 </div>
               </section>
             </div>

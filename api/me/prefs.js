@@ -1,5 +1,6 @@
 // GET  /api/me/prefs  — returns the logged-in user's preferences (defaults applied)
-// POST /api/me/prefs  — partial update; body is { discordNotifications?: boolean }
+// POST /api/me/prefs  — partial update; body is
+//                       { discordNotifications?: boolean, rsiHandle?: string }
 //                       returns the full merged preferences object on success
 // Returns 401 if not logged in, 503 if Redis is unavailable.
 

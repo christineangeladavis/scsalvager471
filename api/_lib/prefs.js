@@ -6,11 +6,21 @@
 //   discordNotifications   : boolean   — opt-in to Discord DMs on job completion
 //   notificationLinkedAt   : number    — ms timestamp when user granted DM scope
 //                                        (null until they complete the link flow)
+//   rsiHandle              : string    — user's RSI Star Citizen handle. When
+//                                        set, this displays in place of their
+//                                        Discord username on the Statistics
+//                                        leaderboard. Empty string means unset.
+
+// RSI handles are 3–24 chars, alphanumeric + dash + underscore per RSI's own
+// validator. We're permissive on length and only enforce a sane upper cap so
+// nobody jams a novel into the field.
+const RSI_HANDLE_MAX_LEN = 32;
 
 export function defaultPrefs() {
   return {
     discordNotifications: false,
     notificationLinkedAt: null,
+    rsiHandle: "",
   };
 }
 
@@ -43,6 +53,13 @@ export function sanitizePrefsUpdate(input) {
   const out = {};
   if (typeof input.discordNotifications === "boolean") {
     out.discordNotifications = input.discordNotifications;
+  }
+  if (typeof input.rsiHandle === "string") {
+    // Trim whitespace and cap length. Empty string is a valid value — it
+    // means "clear the handle" and the leaderboard will fall back to the
+    // Discord username.
+    const trimmed = input.rsiHandle.trim().slice(0, RSI_HANDLE_MAX_LEN);
+    out.rsiHandle = trimmed;
   }
   // notificationLinkedAt is server-managed; clients cannot set it directly.
   return out;

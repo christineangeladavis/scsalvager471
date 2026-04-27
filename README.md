@@ -5,6 +5,12 @@ Made by Chrissyy · Referral: STAR-CH2W-R73F
 
 ## What's in this build
 
+UPDATE 4/27/2026 v2.5
+
+Added:
+- New Statistics tab (logged-in only): shows site-wide totals (SCU refined, profit, refinery fees), Refinery Most Used, Most Used Method, per-material refined totals (Construction Salvage / Pieces / Rubble), plus a Top 5 Salvagers leaderboard ranked by SCU refined.
+- Settings → RSI Handle: enter your Star Citizen handle to display under that name on the Statistics leaderboard instead of your Discord username.
+
 UPDATE 4/26/2026 v2.4
 
 Added:

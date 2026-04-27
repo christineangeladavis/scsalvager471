@@ -16,6 +16,16 @@ Added:
 - Privacy Policy: new "Privacy Policy" link in the site footer opens a full policy explaining what we collect, why, how it's stored, who it's shared with, and what you can do about it. Canonical copy also lives at PRIVACY.md in the repo. Contact channel for questions / data requests is the [Discord community](https://discord.gg/GkQU7AbfBS).
 - Terms of Service: companion "Terms of Service" link next to Privacy Policy in the footer covers eligibility, acceptable use, account suspension, content licensing for community price reports, no-warranty disclaimers, and the explicit non-affiliation with Cloud Imperium Games / Roberts Space Industries. Canonical copy at TERMS.md.
 - What's New: new footer link opens an in-app changelog covering every release back to v1.0, with user-facing summaries of each release's added features and improvements.
+- Screenshot upload → Crop to a single order: when you upload a refinery or sell screenshot, a modal opens so you can drag a box around just the order you want to read. Only the cropped area ships to the analyzer — much cleaner results when your screenshot has multiple queued orders.
+- Refinery screenshot now also extracts the in-game TOTAL COST in aUEC.
+- Refinery Job Orders + Sell Orders: new Clear button next to Submit Order / Log Sale that wipes the form back to defaults. Submitting an order or logging a sale also auto-clears the form so the next entry starts from a clean slate.
+- 30-Day History panel now caps the visible table at ~10 rows and scrolls inside itself, with the column headers pinned to the top — keeps the page short even when you've got weeks of activity logged.
+
+Fixes:
+- Screenshot extraction now reads fields in a deliberate priority order (Material → Amount → Location → Method → Time → Cost) so the most important fields fill first and dependent dropdowns scope correctly.
+- In-game material truncations (e.g. "CONSTRUCTION PI") now resolve to the correct full name on screenshot upload.
+- Refinery method names with OCR drift now still match via a fuzzy fallback.
+- Sell Orders → Sell Location is always visible (no longer hidden until a material is picked).
 
 UPDATE 4/26/2026 v2.4
 

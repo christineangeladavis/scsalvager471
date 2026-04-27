@@ -12,12 +12,17 @@
 //
 // Response shape (any field may be null when the model can't read it):
 //   {
-//     locationName: string | null,    // e.g. "HUR-L1 Green Glade Station"
 //     materialName: string | null,    // e.g. "Diamond" / "Construction Material"
 //     scu: number | null,             // quantity being sold (integer)
+//     locationName: string | null,    // e.g. "HUR-L1 Green Glade Station"
 //     totalAuec: number | null,       // total aUEC for the transaction
 //     pricePerScu: number | null      // unit price per SCU
 //   }
+//
+// Field order in both the prompt and the response is intentional —
+// Material first so the form can fill it before the dependent Sell
+// Location dropdown becomes enabled, then Amount, then Location, then
+// the price fields.
 //
 // Auth: requires a logged-in session.
 // Required env var: ANTHROPIC_API_KEY.
@@ -33,14 +38,16 @@ const EXTRACTION_PROMPT = `You are reading a Star Citizen Commodities / Trading 
 
 Extract the following fields from the image and return them as a single JSON object. Use null for any field you cannot confidently read. Do NOT invent values.
 
-Fields:
-- locationName: the trading station name shown at the top of the "YOUR INVENTORIES" panel (string). Examples: "HUR-L1 Green Glade Station", "ARC-L4", "Levski".
+Read the fields in this order — Material first, Amount second, then Location, then the aUEC totals. The first two are the most important; if you can only read part of the screen, prioritise getting those right.
+
+Fields (return them in this order):
 - materialName: the commodity being sold under "IN DEMAND". Use the name as printed (string). Examples: "Diamond", "Construction Material", "Recycled Material Composite".
 - scu: the quantity being sold in SCU (integer). Use the largest highlighted "AVAILABLE CARGO SIZE" the user has selected, or the totals row.
+- locationName: the trading station name shown at the top of the "YOUR INVENTORIES" panel (string). Examples: "HUR-L1 Green Glade Station", "ARC-L4", "Levski".
 - totalAuec: the total aUEC the player will receive for this transaction (integer). Convert any M / K suffixes — "1.461M" -> 1461000, "12.5K" -> 12500.
 - pricePerScu: the unit price shown next to the commodity (integer aUEC per SCU). Convert any M / K suffixes — "5.70900011K/SCU" -> 5709.
 
-Return ONLY the JSON object on a single line. No prose, no markdown fences.`;
+Return ONLY the JSON object on a single line, with keys in the order listed above. No prose, no markdown fences.`;
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -161,10 +168,11 @@ export default async function handler(req, res) {
   const num = (v) =>
     Number.isFinite(Number(v)) && Number(v) >= 0 ? Math.round(Number(v)) : null;
 
+  // Keys ordered to match the prompt: Material, Amount, Location, aUEC totals.
   return res.status(200).json({
-    locationName: typeof parsed.locationName === "string" ? parsed.locationName : null,
     materialName: typeof parsed.materialName === "string" ? parsed.materialName : null,
     scu: num(parsed.scu),
+    locationName: typeof parsed.locationName === "string" ? parsed.locationName : null,
     totalAuec: num(parsed.totalAuec),
     pricePerScu: num(parsed.pricePerScu),
   });

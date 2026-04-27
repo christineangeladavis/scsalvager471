@@ -374,6 +374,46 @@ function formatTimeAgo(ts) {
   return `${d}d ago`;
 }
 
+// Normalize a string for fuzzy comparison: lowercase, drop punctuation,
+// collapse whitespace. Used by the screenshot extractor to recover from
+// OCR garbles on the in-game stylized fonts (e.g. "Pyrometals Chromaysia"
+// should still resolve to "Pyrometric Chromalysis").
+function normalizeForFuzzyMatch(s) {
+  return String(s || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9 ]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+// Classic Levenshtein edit distance with a rolling 1-D buffer. O(|a|·|b|)
+// time, O(min(|a|,|b|)) space. Method names cap at ~25 chars so this is
+// effectively constant for our use case.
+function levenshtein(a, b) {
+  if (a === b) return 0;
+  if (!a.length) return b.length;
+  if (!b.length) return a.length;
+  // Iterate over the shorter string in the inner loop so the buffer is
+  // bounded by min(|a|,|b|).
+  if (a.length > b.length) {
+    const tmp = a; a = b; b = tmp;
+  }
+  const dp = new Array(a.length + 1);
+  for (let i = 0; i <= a.length; i++) dp[i] = i;
+  for (let j = 1; j <= b.length; j++) {
+    let prev = dp[0];
+    dp[0] = j;
+    for (let i = 1; i <= a.length; i++) {
+      const tmp = dp[i];
+      dp[i] = a[i - 1] === b[j - 1]
+        ? prev
+        : 1 + Math.min(prev, dp[i], dp[i - 1]);
+      prev = tmp;
+    }
+  }
+  return dp[a.length];
+}
+
 function DesktopGrid({ columns, className, children }) {
   // [&>*]:min-w-0 lets grid items shrink below their content's intrinsic
   // width, so any overflow-x-auto wrapper inside (e.g. wide data tables) can
@@ -485,7 +525,10 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [activeTab, setActiveTab] = useState("home"); // "home" | "ledger"
   const [refineryJobs, setRefineryJobs] = useState([]);
   const [sellOrders, setSellOrders] = useState([]);
-  const [jobForm, setJobForm] = useState({
+  // Default shape for a fresh refinery job entry. The Clear button
+  // next to Submit Order resets to this exact object — keep them in
+  // sync if you add a field to the form.
+  const blankJobForm = () => ({
     material: "",
     location: "",
     method: "",
@@ -494,19 +537,33 @@ export default function StarCitizenSalvageGuideWebsite() {
     minutes: "",
     seconds: "",
   });
+  const [jobForm, setJobForm] = useState(blankJobForm());
   const [isAnalyzingScreenshot, setIsAnalyzingScreenshot] = useState(false);
   // Status of the latest refinery screenshot analysis. Shape:
   // { kind: "ok" | "error", text: string } | null
   const [analyzeFeedback, setAnalyzeFeedback] = useState(null);
   const [isAnalyzingSellScreenshot, setIsAnalyzingSellScreenshot] = useState(false);
   const [analyzeSellFeedback, setAnalyzeSellFeedback] = useState(null);
-  const [orderForm, setOrderForm] = useState({
+  // Crop modal state. When the user picks a screenshot we stash the
+  // image here and open the modal so they can drag-select a single
+  // order before it ships to the analyzer. Shape:
+  //   { dataUrl: string, mediaType: string, kind: "refinery" | "sell" }
+  // The crop rectangle is in displayed-image coordinates (pixels of the
+  // <img> element); we translate to natural coordinates at confirm time.
+  const [cropImage, setCropImage] = useState(null);
+  const [cropRect, setCropRect] = useState(null);
+  const cropImgRef = useRef(null);
+  const cropDragStartRef = useRef(null);
+  // Default shape for a fresh sell order entry. The Clear button next
+  // to Log Sale resets to this exact object.
+  const blankOrderForm = () => ({
     material: "",
     scu: "",
     location: "",
     playerName: "",
     aUEC: "",
   });
+  const [orderForm, setOrderForm] = useState(blankOrderForm());
   const [tick, setTick] = useState(0);
   const [isLedgerLoading, setIsLedgerLoading] = useState(true);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
@@ -2065,6 +2122,56 @@ export default function StarCitizenSalvageGuideWebsite() {
     const skippedFields = [];
     const next = { ...jobForm };
 
+    // Fill order (deliberate): Material, Amount, Location, Method, Time, Cost.
+    // Material first because it's the headline field; the screenshot
+    // extraction prompt asks the model to read the fields in this same
+    // order, and the matched-fields summary mirrors it so the user sees
+    // the same priority shown back to them.
+
+    // Material: case-insensitive exact match against the salvage materials.
+    // Mining/ore materials from a non-salvage refinery screenshot won't
+    // match — that's expected; user can pick from the dropdown.
+    //
+    // Fallback: the in-game refinery setup screen truncates the material
+    // column at ~15 chars, so longer names come back as "CONSTRUCTION PI"
+    // / "CONSTRUCTION RU" / "CONSTRUCTION SA". Explicit prefix rules
+    // resolve those clipped strings to the canonical names. Prefix rules
+    // are the site owner's authoritative interpretation; do not change
+    // these without confirmation.
+    if (extracted.rawMaterialName) {
+      const lower = extracted.rawMaterialName.toLowerCase().trim();
+      let r = refineryMaterials.find((m) => m.name.toLowerCase() === lower);
+      if (!r) {
+        const prefixRules = [
+          { prefix: "construction ru", target: "Construction Rubble" },
+          { prefix: "construction pi", target: "Construction Pieces" },
+          { prefix: "construction sa", target: "Construction Salvage" },
+        ];
+        for (const rule of prefixRules) {
+          if (lower.startsWith(rule.prefix)) {
+            r = refineryMaterials.find((m) => m.name === rule.target);
+            if (r) break;
+          }
+        }
+      }
+      if (r) {
+        next.material = r.name;
+        matchedFields.push(`Material: ${r.name}`);
+      } else {
+        skippedFields.push(`Material ("${extracted.rawMaterialName}" — not a salvage material)`);
+      }
+    }
+
+    // Amount (input SCU).
+    if (Number.isFinite(extracted.totalSCU) && extracted.totalSCU > 0) {
+      // Refinery server returns SCU already converted from cSCU (1 SCU =
+      // 100 cSCU). Two decimal places is exactly representable; trim
+      // trailing zeros for the input string.
+      const fixed = (Math.round(extracted.totalSCU * 100) / 100).toString();
+      next.materialScu = fixed;
+      matchedFields.push(`SCU: ${fixed}`);
+    }
+
     // Location: find a refineryLocation whose .name appears as substring
     // (or supersequence) of the extracted location.
     if (extracted.locationName) {
@@ -2080,15 +2187,38 @@ export default function StarCitizenSalvageGuideWebsite() {
       }
     }
 
-    // Method: case-insensitive exact or prefix match.
+    // Method: case-insensitive exact / prefix match, then a Levenshtein
+    // fuzzy fallback. The in-game stylized font causes OCR garbles like
+    // "Pyrometals Chromaysia" -> "Pyrometric Chromalysis"; a plain
+    // substring match doesn't catch those. The fuzzy fallback only
+    // accepts a match within ~35% edit distance of the longer string,
+    // which is permissive enough for typical OCR drift but still
+    // rejects unrelated names.
     if (extracted.methodName) {
       const lower = extracted.methodName.toLowerCase();
-      const m = refineryMethods.find(
+      let m = refineryMethods.find(
         (rm) =>
           rm.name.toLowerCase() === lower ||
           rm.name.toLowerCase().startsWith(lower) ||
           lower.startsWith(rm.name.toLowerCase())
       );
+      if (!m) {
+        const extractedNorm = normalizeForFuzzyMatch(extracted.methodName);
+        let best = null;
+        let bestDist = Infinity;
+        for (const rm of refineryMethods) {
+          const rmNorm = normalizeForFuzzyMatch(rm.name);
+          const dist = levenshtein(extractedNorm, rmNorm);
+          const threshold = Math.ceil(
+            Math.max(rmNorm.length, extractedNorm.length) * 0.35
+          );
+          if (dist <= threshold && dist < bestDist) {
+            best = rm;
+            bestDist = dist;
+          }
+        }
+        if (best) m = best;
+      }
       if (m) {
         next.method = m.name;
         matchedFields.push(`Method: ${m.name}`);
@@ -2097,29 +2227,7 @@ export default function StarCitizenSalvageGuideWebsite() {
       }
     }
 
-    // Material: case-insensitive exact match against the salvage materials.
-    // Mining/ore materials from a non-salvage refinery screenshot won't
-    // match — that's expected; user can pick from the dropdown.
-    if (extracted.rawMaterialName) {
-      const lower = extracted.rawMaterialName.toLowerCase();
-      const r = refineryMaterials.find((m) => m.name.toLowerCase() === lower);
-      if (r) {
-        next.material = r.name;
-        matchedFields.push(`Material: ${r.name}`);
-      } else {
-        skippedFields.push(`Material ("${extracted.rawMaterialName}" — not a salvage material)`);
-      }
-    }
-
-    if (Number.isFinite(extracted.totalSCU) && extracted.totalSCU > 0) {
-      // Refinery server returns SCU already converted from cSCU (1 SCU =
-      // 100 cSCU). Two decimal places is exactly representable; trim
-      // trailing zeros for the input string.
-      const fixed = (Math.round(extracted.totalSCU * 100) / 100).toString();
-      next.materialScu = fixed;
-      matchedFields.push(`SCU: ${fixed}`);
-    }
-
+    // Time (Hours / Min / Sec).
     if (Number.isFinite(extracted.processingTimeSeconds) && extracted.processingTimeSeconds > 0) {
       const total = Math.round(extracted.processingTimeSeconds);
       next.hours = String(Math.floor(total / 3600));
@@ -2130,10 +2238,23 @@ export default function StarCitizenSalvageGuideWebsite() {
       );
     }
 
+    // Cost (refinery fee, aUEC).
+    if (Number.isFinite(extracted.costAUEC) && extracted.costAUEC > 0) {
+      const fee = Math.round(extracted.costAUEC);
+      next.cost = String(fee);
+      matchedFields.push(`Cost: ${fee.toLocaleString()} aUEC`);
+    }
+
     setJobForm(next);
     return { matchedFields, skippedFields };
   };
 
+  // Read the file into a data URL and hand it to the crop modal. We
+  // don't ship anything to the server yet — the user gets to crop a
+  // single order out of the screenshot first (often the refinery setup
+  // shows several queued orders side-by-side and trying to parse all
+  // of them at once produces blended/wrong values). The actual
+  // analyze + form-fill flow runs from the modal's Confirm button.
   const handleScreenshotUpload = async (file) => {
     if (!file) return;
     if (file.size > 8 * 1024 * 1024) {
@@ -2144,21 +2265,7 @@ export default function StarCitizenSalvageGuideWebsite() {
       setAnalyzeFeedback({ kind: "error", text: "Unsupported image type." });
       return;
     }
-    setIsAnalyzingScreenshot(true);
     setAnalyzeFeedback(null);
-
-    // Dev mock — example data lifted from the in-game refinery screen.
-    // The screen prints quantities in cSCU; the production server divides
-    // by 100 in its response, so the mock value here is already the
-    // converted SCU (921 cSCU on screen -> 9.21 SCU here).
-    const devMockExtraction = () => ({
-      locationName: "ARC-L2 Lively Pathway Station",
-      methodName: "XCR Reaction",
-      rawMaterialName: "Iron (Ore)",
-      totalSCU: 9.21,
-      processingTimeSeconds: 271,
-    });
-
     try {
       const dataUrl = await new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -2168,9 +2275,37 @@ export default function StarCitizenSalvageGuideWebsite() {
       });
       const m = /^data:(image\/[^;]+);base64,(.+)$/.exec(String(dataUrl || ""));
       if (!m) throw new Error("Could not encode image.");
-      const mediaType = m[1];
-      const imageBase64 = m[2];
+      setCropImage({ dataUrl: String(dataUrl), mediaType: m[1], kind: "refinery" });
+      setCropRect(null);
+    } catch (e) {
+      setAnalyzeFeedback({
+        kind: "error",
+        text: e && e.message ? e.message : "Could not read image.",
+      });
+    }
+  };
 
+  // Dev mock for refinery analysis — example data lifted from the
+  // in-game refinery screen. The screen prints quantities in cSCU; the
+  // production server divides by 100 in its response, so the mock value
+  // here is already the converted SCU (921 cSCU on screen -> 9.21 SCU).
+  const devMockRefineryExtraction = () => ({
+    rawMaterialName: "Construction Salvage",
+    totalSCU: 9.21,
+    locationName: "ARC-L2 Lively Pathway Station",
+    methodName: "XCR Reaction",
+    processingTimeSeconds: 271,
+    costAUEC: 1152,
+  });
+
+  // Server hop + apply for the refinery flow. Called by the crop
+  // modal's "Crop & Analyze" / "Use Full Image" buttons. Splitting it
+  // out of the upload handler lets us run it against either the
+  // original image or the user's cropped subset with the same code path.
+  const analyzeAndApplyRefinery = async ({ imageBase64, mediaType }) => {
+    setIsAnalyzingScreenshot(true);
+    setAnalyzeFeedback(null);
+    try {
       let extracted;
       try {
         const res = await fetch("/api/refinery/analyze", {
@@ -2182,7 +2317,7 @@ export default function StarCitizenSalvageGuideWebsite() {
         if (!res.ok) {
           const info = await res.json().catch(() => ({}));
           if (import.meta.env.DEV && (res.status === 401 || res.status === 503 || res.status === 404)) {
-            extracted = devMockExtraction();
+            extracted = devMockRefineryExtraction();
           } else {
             throw new Error(info.error || `HTTP ${res.status}`);
           }
@@ -2191,7 +2326,7 @@ export default function StarCitizenSalvageGuideWebsite() {
         }
       } catch (e) {
         if (import.meta.env.DEV) {
-          extracted = devMockExtraction();
+          extracted = devMockRefineryExtraction();
         } else {
           throw e;
         }
@@ -2211,7 +2346,6 @@ export default function StarCitizenSalvageGuideWebsite() {
     } finally {
       setIsAnalyzingScreenshot(false);
     }
-    // file goes out of scope here; nothing is held in client memory.
   };
 
   // --- Sell-orders auto-fill: same shape as the refinery flow.
@@ -2224,6 +2358,11 @@ export default function StarCitizenSalvageGuideWebsite() {
     const skippedFields = [];
     const next = { ...orderForm };
 
+    // Fill order (deliberate): Material, Amount, Location, aUEC.
+    // Material first because the Sell Location dropdown is dependent on
+    // it — picking material before location means the location list is
+    // already scoped correctly when we set it.
+
     // Material match against the SCSalvager material list. Diamond / ore
     // commodities won't match — that's expected; the user can pick.
     if (extracted.materialName) {
@@ -2235,6 +2374,12 @@ export default function StarCitizenSalvageGuideWebsite() {
       } else {
         skippedFields.push(`Material ("${extracted.materialName}" — not in our list)`);
       }
+    }
+
+    // Amount (SCU sold).
+    if (Number.isFinite(extracted.scu) && extracted.scu > 0) {
+      next.scu = String(Math.round(extracted.scu));
+      matchedFields.push(`SCU: ${next.scu}`);
     }
 
     // Sell point match — substring either direction. The screenshot's
@@ -2263,10 +2408,7 @@ export default function StarCitizenSalvageGuideWebsite() {
       }
     }
 
-    if (Number.isFinite(extracted.scu) && extracted.scu > 0) {
-      next.scu = String(Math.round(extracted.scu));
-      matchedFields.push(`SCU: ${next.scu}`);
-    }
+    // aUEC total received.
     if (Number.isFinite(extracted.totalAuec) && extracted.totalAuec > 0) {
       next.aUEC = String(Math.round(extracted.totalAuec));
       matchedFields.push(`aUEC: ${next.aUEC}`);
@@ -2304,19 +2446,7 @@ export default function StarCitizenSalvageGuideWebsite() {
       setAnalyzeSellFeedback({ kind: "error", text: "Unsupported image type." });
       return;
     }
-    setIsAnalyzingSellScreenshot(true);
     setAnalyzeSellFeedback(null);
-
-    // Dev mock — values lifted from the example commodities screenshot
-    // (HUR-L1 Green Glade Station, Diamond, 256 SCU at 5,709/SCU = 1.461M).
-    const devMockSell = () => ({
-      locationName: "HUR-L1 Green Glade Station",
-      materialName: "Diamond",
-      scu: 256,
-      totalAuec: 1461000,
-      pricePerScu: 5709,
-    });
-
     try {
       const dataUrl = await new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -2326,9 +2456,30 @@ export default function StarCitizenSalvageGuideWebsite() {
       });
       const m = /^data:(image\/[^;]+);base64,(.+)$/.exec(String(dataUrl || ""));
       if (!m) throw new Error("Could not encode image.");
-      const mediaType = m[1];
-      const imageBase64 = m[2];
+      setCropImage({ dataUrl: String(dataUrl), mediaType: m[1], kind: "sell" });
+      setCropRect(null);
+    } catch (e) {
+      setAnalyzeSellFeedback({
+        kind: "error",
+        text: e && e.message ? e.message : "Could not read image.",
+      });
+    }
+  };
 
+  // Dev mock for sell analysis — example data lifted from the in-game
+  // Commodities/Trading Console screen.
+  const devMockSellExtraction = () => ({
+    materialName: "Construction Material",
+    scu: 256,
+    locationName: "HUR-L1 Green Glade Station",
+    totalAuec: 1461000,
+    pricePerScu: 5709,
+  });
+
+  const analyzeAndApplySell = async ({ imageBase64, mediaType }) => {
+    setIsAnalyzingSellScreenshot(true);
+    setAnalyzeSellFeedback(null);
+    try {
       let extracted;
       try {
         const res = await fetch("/api/sell/analyze", {
@@ -2340,7 +2491,7 @@ export default function StarCitizenSalvageGuideWebsite() {
         if (!res.ok) {
           const info = await res.json().catch(() => ({}));
           if (import.meta.env.DEV && (res.status === 401 || res.status === 503 || res.status === 404)) {
-            extracted = devMockSell();
+            extracted = devMockSellExtraction();
           } else {
             throw new Error(info.error || `HTTP ${res.status}`);
           }
@@ -2349,7 +2500,7 @@ export default function StarCitizenSalvageGuideWebsite() {
         }
       } catch (e) {
         if (import.meta.env.DEV) {
-          extracted = devMockSell();
+          extracted = devMockSellExtraction();
         } else {
           throw e;
         }
@@ -2372,6 +2523,77 @@ export default function StarCitizenSalvageGuideWebsite() {
     } finally {
       setIsAnalyzingSellScreenshot(false);
     }
+  };
+
+  // Dispatcher used by the crop modal — picks the right downstream
+  // analyzer based on `cropImage.kind`. Always runs after the modal has
+  // closed, so the dataURL reference can be GC'd.
+  const runCropAnalysis = async ({ imageBase64, mediaType, kind }) => {
+    if (kind === "refinery") {
+      await analyzeAndApplyRefinery({ imageBase64, mediaType });
+    } else if (kind === "sell") {
+      await analyzeAndApplySell({ imageBase64, mediaType });
+    }
+  };
+
+  // Confirm handler for the crop modal. If `cropRect` is set, draw the
+  // selected region from the loaded image to a hidden canvas, encode
+  // as PNG, and ship the cropped subset. Otherwise fall back to the
+  // original image untouched. Either way, close the modal first so the
+  // dataURL gets released even if the analysis call throws.
+  const handleCropConfirm = async ({ useFullImage }) => {
+    if (!cropImage) return;
+    const { dataUrl, mediaType, kind } = cropImage;
+    let outBase64 = "";
+    let outMediaType = mediaType;
+
+    if (useFullImage || !cropRect || cropRect.w < 8 || cropRect.h < 8) {
+      // Use the original image bytes as-is.
+      const m = /^data:(image\/[^;]+);base64,(.+)$/.exec(dataUrl);
+      if (!m) {
+        setAnalyzeFeedback({ kind: "error", text: "Could not read image." });
+        setCropImage(null);
+        setCropRect(null);
+        return;
+      }
+      outMediaType = m[1];
+      outBase64 = m[2];
+    } else {
+      // Translate the crop rectangle from displayed coords to natural
+      // image coords, then draw that region into a fresh canvas. PNG
+      // encode for losslessness — these screenshots are usually small
+      // enough that PNG bloat doesn't matter.
+      const img = cropImgRef.current;
+      if (!img) return;
+      const rect = img.getBoundingClientRect();
+      const scaleX = img.naturalWidth / rect.width;
+      const scaleY = img.naturalHeight / rect.height;
+      const sx = Math.max(0, Math.round(cropRect.x * scaleX));
+      const sy = Math.max(0, Math.round(cropRect.y * scaleY));
+      const sw = Math.max(1, Math.round(cropRect.w * scaleX));
+      const sh = Math.max(1, Math.round(cropRect.h * scaleY));
+      const canvas = document.createElement("canvas");
+      canvas.width = sw;
+      canvas.height = sh;
+      const ctx = canvas.getContext("2d");
+      // The displayed <img> is the same source image, so drawing from
+      // it gives us the natural pixel data inside the crop rect.
+      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh);
+      const cropDataUrl = canvas.toDataURL("image/png");
+      const m = /^data:(image\/[^;]+);base64,(.+)$/.exec(cropDataUrl);
+      if (!m) {
+        setAnalyzeFeedback({ kind: "error", text: "Could not crop image." });
+        setCropImage(null);
+        setCropRect(null);
+        return;
+      }
+      outMediaType = m[1];
+      outBase64 = m[2];
+    }
+
+    setCropImage(null);
+    setCropRect(null);
+    await runCropAnalysis({ imageBase64: outBase64, mediaType: outMediaType, kind });
   };
 
   // --- Ledger: handlers ---
@@ -2408,15 +2630,12 @@ export default function StarCitizenSalvageGuideWebsite() {
     };
     const nextJobs = [newJob, ...refineryJobs];
     setRefineryJobs(nextJobs);
-    setJobForm({
-      material: jobForm.material,
-      location: jobForm.location,
-      method: jobForm.method,
-      materialScu: "",
-      hours: "",
-      minutes: "",
-      seconds: "",
-    });
+    // Full reset — same shape the Clear button produces. Previously we
+    // kept material / location / method to make repeat submissions
+    // faster, but the user wants a clean slate after every submit so
+    // there's no carry-over from the last order.
+    setJobForm(blankJobForm());
+    setAnalyzeFeedback(null);
     saveLedger(nextJobs, sellOrders);
   };
 
@@ -2452,13 +2671,9 @@ export default function StarCitizenSalvageGuideWebsite() {
     };
     const nextOrders = [newOrder, ...sellOrders];
     setSellOrders(nextOrders);
-    setOrderForm({
-      material: orderForm.material,
-      scu: "",
-      location: orderForm.location,
-      playerName: "",
-      aUEC: "",
-    });
+    // Full reset — matches the Clear button.
+    setOrderForm(blankOrderForm());
+    setAnalyzeSellFeedback(null);
     saveLedger(refineryJobs, nextOrders);
   };
 
@@ -3570,18 +3785,34 @@ export default function StarCitizenSalvageGuideWebsite() {
                       <div className="mt-0.5 text-sm font-bold text-amber-300">{Math.round(jobFormPreview.cost).toLocaleString()} aUEC</div>
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setShowSubmitJobConfirm(true)}
-                    disabled={!isJobFormValid}
-                    className={`mt-1 rounded-xl border px-4 py-2 text-sm font-semibold transition ${
-                      isJobFormValid
-                        ? "border-cyan-400 bg-cyan-500/20 text-cyan-100 hover:bg-cyan-500/30"
-                        : "cursor-not-allowed border-slate-700 bg-slate-800/50 text-slate-500"
-                    }`}
-                  >
-                    Submit Order
-                  </button>
+                  <div className="mt-1 flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowSubmitJobConfirm(true)}
+                      disabled={!isJobFormValid}
+                      className={`flex-1 min-w-[160px] rounded-xl border px-4 py-2 text-sm font-semibold transition ${
+                        isJobFormValid
+                          ? "border-cyan-400 bg-cyan-500/20 text-cyan-100 hover:bg-cyan-500/30"
+                          : "cursor-not-allowed border-slate-700 bg-slate-800/50 text-slate-500"
+                      }`}
+                    >
+                      Submit Order
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        // Reset every visible field on the refinery form.
+                        // Also clears any auto-fill feedback so the line
+                        // above the form doesn't lie about the current
+                        // state.
+                        setJobForm(blankJobForm());
+                        setAnalyzeFeedback(null);
+                      }}
+                      className="rounded-xl border border-slate-700 bg-slate-800/60 px-4 py-2 text-sm font-semibold text-slate-300 hover:border-rose-500/40 hover:text-rose-300"
+                    >
+                      Clear
+                    </button>
+                  </div>
                 </div>
 
                 {/* In Progress */}
@@ -3736,37 +3967,40 @@ export default function StarCitizenSalvageGuideWebsite() {
                       className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
                     />
                   </div>
-                  {orderForm.material && (
-                    <div>
-                      <label className="mb-1 block text-xs text-slate-400">Sell Location</label>
-                      <select
-                        value={orderForm.location}
-                        onChange={(e) => setOrderForm({ ...orderForm, location: e.target.value, playerName: "" })}
-                        disabled={!user && !import.meta.env.DEV}
-                        className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        <option value="">(Select a Location)</option>
-                        {/* "Sold to Player" sits directly under the placeholder
-                            for fast access — selling to another player is a
-                            common ledger entry and shouldn't be buried below
-                            the system groups. */}
-                        {orderSellPointEntries.some((p) => p.isPlayer) && (
-                          <option value={PLAYER_SELL_POINT}>{PLAYER_SELL_POINT}</option>
-                        )}
-                        {groupSellPointEntriesBySystem(orderSellPointEntries)
-                          .filter((group) => group.system !== "Player")
-                          .map((group) => (
-                            <optgroup key={group.system} label={group.system}>
-                              {group.entries.map((p) => (
-                                <option key={p.name} value={p.name}>
-                                  {`${p.name} · ${p.effectivePrice.toLocaleString()} aUEC/SCU${p.isReported ? " ★" : ""}`}
-                                </option>
-                              ))}
-                            </optgroup>
-                          ))}
-                      </select>
-                    </div>
-                  )}
+                  {/* Sell Location — always visible. The dropdown's
+                      grouped option list still depends on the chosen
+                      material (orderSellPointEntries derives from it)
+                      but the field itself stays on screen so the user
+                      can see and pick it whenever. */}
+                  <div>
+                    <label className="mb-1 block text-xs text-slate-400">Sell Location</label>
+                    <select
+                      value={orderForm.location}
+                      onChange={(e) => setOrderForm({ ...orderForm, location: e.target.value, playerName: "" })}
+                      disabled={!user && !import.meta.env.DEV}
+                      className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <option value="">(Select a Location)</option>
+                      {/* "Sold to Player" sits directly under the placeholder
+                          for fast access — selling to another player is a
+                          common ledger entry and shouldn't be buried below
+                          the system groups. */}
+                      {orderSellPointEntries.some((p) => p.isPlayer) && (
+                        <option value={PLAYER_SELL_POINT}>{PLAYER_SELL_POINT}</option>
+                      )}
+                      {groupSellPointEntriesBySystem(orderSellPointEntries)
+                        .filter((group) => group.system !== "Player")
+                        .map((group) => (
+                          <optgroup key={group.system} label={group.system}>
+                            {group.entries.map((p) => (
+                              <option key={p.name} value={p.name}>
+                                {`${p.name} · ${p.effectivePrice.toLocaleString()} aUEC/SCU${p.isReported ? " ★" : ""}`}
+                              </option>
+                            ))}
+                          </optgroup>
+                        ))}
+                    </select>
+                  </div>
                   {orderForm.location === PLAYER_SELL_POINT && (
                     <div>
                       <label className="mb-1 block text-xs text-slate-400">Player Name</label>
@@ -3793,18 +4027,30 @@ export default function StarCitizenSalvageGuideWebsite() {
                       className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
                     />
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setShowSubmitSellConfirm(true)}
-                    disabled={!isOrderFormValid}
-                    className={`mt-1 rounded-xl border px-4 py-2 text-sm font-semibold transition ${
-                      isOrderFormValid
-                        ? "border-cyan-400 bg-cyan-500/20 text-cyan-100 hover:bg-cyan-500/30"
-                        : "cursor-not-allowed border-slate-700 bg-slate-800/50 text-slate-500"
-                    }`}
-                  >
-                    Log Sale
-                  </button>
+                  <div className="mt-1 flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowSubmitSellConfirm(true)}
+                      disabled={!isOrderFormValid}
+                      className={`flex-1 min-w-[160px] rounded-xl border px-4 py-2 text-sm font-semibold transition ${
+                        isOrderFormValid
+                          ? "border-cyan-400 bg-cyan-500/20 text-cyan-100 hover:bg-cyan-500/30"
+                          : "cursor-not-allowed border-slate-700 bg-slate-800/50 text-slate-500"
+                      }`}
+                    >
+                      Log Sale
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOrderForm(blankOrderForm());
+                        setAnalyzeSellFeedback(null);
+                      }}
+                      className="rounded-xl border border-slate-700 bg-slate-800/60 px-4 py-2 text-sm font-semibold text-slate-300 hover:border-rose-500/40 hover:text-rose-300"
+                    >
+                      Clear
+                    </button>
+                  </div>
                 </div>
 
                 {orderForm.location !== PLAYER_SELL_POINT && (
@@ -3951,9 +4197,14 @@ export default function StarCitizenSalvageGuideWebsite() {
                   Nothing in your 30-day history yet. Collect a refinery job or log a sale to get started.
                 </div>
               ) : (
-                <div className="mt-4 overflow-x-auto rounded-2xl border border-slate-700">
+                // Cap the visible height at ~10 rows so the panel doesn't
+                // run away when the user has weeks of activity logged.
+                // 32rem ≈ 512px — header + ~10 standard-height rows. The
+                // <thead> below stays pinned at the top of the scroll
+                // box so column titles remain visible while scrolling.
+                <div className="mt-4 overflow-x-auto overflow-y-auto max-h-[32rem] rounded-2xl border border-slate-700">
                   <table className="w-full min-w-[640px] text-left text-sm md:min-w-0">
-                    <thead className="bg-slate-950 text-slate-300">
+                    <thead className="bg-slate-950 text-slate-300 sticky top-0 z-10">
                       <tr>
                         <th className="px-4 py-3">Date</th>
                         <th className="px-4 py-3">Type</th>
@@ -5790,6 +6041,142 @@ export default function StarCitizenSalvageGuideWebsite() {
           </div>
         )}
 
+        {/* Screenshot crop modal.
+            Opens when the user picks a screenshot (refinery or sell).
+            Lets them drag-select a rectangle around a single order so
+            the vision model isn't trying to parse multiple queued
+            orders at once. The rectangle is captured in displayed-image
+            coordinates and translated to natural pixels at confirm
+            time so the cropped output preserves full source resolution. */}
+        {cropImage && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+            onClick={() => {
+              setCropImage(null);
+              setCropRect(null);
+            }}
+          >
+            <div
+              className="w-full max-w-3xl max-h-[92vh] overflow-y-auto rounded-3xl border border-cyan-500/30 bg-slate-900 p-5 shadow-2xl shadow-cyan-950/40"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="crop-title"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h3 id="crop-title" className="text-lg font-bold text-cyan-300">
+                    Crop to a single order
+                  </h3>
+                  <p className="mt-1 text-xs text-slate-400">
+                    Drag a box around just the order you want to read. We'll send only the cropped area to the analyzer for cleaner results — or skip cropping to use the full image.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCropImage(null);
+                    setCropRect(null);
+                  }}
+                  aria-label="Cancel"
+                  className="rounded-md border border-slate-700 bg-slate-800/60 px-2 py-1 text-xs text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div
+                className="relative mt-4 overflow-hidden rounded-xl border border-slate-800 bg-slate-950 select-none"
+                onMouseDown={(e) => {
+                  // Anchor the drag against the image element's bounding
+                  // rect — the wrapping div may include padding/borders
+                  // we don't want to count.
+                  const img = cropImgRef.current;
+                  if (!img) return;
+                  const rect = img.getBoundingClientRect();
+                  const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+                  const y = Math.max(0, Math.min(rect.height, e.clientY - rect.top));
+                  cropDragStartRef.current = { x, y };
+                  setCropRect({ x, y, w: 0, h: 0 });
+                }}
+                onMouseMove={(e) => {
+                  if (!cropDragStartRef.current || !cropImgRef.current) return;
+                  // Only draw while the primary button is pressed —
+                  // otherwise mouse-leave + return without re-clicking
+                  // would keep extending the rect.
+                  if ((e.buttons & 1) === 0) {
+                    cropDragStartRef.current = null;
+                    return;
+                  }
+                  const img = cropImgRef.current;
+                  const rect = img.getBoundingClientRect();
+                  const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+                  const y = Math.max(0, Math.min(rect.height, e.clientY - rect.top));
+                  const start = cropDragStartRef.current;
+                  setCropRect({
+                    x: Math.min(start.x, x),
+                    y: Math.min(start.y, y),
+                    w: Math.abs(x - start.x),
+                    h: Math.abs(y - start.y),
+                  });
+                }}
+                onMouseUp={() => {
+                  cropDragStartRef.current = null;
+                }}
+                onMouseLeave={() => {
+                  cropDragStartRef.current = null;
+                }}
+              >
+                <img
+                  ref={cropImgRef}
+                  src={cropImage.dataUrl}
+                  alt="Screenshot to crop"
+                  draggable={false}
+                  className="block max-h-[60vh] w-auto max-w-full mx-auto cursor-crosshair"
+                  style={{ userSelect: "none", WebkitUserSelect: "none" }}
+                />
+                {cropRect && cropRect.w > 0 && cropRect.h > 0 && (
+                  <div
+                    className="pointer-events-none absolute border-2 border-cyan-400 bg-cyan-400/10 shadow-[0_0_0_99999px_rgba(2,6,23,0.6)]"
+                    style={{
+                      left: cropRect.x + "px",
+                      top: cropRect.y + "px",
+                      width: cropRect.w + "px",
+                      height: cropRect.h + "px",
+                    }}
+                  />
+                )}
+              </div>
+
+              <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setCropRect(null)}
+                  disabled={!cropRect}
+                  className="rounded-md border border-slate-700 bg-slate-800/60 px-3 py-1.5 text-xs text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Reset crop
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleCropConfirm({ useFullImage: true })}
+                  className="rounded-md border border-slate-700 bg-slate-800/60 px-3 py-1.5 text-xs text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                >
+                  Use full image
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleCropConfirm({ useFullImage: false })}
+                  disabled={!cropRect || cropRect.w < 8 || cropRect.h < 8}
+                  className="rounded-md border border-cyan-400/40 bg-cyan-500/15 px-3 py-1.5 text-xs font-semibold text-cyan-100 hover:bg-cyan-500/25 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Crop &amp; Analyze
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* What's New modal — user-facing changelog.
             Reformatted from README.md: Added/Removed entries stay
             informative since users want to know about new features;
@@ -5834,6 +6221,17 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <li>Settings → <strong>RSI Handle verification</strong> — paste a one-time code into your RSI Short Bio to prove ownership. Verified handles get a check mark on the leaderboard, and the handle only displays once verified (so nobody can impersonate you by typing your handle into Settings).</li>
                     <li>Settings → <strong>Danger Zone</strong> — permanently delete your account with a two-step confirmation. Wipes your ledger, preferences, login history, and active sessions, and drops you from Statistics aggregations.</li>
                     <li>New <strong>Privacy Policy</strong> and <strong>Terms of Service</strong> in the footer covering what we collect, why, how it's stored, and your rights.</li>
+                    <li>Screenshot upload → <strong>Crop to a single order</strong>: when you upload a refinery or sell screenshot, drag a box around the order you want to read. Only the cropped area ships for analysis — much cleaner results when your screenshot has multiple queued orders.</li>
+                    <li>Refinery screenshot now also extracts the in-game <strong>TOTAL COST</strong> in aUEC.</li>
+                    <li><strong>Clear button</strong> next to Submit Order / Log Sale that resets the form. Submitting also auto-clears the form so the next entry starts blank.</li>
+                    <li><strong>30-Day History</strong> table caps the visible rows at ~10 with sticky column headers — keeps the page short even with weeks of activity.</li>
+                  </ul>
+                  <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Fixes</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li>Screenshot extraction now reads fields in priority order so the most important fields fill first and dependent dropdowns scope correctly.</li>
+                    <li>In-game material name truncations now resolve to the correct full name on screenshot upload.</li>
+                    <li>Refinery method names with OCR drift now still match via a fuzzy fallback.</li>
+                    <li>Sell Orders → Sell Location is always visible (no longer hidden until a material is picked).</li>
                   </ul>
                 </section>
 

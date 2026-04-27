@@ -12,12 +12,18 @@
 //
 // Response shape (any field may be null when the model can't see it):
 //   {
-//     locationName: string | null,        // e.g. "ARC-L2 Lively Pathway Station"
-//     methodName: string | null,          // e.g. "XCR Reaction"
-//     rawMaterialName: string | null,     // e.g. "Iron (Ore)"
-//     totalSCU: number | null,            // e.g. 921 (from "TO REFINE")
-//     processingTimeSeconds: number | null // e.g. 271 (4m 31s)
+//     rawMaterialName: string | null,        // e.g. "Construction Salvage"
+//     totalSCU: number | null,               // e.g. 9.21 (server divides by 100 for cSCU -> SCU)
+//     locationName: string | null,           // e.g. "ARC-L2 Lively Pathway Station"
+//     methodName: string | null,             // e.g. "XCR Reaction"
+//     processingTimeSeconds: number | null,  // e.g. 271 (4m 31s)
+//     costAUEC: number | null                // e.g. 1152 (refinery fee paid up front)
 //   }
+//
+// Field order in both the prompt and the response is intentional —
+// Material comes first so the model anchors on it (and so the client
+// can fill the Material dropdown before any dependent dropdowns), then
+// Amount, then Location/Method, then Time, then Cost.
 //
 // Auth: requires a logged-in session (any user).
 //
@@ -34,14 +40,17 @@ const EXTRACTION_PROMPT = `You are reading a Star Citizen refinery order screen.
 
 Extract the following fields from the image and return them as a single JSON object. Use null for any field you cannot confidently read. Do NOT invent values.
 
-Fields:
+Read the fields in this order — Material first, Amount second, then Location, Method, Time, and Cost. The first two are the most important; if you can only read part of the screen, prioritise getting those right.
+
+Fields (return them in this order):
+- rawMaterialName: the primary raw material being refined. If multiple materials are listed, return the one with the highest QTY. Include the parenthetical suffix as shown. Examples: "Iron (Ore)", "Construction Salvage", "Construction Pieces".
+- totalSCU: the "TO REFINE" total quantity AS PRINTED on the screen (integer). The in-game refinery setup screen lists quantities in cSCU (1 SCU = 100 cSCU); just return the raw on-screen number — the server divides by 100 to get SCU.
 - locationName: the refinery station name shown at the top of the screen (string). Examples: "ARC-L2 Lively Pathway Station", "Levski", "HUR-L1".
 - methodName: the processing/refinery method shown under "PROCESSING SELECTION, YIELD AND COSTS" (string). Examples: "XCR Reaction", "Cormack Method", "Dinyx Solventation".
-- rawMaterialName: the primary raw material being refined. If multiple materials are listed, return the one with the highest QTY. Include the parenthetical suffix as shown. Examples: "Iron (Ore)", "Construction Salvage".
-- totalSCU: the "TO REFINE" total quantity AS PRINTED on the screen (integer). The in-game refinery setup screen lists quantities in cSCU (1 SCU = 100 cSCU); just return the raw on-screen number — the server divides by 100 to get SCU.
 - processingTimeSeconds: the processing time converted to total seconds (integer). E.g. "4m 31s" -> 271, "1h 30m" -> 5400.
+- costAUEC: the total refinery cost / fee in aUEC the player will be charged for the job (integer). This is the up-front fee, NOT the expected sale value. Convert any M / K suffixes — "1.4K aUEC" -> 1400.
 
-Return ONLY the JSON object on a single line. No prose, no markdown fences.`;
+Return ONLY the JSON object on a single line, with keys in the order listed above. No prose, no markdown fences.`;
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -179,15 +188,21 @@ export default async function handler(req, res) {
       ? Math.round(rawTotal) / 100
       : null;
 
+  // Keys ordered to match the prompt: Material, Amount, Location,
+  // Method, Time, Cost.
   const out = {
-    locationName: typeof parsed.locationName === "string" ? parsed.locationName : null,
-    methodName: typeof parsed.methodName === "string" ? parsed.methodName : null,
     rawMaterialName: typeof parsed.rawMaterialName === "string" ? parsed.rawMaterialName : null,
     totalSCU,
+    locationName: typeof parsed.locationName === "string" ? parsed.locationName : null,
+    methodName: typeof parsed.methodName === "string" ? parsed.methodName : null,
     processingTimeSeconds:
       Number.isFinite(Number(parsed.processingTimeSeconds)) &&
       Number(parsed.processingTimeSeconds) >= 0
         ? Math.round(Number(parsed.processingTimeSeconds))
+        : null,
+    costAUEC:
+      Number.isFinite(Number(parsed.costAUEC)) && Number(parsed.costAUEC) >= 0
+        ? Math.round(Number(parsed.costAUEC))
         : null,
   };
 

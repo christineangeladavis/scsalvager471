@@ -2867,39 +2867,41 @@ export default function StarCitizenSalvageGuideWebsite() {
                   />
                 </div>
 
-                <div className="rounded-2xl border border-slate-700 bg-slate-950/70 p-4">
-                  <label className="mb-2 block text-sm text-slate-400">Sell Location</label>
-                  <select
-                    value={selectedSellPointName}
-                    onChange={(e) => setSelectedSellPointName(e.target.value)}
-                    className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 outline-none focus:border-cyan-400"
-                  >
-                    <option value="">(Select a Location)</option>
-                    {groupSellPointEntriesBySystem(sortedSellPointEntries).map((group) => (
-                      <optgroup key={group.system} label={group.system}>
-                        {group.entries.map((point) => (
-                          <option key={point.name} value={point.name}>
-                            {point.isPlayer
-                              ? point.name
-                              : `${point.name} · ${point.effectivePrice.toLocaleString()} aUEC/SCU${point.isReported ? " ★" : ""}`}
-                          </option>
-                        ))}
-                      </optgroup>
-                    ))}
-                  </select>
-                  {isPlayerEstimate && (
-                    <div className="mt-3">
-                      <label className="mb-1 block text-xs text-slate-400">Player Name</label>
-                      <input
-                        type="text"
-                        placeholder="Enter player handle"
-                        value={estimatePlayerName}
-                        onChange={(e) => setEstimatePlayerName(e.target.value)}
-                        className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400"
-                      />
-                    </div>
-                  )}
-                </div>
+                {selectedSellMaterial && (
+                  <div className="rounded-2xl border border-slate-700 bg-slate-950/70 p-4">
+                    <label className="mb-2 block text-sm text-slate-400">Sell Location</label>
+                    <select
+                      value={selectedSellPointName}
+                      onChange={(e) => setSelectedSellPointName(e.target.value)}
+                      className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 outline-none focus:border-cyan-400"
+                    >
+                      <option value="">(Select a Location)</option>
+                      {groupSellPointEntriesBySystem(sortedSellPointEntries).map((group) => (
+                        <optgroup key={group.system} label={group.system}>
+                          {group.entries.map((point) => (
+                            <option key={point.name} value={point.name}>
+                              {point.isPlayer
+                                ? point.name
+                                : `${point.name} · ${point.effectivePrice.toLocaleString()} aUEC/SCU${point.isReported ? " ★" : ""}`}
+                            </option>
+                          ))}
+                        </optgroup>
+                      ))}
+                    </select>
+                    {isPlayerEstimate && (
+                      <div className="mt-3">
+                        <label className="mb-1 block text-xs text-slate-400">Player Name</label>
+                        <input
+                          type="text"
+                          placeholder="Enter player handle"
+                          value={estimatePlayerName}
+                          onChange={(e) => setEstimatePlayerName(e.target.value)}
+                          className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400"
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {!selectedSellPointName && (
                   <div className="rounded-2xl border border-dashed border-slate-700 bg-slate-950/40 p-6 text-center text-sm text-slate-500">
@@ -3362,28 +3364,30 @@ export default function StarCitizenSalvageGuideWebsite() {
                       className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
                     />
                   </div>
-                  <div>
-                    <label className="mb-1 block text-xs text-slate-400">Sell Location</label>
-                    <select
-                      value={orderForm.location}
-                      onChange={(e) => setOrderForm({ ...orderForm, location: e.target.value, playerName: "" })}
-                      disabled={!user && !import.meta.env.DEV}
-                      className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      <option value="">(Select a Location)</option>
-                      {groupSellPointEntriesBySystem(orderSellPointEntries).map((group) => (
-                        <optgroup key={group.system} label={group.system}>
-                          {group.entries.map((p) => (
-                            <option key={p.name} value={p.name}>
-                              {p.isPlayer
-                                ? p.name
-                                : `${p.name} · ${p.effectivePrice.toLocaleString()} aUEC/SCU${p.isReported ? " ★" : ""}`}
-                            </option>
-                          ))}
-                        </optgroup>
-                      ))}
-                    </select>
-                  </div>
+                  {orderForm.material && (
+                    <div>
+                      <label className="mb-1 block text-xs text-slate-400">Sell Location</label>
+                      <select
+                        value={orderForm.location}
+                        onChange={(e) => setOrderForm({ ...orderForm, location: e.target.value, playerName: "" })}
+                        disabled={!user && !import.meta.env.DEV}
+                        className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        <option value="">(Select a Location)</option>
+                        {groupSellPointEntriesBySystem(orderSellPointEntries).map((group) => (
+                          <optgroup key={group.system} label={group.system}>
+                            {group.entries.map((p) => (
+                              <option key={p.name} value={p.name}>
+                                {p.isPlayer
+                                  ? p.name
+                                  : `${p.name} · ${p.effectivePrice.toLocaleString()} aUEC/SCU${p.isReported ? " ★" : ""}`}
+                              </option>
+                            ))}
+                          </optgroup>
+                        ))}
+                      </select>
+                    </div>
+                  )}
                   {orderForm.location === PLAYER_SELL_POINT && (
                     <div>
                       <label className="mb-1 block text-xs text-slate-400">Player Name</label>

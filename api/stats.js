@@ -137,17 +137,19 @@ export default async function handler(req, res) {
     if (userScu > 0 || userProfit > 0) {
       const meta = await getUserMeta(redis, userId);
       const prefs = await getPrefs(redis, userId);
-      // Prefer the user's RSI handle on the leaderboard — that's the name
-      // they go by in-game. Fall back to their Discord username when no
-      // handle is set. The `verified` flag is only meaningful when the
-      // displayed name actually IS the RSI handle (verifying a handle
-      // and then displaying the Discord name would be misleading).
+      // Display the RSI handle ONLY after the user has passed the
+      // Short-Bio token check. An unverified handle is just a string
+      // someone typed into Settings — letting it override the Discord
+      // username would let anyone impersonate anyone. Falling back to
+      // the Discord username until verified makes the verification
+      // flow load-bearing (and is the incentive to complete it).
       const rsiHandle = prefs && typeof prefs.rsiHandle === "string"
         ? prefs.rsiHandle.trim()
         : "";
-      const usingRsiHandle = Boolean(rsiHandle);
-      const displayName = rsiHandle || (meta && meta.username) || "Unknown";
-      const verified = Boolean(usingRsiHandle && prefs && prefs.rsiHandleVerified);
+      const verified = Boolean(rsiHandle && prefs && prefs.rsiHandleVerified);
+      const displayName = verified
+        ? rsiHandle
+        : (meta && meta.username) || "Unknown";
       perUser.push({
         username: displayName,
         scuRefined: userScu,

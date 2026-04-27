@@ -11,6 +11,7 @@ Added:
 - New Statistics tab (logged-in only): shows site-wide totals (SCU refined, profit, refinery fees), Refinery Most Used, Most Used Method, per-material refined totals (Construction Salvage / Pieces / Rubble), plus a Top 5 Salvagers leaderboard ranked by SCU refined.
 - Settings → RSI Handle: enter your Star Citizen handle to display under that name on the Statistics leaderboard instead of your Discord username.
 - Settings → RSI Handle verification: prove ownership of your handle by pasting a one-time verification code into your RSI Short Bio. Once we see it, your handle gets a check mark next to it on the Statistics leaderboard. You can remove the code from your bio after we verify.
+- Statistics leaderboard now displays your RSI handle only once it's been verified. Saving a handle without verifying still shows your Discord username — verification is what unlocks the swap (and prevents impersonation by someone typing in your handle).
 
 UPDATE 4/26/2026 v2.4
 

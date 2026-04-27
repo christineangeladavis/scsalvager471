@@ -457,7 +457,7 @@ function StockComponentsTable({ stockComponents }) {
 export default function StarCitizenSalvageGuideWebsite() {
   const [selectedShip, setSelectedShip] = useState(ships[0]);
   const [selectedMaterial, setSelectedMaterial] = useState(refineryMaterials[0].name);
-  const [selectedRefineryMethod, setSelectedRefineryMethod] = useState(refineryMethods[0].name);
+  const [selectedRefineryMethod, setSelectedRefineryMethod] = useState("");
   const [selectedRefineryLocation, setSelectedRefineryLocation] = useState("");
   const [scuInput, setScuInput] = useState("0");
   const [search, setSearch] = useState("");
@@ -488,7 +488,7 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [jobForm, setJobForm] = useState({
     material: "Construction Salvage",
     location: "",
-    method: refineryMethods[0].name,
+    method: "",
     materialScu: "",
     hours: "",
     minutes: "",
@@ -2141,9 +2141,9 @@ export default function StarCitizenSalvageGuideWebsite() {
       setEditForm({
         material: j.material,
         location: j.location || "",
-        // For legacy entries (no method/materialScu), fall back to defaults so
-        // the dropdowns/input populate; user can adjust before saving.
-        method: j.method || refineryMethods[0].name,
+        // For legacy entries (no method/materialScu), fall back to the
+        // placeholder so the user has to pick before saving.
+        method: j.method || "",
         materialScu: String(j.materialScu ?? ""),
         cost: String(j.cost ?? ""),
         ...hms,
@@ -2707,7 +2707,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     </optgroup>
                   </select>
 
-                  <label className="mb-2 mt-4 block text-sm text-slate-400">Material Type</label>
+                  <label className="mb-2 mt-4 block text-sm text-slate-400">Material</label>
                   <select
                     value={selectedMaterial}
                     onChange={(e) => setSelectedMaterial(e.target.value)}

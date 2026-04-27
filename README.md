@@ -1,4 +1,4 @@
-# SCSalvager.net — Star Citizen Salvage Guide
+# [SCSalvager.net](http://SCSalvager.net) - Your All in One Salvage Tool
 
 Interactive salvage companion for Star Citizen patch 4.7.2.
 Made by Chrissyy · Referral: STAR-CH2W-R73F

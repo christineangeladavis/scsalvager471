@@ -456,13 +456,13 @@ function StockComponentsTable({ stockComponents }) {
 
 export default function StarCitizenSalvageGuideWebsite() {
   const [selectedShip, setSelectedShip] = useState(ships[0]);
-  const [selectedMaterial, setSelectedMaterial] = useState(refineryMaterials[0].name);
+  const [selectedMaterial, setSelectedMaterial] = useState("");
   const [selectedRefineryMethod, setSelectedRefineryMethod] = useState("");
   const [selectedRefineryLocation, setSelectedRefineryLocation] = useState("");
   const [scuInput, setScuInput] = useState("0");
   const [search, setSearch] = useState("");
   const [imageLoadErrors, setImageLoadErrors] = useState({});
-  const [selectedSellMaterial, setSelectedSellMaterial] = useState(SELL_MATERIALS[0]);
+  const [selectedSellMaterial, setSelectedSellMaterial] = useState("");
   const [estimatePlayerName, setEstimatePlayerName] = useState("");
   const [selectedSellPointName, setSelectedSellPointName] = useState("");
   const [sellYieldInput, setSellYieldInput] = useState("0");
@@ -486,7 +486,7 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [refineryJobs, setRefineryJobs] = useState([]);
   const [sellOrders, setSellOrders] = useState([]);
   const [jobForm, setJobForm] = useState({
-    material: "Construction Salvage",
+    material: "",
     location: "",
     method: "",
     materialScu: "",
@@ -501,7 +501,7 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [isAnalyzingSellScreenshot, setIsAnalyzingSellScreenshot] = useState(false);
   const [analyzeSellFeedback, setAnalyzeSellFeedback] = useState(null);
   const [orderForm, setOrderForm] = useState({
-    material: SELL_MATERIALS[0],
+    material: "",
     scu: "",
     location: "",
     playerName: "",
@@ -2713,6 +2713,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     onChange={(e) => setSelectedMaterial(e.target.value)}
                     className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 outline-none focus:border-cyan-400"
                   >
+                    <option value="">(Select a Material)</option>
                     {refineryMaterials.map((row) => (
                       <option key={row.name} value={row.name}>
                         {row.name}
@@ -2847,6 +2848,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     }}
                     className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 outline-none focus:border-cyan-400"
                   >
+                    <option value="">(Select a Material)</option>
                     {SELL_MATERIALS.map((m) => (
                       <option key={m} value={m}>{m}</option>
                     ))}
@@ -3097,6 +3099,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                       disabled={!user && !import.meta.env.DEV}
                       className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
                     >
+                      <option value="">(Select a Material)</option>
                       {refineryMaterials.map((r) => (
                         <option key={r.name} value={r.name}>{r.name}</option>
                       ))}
@@ -3340,6 +3343,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                       disabled={!user && !import.meta.env.DEV}
                       className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
                     >
+                      <option value="">(Select a Material)</option>
                       {SELL_MATERIALS.map((m) => (
                         <option key={m} value={m}>{m}</option>
                       ))}
@@ -3683,6 +3687,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                             onChange={(e) => setEditForm({ ...editForm, material: e.target.value })}
                             className="w-full rounded-xl border border-cyan-500/25 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-cyan-400"
                           >
+                            <option value="">(Select a Material)</option>
                             {refineryMaterials.map((r) => (
                               <option key={r.name} value={r.name}>{r.name}</option>
                             ))}
@@ -3754,7 +3759,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                         <div>
                           <label className="mb-1 block text-xs text-slate-400">Material</label>
                           <select
-                            value={editForm.material || "Construction Material"}
+                            value={editForm.material || ""}
                             onChange={(e) => {
                               const next = e.target.value;
                               setEditForm({
@@ -3767,6 +3772,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                             }}
                             className="w-full rounded-xl border border-cyan-500/25 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-cyan-400"
                           >
+                            <option value="">(Select a Material)</option>
                             {SELL_MATERIALS.map((m) => (
                               <option key={m} value={m}>{m}</option>
                             ))}

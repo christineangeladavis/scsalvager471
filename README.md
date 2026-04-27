@@ -26,6 +26,9 @@ Notable Changes:
 - Refinery time is now user-entered with Hours/Min/Sec fields on the Ledger's Submit Order and Edit Job forms (matches what the in-game refinery actually quotes you). The Home page Refinery Bonus Yield Calculator no longer shows an auto-estimated Time row — it's expected yield + cost only.
 - Report a Price now also lives on the Ledger, between the Sell Orders form and Recent Sales. It targets whatever sell point you're logging an order for, and shares its median with the Home page widget — so a report from either place updates the Sell Location dropdown for everyone.
 - Sell Location dropdowns (Home Sell Estimate + Ledger Sell Orders + Edit modal) are now grouped by system — Stanton / Pyro / Nyx — with each system sorted by best price first. Matches the Refinery Location dropdown's grouping. Also: a couple of label tidies — "Sell Point" → "Sell Location" on the Ledger, and "Material SCU" → "SCU Amount" on the Home Sell Estimate.
+- Material renamed: "Recycle Material Composite" → "Recycled Material Composite" to match the in-game name. Existing community price reports roll forward; old- and new-name reports merge into a single median.
+- Location and Refinery Method dropdowns now default to "(Select a Location)" / "(Select a Method)" — you have to pick before the Home Sell Estimate shows a result.
+- Sell-order screenshot auto-fill no longer guesses a location when the result is ambiguous (e.g. "Pyro Gateway" matches both the Stanton and Nyx ends of the gate) — it surfaces the candidates and lets you pick.
 
 UPDATE 4/25/2026 v2.2
 Notable Changes:

@@ -11,6 +11,7 @@ Added:
 - Refinery Job Orders: new "Upload screenshot" button. Drop in a screenshot of the in-game refinery setup screen and the Refinery Location, Method, SCU, and Refinery Time fields auto-fill (cSCU values from the in-game screen are converted to SCU automatically — 1 SCU = 100 cSCU).
 - Sell Orders: same flow. Drop in a screenshot of the in-game Commodities / Trading Console and Sell Location, SCU, and aUEC fields auto-fill — plus the Report a Price input is seeded with the per-SCU value from the screenshot.
 - Both upload flows analyze the image once via vision AI and discard it immediately. Nothing is stored on the server.
+- Anonymous visitors get a one-time login prompt on page load that explains what signing in with Discord unlocks (the Ledger, community price reports, optional refinery-completion DMs). Dismissible with a 24-hour cooldown so it doesn't nag.
 
 Fixes:
 - Sell-order screenshot auto-fill no longer guesses a location when the result is ambiguous (e.g. "Pyro Gateway" matches both the Stanton and Nyx ends of the gate) — it surfaces the candidates and lets you pick.

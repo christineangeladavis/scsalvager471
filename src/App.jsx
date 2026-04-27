@@ -519,6 +519,7 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [ledgerSaveError, setLedgerSaveError] = useState("");
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   // --- Build / deploy version detection ---
   // __BUILD_VERSION__ is replaced at compile time by vite.config.js with the
@@ -870,6 +871,34 @@ export default function StarCitizenSalvageGuideWebsite() {
       });
     return () => { cancelled = true; };
   }, []);
+
+  // --- Login prompt: pitch the Discord login to anonymous visitors so
+  // they know the Ledger / community price reports / completion DMs
+  // exist. Dismissible — sets a localStorage timestamp that suppresses
+  // the prompt for the next 24 hours so we don't nag users who said no.
+  useEffect(() => {
+    if (authLoading) return; // wait for /api/auth/me to settle
+    if (user) return;        // already logged in
+    try {
+      const dismissedAt = Number(localStorage.getItem("loginPromptDismissedAt") || "0");
+      const COOLDOWN_MS = 24 * 60 * 60 * 1000;
+      if (Number.isFinite(dismissedAt) && Date.now() - dismissedAt < COOLDOWN_MS) {
+        return; // user dismissed recently — leave them alone
+      }
+    } catch {
+      // localStorage blocked (private mode, etc.) — fall through and show.
+    }
+    setShowLoginPrompt(true);
+  }, [authLoading, user]);
+
+  const dismissLoginPrompt = () => {
+    try {
+      localStorage.setItem("loginPromptDismissedAt", String(Date.now()));
+    } catch {
+      // ignore
+    }
+    setShowLoginPrompt(false);
+  };
 
   // --- Presence heartbeat: while a user is logged in and the tab is
   // visible, POST /api/me/heartbeat every 30s so the admin Active Users
@@ -4343,6 +4372,62 @@ export default function StarCitizenSalvageGuideWebsite() {
               )}
             </div>
             )}
+          </div>
+        )}
+
+        {/* --- Anonymous login prompt --- */}
+        {showLoginPrompt && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+            onClick={dismissLoginPrompt}
+          >
+            <div
+              className="mx-4 w-full max-w-md rounded-3xl border border-cyan-500/40 bg-slate-900 p-6 shadow-2xl shadow-cyan-950/40"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="login-prompt-title"
+            >
+              <h3 id="login-prompt-title" className="text-lg font-bold text-cyan-200">
+                Log in to unlock the full site
+              </h3>
+              <p className="mt-3 text-sm text-slate-300">
+                You can browse ship stats, refinery yields, and community sell prices without an account — but signing in with Discord adds:
+              </p>
+              <ul className="mt-3 space-y-1.5 text-sm text-slate-300">
+                <li className="flex gap-2">
+                  <span aria-hidden="true" className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-400" />
+                  <span>The <span className="font-semibold text-cyan-200">Ledger</span> — track refinery jobs and sales across devices, with live timers and lifetime stats.</span>
+                </li>
+                <li className="flex gap-2">
+                  <span aria-hidden="true" className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-400" />
+                  <span>The ability to <span className="font-semibold text-cyan-200">report community prices</span> for sell points.</span>
+                </li>
+                <li className="flex gap-2">
+                  <span aria-hidden="true" className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-400" />
+                  <span>Optional <span className="font-semibold text-cyan-200">Discord DMs</span> when your refinery jobs finish.</span>
+                </li>
+              </ul>
+              <div className="mt-6 grid gap-2 sm:grid-cols-2">
+                <a
+                  href="/api/auth/login"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-indigo-400 bg-indigo-500/30 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-indigo-950/50 hover:bg-indigo-500/50"
+                >
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4" aria-hidden="true">
+                    <path d="M20.317 4.369A19.79 19.79 0 0 0 16.558 3a.074.074 0 0 0-.079.037c-.34.607-.719 1.396-.984 2.013a18.27 18.27 0 0 0-5.487 0 12.51 12.51 0 0 0-1-2.013.077.077 0 0 0-.078-.037 19.736 19.736 0 0 0-3.76 1.369.07.07 0 0 0-.032.027C2.533 8.046 1.864 11.625 2.193 15.16a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.105 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.371-.291a.074.074 0 0 1 .077-.01c3.927 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.009c.12.099.245.198.372.292a.077.077 0 0 1-.006.128 12.3 12.3 0 0 1-1.873.891.077.077 0 0 0-.041.106 15.86 15.86 0 0 0 1.226 1.993.076.076 0 0 0 .084.029 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-4.087-.838-7.638-3.549-10.787a.06.06 0 0 0-.031-.028zM8.02 13.331c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.974 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+                  </svg>
+                  Log in with Discord
+                </a>
+                <button
+                  type="button"
+                  onClick={dismissLoginPrompt}
+                  className="rounded-xl border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-300 hover:border-slate-500 hover:bg-slate-700"
+                >
+                  Maybe later
+                </button>
+              </div>
+              <p className="mt-3 text-center text-[11px] text-slate-500">We won't show this again for 24 hours.</p>
+            </div>
           </div>
         )}
 

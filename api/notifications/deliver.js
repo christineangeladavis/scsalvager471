@@ -31,16 +31,17 @@ function readRawBody(req) {
 
 function buildJobMessage(job) {
   // The refinery output for Construction Salvage / Pieces / Rubble is always
-  // "Construction Material", regardless of which input was used. We report the
-  // refined yield (job.yield) — the SCU the user actually picks up — not the
+  // "Construction Materials" (plural — matches the in-game Commodities
+  // label), regardless of which input was used. We report the refined
+  // yield (job.yield) — the SCU the user actually picks up — not the
   // raw materialScu they originally fed in.
-  // Format: "Your Refinery Job for {yield} SCU of Construction Material is ready for pickup at {location}."
+  // Format: "Your Refinery Job for {yield} SCU of Construction Materials is ready for pickup at {location}."
   const yieldNum = Number(job.yield);
   const scu = Number.isFinite(yieldNum) && yieldNum > 0
     ? `${yieldNum.toLocaleString(undefined, { maximumFractionDigits: 2 })} SCU`
     : "your batch";
   const location = job.location || "your refinery";
-  return `Your Refinery Job for ${scu} of Construction Material is ready for pickup at ${location}.`;
+  return `Your Refinery Job for ${scu} of Construction Materials is ready for pickup at ${location}.`;
 }
 
 export default async function handler(req, res) {

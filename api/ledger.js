@@ -63,9 +63,11 @@ export function sanitizeSellOrder(o) {
   if (!o || typeof o !== "object") return null;
   const out = {
     id: String(o.id || "").slice(0, 80),
-    // Material defaults to Construction Material for legacy entries written
-    // before the field was tracked.
-    material: o.material ? String(o.material).slice(0, 80) : "Construction Material",
+    // Material defaults to Construction Materials for legacy entries
+    // written before the field was tracked. (Renamed from "Construction
+    // Material" singular to match the in-game UI; the client and the
+    // prices endpoint both alias the singular form to the plural.)
+    material: o.material ? String(o.material).slice(0, 80) : "Construction Materials",
     scu: Number(o.scu),
     location: String(o.location || "").slice(0, 120),
     // Player name only meaningful when the location is the player-sale

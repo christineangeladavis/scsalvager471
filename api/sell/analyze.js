@@ -12,7 +12,7 @@
 //
 // Response shape (any field may be null when the model can't read it):
 //   {
-//     materialName: string | null,    // e.g. "Diamond" / "Construction Material"
+//     materialName: string | null,    // e.g. "Diamond" / "Construction Materials"
 //     scu: number | null,             // quantity being sold (integer)
 //     locationName: string | null,    // e.g. "HUR-L1 Green Glade Station"
 //     totalAuec: number | null,       // total aUEC for the transaction
@@ -41,7 +41,7 @@ Extract the following fields from the image and return them as a single JSON obj
 Read the fields in this order — Material first, Amount second, then Location, then the aUEC totals. The first two are the most important; if you can only read part of the screen, prioritise getting those right.
 
 Fields (return them in this order):
-- materialName: the commodity being sold under "IN DEMAND". Use the name as printed (string). Examples: "Diamond", "Construction Material", "Recycled Material Composite".
+- materialName: the commodity being sold under "IN DEMAND". Use the name as printed (string). Examples: "Diamond", "Construction Materials", "Recycled Material Composite".
 - scu: the quantity being sold in SCU (integer). Use the largest highlighted "AVAILABLE CARGO SIZE" the user has selected, or the totals row.
 - locationName: the trading station name shown at the top of the "YOUR INVENTORIES" panel (string). Examples: "HUR-L1 Green Glade Station", "ARC-L4", "Levski".
 - totalAuec: the total aUEC the player will receive for this transaction (integer). Convert any M / K suffixes — "1.461M" -> 1461000, "12.5K" -> 12500.

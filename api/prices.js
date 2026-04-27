@@ -27,18 +27,22 @@ const MASTER_KEY = "cmat-prices:all";
 const MAX_REPORTS_PER_LOCATION = 50;
 const MIN_PRICE = 100;
 const MAX_PRICE = 200000;
-const DEFAULT_MATERIAL = "Construction Material";
+const DEFAULT_MATERIAL = "Construction Materials";
 // Old name -> new name. We accept the old name on write (so stale clients
 // don't error) and normalize it to the new name before keying. On read
 // we merge old-keyed entries into the new key.
 const MATERIAL_RENAMES = {
   "Recycle Material Composite": "Recycled Material Composite",
+  // Renamed to match the in-game label ("CONSTRUCTION MATERIALS",
+  // plural) shown on the Commodities / Trading Console screen.
+  "Construction Material": "Construction Materials",
 };
 const ALLOWED_MATERIALS = new Set([
-  "Construction Material",
+  "Construction Materials",
   "Recycled Material Composite",
-  // Legacy alias — accepted from stale clients, normalized to the new
-  // name before the storage key is built.
+  // Legacy aliases — accepted from stale clients and from old stored
+  // reports, normalized to the new name before the storage key is built.
+  "Construction Material",
   "Recycle Material Composite",
 ]);
 const KEY_SEP = "::";

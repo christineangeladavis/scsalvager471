@@ -146,49 +146,49 @@ const ships = [
   },
 ];
 
-const SELL_MATERIALS = ["Construction Material", "Recycled Material Composite"];
+const SELL_MATERIALS = ["Construction Materials", "Recycled Material Composite"];
 const PLAYER_SELL_POINT = "Sold to Player";
 
 const sellPoints = [
   // === CONSTRUCTION MATERIAL ===
   // 16,000 aUEC/SCU
-  { name: "ARC-L4",                    region: "ArcCorp Lagrange Point 4",          system: "Stanton", pricePerScu: 16000, material: "Construction Material" },
-  { name: "HUR-L1",                    region: "Hurston Lagrange Point 1",           system: "Stanton", pricePerScu: 16000, material: "Construction Material" },
+  { name: "ARC-L4",                    region: "ArcCorp Lagrange Point 4",          system: "Stanton", pricePerScu: 16000, material: "Construction Materials" },
+  { name: "HUR-L1",                    region: "Hurston Lagrange Point 1",           system: "Stanton", pricePerScu: 16000, material: "Construction Materials" },
   // 15,000 aUEC/SCU
-  { name: "ARC-L1",                    region: "ArcCorp Lagrange Point 1",           system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
-  { name: "ARC-L2",                    region: "ArcCorp Lagrange Point 2",           system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
-  { name: "ARC-L3",                    region: "ArcCorp Lagrange Point 3",           system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
-  { name: "ARC-L5",                    region: "ArcCorp Lagrange Point 5",           system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
-  { name: "CBD Lorville",              region: "Hurston",                            system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
-  { name: "CRU-L4",                    region: "Crusader Lagrange Point 4",          system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
-  { name: "Everus Harbor",             region: "Hurston",                            system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
-  { name: "HUR-L3",                    region: "Hurston Lagrange Point 3",           system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
-  { name: "HUR-L4",                    region: "Hurston Lagrange Point 4",           system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
-  { name: "MIC-L1",                    region: "microTech Lagrange Point 1",         system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
-  { name: "MIC-L2",                    region: "microTech Lagrange Point 2",         system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
-  { name: "MIC-L4",                    region: "microTech Lagrange Point 4",         system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
-  { name: "MIC-L5",                    region: "microTech Lagrange Point 5",         system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
-  { name: "Port Tressler",             region: "MicroTech",                          system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
-  { name: "TDD Area 18",               region: "ArcCorp",                            system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
-  { name: "TDD New Babbage",           region: "MicroTech",                          system: "Stanton", pricePerScu: 15000, material: "Construction Material" },
+  { name: "ARC-L1",                    region: "ArcCorp Lagrange Point 1",           system: "Stanton", pricePerScu: 15000, material: "Construction Materials" },
+  { name: "ARC-L2",                    region: "ArcCorp Lagrange Point 2",           system: "Stanton", pricePerScu: 15000, material: "Construction Materials" },
+  { name: "ARC-L3",                    region: "ArcCorp Lagrange Point 3",           system: "Stanton", pricePerScu: 15000, material: "Construction Materials" },
+  { name: "ARC-L5",                    region: "ArcCorp Lagrange Point 5",           system: "Stanton", pricePerScu: 15000, material: "Construction Materials" },
+  { name: "CBD Lorville",              region: "Hurston",                            system: "Stanton", pricePerScu: 15000, material: "Construction Materials" },
+  { name: "CRU-L4",                    region: "Crusader Lagrange Point 4",          system: "Stanton", pricePerScu: 15000, material: "Construction Materials" },
+  { name: "Everus Harbor",             region: "Hurston",                            system: "Stanton", pricePerScu: 15000, material: "Construction Materials" },
+  { name: "HUR-L3",                    region: "Hurston Lagrange Point 3",           system: "Stanton", pricePerScu: 15000, material: "Construction Materials" },
+  { name: "HUR-L4",                    region: "Hurston Lagrange Point 4",           system: "Stanton", pricePerScu: 15000, material: "Construction Materials" },
+  { name: "MIC-L1",                    region: "microTech Lagrange Point 1",         system: "Stanton", pricePerScu: 15000, material: "Construction Materials" },
+  { name: "MIC-L2",                    region: "microTech Lagrange Point 2",         system: "Stanton", pricePerScu: 15000, material: "Construction Materials" },
+  { name: "MIC-L4",                    region: "microTech Lagrange Point 4",         system: "Stanton", pricePerScu: 15000, material: "Construction Materials" },
+  { name: "MIC-L5",                    region: "microTech Lagrange Point 5",         system: "Stanton", pricePerScu: 15000, material: "Construction Materials" },
+  { name: "Port Tressler",             region: "MicroTech",                          system: "Stanton", pricePerScu: 15000, material: "Construction Materials" },
+  { name: "TDD Area 18",               region: "ArcCorp",                            system: "Stanton", pricePerScu: 15000, material: "Construction Materials" },
+  { name: "TDD New Babbage",           region: "MicroTech",                          system: "Stanton", pricePerScu: 15000, material: "Construction Materials" },
   // 14,000 aUEC/SCU
-  { name: "Checkmate",                 region: "Monox Lagrange Point 4",             system: "Pyro",    pricePerScu: 14000, material: "Construction Material" },
-  { name: "Dunboro",                   region: "MicroTech",                          system: "Stanton", pricePerScu: 14000, material: "Construction Material" },
-  { name: "Megumi",                    region: "Pyro VI Lagrange Point 5",           system: "Pyro",    pricePerScu: 14000, material: "Construction Material" },
-  { name: "Nyx Gateway (Stanton)",     region: "Nyx Gateway (Stanton system)",       system: "Stanton", pricePerScu: 14000, material: "Construction Material" },
-  { name: "Orbituary",                 region: "Bloom",                              system: "Pyro",    pricePerScu: 14000, material: "Construction Material" },
-  { name: "Pickers Field",             region: "Hurston",                            system: "Stanton", pricePerScu: 14000, material: "Construction Material" },
-  { name: "Pyro Gateway (Nyx)",        region: "Pyro Gateway (Nyx system)",          system: "Nyx",     pricePerScu: 14000, material: "Construction Material" },
-  { name: "Pyro Gateway (Stanton)",    region: "Pyro Gateway (Stanton system)",      system: "Stanton", pricePerScu: 14000, material: "Construction Material" },
-  { name: "Rappel",                    region: "Hurston",                            system: "Stanton", pricePerScu: 14000, material: "Construction Material" },
-  { name: "Ruin Station",              region: "Terminus",                           system: "Pyro",    pricePerScu: 14000, material: "Construction Material" },
-  { name: "Stanton Gateway (Pyro)",    region: "Stanton Gateway (Pyro system)",      system: "Pyro",    pricePerScu: 14000, material: "Construction Material" },
-  { name: "TDD Orison",                region: "Crusader",                           system: "Stanton", pricePerScu: 14000, material: "Construction Material" },
+  { name: "Checkmate",                 region: "Monox Lagrange Point 4",             system: "Pyro",    pricePerScu: 14000, material: "Construction Materials" },
+  { name: "Dunboro",                   region: "MicroTech",                          system: "Stanton", pricePerScu: 14000, material: "Construction Materials" },
+  { name: "Megumi",                    region: "Pyro VI Lagrange Point 5",           system: "Pyro",    pricePerScu: 14000, material: "Construction Materials" },
+  { name: "Nyx Gateway (Stanton)",     region: "Nyx Gateway (Stanton system)",       system: "Stanton", pricePerScu: 14000, material: "Construction Materials" },
+  { name: "Orbituary",                 region: "Bloom",                              system: "Pyro",    pricePerScu: 14000, material: "Construction Materials" },
+  { name: "Pickers Field",             region: "Hurston",                            system: "Stanton", pricePerScu: 14000, material: "Construction Materials" },
+  { name: "Pyro Gateway (Nyx)",        region: "Pyro Gateway (Nyx system)",          system: "Nyx",     pricePerScu: 14000, material: "Construction Materials" },
+  { name: "Pyro Gateway (Stanton)",    region: "Pyro Gateway (Stanton system)",      system: "Stanton", pricePerScu: 14000, material: "Construction Materials" },
+  { name: "Rappel",                    region: "Hurston",                            system: "Stanton", pricePerScu: 14000, material: "Construction Materials" },
+  { name: "Ruin Station",              region: "Terminus",                           system: "Pyro",    pricePerScu: 14000, material: "Construction Materials" },
+  { name: "Stanton Gateway (Pyro)",    region: "Stanton Gateway (Pyro system)",      system: "Pyro",    pricePerScu: 14000, material: "Construction Materials" },
+  { name: "TDD Orison",                region: "Crusader",                           system: "Stanton", pricePerScu: 14000, material: "Construction Materials" },
   // 12,000 aUEC/SCU
-  { name: "GrimHEX",                   region: "Crusader",                           system: "Stanton", pricePerScu: 12000, material: "Construction Material" },
-  { name: "Reclamation Orinth",        region: "Hurston",                            system: "Stanton", pricePerScu: 12000, material: "Construction Material" },
+  { name: "GrimHEX",                   region: "Crusader",                           system: "Stanton", pricePerScu: 12000, material: "Construction Materials" },
+  { name: "Reclamation Orinth",        region: "Hurston",                            system: "Stanton", pricePerScu: 12000, material: "Construction Materials" },
   // 11,000 aUEC/SCU
-  { name: "CRU-L5 Maintenance",        region: "Crusader Lagrange Point 5",          system: "Stanton", pricePerScu: 11000, material: "Construction Material" },
+  { name: "CRU-L5 Maintenance",        region: "Crusader Lagrange Point 5",          system: "Stanton", pricePerScu: 11000, material: "Construction Materials" },
 
   // === RECYCLE MATERIAL COMPOSITE === (UEX, Star Citizen 4.7.2)
   // 8,500 aUEC/SCU
@@ -372,6 +372,28 @@ function formatTimeAgo(ts) {
   if (h < 24) return `${h}h ago`;
   const d = Math.floor(h / 24);
   return `${d}d ago`;
+}
+
+// Sell-side material rename map. The sell-able material was renamed
+// from "Construction Material" (singular) to "Construction Materials"
+// (plural) to match the in-game Commodities / Trading Console label.
+// Applied to every sell order on load so legacy entries display under
+// the new name across history, recent sales, and the edit modal — and
+// re-save with the new name on the user's next edit. New writes always
+// use the new name directly.
+const SELL_MATERIAL_RENAMES = {
+  "Construction Material": "Construction Materials",
+};
+function canonicalSellMaterial(name) {
+  if (typeof name !== "string") return name;
+  return SELL_MATERIAL_RENAMES[name] || name;
+}
+function canonicalizeSellOrder(o) {
+  if (!o || typeof o !== "object") return o;
+  if (typeof o.material === "string" && SELL_MATERIAL_RENAMES[o.material]) {
+    return { ...o, material: SELL_MATERIAL_RENAMES[o.material] };
+  }
+  return o;
 }
 
 // Normalize a string for fuzzy comparison: lowercase, drop punctuation,
@@ -846,7 +868,7 @@ export default function StarCitizenSalvageGuideWebsite() {
   );
 
   const editSellPointEntries = useMemo(
-    () => buildSortedSellPointEntries(editForm.material || "Construction Material"),
+    () => buildSortedSellPointEntries(editForm.material || "Construction Materials"),
     [reportedPrices, editForm.material]
   );
 
@@ -1156,7 +1178,7 @@ export default function StarCitizenSalvageGuideWebsite() {
             sales: [
               {
                 id: "mock_s1",
-                material: "Construction Material",
+                material: "Construction Materials",
                 scu: 36,
                 aUEC: 540000,
                 location: "ARC-L4",
@@ -1889,7 +1911,11 @@ export default function StarCitizenSalvageGuideWebsite() {
           const raw = localStorage.getItem("__dev_ledger__");
           const data = raw ? JSON.parse(raw) : {};
           setRefineryJobs(Array.isArray(data.refineryJobs) ? data.refineryJobs : []);
-          setSellOrders(Array.isArray(data.sellOrders) ? data.sellOrders : []);
+          setSellOrders(
+            Array.isArray(data.sellOrders)
+              ? data.sellOrders.map(canonicalizeSellOrder)
+              : []
+          );
         } catch {
           setRefineryJobs([]);
           setSellOrders([]);
@@ -1911,7 +1937,11 @@ export default function StarCitizenSalvageGuideWebsite() {
       .then((data) => {
         if (cancelled) return;
         setRefineryJobs(Array.isArray(data.refineryJobs) ? data.refineryJobs : []);
-        setSellOrders(Array.isArray(data.sellOrders) ? data.sellOrders : []);
+        setSellOrders(
+          Array.isArray(data.sellOrders)
+            ? data.sellOrders.map(canonicalizeSellOrder)
+            : []
+        );
         // Mark hydration complete for THIS user — this is the only path that
         // unlocks saveLedger() for this user's session.
         hydratedForUserRef.current = user.id;
@@ -2056,7 +2086,7 @@ export default function StarCitizenSalvageGuideWebsite() {
     const sells = sellOrders
       .filter((o) => !o.deletedAt && o.submittedAt && o.submittedAt >= historyCutoff)
       .map((o) => {
-        const materialLabel = o.material || "Construction Material";
+        const materialLabel = o.material || "Construction Materials";
         const isPlayer = o.location === PLAYER_SELL_POINT;
         const locationLabel = isPlayer && o.playerName
           ? `${o.location} (${o.playerName})`
@@ -2469,7 +2499,7 @@ export default function StarCitizenSalvageGuideWebsite() {
   // Dev mock for sell analysis — example data lifted from the in-game
   // Commodities/Trading Console screen.
   const devMockSellExtraction = () => ({
-    materialName: "Construction Material",
+    materialName: "Construction Materials",
     scu: 256,
     locationName: "HUR-L1 Green Glade Station",
     totalAuec: 1461000,
@@ -2739,7 +2769,7 @@ export default function StarCitizenSalvageGuideWebsite() {
       if (!o) return;
       setEditingEntry(entry);
       setEditForm({
-        material: o.material || "Construction Material",
+        material: o.material || "Construction Materials",
         scu: String(o.scu ?? ""),
         location: o.location,
         playerName: o.playerName || "",
@@ -2815,7 +2845,7 @@ export default function StarCitizenSalvageGuideWebsite() {
         o.id === editingEntry.id
           ? {
               ...o,
-              material: editForm.material || o.material || "Construction Material",
+              material: editForm.material || o.material || "Construction Materials",
               scu: Number(editForm.scu),
               location: editForm.location,
               playerName: isPlayer ? (editForm.playerName || "").trim() : "",
@@ -6232,6 +6262,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <li>In-game material name truncations now resolve to the correct full name on screenshot upload.</li>
                     <li>Refinery method names with OCR drift now still match via a fuzzy fallback.</li>
                     <li>Sell Orders → Sell Location is always visible (no longer hidden until a material is picked).</li>
+                    <li>Sell-side material renamed to "Construction Materials" (plural) to match the in-game Commodities label. Old ledger entries display under the new name automatically.</li>
                   </ul>
                 </section>
 

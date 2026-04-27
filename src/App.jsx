@@ -3374,17 +3374,24 @@ export default function StarCitizenSalvageGuideWebsite() {
                         className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         <option value="">(Select a Location)</option>
-                        {groupSellPointEntriesBySystem(orderSellPointEntries).map((group) => (
-                          <optgroup key={group.system} label={group.system}>
-                            {group.entries.map((p) => (
-                              <option key={p.name} value={p.name}>
-                                {p.isPlayer
-                                  ? p.name
-                                  : `${p.name} · ${p.effectivePrice.toLocaleString()} aUEC/SCU${p.isReported ? " ★" : ""}`}
-                              </option>
-                            ))}
-                          </optgroup>
-                        ))}
+                        {/* "Sold to Player" sits directly under the placeholder
+                            for fast access — selling to another player is a
+                            common ledger entry and shouldn't be buried below
+                            the system groups. */}
+                        {orderSellPointEntries.some((p) => p.isPlayer) && (
+                          <option value={PLAYER_SELL_POINT}>{PLAYER_SELL_POINT}</option>
+                        )}
+                        {groupSellPointEntriesBySystem(orderSellPointEntries)
+                          .filter((group) => group.system !== "Player")
+                          .map((group) => (
+                            <optgroup key={group.system} label={group.system}>
+                              {group.entries.map((p) => (
+                                <option key={p.name} value={p.name}>
+                                  {`${p.name} · ${p.effectivePrice.toLocaleString()} aUEC/SCU${p.isReported ? " ★" : ""}`}
+                                </option>
+                              ))}
+                            </optgroup>
+                          ))}
                       </select>
                     </div>
                   )}

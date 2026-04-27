@@ -458,13 +458,13 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [selectedShip, setSelectedShip] = useState(ships[0]);
   const [selectedMaterial, setSelectedMaterial] = useState(refineryMaterials[0].name);
   const [selectedRefineryMethod, setSelectedRefineryMethod] = useState(refineryMethods[0].name);
-  const [selectedRefineryLocation, setSelectedRefineryLocation] = useState("Levski");
+  const [selectedRefineryLocation, setSelectedRefineryLocation] = useState("");
   const [scuInput, setScuInput] = useState("0");
   const [search, setSearch] = useState("");
   const [imageLoadErrors, setImageLoadErrors] = useState({});
   const [selectedSellMaterial, setSelectedSellMaterial] = useState(SELL_MATERIALS[0]);
   const [estimatePlayerName, setEstimatePlayerName] = useState("");
-  const [selectedSellPointName, setSelectedSellPointName] = useState(sellPoints[0].name);
+  const [selectedSellPointName, setSelectedSellPointName] = useState("");
   const [sellYieldInput, setSellYieldInput] = useState("0");
   const [reportedPrices, setReportedPrices] = useState({});
   const [reportedMeta, setReportedMeta] = useState({});
@@ -487,7 +487,7 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [sellOrders, setSellOrders] = useState([]);
   const [jobForm, setJobForm] = useState({
     material: "Construction Salvage",
-    location: "Levski",
+    location: "",
     method: refineryMethods[0].name,
     materialScu: "",
     hours: "",
@@ -503,7 +503,7 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [orderForm, setOrderForm] = useState({
     material: SELL_MATERIALS[0],
     scu: "",
-    location: sellPoints[0].name,
+    location: "",
     playerName: "",
     aUEC: "",
   });
@@ -603,11 +603,16 @@ export default function StarCitizenSalvageGuideWebsite() {
   }, [filteredShips, selectedShip.name]);
 
   useEffect(() => {
+    // Empty selection (the "(Select a Location)" placeholder) is valid —
+    // don't auto-pick a real location for the user.
+    if (!selectedSellPointName) return;
     if (selectedSellPointName === PLAYER_SELL_POINT) return;
     const visible = sellPoints.filter((p) => p.material === selectedSellMaterial);
     const stillExists = visible.some((p) => p.name === selectedSellPointName);
     if (!stillExists) {
-      setSelectedSellPointName(visible[0]?.name ?? PLAYER_SELL_POINT);
+      // Current pick isn't valid for this material — drop back to the
+      // placeholder rather than guessing a different location.
+      setSelectedSellPointName("");
     }
   }, [selectedSellPointName, selectedSellMaterial]);
 
@@ -2076,7 +2081,7 @@ export default function StarCitizenSalvageGuideWebsite() {
       const hms = secondsToHms(totalSec);
       setEditForm({
         material: j.material,
-        location: j.location || "Levski",
+        location: j.location || "",
         // For legacy entries (no method/materialScu), fall back to defaults so
         // the dropdowns/input populate; user can adjust before saving.
         method: j.method || refineryMethods[0].name,
@@ -2662,6 +2667,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     onChange={(e) => setSelectedRefineryMethod(e.target.value)}
                     className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 outline-none focus:border-cyan-400"
                   >
+                    <option value="">(Select a Method)</option>
                     {refineryMethods.map((m) => (
                       <option key={m.name} value={m.name}>
                         {m.name} — {m.speed}/{m.cost}/{m.yieldRating}
@@ -2775,8 +2781,9 @@ export default function StarCitizenSalvageGuideWebsite() {
                     onChange={(e) => {
                       const next = e.target.value;
                       setSelectedSellMaterial(next);
-                      const firstForMat = sellPoints.find((p) => p.material === next);
-                      setSelectedSellPointName(firstForMat?.name ?? PLAYER_SELL_POINT);
+                      // Reset to placeholder rather than auto-picking a real
+                      // location when material changes.
+                      setSelectedSellPointName("");
                       setEstimatePlayerName("");
                     }}
                     className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 outline-none focus:border-cyan-400"
@@ -2833,13 +2840,19 @@ export default function StarCitizenSalvageGuideWebsite() {
                   )}
                 </div>
 
-                {isPlayerEstimate && (
+                {!selectedSellPointName && (
+                  <div className="rounded-2xl border border-dashed border-slate-700 bg-slate-950/40 p-6 text-center text-sm text-slate-500">
+                    Pick a Sell Location above to see your sale estimate.
+                  </div>
+                )}
+
+                {selectedSellPointName && isPlayerEstimate && (
                   <div className="rounded-2xl border border-cyan-500/25 bg-cyan-500/10 p-4 text-sm text-slate-300">
                     Player sales have no fixed price. Negotiate with the buyer and log the actual aUEC received in the Sell Orders form.
                   </div>
                 )}
 
-                {!isPlayerEstimate && (
+                {selectedSellPointName && !isPlayerEstimate && (
                   <div className="overflow-x-auto rounded-2xl border border-slate-700">
                     <table className="w-full text-left text-sm">
                       <thead className="bg-slate-950 text-slate-300">
@@ -2866,7 +2879,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                   </div>
                 )}
 
-                {!isPlayerEstimate && (
+                {selectedSellPointName && !isPlayerEstimate && (
                 <div className="rounded-2xl border border-cyan-500/30 bg-cyan-500/5 p-4">
                   <div className="text-xs uppercase tracking-[0.2em] text-cyan-200">Report a Price</div>
                   <p className="mt-1 text-xs text-slate-400">
@@ -3077,6 +3090,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                       disabled={!user && !import.meta.env.DEV}
                       className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
                     >
+                      <option value="">(Select a Method)</option>
                       {refineryMethods.map((m) => (
                         <option key={m.name} value={m.name}>
                           {m.name} — {m.speed}/{m.cost}/{m.yieldRating}
@@ -3256,11 +3270,11 @@ export default function StarCitizenSalvageGuideWebsite() {
                       value={orderForm.material}
                       onChange={(e) => {
                         const next = e.target.value;
-                        const firstForMat = sellPoints.find((p) => p.material === next);
                         setOrderForm({
                           ...orderForm,
                           material: next,
-                          location: firstForMat?.name ?? PLAYER_SELL_POINT,
+                          // Reset to placeholder rather than auto-picking.
+                          location: "",
                           playerName: "",
                         });
                       }}
@@ -3581,7 +3595,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                         <div>
                           <label className="mb-1 block text-xs text-slate-400">Refinery Location</label>
                           <select
-                            value={editForm.location || "Levski"}
+                            value={editForm.location || ""}
                             onChange={(e) => setEditForm({ ...editForm, location: e.target.value })}
                             className="w-full rounded-xl border border-cyan-500/25 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-cyan-400"
                           >
@@ -3618,10 +3632,11 @@ export default function StarCitizenSalvageGuideWebsite() {
                         <div>
                           <label className="mb-1 block text-xs text-slate-400">Refinery Method</label>
                           <select
-                            value={editForm.method || refineryMethods[0].name}
+                            value={editForm.method || ""}
                             onChange={(e) => setEditForm({ ...editForm, method: e.target.value })}
                             className="w-full rounded-xl border border-cyan-500/25 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-cyan-400"
                           >
+                            <option value="">(Select a Method)</option>
                             {refineryMethods.map((m) => (
                               <option key={m.name} value={m.name}>
                                 {m.name} — {m.speed}/{m.cost}/{m.yieldRating}
@@ -3683,11 +3698,11 @@ export default function StarCitizenSalvageGuideWebsite() {
                             value={editForm.material || "Construction Material"}
                             onChange={(e) => {
                               const next = e.target.value;
-                              const firstForMat = sellPoints.find((p) => p.material === next);
                               setEditForm({
                                 ...editForm,
                                 material: next,
-                                location: firstForMat?.name ?? PLAYER_SELL_POINT,
+                                // Reset to placeholder rather than auto-picking.
+                                location: "",
                                 playerName: "",
                               });
                             }}

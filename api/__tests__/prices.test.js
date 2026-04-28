@@ -41,7 +41,7 @@ describe("buildPublicView", () => {
   it("builds correct public view for a namespaced location key", () => {
     const now = Date.now();
     const result = buildPublicView({
-      "Construction Material::Lorville": {
+      "Construction Materials::Lorville": {
         reports: [
           { price: 1000, ts: now - 2000 },
           { price: 2000, ts: now - 1000 },
@@ -49,12 +49,12 @@ describe("buildPublicView", () => {
         ],
       },
     });
-    expect(result["Construction Material::Lorville"].medianPrice).toBe(2000);
-    expect(result["Construction Material::Lorville"].reportCount).toBe(3);
-    expect(result["Construction Material::Lorville"].lastReportedAt).toBe(now);
+    expect(result["Construction Materials::Lorville"].medianPrice).toBe(2000);
+    expect(result["Construction Materials::Lorville"].reportCount).toBe(3);
+    expect(result["Construction Materials::Lorville"].lastReportedAt).toBe(now);
   });
 
-  it("normalizes legacy plain keys to namespaced Construction Material keys", () => {
+  it("normalizes legacy plain keys to namespaced Construction Materials keys", () => {
     const ts1 = 1000;
     const ts2 = 9000;
     const result = buildPublicView({
@@ -65,7 +65,7 @@ describe("buildPublicView", () => {
         ],
       },
     });
-    expect(result["Construction Material::Port Olisar"].lastReportedAt).toBe(ts2);
+    expect(result["Construction Materials::Port Olisar"].lastReportedAt).toBe(ts2);
   });
 
   it("skips entries where all reports have non-numeric prices", () => {

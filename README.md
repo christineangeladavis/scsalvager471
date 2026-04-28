@@ -5,6 +5,18 @@ Made by Chrissyy · Referral: STAR-CH2W-R73F
 
 ## What's in this build
 
+UPDATE 4/28/2026 v2.6
+
+Added:
+- New Missions tab between Ship Details and Ledger. Browse 59 in-game salvage contracts pulled from the live game data, filter by Search / System (Stanton / Pyro / Nyx / Multi) / Faction (Adagio Holdings / Tar Pits) / Legality / Min reward (slider 0–550,000 aUEC), sort by any column, and click any row to open a full mission detail popup.
+- Mission detail popup: full briefing copy from the in-game contract manager, location chips (Pickup / Destinations / Prerequisite), chain relationships (Chain starts with / Requires completion of / Unlocks — clickable when the linked mission is also a salvage entry), Min/Max Rank with XP thresholds, and a flag/cooldown grid (Shareable, Sharing CrimeStat, Once only, Re-accept after abandon/fail, Cooldown, Abandon cooldown).
+- Mission Reward column shows fee-bearing missions as a negative aUEC line under the reward (e.g. main reward + `-5,000 aUEC` buy-in).
+- Ship Details now includes the pledge price in USD and every in-game purchase location with its aUEC price, sourced from finder.cstone.space. Lorville rows display a "10% discount" badge.
+- Ship Details lists Teach's Special editions (Levski / Teach's Ship Shop) for ships that have them: Reclaimer (33,339,600 aUEC), Vulture (2,778,300 aUEC), Fortune (1,984,500 aUEC).
+
+Fixes:
+- Drake Vulture and MISC Fortune roles renamed from "Solo Salvage" to "Light Salvage" to match in-game classification.
+
 UPDATE 4/27/2026 v2.5.1
 
 Added:

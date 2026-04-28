@@ -64,6 +64,17 @@ export default async function handler(req, res) {
   // anyone, so abort.
   const session = await getSession(req, redis);
   if (!session) {
+    // Diagnostic: surface why the session check failed so we can tell
+    // a genuine 7-day expiry apart from a host-mismatch (cookie scoped
+    // to www.* but callback running on canonical, etc.).
+    console.warn("[oauth/notifications-callback] no session", {
+      hasSessionCookie: !!cookies.scs_session,
+      hasStateCookie: !!storedState,
+      stateMatched: !!storedState && state === storedState,
+      host: req.headers.host,
+      xfh: req.headers["x-forwarded-host"],
+      cookieHeaderLen: (req.headers.cookie || "").length,
+    });
     return redirect(res, `/?notifications=error&reason=session`);
   }
 

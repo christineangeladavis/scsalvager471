@@ -22,8 +22,29 @@ import {
 
 const NOTIFICATIONS_STATE_COOKIE = "scs_notif_state";
 const NOTIFICATIONS_CALLBACK_PATH = "/api/auth/notifications-callback";
+// Discord OAuth redirect_uri is pinned to this host (see api/_lib/
+// discord.js). The session + state cookies must live on the same host
+// or the callback can't read them.
+const CANONICAL_HOST = "scsalvager.net";
 
 export default async function handler(req, res) {
+  // Bounce non-canonical hosts to the canonical entry point first, so
+  // the session cookie and state cookie are scoped to the same host
+  // the OAuth callback lands on. Without this, users who reach the
+  // settings panel via www.* or a preview deploy hit the callback
+  // with no session cookie present and get "Your login session
+  // expired" even though they're logged in on the originating host.
+  const incomingHost = (req.headers["x-forwarded-host"] || req.headers.host || "").toLowerCase();
+  const isProd =
+    process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production";
+  if (isProd && incomingHost && incomingHost !== CANONICAL_HOST) {
+    const canonical = `https://${CANONICAL_HOST}/api/auth/notifications-link`;
+    console.log("[oauth/notifications-link] non-canonical host=%s, redirecting to %s", incomingHost, canonical);
+    res.writeHead(302, { Location: canonical });
+    res.end();
+    return;
+  }
+
   let redis;
   try {
     redis = getRedis();

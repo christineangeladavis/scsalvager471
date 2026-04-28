@@ -3196,14 +3196,33 @@ export default function StarCitizenSalvageGuideWebsite() {
   // within 24h"). Pauses when the tab is hidden to keep idle traffic
   // quiet, and fires immediately on focus-back so the user shows up as
   // online again without waiting for the next interval.
+  //
+  // 401 self-heal: when the server says the session is gone (cookie
+  // expired, force-logout, account deletion), clear local user state.
+  // The effect cleanup tears down the interval automatically so we
+  // stop pinging /api/me/heartbeat with a dead cookie — otherwise
+  // Vercel logs fill with 401s every 30s for the orphan tab.
   useEffect(() => {
     if (!user) return;
     let cancelled = false;
     const HEARTBEAT_MS = 30 * 1000;
-    const beat = () => {
+    const beat = async () => {
       if (cancelled) return;
       if (typeof document !== "undefined" && document.visibilityState === "hidden") return;
-      fetch("/api/me/heartbeat", { method: "POST", credentials: "same-origin" }).catch(() => {});
+      try {
+        const res = await fetch("/api/me/heartbeat", {
+          method: "POST",
+          credentials: "same-origin",
+        });
+        if (cancelled) return;
+        if (res.status === 401) {
+          // Session is gone server-side. Drop local user so the
+          // useEffect cleanup kills the interval on the next render.
+          setUser(null);
+        }
+      } catch {
+        // Network blip — try again on the next interval.
+      }
     };
     beat(); // immediate first beat so the user shows online right away
     const id = setInterval(beat, HEARTBEAT_MS);

@@ -195,6 +195,8 @@ const ships = [
 //     (each row: { name, type, system, planet, moon }),
 //   chainStartsWith[] / requires[] / unlocks[]
 //     (each row: { id, name } pointing at another contract).
+// Filter: missionType === "Salvage" (59 entries).
+// Filter: missionType === "Salvage" (59 entries).
 const MISSIONS = [
   {
     id: "7858db48-7eb6-4a6c-b56b-5df1c5235d1d",
@@ -228,6 +230,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [],
+    turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":10,"max":10},{"name":"Construction Materials","unit":"SCU","min":41,"max":41},{"name":"Power Plant, Military Grade (S2)","unit":"count","min":2,"max":2},{"name":"Cooler, Military Grade (S2)","unit":"count","min":2,"max":2},{"name":"Shield Generator, Military Grade (S2)","unit":"count","min":2,"max":2},{"name":"Ship Weapon (S3 or S4)","unit":"count","min":8,"max":8}],
   },
   {
     id: "993fbe39-f45a-456a-a94a-a65714c1db49",
@@ -261,6 +264,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [],
+    turnIns: [{"name":"Power Plant, Competition Grade (S2)","unit":"count","min":2,"max":2},{"name":"Cooler, Competition Grade (S2)","unit":"count","min":2,"max":2},{"name":"Shield Generator, Competition Grade (S2)","unit":"count","min":2,"max":2}],
   },
   {
     id: "c2bf4edf-eb40-4abb-a81d-03bac07badd8",
@@ -294,6 +298,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [],
+    turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":15,"max":15},{"name":"Construction Materials","unit":"SCU","min":15,"max":15},{"name":"Power Plant, Civilian Grade (S2)","unit":"count","min":2,"max":2},{"name":"Cooler, Civilian Grade (S2)","unit":"count","min":2,"max":2},{"name":"Shield Generator, Civilian Grade (S2)","unit":"count","min":4,"max":4}],
   },
   {
     id: "09f5d6ae-c1a2-4dba-ba0d-886c33ea1af6",
@@ -327,6 +332,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [],
+    turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":15,"max":15},{"name":"Quantum Drive, Industrial (S2)","unit":"count","min":2,"max":2},{"name":"Power Plant, Industrial Grade (S2)","unit":"count","min":2,"max":2},{"name":"Ship Mining Laser","unit":"count","min":4,"max":4},{"name":"Ship Salvage Head","unit":"count","min":4,"max":4}],
   },
   {
     id: "acf17ba4-4007-466c-9081-72aee28232b3",
@@ -360,6 +366,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [],
+    turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":10,"max":10},{"name":"Construction Materials","unit":"SCU","min":41,"max":41},{"name":"Power Plant, Industrial Grade (S2)","unit":"count","min":3,"max":3},{"name":"Cooler, Industrial Grade (S2)","unit":"count","min":3,"max":3},{"name":"Shield Generator, Industrial Grade (S2)","unit":"count","min":3,"max":3},{"name":"Quantum Drive, Industrial (S2)","unit":"count","min":2,"max":2},{"name":"Ship Mining Laser","unit":"count","min":2,"max":2}],
   },
   {
     id: "1331671c-4bbd-47bc-b71e-c19def138faa",
@@ -393,6 +400,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [],
+    turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":10,"max":10},{"name":"Construction Materials","unit":"SCU","min":41,"max":41},{"name":"Power Plant, Civilian Grade (S2)","unit":"count","min":3,"max":3},{"name":"Cooler, Civilian Grade (S2)","unit":"count","min":3,"max":3},{"name":"Shield Generator, Civilian Grade (S2)","unit":"count","min":3,"max":3},{"name":"Ship Weapon (S3 or S4)","unit":"count","min":6,"max":6}],
   },
   {
     id: "28e535c8-740f-47cc-adcb-6238a0b5b724",
@@ -426,6 +434,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [],
+    turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":10,"max":10},{"name":"Construction Materials","unit":"SCU","min":6,"max":6},{"name":"Ship Weapon (S3 or S4)","unit":"count","min":2,"max":2},{"name":"Ship Missile","unit":"count","min":4,"max":4},{"name":"Ship Bomb","unit":"count","min":2,"max":2}],
   },
   {
     id: "fe5b519c-1149-454c-a680-8d2788c3f487",
@@ -459,6 +468,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [],
+    turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":10,"max":10},{"name":"Construction Materials","unit":"SCU","min":5,"max":5},{"name":"Quantum Drive (S1)","unit":"count","min":2,"max":2},{"name":"Ship Mining Laser","unit":"count","min":3,"max":3},{"name":"Ship Salvage Head","unit":"count","min":3,"max":3}],
   },
   {
     id: "44b632f2-e2e2-42e3-b0d5-a19889263c15",
@@ -492,6 +502,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [],
+    turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":14,"max":14},{"name":"Construction Materials","unit":"SCU","min":5,"max":5},{"name":"Shield Generator (S1)","unit":"count","min":8,"max":8},{"name":"Ship Weapon (S3 or S4)","unit":"count","min":8,"max":8},{"name":"Construction Rubble","unit":"SCU","min":4,"max":4}],
   },
   {
     id: "a2e30021-9bbd-4cbe-a014-3a851c86331c",
@@ -525,6 +536,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [],
+    turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":9,"max":9},{"name":"Construction Materials","unit":"SCU","min":6,"max":6},{"name":"Power Plant (S1)","unit":"count","min":2,"max":2},{"name":"Ship Weapon (S1 or S2)","unit":"count","min":6,"max":6},{"name":"Cooler (S1)","unit":"count","min":2,"max":2},{"name":"Shield Generator (S1)","unit":"count","min":2,"max":2}],
   },
   {
     id: "813ea00d-3766-46fd-802f-a9e5775de6b3",
@@ -558,6 +570,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [],
+    turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":7,"max":7},{"name":"Construction Rubble","unit":"SCU","min":4,"max":4},{"name":"Power Plant (S1)","unit":"count","min":4,"max":4},{"name":"Shield Generator (S1)","unit":"count","min":2,"max":2},{"name":"Cooler (S1)","unit":"count","min":2,"max":2}],
   },
   {
     id: "de9667b3-3142-46a3-80ae-f101c338ed4b",
@@ -591,6 +604,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [],
+    turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":6,"max":6},{"name":"Construction Materials","unit":"SCU","min":6,"max":6},{"name":"Power Plant (S1)","unit":"count","min":4,"max":4},{"name":"Cooler (S1)","unit":"count","min":4,"max":4},{"name":"Shield Generator (S1)","unit":"count","min":4,"max":4}],
   },
   {
     id: "5e97df76-fe6d-4a2e-91f6-95f9c7596f3f",
@@ -624,6 +638,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [],
+    turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":10,"max":10}],
   },
   {
     id: "e672b66a-a480-4ef2-b491-aaade45836c4",
@@ -657,6 +672,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [],
+    turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":10,"max":10}],
   },
   {
     id: "eab205c6-d19a-4f4c-af8c-0c823c34c40a",
@@ -690,6 +706,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [],
+    turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":10,"max":10}],
   },
   {
     id: "500a190f-14d5-4587-83f7-d33eb7a37577",
@@ -723,6 +740,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [{"id":"63550989-f035-4dc6-a8f6-c6f5c8482c33","name":"Adagio Holdings in Need of Salvagers"}],
     unlocks: [],
+    turnIns: [{"name":"Quantum Drive (S1)","unit":"count","min":4,"max":4},{"name":"Power Plant (S1)","unit":"count","min":4,"max":4}],
   },
   {
     id: "d28dfeee-2ffa-4ec8-87d9-2a5db01bb5ec",
@@ -756,6 +774,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [],
+    turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":5,"max":5},{"name":"Construction Materials","unit":"SCU","min":3,"max":3}],
   },
   {
     id: "06212b32-00ce-43e6-8fd4-4c7e0d833bf1",
@@ -789,6 +808,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [],
+    turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":5,"max":5},{"name":"Construction Rubble","unit":"SCU","min":3,"max":3}],
   },
   {
     id: "7fb2faa7-b6d4-47e9-90ec-7e635cc2a9b0",
@@ -822,6 +842,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [],
+    turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":5,"max":5},{"name":"Construction Materials","unit":"SCU","min":3,"max":3}],
   },
   {
     id: "f8823d3b-df07-40fe-aa2f-ab2e52f30d86",
@@ -855,6 +876,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [{"id":"63550989-f035-4dc6-a8f6-c6f5c8482c33","name":"Adagio Holdings in Need of Salvagers"}],
     unlocks: [],
+    turnIns: [{"name":"Ship Weapon (S1 or S2)","unit":"count","min":8,"max":8}],
   },
   {
     id: "e4853f9d-f027-4f83-bd82-1835cc2f6409",
@@ -888,6 +910,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [{"id":"63550989-f035-4dc6-a8f6-c6f5c8482c33","name":"Adagio Holdings in Need of Salvagers"}],
     unlocks: [],
+    turnIns: [],
   },
   {
     id: "787ac783-5a7f-49cf-b4b0-f3571f7ce6d6",
@@ -921,6 +944,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [{"id":"63550989-f035-4dc6-a8f6-c6f5c8482c33","name":"Adagio Holdings in Need of Salvagers"}],
     unlocks: [],
+    turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":5,"max":5}],
   },
   {
     id: "67608eaf-63b0-4d4f-9103-7960eeeb9166",
@@ -954,6 +978,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [{"id":"63550989-f035-4dc6-a8f6-c6f5c8482c33","name":"Adagio Holdings in Need of Salvagers"}],
     unlocks: [],
+    turnIns: [],
   },
   {
     id: "2a20ef29-7922-487f-b42c-70b48fe8031a",
@@ -987,6 +1012,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [{"id":"63550989-f035-4dc6-a8f6-c6f5c8482c33","name":"Adagio Holdings in Need of Salvagers"}],
     unlocks: [],
+    turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":5,"max":5}],
   },
   {
     id: "9ff34277-7cba-441d-ac0f-1fcfc9d6e16c",
@@ -1020,6 +1046,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [{"id":"63550989-f035-4dc6-a8f6-c6f5c8482c33","name":"Adagio Holdings in Need of Salvagers"}],
     unlocks: [],
+    turnIns: [],
   },
   {
     id: "2501a070-bff6-4491-9c49-3456f1bfe128",
@@ -1053,6 +1080,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [{"id":"63550989-f035-4dc6-a8f6-c6f5c8482c33","name":"Adagio Holdings in Need of Salvagers"}],
     unlocks: [],
+    turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":5,"max":5}],
   },
   {
     id: "63550989-f035-4dc6-a8f6-c6f5c8482c33",
@@ -1086,6 +1114,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [{"id":"61201483-e22b-4170-ba24-705efb270635","name":"Salvager Needed (Small Special Order of RMC / Components)"},{"id":"f8823d3b-df07-40fe-aa2f-ab2e52f30d86","name":"Salvager Needed (Small Special Order of RMC / Components)"},{"id":"500a190f-14d5-4587-83f7-d33eb7a37577","name":"Salvager Needed (Small Special Order of RMC / Components)"},{"id":"5c455aa4-f18a-4f3e-8195-4d3d20f447a5","name":"Salvager Needed (Small Supply of RMC / Components)"},{"id":"fff5c566-eeae-4bae-9a03-26ae9b5e8d49","name":"Salvager Needed (Small Supply of RMC / Components)"},{"id":"4aa7b26e-701d-410e-a128-e9e2864568e0","name":"Salvager Needed (Small Supply of RMC / Components)"},{"id":"67608eaf-63b0-4d4f-9103-7960eeeb9166","name":"Salvager Needed (Small Supply of RMC / UCM)"},{"id":"e4853f9d-f027-4f83-bd82-1835cc2f6409","name":"Salvager Needed (Small Supply of RMC / UCM)"},{"id":"9ff34277-7cba-441d-ac0f-1fcfc9d6e16c","name":"Salvager Needed (Small Supply of RMC / UCM)"},{"id":"2a20ef29-7922-487f-b42c-70b48fe8031a","name":"Salvager Needed (Small Supply of RMC)"},{"id":"787ac783-5a7f-49cf-b4b0-f3571f7ce6d6","name":"Salvager Needed (Small Supply of RMC)"},{"id":"2501a070-bff6-4491-9c49-3456f1bfe128","name":"Salvager Needed (Small Supply of RMC)"}],
+    turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":1,"max":1}],
   },
   {
     id: "73cf6254-785a-41c1-b7a9-bdce2f6380e0",
@@ -1119,6 +1148,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [{"id":"61201483-e22b-4170-ba24-705efb270635","name":"Salvager Needed (Small Special Order of RMC / Components)"},{"id":"f8823d3b-df07-40fe-aa2f-ab2e52f30d86","name":"Salvager Needed (Small Special Order of RMC / Components)"},{"id":"500a190f-14d5-4587-83f7-d33eb7a37577","name":"Salvager Needed (Small Special Order of RMC / Components)"},{"id":"5c455aa4-f18a-4f3e-8195-4d3d20f447a5","name":"Salvager Needed (Small Supply of RMC / Components)"},{"id":"fff5c566-eeae-4bae-9a03-26ae9b5e8d49","name":"Salvager Needed (Small Supply of RMC / Components)"},{"id":"4aa7b26e-701d-410e-a128-e9e2864568e0","name":"Salvager Needed (Small Supply of RMC / Components)"},{"id":"67608eaf-63b0-4d4f-9103-7960eeeb9166","name":"Salvager Needed (Small Supply of RMC / UCM)"},{"id":"e4853f9d-f027-4f83-bd82-1835cc2f6409","name":"Salvager Needed (Small Supply of RMC / UCM)"},{"id":"9ff34277-7cba-441d-ac0f-1fcfc9d6e16c","name":"Salvager Needed (Small Supply of RMC / UCM)"},{"id":"2a20ef29-7922-487f-b42c-70b48fe8031a","name":"Salvager Needed (Small Supply of RMC)"},{"id":"787ac783-5a7f-49cf-b4b0-f3571f7ce6d6","name":"Salvager Needed (Small Supply of RMC)"},{"id":"2501a070-bff6-4491-9c49-3456f1bfe128","name":"Salvager Needed (Small Supply of RMC)"}],
+    turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":1,"max":1}],
   },
   {
     id: "76ed5ffe-32b6-473a-9605-19f82c5d879e",
@@ -1152,6 +1182,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [{"id":"61201483-e22b-4170-ba24-705efb270635","name":"Salvager Needed (Small Special Order of RMC / Components)"},{"id":"f8823d3b-df07-40fe-aa2f-ab2e52f30d86","name":"Salvager Needed (Small Special Order of RMC / Components)"},{"id":"500a190f-14d5-4587-83f7-d33eb7a37577","name":"Salvager Needed (Small Special Order of RMC / Components)"},{"id":"5c455aa4-f18a-4f3e-8195-4d3d20f447a5","name":"Salvager Needed (Small Supply of RMC / Components)"},{"id":"fff5c566-eeae-4bae-9a03-26ae9b5e8d49","name":"Salvager Needed (Small Supply of RMC / Components)"},{"id":"4aa7b26e-701d-410e-a128-e9e2864568e0","name":"Salvager Needed (Small Supply of RMC / Components)"},{"id":"67608eaf-63b0-4d4f-9103-7960eeeb9166","name":"Salvager Needed (Small Supply of RMC / UCM)"},{"id":"e4853f9d-f027-4f83-bd82-1835cc2f6409","name":"Salvager Needed (Small Supply of RMC / UCM)"},{"id":"9ff34277-7cba-441d-ac0f-1fcfc9d6e16c","name":"Salvager Needed (Small Supply of RMC / UCM)"},{"id":"2a20ef29-7922-487f-b42c-70b48fe8031a","name":"Salvager Needed (Small Supply of RMC)"},{"id":"787ac783-5a7f-49cf-b4b0-f3571f7ce6d6","name":"Salvager Needed (Small Supply of RMC)"},{"id":"2501a070-bff6-4491-9c49-3456f1bfe128","name":"Salvager Needed (Small Supply of RMC)"}],
+    turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":1,"max":1}],
   },
   {
     id: "5c455aa4-f18a-4f3e-8195-4d3d20f447a5",
@@ -1185,6 +1216,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [{"id":"63550989-f035-4dc6-a8f6-c6f5c8482c33","name":"Adagio Holdings in Need of Salvagers"}],
     unlocks: [],
+    turnIns: [{"name":"Power Plant (S1)","unit":"count","min":2,"max":2},{"name":"Shield Generator (S1)","unit":"count","min":2,"max":2}],
   },
   {
     id: "fff5c566-eeae-4bae-9a03-26ae9b5e8d49",
@@ -1218,6 +1250,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [{"id":"63550989-f035-4dc6-a8f6-c6f5c8482c33","name":"Adagio Holdings in Need of Salvagers"}],
     unlocks: [],
+    turnIns: [{"name":"Shield Generator (S1)","unit":"count","min":2,"max":2},{"name":"Cooler (S1)","unit":"count","min":2,"max":2},{"name":"Power Plant (S1)","unit":"count","min":2,"max":2}],
   },
   {
     id: "4aa7b26e-701d-410e-a128-e9e2864568e0",
@@ -1251,6 +1284,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [{"id":"63550989-f035-4dc6-a8f6-c6f5c8482c33","name":"Adagio Holdings in Need of Salvagers"}],
     unlocks: [],
+    turnIns: [{"name":"Shield Generator (S1)","unit":"count","min":2,"max":2},{"name":"Power Plant (S1)","unit":"count","min":2,"max":2},{"name":"Cooler (S1)","unit":"count","min":4,"max":4}],
   },
   {
     id: "61201483-e22b-4170-ba24-705efb270635",
@@ -1284,6 +1318,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [{"id":"63550989-f035-4dc6-a8f6-c6f5c8482c33","name":"Adagio Holdings in Need of Salvagers"}],
     unlocks: [],
+    turnIns: [{"name":"Ship Weapon (S1 or S2)","unit":"count","min":1,"max":1},{"name":"Ship Mining Laser","unit":"count","min":1,"max":1},{"name":"Ship Salvage Head","unit":"count","min":1,"max":1}],
   },
   {
     id: "41127c2d-7685-fb1d-9f08-57bde4310aa7",
@@ -1317,6 +1352,7 @@ const MISSIONS = [
     chainStartsWith: [{"id":"46541e90-fa81-f9d4-7206-a88fdda5789f","name":"Adagio Holdings: Salvage Mission (Intro)"}],
     requires: [{"id":"d46436e6-56ea-40ed-a0fd-e7c0c7218fbb","name":"[SHIP] clean up"}],
     unlocks: [{"id":"3617c33e-0f3f-44e7-b468-7de2a2db1dc4","name":"[SHIP] clean up"},{"id":"40a00ef8-0b53-9270-bc2c-ef38cda62eb2","name":"Adagio Holdings: Salvage Mission (Medium)"},{"id":"c2871e21-9f59-448e-97c7-0e7bfe4bf8b6","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"},{"id":"f91fbab9-1e90-4fb8-871d-961053ad1f49","name":"Risky [SHIP] Salvage Job"}],
+    turnIns: [],
   },
   {
     id: "46541e90-fa81-f9d4-7206-a88fdda5789f",
@@ -1350,6 +1386,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [{"id":"4eebc223-b15f-9cba-d1b9-070816b6caa9","name":"Adagio Holdings: Salvage Mission (Very Easy)"},{"id":"d56b6a21-6ccc-4620-8bcc-aa3538f220dd","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"}],
+    turnIns: [],
   },
   {
     id: "40a00ef8-0b53-9270-bc2c-ef38cda62eb2",
@@ -1383,6 +1420,7 @@ const MISSIONS = [
     chainStartsWith: [{"id":"46541e90-fa81-f9d4-7206-a88fdda5789f","name":"Adagio Holdings: Salvage Mission (Intro)"}],
     requires: [{"id":"152bc6c1-70e0-44fb-a89a-5200456f132c","name":"[SHIP] clean up"}],
     unlocks: [{"id":"93113c47-1c37-4e7f-bda3-76911dfebd67","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"}],
+    turnIns: [],
   },
   {
     id: "4eebc223-b15f-9cba-d1b9-070816b6caa9",
@@ -1416,6 +1454,7 @@ const MISSIONS = [
     chainStartsWith: [{"id":"46541e90-fa81-f9d4-7206-a88fdda5789f","name":"Adagio Holdings: Salvage Mission (Intro)"}],
     requires: [{"id":"46541e90-fa81-f9d4-7206-a88fdda5789f","name":"Adagio Holdings: Salvage Mission (Intro)"}],
     unlocks: [{"id":"152bc6c1-70e0-44fb-a89a-5200456f132c","name":"[SHIP] clean up"},{"id":"41127c2d-7685-fb1d-9f08-57bde4310aa7","name":"Adagio Holdings: Salvage Mission (Easy)"},{"id":"6aa230b9-0719-4ca6-8e8f-55358c88ab74","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"}],
+    turnIns: [],
   },
   {
     id: "6aa230b9-0719-4ca6-8e8f-55358c88ab74",
@@ -1449,6 +1488,7 @@ const MISSIONS = [
     chainStartsWith: [{"id":"6198b19b-187d-4342-8883-350387408a03","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"}],
     requires: [{"id":"d46436e6-56ea-40ed-a0fd-e7c0c7218fbb","name":"[SHIP] clean up"}],
     unlocks: [{"id":"3617c33e-0f3f-44e7-b468-7de2a2db1dc4","name":"[SHIP] clean up"},{"id":"40a00ef8-0b53-9270-bc2c-ef38cda62eb2","name":"Adagio Holdings: Salvage Mission (Medium)"},{"id":"c2871e21-9f59-448e-97c7-0e7bfe4bf8b6","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"},{"id":"f91fbab9-1e90-4fb8-871d-961053ad1f49","name":"Risky [SHIP] Salvage Job"}],
+    turnIns: [],
   },
   {
     id: "93113c47-1c37-4e7f-bda3-76911dfebd67",
@@ -1482,6 +1522,7 @@ const MISSIONS = [
     chainStartsWith: [{"id":"6198b19b-187d-4342-8883-350387408a03","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"}],
     requires: [{"id":"3617c33e-0f3f-44e7-b468-7de2a2db1dc4","name":"[SHIP] clean up"}],
     unlocks: [],
+    turnIns: [],
   },
   {
     id: "6198b19b-187d-4342-8883-350387408a03",
@@ -1515,6 +1556,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [{"id":"4eebc223-b15f-9cba-d1b9-070816b6caa9","name":"Adagio Holdings: Salvage Mission (Very Easy)"},{"id":"d56b6a21-6ccc-4620-8bcc-aa3538f220dd","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"}],
+    turnIns: [],
   },
   {
     id: "c2871e21-9f59-448e-97c7-0e7bfe4bf8b6",
@@ -1548,6 +1590,7 @@ const MISSIONS = [
     chainStartsWith: [{"id":"6198b19b-187d-4342-8883-350387408a03","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"}],
     requires: [{"id":"152bc6c1-70e0-44fb-a89a-5200456f132c","name":"[SHIP] clean up"}],
     unlocks: [{"id":"93113c47-1c37-4e7f-bda3-76911dfebd67","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"}],
+    turnIns: [],
   },
   {
     id: "d56b6a21-6ccc-4620-8bcc-aa3538f220dd",
@@ -1581,6 +1624,7 @@ const MISSIONS = [
     chainStartsWith: [{"id":"6198b19b-187d-4342-8883-350387408a03","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"}],
     requires: [{"id":"46541e90-fa81-f9d4-7206-a88fdda5789f","name":"Adagio Holdings: Salvage Mission (Intro)"}],
     unlocks: [{"id":"152bc6c1-70e0-44fb-a89a-5200456f132c","name":"[SHIP] clean up"},{"id":"41127c2d-7685-fb1d-9f08-57bde4310aa7","name":"Adagio Holdings: Salvage Mission (Easy)"},{"id":"6aa230b9-0719-4ca6-8e8f-55358c88ab74","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"}],
+    turnIns: [],
   },
   {
     id: "fd8e44db-6c4d-4aac-8cd7-6f570254c591",
@@ -1614,6 +1658,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [],
+    turnIns: [],
   },
   {
     id: "e054f8ec-0dd0-453e-9bb6-0524e991a5d8",
@@ -1647,6 +1692,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [],
+    turnIns: [],
   },
   {
     id: "c0367fb3-fe9a-4d96-a52e-37379fb84c48",
@@ -1680,6 +1726,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [],
+    turnIns: [],
   },
   {
     id: "fb7cdad3-3adf-47db-a9dc-fbc9b8c48f11",
@@ -1713,6 +1760,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [],
+    turnIns: [],
   },
   {
     id: "e4d58696-cb09-4a99-9455-c38c8cea760d",
@@ -1746,6 +1794,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [],
+    turnIns: [],
   },
   {
     id: "16f1f278-25d4-42ae-9720-78de4832963b",
@@ -1779,6 +1828,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [],
+    turnIns: [],
   },
   {
     id: "ae20c909-cc86-46aa-aee3-f2ea70faeff1",
@@ -1812,6 +1862,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [],
+    turnIns: [],
   },
   {
     id: "adada33c-0309-44b1-b0db-1d4421756b49",
@@ -1845,6 +1896,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [],
+    turnIns: [],
   },
   {
     id: "f9d84f75-b48c-4f4b-8f6e-ee59434efee4",
@@ -1878,6 +1930,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [],
+    turnIns: [],
   },
   {
     id: "3fb8de52-6791-4ea9-bf1c-737bf4f7fa78",
@@ -1911,6 +1964,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [],
+    turnIns: [],
   },
   {
     id: "ce3723ef-cc33-41ab-9d36-f8ab0510455b",
@@ -1944,6 +1998,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [],
+    turnIns: [],
   },
   {
     id: "bbb1603f-640a-4061-b75c-7c6c6b4e7d55",
@@ -1977,6 +2032,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [],
+    turnIns: [],
   },
   {
     id: "3617c33e-0f3f-44e7-b468-7de2a2db1dc4",
@@ -2010,6 +2066,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [{"id":"152bc6c1-70e0-44fb-a89a-5200456f132c","name":"[SHIP] clean up"}],
     unlocks: [{"id":"93113c47-1c37-4e7f-bda3-76911dfebd67","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"}],
+    turnIns: [],
   },
   {
     id: "152bc6c1-70e0-44fb-a89a-5200456f132c",
@@ -2043,6 +2100,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [{"id":"d46436e6-56ea-40ed-a0fd-e7c0c7218fbb","name":"[SHIP] clean up"}],
     unlocks: [{"id":"3617c33e-0f3f-44e7-b468-7de2a2db1dc4","name":"[SHIP] clean up"},{"id":"40a00ef8-0b53-9270-bc2c-ef38cda62eb2","name":"Adagio Holdings: Salvage Mission (Medium)"},{"id":"c2871e21-9f59-448e-97c7-0e7bfe4bf8b6","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"},{"id":"f91fbab9-1e90-4fb8-871d-961053ad1f49","name":"Risky [SHIP] Salvage Job"}],
+    turnIns: [],
   },
   {
     id: "d46436e6-56ea-40ed-a0fd-e7c0c7218fbb",
@@ -2076,6 +2134,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [{"id":"152bc6c1-70e0-44fb-a89a-5200456f132c","name":"[SHIP] clean up"},{"id":"41127c2d-7685-fb1d-9f08-57bde4310aa7","name":"Adagio Holdings: Salvage Mission (Easy)"},{"id":"6aa230b9-0719-4ca6-8e8f-55358c88ab74","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"}],
+    turnIns: [],
   },
   {
     id: "f34ee69a-3836-4853-9765-2ced2596bc6e",
@@ -2109,6 +2168,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [],
     unlocks: [{"id":"3617c33e-0f3f-44e7-b468-7de2a2db1dc4","name":"[SHIP] clean up"},{"id":"40a00ef8-0b53-9270-bc2c-ef38cda62eb2","name":"Adagio Holdings: Salvage Mission (Medium)"},{"id":"c2871e21-9f59-448e-97c7-0e7bfe4bf8b6","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"},{"id":"f91fbab9-1e90-4fb8-871d-961053ad1f49","name":"Risky [SHIP] Salvage Job"}],
+    turnIns: [],
   },
   {
     id: "f91fbab9-1e90-4fb8-871d-961053ad1f49",
@@ -2142,6 +2202,7 @@ const MISSIONS = [
     chainStartsWith: [],
     requires: [{"id":"152bc6c1-70e0-44fb-a89a-5200456f132c","name":"[SHIP] clean up"}],
     unlocks: [],
+    turnIns: [],
   },
 ];
 
@@ -2152,12 +2213,11660 @@ const PLAYER_SELL_POINT = "Sold to Player";
 // notification bell surfaces a "new site update available" entry until
 // the user opens the What's New modal (or marks it read). Per-browser
 // pointer is stored at localStorage["scs_whatsnew_seen_version"].
-const LATEST_WHATSNEW_VERSION = "v2.6";
+const LATEST_WHATSNEW_VERSION = "v2.6.1";
 
 // localStorage key for explicitly dismissed notification ids. Lets
 // users hide the red badge without changing their underlying setup
 // (e.g. dismiss the "Discord DMs off" nag without enabling DMs).
 const DISMISSED_NOTIFICATIONS_KEY = "scs_dismissed_notifications";
+
+// Auto-generated from .claude/ship-components.csv
+// Star Citizen ship default-component table sourced from
+// the public Google Sheet
+// https://docs.google.com/spreadsheets/d/1fFTnvQc8_i9lur4PB3txqipK1ljRkOgw6kTEimx3xdg
+// (gid 166561172). Powers the click-to-expand "ships that
+// ship with this component" list on mission turn-ins.
+// Re-run .claude/build-ship-components.cjs after refreshing
+// the CSV to update this list.
+const SHIP_COMPONENTS = [
+  {
+    "ship": "100i",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "100i",
+    "component": "StrikeForce II",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "100i",
+    "component": "Web",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "100i",
+    "component": "PowerBolt",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "100i",
+    "component": "ArcticStorm",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "100i",
+    "component": "Expedition",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "125a",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "125a",
+    "component": "StrikeForce II",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "125a",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "125a",
+    "component": "Regulus",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "125a",
+    "component": "Allstop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "125a",
+    "component": "Expedition",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "135c",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "135c",
+    "component": "StrikeForce II",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "135c",
+    "component": "Bulwark",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "135c",
+    "component": "Fortitude",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "135c",
+    "component": "Thermax",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "135c",
+    "component": "Expedition",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "300i",
+    "component": "M5A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "300i",
+    "component": "SW16BR3 \"Shredder\"",
+    "type": "Weapon",
+    "class": "Ballistic Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "300i",
+    "component": "StrikeForce II",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "300i",
+    "component": "Web",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "300i",
+    "component": "PowerBolt",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "300i",
+    "component": "ArcticStorm",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "300i",
+    "component": "Expedition",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "315p",
+    "component": "SW16BR3 \"Shredder\"",
+    "type": "Weapon",
+    "class": "Ballistic Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "315p",
+    "component": "Tempest II",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "315p",
+    "component": "Shimmer",
+    "type": "Shield",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "315p",
+    "component": "SonicLite",
+    "type": "Power Plant",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "315p",
+    "component": "Heatsafe",
+    "type": "Cooler",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "315p",
+    "component": "Goliath",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "325a",
+    "component": "M6A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "325a",
+    "component": "SW16BR3 \"Shredder\"",
+    "type": "Weapon",
+    "class": "Ballistic Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "325a",
+    "component": "Dominator II",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "325a",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "325a",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "325a",
+    "component": "Regulus",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "325a",
+    "component": "Beacon",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "325a",
+    "component": "Allstop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "350r",
+    "component": "M5A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "350r",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "350r",
+    "component": "StrikeForce II",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "350r",
+    "component": "Targa",
+    "type": "Shield",
+    "class": "Competition",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "350r",
+    "component": "SunFlare",
+    "type": "Power Plant",
+    "class": "Competition",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "350r",
+    "component": "QuikCool",
+    "type": "Cooler",
+    "class": "Competition",
+    "grade": "D",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "350r",
+    "component": "Eos",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "400i",
+    "component": "CF-447 Rhino",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "400i",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "400i",
+    "component": "StrikeForce II",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "400i",
+    "component": "Marksman I",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "400i",
+    "component": "Guard",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "400i",
+    "component": "Sedulity",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "B",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "400i",
+    "component": "Snowfall",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "B",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "400i",
+    "component": "Torrent",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "600i",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "600i",
+    "component": "M7A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "600i",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": false
+  },
+  {
+    "ship": "600i",
+    "component": "Stronghold",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "600i",
+    "component": "Durango",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "A",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "600i",
+    "component": "FrostBurn",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "600i",
+    "component": "Odyssey",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "600i Executive Edition",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "600i Executive Edition",
+    "component": "M7A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "600i Executive Edition",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": false
+  },
+  {
+    "ship": "600i Executive Edition",
+    "component": "Stronghold",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "600i Executive Edition",
+    "component": "Durango",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "A",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "600i Executive Edition",
+    "component": "FrostBurn",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "600i Executive Edition",
+    "component": "Odyssey",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "600i Touring",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "600i Touring",
+    "component": "M7A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "600i Touring",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": false
+  },
+  {
+    "ship": "600i Touring",
+    "component": "Stronghold",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "600i Touring",
+    "component": "Durango",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "A",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "600i Touring",
+    "component": "FrostBurn",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "600i Touring",
+    "component": "Odyssey",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "85X Limited",
+    "component": "CF-117 Bulldog",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "85X Limited",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "85X Limited",
+    "component": "Targa",
+    "type": "Shield",
+    "class": "Competition",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "85X Limited",
+    "component": "PowerBolt",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "85X Limited",
+    "component": "IcePlunge",
+    "type": "Cooler",
+    "class": "Competition",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "85X Limited",
+    "component": "Beacon",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "890 Jump",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "890 Jump",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "890 Jump",
+    "component": "M6A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "890 Jump",
+    "component": "M2C \"Swarm\"",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "890 Jump",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "890 Jump",
+    "component": "Serac",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "A",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "890 Jump",
+    "component": "Stellate",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "A",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "890 Jump",
+    "component": "Allegro",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "A",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "890 Jump",
+    "component": "Glacis",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "A",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "A1 Spirit",
+    "component": "M5A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "A1 Spirit",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "A1 Spirit",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "A1 Spirit",
+    "component": "Stormburst",
+    "type": "Bomb",
+    "class": "",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "A1 Spirit",
+    "component": "Boreal",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "D",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "A1 Spirit",
+    "component": "UltraFlux",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "B",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "A1 Spirit",
+    "component": "Yeager",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "B",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "A1 Spirit",
+    "component": "FullStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "A2 Hercules Starlifter",
+    "component": "M7A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "A2 Hercules Starlifter",
+    "component": "M6A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "A2 Hercules Starlifter",
+    "component": "CF-447 Rhino",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "A2 Hercules Starlifter",
+    "component": "Omnisky XV",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "A2 Hercules Starlifter",
+    "component": "CF-557 Galdereen",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "A2 Hercules Starlifter",
+    "component": "Colossus Bomb",
+    "type": "Bomb",
+    "class": "",
+    "grade": "",
+    "size": 10,
+    "accessible": true
+  },
+  {
+    "ship": "A2 Hercules Starlifter",
+    "component": "Mercury",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "A2 Hercules Starlifter",
+    "component": "SuperDrive",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "A2 Hercules Starlifter",
+    "component": "Pontes",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "A2 Hercules Starlifter",
+    "component": "FullBlock",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "B",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Apollo Medivac",
+    "component": "CF-447 Rhino",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Apollo Medivac",
+    "component": "Mantis GT-220",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Apollo Medivac",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Apollo Medivac",
+    "component": "STOP",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Apollo Medivac",
+    "component": "FullForce",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Apollo Medivac",
+    "component": "ColdSnap",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Apollo Medivac",
+    "component": "Odyssey",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Apollo Triage",
+    "component": "CF-447 Rhino",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Apollo Triage",
+    "component": "M5A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Apollo Triage",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Apollo Triage",
+    "component": "STOP",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Apollo Triage",
+    "component": "FullForce",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Apollo Triage",
+    "component": "ColdSnap",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Apollo Triage",
+    "component": "Odyssey",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Ares Star Fighter Inferno",
+    "component": "SF7B",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 7,
+    "accessible": true
+  },
+  {
+    "ship": "Ares Star Fighter Inferno",
+    "component": "Viper III",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Ares Star Fighter Inferno",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": false
+  },
+  {
+    "ship": "Ares Star Fighter Inferno",
+    "component": "Arctic",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Ares Star Fighter Inferno",
+    "component": "Maelstrom",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Ares Star Fighter Inferno",
+    "component": "Crossfield",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Ares Star Fighter Inferno",
+    "component": "FullStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Ares Star Fighter Ion",
+    "component": "SF7E",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 7,
+    "accessible": true
+  },
+  {
+    "ship": "Ares Star Fighter Ion",
+    "component": "Viper III",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Ares Star Fighter Ion",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": false
+  },
+  {
+    "ship": "Ares Star Fighter Ion",
+    "component": "Arctic",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Ares Star Fighter Ion",
+    "component": "Maelstrom",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Ares Star Fighter Ion",
+    "component": "Crossfield",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Ares Star Fighter Ion",
+    "component": "FullStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Arrow",
+    "component": "Yellowjacket GT-210",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Arrow",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Arrow",
+    "component": "Dominator II",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Arrow",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Arrow",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Arrow",
+    "component": "Regulus",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Arrow",
+    "component": "Beacon",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Arrow",
+    "component": "AllStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Asgard",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Asgard",
+    "component": "CF-447 Rhino",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Asgard",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Asgard",
+    "component": "Arctic",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Asgard",
+    "component": "Maelstrom",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Asgard",
+    "component": "FullStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Asgard",
+    "component": "Odyssey",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk I CL",
+    "component": "CF-117 Bulldog",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk I CL",
+    "component": "TaskForce I",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk I CL",
+    "component": "Bulwark",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk I CL",
+    "component": "Roughneck",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "D",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk I CL",
+    "component": "Hydrocel",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "D",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk I CL",
+    "component": "Eos",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk I ES",
+    "component": "9-Series Longsword",
+    "type": "Weapon",
+    "class": "Ballistic Cannon",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk I ES",
+    "component": "TaskForce I",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk I ES",
+    "component": "Ink",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "D",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk I ES",
+    "component": "ZapJet",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "D",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk I ES",
+    "component": "BlastChill",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "D",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk I ES",
+    "component": "Eos",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk I LN",
+    "component": "CF-117 Bulldog",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk I LN",
+    "component": "Dominator II",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk I LN",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk I LN",
+    "component": "Charger",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "D",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk I LN",
+    "component": "SecureHyde",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "D",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk I LN",
+    "component": "Eos",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk I LX",
+    "component": "CF-117 Bulldog",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk I LX",
+    "component": "StrikeForce II",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk I LX",
+    "component": "Targa",
+    "type": "Shield",
+    "class": "Competition",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk I LX",
+    "component": "LumaCore",
+    "type": "Power Plant",
+    "class": "Competition",
+    "grade": "A",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk I LX",
+    "component": "QuikCool",
+    "type": "Cooler",
+    "class": "Competition",
+    "grade": "D",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk I LX",
+    "component": "Eos",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk I MR",
+    "component": "CF-117 Bulldog",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk I MR",
+    "component": "Marksman I",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk I MR",
+    "component": "Bulwark",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk I MR",
+    "component": "Roughneck",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "D",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk I MR",
+    "component": "Hydrocel",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "D",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk I MR",
+    "component": "Eos",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk II",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk II",
+    "component": "Marksman I",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk II",
+    "component": "5SA 'Rhada'",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk II",
+    "component": "PowerBolt",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk II",
+    "component": "Frost-Star",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Aurora Mk II",
+    "component": "Eos",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Avenger Stalker",
+    "component": "Revenant",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Avenger Stalker",
+    "component": "Omnisky IX",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Avenger Stalker",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Avenger Stalker",
+    "component": "Shimmer",
+    "type": "Shield",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Avenger Stalker",
+    "component": "PowerBolt",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Avenger Stalker",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Avenger Stalker",
+    "component": "Expedition",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Avenger Titan",
+    "component": "Revenant",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Avenger Titan",
+    "component": "Omnisky IX",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Avenger Titan",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Avenger Titan",
+    "component": "Bulwark",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Avenger Titan",
+    "component": "Endurance",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "B",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Avenger Titan",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Avenger Titan",
+    "component": "Expedition",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Avenger Titan Renegade",
+    "component": "11-Series Broadsword",
+    "type": "Weapon",
+    "class": "Ballistic Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Avenger Titan Renegade",
+    "component": "Omnisky IX",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Avenger Titan Renegade",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Avenger Titan Renegade",
+    "component": "Bulwark",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Avenger Titan Renegade",
+    "component": "Endurance",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "B",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Avenger Titan Renegade",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Avenger Titan Renegade",
+    "component": "Expedition",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Avenger Warlock",
+    "component": "Revenant",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Avenger Warlock",
+    "component": "Omnisky IX",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Avenger Warlock",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Avenger Warlock",
+    "component": "Dominator II",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Avenger Warlock",
+    "component": "REP-8 EMP Generator",
+    "type": "EMP Generator",
+    "class": "",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Avenger Warlock",
+    "component": "Shimmer",
+    "type": "Shield",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Avenger Warlock",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Avenger Warlock",
+    "component": "Regulus",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Avenger Warlock",
+    "component": "Expedition",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Ballista",
+    "component": "Scorpion GT-215",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Ballista",
+    "component": "Scimitar V",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 5,
+    "accessible": false
+  },
+  {
+    "ship": "Ballista",
+    "component": "Hellion VII",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 7,
+    "accessible": false
+  },
+  {
+    "ship": "Ballista",
+    "component": "Pin",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Ballista",
+    "component": "Radix",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Ballista",
+    "component": "Frost-Star SL",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Ballista Dunestalker",
+    "component": "Scorpion GT-215",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Ballista Dunestalker",
+    "component": "Scimitar V",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 5,
+    "accessible": false
+  },
+  {
+    "ship": "Ballista Dunestalker",
+    "component": "Hellion VII",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 7,
+    "accessible": false
+  },
+  {
+    "ship": "Ballista Dunestalker",
+    "component": "Pin",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Ballista Dunestalker",
+    "component": "Radix",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Ballista Dunestalker",
+    "component": "Frost-Star SL",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Ballista Snowblind",
+    "component": "Scorpion GT-215",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Ballista Snowblind",
+    "component": "Scimitar V",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 5,
+    "accessible": false
+  },
+  {
+    "ship": "Ballista Snowblind",
+    "component": "Hellion VII",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 7,
+    "accessible": false
+  },
+  {
+    "ship": "Ballista Snowblind",
+    "component": "Pin",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Ballista Snowblind",
+    "component": "Radix",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Ballista Snowblind",
+    "component": "Frost-Star SL",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Blade",
+    "component": "Warlord'",
+    "type": "Weapon",
+    "class": "Plasma Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Blade",
+    "component": "Wasp'",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Blade",
+    "component": "Arrow' I",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Blade",
+    "component": "Charger",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "D",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Blade",
+    "component": "Allstop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Blade",
+    "component": "IcePlunge",
+    "type": "Cooler",
+    "class": "Competition",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Blade",
+    "component": "Rush",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Buccaneer",
+    "component": "Revenant",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Buccaneer",
+    "component": "Yellowjacket GT-210",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Buccaneer",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Buccaneer",
+    "component": "Tempest II",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Buccaneer",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Buccaneer",
+    "component": "Web",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Buccaneer",
+    "component": "Polar",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "B",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Buccaneer",
+    "component": "JS-300",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "A",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Buccaneer",
+    "component": "Rush",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "C1 Spirit",
+    "component": "M5A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "C1 Spirit",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "C1 Spirit",
+    "component": "Boreal",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "D",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "C1 Spirit",
+    "component": "UltraFlux",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "B",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "C1 Spirit",
+    "component": "Yeager",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "B",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "C1 Spirit",
+    "component": "FullStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "C2 Hercules Starlifter",
+    "component": "M7A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "C2 Hercules Starlifter",
+    "component": "M6A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "C2 Hercules Starlifter",
+    "component": "CF-447 Rhino",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "C2 Hercules Starlifter",
+    "component": "Stronghold",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "C2 Hercules Starlifter",
+    "component": "Ginzel",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "C2 Hercules Starlifter",
+    "component": "ThermalCore",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "C2 Hercules Starlifter",
+    "component": "Kama",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "C8 Pisces",
+    "component": "CF-117 Bulldog",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "C8 Pisces",
+    "component": "Marksman I",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "C8 Pisces",
+    "component": "Shimmer",
+    "type": "Shield",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "C8 Pisces",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "C8 Pisces",
+    "component": "Regulus",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "C8 Pisces",
+    "component": "Expedition",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "C8R Pisces Rescue",
+    "component": "CF-117 Bulldog",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "C8R Pisces Rescue",
+    "component": "Marksman I",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "C8R Pisces Rescue",
+    "component": "Shimmer",
+    "type": "Shield",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "C8R Pisces Rescue",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "C8R Pisces Rescue",
+    "component": "Regulus",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "C8R Pisces Rescue",
+    "component": "Expedition",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "C8X Pisces Expedition",
+    "component": "CF-117 Bulldog",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "C8X Pisces Expedition",
+    "component": "FL-11",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "C8X Pisces Expedition",
+    "component": "Marksman I",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "C8X Pisces Expedition",
+    "component": "Shimmer",
+    "type": "Shield",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "C8X Pisces Expedition",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "C8X Pisces Expedition",
+    "component": "Regulus",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "C8X Pisces Expedition",
+    "component": "Expedition",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Carrack",
+    "component": "CF-447 Rhino",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Carrack",
+    "component": "Barbican",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "B",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Carrack",
+    "component": "Reliance",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "B",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Carrack",
+    "component": "Ice-Flush",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "B",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Carrack",
+    "component": "Kama",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Carrack Expedition",
+    "component": "CF-447 Rhino",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Carrack Expedition",
+    "component": "Barbican",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "B",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Carrack Expedition",
+    "component": "Reliance",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "B",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Carrack Expedition",
+    "component": "Ice-Flush",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "B",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Carrack Expedition",
+    "component": "Kama",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Caterpillar",
+    "component": "M5A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Caterpillar",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Caterpillar",
+    "component": "CF-447 Rhino",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Caterpillar",
+    "component": "Stronghold",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Caterpillar",
+    "component": "Ginzel",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Caterpillar",
+    "component": "ThermalCore",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Caterpillar",
+    "component": "Pontes",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Caterpillar Pirate",
+    "component": "M5A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Caterpillar Pirate",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Caterpillar Pirate",
+    "component": "CF-447 Rhino",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Caterpillar Pirate",
+    "component": "Stronghold",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Caterpillar Pirate",
+    "component": "Ginzel",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Caterpillar Pirate",
+    "component": "ThermalCore",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Caterpillar Pirate",
+    "component": "Pontes",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Centurion",
+    "component": "Attrition-3",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Centurion",
+    "component": "CF-447 Rhino",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Centurion",
+    "component": "Castra",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "Centurion",
+    "component": "Defiant",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "B",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "Centurion",
+    "component": "OverDrive",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Centurion",
+    "component": "Cryo-Star SL",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "B",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "Centurion",
+    "component": "Frost-Star",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Clipper",
+    "component": "Mantis GT-220",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Clipper",
+    "component": "Omnisky IX",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Clipper",
+    "component": "Marksman I",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Clipper",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Clipper",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Clipper",
+    "component": "Ink",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "D",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Clipper",
+    "component": "BlastChill",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "D",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Clipper",
+    "component": "ZapJet",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "D",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Clipper",
+    "component": "Flood",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "D",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Constellation Andromeda",
+    "component": "CF-557 Galdereen",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "Constellation Andromeda",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Constellation Andromeda",
+    "component": "StrikeForce II",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Constellation Andromeda",
+    "component": "Marksman I",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Constellation Andromeda",
+    "component": "5CA 'Akura'",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Constellation Andromeda",
+    "component": "DayBreak",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Constellation Andromeda",
+    "component": "Frost-Star EX",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Constellation Andromeda",
+    "component": "Bolon",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Constellation Aquila",
+    "component": "M7A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "Constellation Aquila",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Constellation Aquila",
+    "component": "StrikeForce II",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Constellation Aquila",
+    "component": "5CA 'Akura'",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Constellation Aquila",
+    "component": "DayBreak",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Constellation Aquila",
+    "component": "Frost-Star EX",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Constellation Aquila",
+    "component": "Bolon",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Constellation Phoenix",
+    "component": "Omnisky XV",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "Constellation Phoenix",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Constellation Phoenix",
+    "component": "M2C \"Swarm\"",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Constellation Phoenix",
+    "component": "Marksman I",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Constellation Phoenix",
+    "component": "5CA 'Akura'",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Constellation Phoenix",
+    "component": "DayBreak",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Constellation Phoenix",
+    "component": "Frost-Star EX",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Constellation Phoenix",
+    "component": "Bolon",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Constellation Phoenix Emerald",
+    "component": "Omnisky XV",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "Constellation Phoenix Emerald",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": false
+  },
+  {
+    "ship": "Constellation Phoenix Emerald",
+    "component": "M2C \"Swarm\"",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Constellation Phoenix Emerald",
+    "component": "Marksman I",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Constellation Phoenix Emerald",
+    "component": "5CA 'Akura'",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Constellation Phoenix Emerald",
+    "component": "DayBreak",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Constellation Phoenix Emerald",
+    "component": "Frost-Star EX",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Constellation Phoenix Emerald",
+    "component": "Bolon",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Constellation Taurus",
+    "component": "CF-557 Galdereen",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "Constellation Taurus",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Constellation Taurus",
+    "component": "StrikeForce II",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Constellation Taurus",
+    "component": "Stronghold",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Constellation Taurus",
+    "component": "Diligence",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Constellation Taurus",
+    "component": "CoolCore",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Constellation Taurus",
+    "component": "Bolon",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Corsair",
+    "component": "M6A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Corsair",
+    "component": "M7A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "Corsair",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Corsair",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Corsair",
+    "component": "5CA 'Akura'",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Corsair",
+    "component": "DayBreak",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Corsair",
+    "component": "Frost-Star EX",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Corsair",
+    "component": "Torrent",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "CSV-SM",
+    "component": "PIN",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "CSV-SM",
+    "component": "Radix",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "CSV-SM",
+    "component": "Frost-Star SL",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "Cutlass Black",
+    "component": "Mantis GT-220",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Cutlass Black",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Cutlass Black",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Cutlass Black",
+    "component": "Tempest II",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Cutlass Black",
+    "component": "STOP",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Cutlass Black",
+    "component": "DayBreak",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Cutlass Black",
+    "component": "ColdSnap",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Cutlass Black",
+    "component": "Odyssey",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Cutlass Blue",
+    "component": "Mantis GT-220",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Cutlass Blue",
+    "component": "DR Model-XJ3",
+    "type": "Weapon",
+    "class": "Distortion Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Cutlass Blue",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Cutlass Blue",
+    "component": "Burke QD",
+    "type": "QED",
+    "class": "",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Cutlass Blue",
+    "component": "Tempest II",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Cutlass Blue",
+    "component": "Aspis",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Cutlass Blue",
+    "component": "TurboDrive",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Cutlass Blue",
+    "component": "Graupel",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Cutlass Blue",
+    "component": "Bolon",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Cutlass Red",
+    "component": "Mantis GT-220",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Cutlass Red",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Cutlass Red",
+    "component": "Aspis",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Cutlass Red",
+    "component": "Diligence",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Cutlass Red",
+    "component": "CoolCore",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Cutlass Red",
+    "component": "Bolon",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Cutlass Steel",
+    "component": "Mantis GT-220",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Cutlass Steel",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Cutlass Steel",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Cutlass Steel",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Cutlass Steel",
+    "component": "Tempest II",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Cutlass Steel",
+    "component": "Arctic",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Cutlass Steel",
+    "component": "TurboDrive",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Cutlass Steel",
+    "component": "Crossfield",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Cutlass Steel",
+    "component": "FullStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Cutter",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Cutter",
+    "component": "Spark I",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Cutter",
+    "component": "HEX",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "B",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Cutter",
+    "component": "LightBlossom",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Cutter",
+    "component": "BlastChill",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "D",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Cutter",
+    "component": "FoxFire",
+    "type": "Quantum Drive",
+    "class": "Competition",
+    "grade": "B",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Cutter Rambler",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Cutter Rambler",
+    "component": "Spark I",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Cutter Rambler",
+    "component": "HEX",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "B",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Cutter Rambler",
+    "component": "LightBlossom",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Cutter Rambler",
+    "component": "BlastChill",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "D",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Cutter Rambler",
+    "component": "FoxFire",
+    "type": "Quantum Drive",
+    "class": "Competition",
+    "grade": "B",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Cutter Scout",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Cutter Scout",
+    "component": "Tempest II",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Cutter Scout",
+    "component": "HEX",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "B",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Cutter Scout",
+    "component": "Boreal",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "D",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Cutter Scout",
+    "component": "Exogen",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "D",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Cutter Scout",
+    "component": "FoxFire",
+    "type": "Quantum Drive",
+    "class": "Competition",
+    "grade": "B",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Cyclone",
+    "component": "PIN",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Cyclone",
+    "component": "Radix",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Cyclone",
+    "component": "Frost-Star SL",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Cyclone AA",
+    "component": "Dominator II",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Cyclone AA",
+    "component": "Tromag Burst Generator",
+    "type": "EMP Generator",
+    "class": "",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Cyclone AA",
+    "component": "PIN",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Cyclone AA",
+    "component": "Radix",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Cyclone AA",
+    "component": "Frost-Star SL",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Cyclone MT",
+    "component": "9-Series Longsword",
+    "type": "Weapon",
+    "class": "Ballistic Cannon",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Cyclone MT",
+    "component": "Dominator II",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Cyclone MT",
+    "component": "PIN",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Cyclone MT",
+    "component": "Radix",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Cyclone MT",
+    "component": "Frost-Star SL",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Cyclone RC",
+    "component": "PIN",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Cyclone RC",
+    "component": "Radix",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Cyclone RC",
+    "component": "Frost-Star SL",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Cyclone RN",
+    "component": "PIN",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Cyclone RN",
+    "component": "Radix",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Cyclone RN",
+    "component": "Frost-Star SL",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Cyclone TR",
+    "component": "Yellowjacket GT-210",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Cyclone TR",
+    "component": "PIN",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Cyclone TR",
+    "component": "Radix",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Cyclone TR",
+    "component": "Frost-Star SL",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Defender",
+    "component": "Singe-3",
+    "type": "Weapon",
+    "class": "Tachyon Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Defender",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Defender",
+    "component": "Polar",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "B",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Defender",
+    "component": "IonBurst",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "B",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Defender",
+    "component": "Beacon",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Defender",
+    "component": "Sukoran",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Dragonfly",
+    "component": "Havoc",
+    "type": "Weapon",
+    "class": "Ballistic Scattergun",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Dragonfly",
+    "component": "Radix",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Dragonfly",
+    "component": "Fridan",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Dragonfly Star Kitten",
+    "component": "Havoc",
+    "type": "Weapon",
+    "class": "Ballistic Scattergun",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Dragonfly Star Kitten",
+    "component": "Radix",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Dragonfly Star Kitten",
+    "component": "Fridan",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Dragonfly YellowJacket",
+    "component": "Havoc",
+    "type": "Weapon",
+    "class": "Ballistic Scattergun",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Dragonfly YellowJacket",
+    "component": "Radix",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Dragonfly YellowJacket",
+    "component": "Fridan",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Eclipse",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Eclipse",
+    "component": "Argos IX",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 10,
+    "accessible": false
+  },
+  {
+    "ship": "Eclipse",
+    "component": "Veil",
+    "type": "Shield",
+    "class": "Stealth",
+    "grade": "B",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Eclipse",
+    "component": "DeltaMax",
+    "type": "Power Plant",
+    "class": "Stealth",
+    "grade": "B",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Eclipse",
+    "component": "VaporBlock",
+    "type": "Cooler",
+    "class": "Stealth",
+    "grade": "B",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Eclipse",
+    "component": "Drift",
+    "type": "Quantum Drive",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7A Hornet Mk I",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "F7A Hornet Mk I",
+    "component": "AD4B",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "F7A Hornet Mk I",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "F7A Hornet Mk I",
+    "component": "Dominator II",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "F7A Hornet Mk I",
+    "component": "Marksman I",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "F7A Hornet Mk I",
+    "component": "WEB",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7A Hornet Mk I",
+    "component": "TurboDrive",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "F7A Hornet Mk I",
+    "component": "ArcticStorm",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7A Hornet Mk I",
+    "component": "Eos",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7A Hornet Mk II",
+    "component": "Omnisky IX",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "F7A Hornet Mk II",
+    "component": "Revenant",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "F7A Hornet Mk II",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "F7A Hornet Mk II",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7A Hornet Mk II",
+    "component": "Maelstrom",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "F7A Hornet Mk II",
+    "component": "AllStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7A Hornet Mk II",
+    "component": "Eos",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C Hornet Mk I",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "F7C Hornet Mk I",
+    "component": "Dominator II",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "F7C Hornet Mk I",
+    "component": "Marksman I",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C Hornet Mk I",
+    "component": "WEB",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C Hornet Mk I",
+    "component": "PowerBolt",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C Hornet Mk I",
+    "component": "ArcticStorm",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C Hornet Mk I",
+    "component": "Eos",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C Hornet Mk II",
+    "component": "Revenant",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "F7C Hornet Mk II",
+    "component": "Marksman I",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C Hornet Mk II",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C Hornet Mk II",
+    "component": "Regulus",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C Hornet Mk II",
+    "component": "AllStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C Hornet Mk II",
+    "component": "Eos",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C Hornet Wildfire Mk I",
+    "component": "Tarantula GT-870 Mk 3",
+    "type": "Weapon",
+    "class": "Ballistic Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "F7C Hornet Wildfire Mk I",
+    "component": "Revenant",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "F7C Hornet Wildfire Mk I",
+    "component": "Dominator II",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "F7C Hornet Wildfire Mk I",
+    "component": "Marksman I",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C Hornet Wildfire Mk I",
+    "component": "WEB",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C Hornet Wildfire Mk I",
+    "component": "Roughneck",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "D",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C Hornet Wildfire Mk I",
+    "component": "ArcticStorm",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C Hornet Wildfire Mk I",
+    "component": "Eos",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-M Hornet Heartseeker Mk I",
+    "component": "CF-117 Bulldog",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "F7C-M Hornet Heartseeker Mk I",
+    "component": "Mantis GT-220",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "F7C-M Hornet Heartseeker Mk I",
+    "component": "M6A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "F7C-M Hornet Heartseeker Mk I",
+    "component": "Rattler II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "F7C-M Hornet Heartseeker Mk I",
+    "component": "Polar",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "B",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-M Hornet Heartseeker Mk I",
+    "component": "OverDrive",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-M Hornet Heartseeker Mk I",
+    "component": "ForceWall",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "B",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-M Hornet Heartseeker Mk I",
+    "component": "Eos",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-M Hornet Heartseeker Mk II",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "F7C-M Hornet Heartseeker Mk II",
+    "component": "Revenant",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "F7C-M Hornet Heartseeker Mk II",
+    "component": "TMSB-5 Gatling",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "F7C-M Hornet Heartseeker Mk II",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "F7C-M Hornet Heartseeker Mk II",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-M Hornet Heartseeker Mk II",
+    "component": "Maelstrom",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-M Hornet Heartseeker Mk II",
+    "component": "AllStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-M Hornet Heartseeker Mk II",
+    "component": "Eos",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-M Super Hornet Mk I",
+    "component": "CF-117 Bulldog",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "F7C-M Super Hornet Mk I",
+    "component": "Mantis GT-220",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "F7C-M Super Hornet Mk I",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "F7C-M Super Hornet Mk I",
+    "component": "Marksman I",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-M Super Hornet Mk I",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-M Super Hornet Mk I",
+    "component": "Regulus",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-M Super Hornet Mk I",
+    "component": "AllStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-M Super Hornet Mk I",
+    "component": "Eos",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-M Super Hornet Mk II",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "F7C-M Super Hornet Mk II",
+    "component": "Revenant",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "F7C-M Super Hornet Mk II",
+    "component": "Spark I",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "F7C-M Super Hornet Mk II",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "F7C-M Super Hornet Mk II",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-M Super Hornet Mk II",
+    "component": "Maelstrom",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-M Super Hornet Mk II",
+    "component": "AllStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-M Super Hornet Mk II",
+    "component": "Eos",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-R Hornet Tracker Mk I",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "F7C-R Hornet Tracker Mk I",
+    "component": "Dominator II",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "F7C-R Hornet Tracker Mk I",
+    "component": "Marksman I",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-R Hornet Tracker Mk I",
+    "component": "Targa",
+    "type": "Shield",
+    "class": "Competition",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-R Hornet Tracker Mk I",
+    "component": "LumaCore",
+    "type": "Power Plant",
+    "class": "Competition",
+    "grade": "A",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-R Hornet Tracker Mk I",
+    "component": "IcePlunge",
+    "type": "Cooler",
+    "class": "Competition",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-R Hornet Tracker Mk I",
+    "component": "Eos",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-R Hornet Tracker Mk II",
+    "component": "Revenant",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "F7C-R Hornet Tracker Mk II",
+    "component": "Marksman I",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "F7C-R Hornet Tracker Mk II",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-R Hornet Tracker Mk II",
+    "component": "Regulus",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-R Hornet Tracker Mk II",
+    "component": "AllStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-R Hornet Tracker Mk II",
+    "component": "Eos",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-S Hornet Ghost Mk I",
+    "component": "Omnisky IX",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "F7C-S Hornet Ghost Mk I",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-S Hornet Ghost Mk I",
+    "component": "Marksman I",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-S Hornet Ghost Mk I",
+    "component": "Shimmer",
+    "type": "Shield",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-S Hornet Ghost Mk I",
+    "component": "Slipstream",
+    "type": "Power Plant",
+    "class": "Stealth",
+    "grade": "A",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-S Hornet Ghost Mk I",
+    "component": "HeatSafe",
+    "type": "Cooler",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-S Hornet Ghost Mk I",
+    "component": "Eos",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-S Hornet Ghost Mk II",
+    "component": "Revenant",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "F7C-S Hornet Ghost Mk II",
+    "component": "Marksman I",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "F7C-S Hornet Ghost Mk II",
+    "component": "Shimmer",
+    "type": "Shield",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-S Hornet Ghost Mk II",
+    "component": "SonicLite",
+    "type": "Power Plant",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-S Hornet Ghost Mk II",
+    "component": "HeatSafe",
+    "type": "Cooler",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F7C-S Hornet Ghost Mk II",
+    "component": "Drift",
+    "type": "Quantum Drive",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F8A Lightning",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "F8A Lightning",
+    "component": "M6A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "F8A Lightning",
+    "component": "M5A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "F8A Lightning",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "F8A Lightning",
+    "component": "Polar",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "B",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F8A Lightning",
+    "component": "Maelstrom",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "F8A Lightning",
+    "component": "Sheut",
+    "type": "Shield",
+    "class": "Stealth",
+    "grade": "B",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "F8A Lightning",
+    "component": "Expedition",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F8C Lightning",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "F8C Lightning",
+    "component": "Tarantula GT-870 Mk 3",
+    "type": "Weapon",
+    "class": "Ballistic Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "F8C Lightning",
+    "component": "Tarantula GT-870 Mk 2",
+    "type": "Weapon",
+    "class": "Ballistic Cannon",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "F8C Lightning",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "F8C Lightning",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "F8C Lightning",
+    "component": "Polar",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "B",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "F8C Lightning",
+    "component": "Maelstrom",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "F8C Lightning",
+    "component": "Sheut",
+    "type": "Shield",
+    "class": "Stealth",
+    "grade": "B",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "F8C Lightning",
+    "component": "Expedition",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Fortune",
+    "component": "CF-117 Bulldog",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Fortune",
+    "component": "Bulwark",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Fortune",
+    "component": "Trommel",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "D",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Fortune",
+    "component": "Snowfall",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "B",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Fortune",
+    "component": "Goliath",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer",
+    "component": "M5A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer",
+    "component": "5MA 'Chimalli'",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer",
+    "component": "DayBreak",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer",
+    "component": "Frost-Star EX",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer",
+    "component": "Odyssey",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer DUR",
+    "component": "Attrition-3",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer DUR",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer DUR",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer DUR",
+    "component": "Dominator II",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer DUR",
+    "component": "5MA 'Chimalli'",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer DUR",
+    "component": "DayBreak",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer DUR",
+    "component": "Frost-Star EX",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer DUR",
+    "component": "Odyssey",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer MAX",
+    "component": "Omnisky IX",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer MAX",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer MAX",
+    "component": "Thunderbolt III",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer MAX",
+    "component": "Dominator II",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer MAX",
+    "component": "5MA 'Chimalli'",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer MAX",
+    "component": "DayBreak",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer MAX",
+    "component": "Frost-Star EX",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer MAX",
+    "component": "Odyssey",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer MIS",
+    "component": "M5A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer MIS",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer MIS",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer MIS",
+    "component": "Thunderbolt III",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer MIS",
+    "component": "Arctic",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer MIS",
+    "component": "Maelstrom",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer MIS",
+    "component": "Crossfield",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Freelancer MIS",
+    "component": "FullStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Fury",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Fury",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Fury",
+    "component": "Cloak",
+    "type": "Shield",
+    "class": "Stealth",
+    "grade": "D",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Fury",
+    "component": "Roughneck",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "D",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Fury",
+    "component": "Hydrocel",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "D",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Fury LX",
+    "component": "Falco",
+    "type": "Shield",
+    "class": "Competition",
+    "grade": "D",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Fury LX",
+    "component": "Roughneck",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "D",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Fury LX",
+    "component": "IcePlunge",
+    "type": "Cooler",
+    "class": "Competition",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Fury MX",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Fury MX",
+    "component": "Marksman I",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Fury MX",
+    "component": "Cloak",
+    "type": "Shield",
+    "class": "Stealth",
+    "grade": "D",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Fury MX",
+    "component": "Roughneck",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "D",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Fury MX",
+    "component": "Hydrocel",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "D",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Gladiator",
+    "component": "CF-447 Rhino",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Gladiator",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Gladiator",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Gladiator",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Gladiator",
+    "component": "Stalker V",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "Gladiator",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Gladiator",
+    "component": "Maelstrom",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Gladiator",
+    "component": "Beacon",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Gladiator",
+    "component": "FullStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Gladius",
+    "component": "Mantis GT-220",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Gladius",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Gladius",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Gladius",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Gladius",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Gladius",
+    "component": "Regulus",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Gladius",
+    "component": "Beacon",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Gladius",
+    "component": "AllStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Gladius Pirate",
+    "component": "Mantis GT-220",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Gladius Pirate",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Gladius Pirate",
+    "component": "Marksman I",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Gladius Pirate",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Gladius Pirate",
+    "component": "Polar",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "B",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Gladius Pirate",
+    "component": "Charger",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "D",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Gladius Pirate",
+    "component": "SecureHyde",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "D",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Gladius Pirate",
+    "component": "Expedition",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Gladius Valiant",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Gladius Valiant",
+    "component": "Omnisky IX",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Gladius Valiant",
+    "component": "Viper III",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Gladius Valiant",
+    "component": "Pioneer I",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Gladius Valiant",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Gladius Valiant",
+    "component": "Regulus",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Gladius Valiant",
+    "component": "Beacon",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Gladius Valiant",
+    "component": "AllStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Glaive",
+    "component": "WEAK'",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Glaive",
+    "component": "WRATH'",
+    "type": "Weapon",
+    "class": "Plasma Cannon",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "Glaive",
+    "component": "Bullet' II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Glaive",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Glaive",
+    "component": "Fierell Cascade",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "B",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Glaive",
+    "component": "Beacon",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Glaive",
+    "component": "AllStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Golem",
+    "component": "CF-117 Bulldog",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Golem",
+    "component": "Spark I",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Golem",
+    "component": "Bulwark",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Golem",
+    "component": "Fortitude",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Golem",
+    "component": "Thermax",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Golem",
+    "component": "Goliath",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Golem Ox",
+    "component": "CF-117 Bulldog",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Golem Ox",
+    "component": "Spark I",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Golem Ox",
+    "component": "Bulwark",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Golem Ox",
+    "component": "Fortitude",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Golem Ox",
+    "component": "Thermax",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Golem Ox",
+    "component": "Goliath",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Guardian",
+    "component": "M7A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "Guardian",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Guardian",
+    "component": "Arctic",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Guardian",
+    "component": "OverDrive",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Guardian",
+    "component": "Crossfield",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Guardian",
+    "component": "FullStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Guardian MX",
+    "component": "CF-447 Rhino",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Guardian MX",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Guardian MX",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Guardian MX",
+    "component": "Arctic",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Guardian MX",
+    "component": "Maelstrom",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Guardian MX",
+    "component": "Crossfield",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Guardian MX",
+    "component": "fullStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Guardian QI",
+    "component": "M7A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "Guardian QI",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Guardian QI",
+    "component": "Captor QD",
+    "type": "QED",
+    "class": "",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Guardian QI",
+    "component": "Arctic",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Guardian QI",
+    "component": "Regulus",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Guardian QI",
+    "component": "Crossfield",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Guardian QI",
+    "component": "fullStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Hammerhead",
+    "component": "CF-447 Rhino",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Hammerhead",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Hammerhead",
+    "component": "Viper III",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Hammerhead",
+    "component": "Stronghold",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Hammerhead",
+    "component": "Mercury",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Hammerhead",
+    "component": "SuperDrive",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Hammerhead",
+    "component": "Kama",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Hawk",
+    "component": "Suckerpunch",
+    "type": "Weapon",
+    "class": "Distortion Cannon",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Hawk",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Hawk",
+    "component": "TroMag Burst Generator",
+    "type": "EMP Generator",
+    "class": "",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Hawk",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Hawk",
+    "component": "Regulus",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Hawk",
+    "component": "AllStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Hawk",
+    "component": "Rush",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Herald",
+    "component": "Mantis GT-220",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Herald",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Herald",
+    "component": "Dominator II",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Herald",
+    "component": "Shimmer",
+    "type": "Shield",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Herald",
+    "component": "Slipstream",
+    "type": "Power Plant",
+    "class": "Stealth",
+    "grade": "A",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Herald",
+    "component": "HeatSafe",
+    "type": "Cooler",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Herald",
+    "component": "Expedition",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Hermes",
+    "component": "CF-447 Rhino",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Hermes",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Hermes",
+    "component": "STOP",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Hermes",
+    "component": "FullForce",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Hermes",
+    "component": "ColdSnap",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Hermes",
+    "component": "Odyssey",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "HoverQuad",
+    "component": "Radix",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "HoverQuad",
+    "component": "Fridan",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "Hull A",
+    "component": "CF-117 Bulldog",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Hull A",
+    "component": "Armada",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "D",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Hull A",
+    "component": "IonBurst",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "B",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Hull A",
+    "component": "ArcticStorm",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Hull A",
+    "component": "Goliath",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Hull C",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Hull C",
+    "component": "Stronghold",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Hull C",
+    "component": "Blizzard",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "A",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Hull C",
+    "component": "Centurion",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Hull C",
+    "component": "Kama",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Hurricane",
+    "component": "CF-447 Rhino",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Hurricane",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Hurricane",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Hurricane",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Hurricane",
+    "component": "Regulus",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Hurricane",
+    "component": "FullStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Hurricane",
+    "component": "Expedition",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Idris M",
+    "component": "M9A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 7,
+    "accessible": true
+  },
+  {
+    "ship": "Idris M",
+    "component": "CF-557 Galdereen",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "Idris M",
+    "component": "Destroyer Mass Driver",
+    "type": "Weapon",
+    "class": "Ballistic Cannon",
+    "grade": "",
+    "size": 10,
+    "accessible": true
+  },
+  {
+    "ship": "Idris M",
+    "component": "Revenant",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Idris M",
+    "component": "M2C \"Swarm\"",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Idris M",
+    "component": "Stalker V",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "Idris M",
+    "component": "Idris Cooler",
+    "type": "Cooler",
+    "class": "",
+    "grade": "A",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Idris M",
+    "component": "Idris PowerPlant",
+    "type": "Power Plant",
+    "class": "",
+    "grade": "A",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Idris M",
+    "component": "Frontline",
+    "type": "Quantum Drive",
+    "class": "",
+    "grade": "A",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Idris M",
+    "component": "Holdstrong",
+    "type": "Shield",
+    "class": "",
+    "grade": "A",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Idris P",
+    "component": "M7A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "Idris P",
+    "component": "CF-557 Galdereen",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "Idris P",
+    "component": "Revenant",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Idris P",
+    "component": "M2C \"Swarm\"",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Idris P",
+    "component": "Idris Cooler",
+    "type": "Cooler",
+    "class": "",
+    "grade": "A",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Idris P",
+    "component": "Idris PowerPlant",
+    "type": "Power Plant",
+    "class": "",
+    "grade": "A",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Idris P",
+    "component": "Frontline",
+    "type": "Quantum Drive",
+    "class": "",
+    "grade": "A",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Idris P",
+    "component": "Holdstrong",
+    "type": "Shield",
+    "class": "",
+    "grade": "A",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Intrepid",
+    "component": "CF-447 Rhino",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Intrepid",
+    "component": "Marksman I",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Intrepid",
+    "component": "HEX",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "B",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Intrepid",
+    "component": "LightBlossom",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Intrepid",
+    "component": "BlastChill",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "D",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Intrepid",
+    "component": "FoxFire",
+    "type": "Quantum Drive",
+    "class": "Competition",
+    "grade": "B",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Khartu-al",
+    "component": "CF-447 Rhino",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Khartu-al",
+    "component": "Polar",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "B",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Khartu-al",
+    "component": "DynaFlux",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "B",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Khartu-al",
+    "component": "ForceWall",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "B",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Khartu-al",
+    "component": "Eos",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "L-21 Wolf",
+    "component": "Relentless L-21",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "L-21 Wolf",
+    "component": "Marksman I",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "L-21 Wolf",
+    "component": "Hex",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "B",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "L-21 Wolf",
+    "component": "LightBlossom",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "L-21 Wolf",
+    "component": "BlastChill",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "D",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "L-21 Wolf",
+    "component": "Foxfire",
+    "type": "Quantum Drive",
+    "class": "Competition",
+    "grade": "B",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "L-22 Alpha Wolf",
+    "component": "Axiom L-22",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "L-22 Alpha Wolf",
+    "component": "Dominator II",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "L-22 Alpha Wolf",
+    "component": "Hex",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "B",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "L-22 Alpha Wolf",
+    "component": "LightBlossom",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "L-22 Alpha Wolf",
+    "component": "BlastChill",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "D",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "L-22 Alpha Wolf",
+    "component": "VK-00",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "A",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Lynx",
+    "component": "M3A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Lynx",
+    "component": "PIN",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "Lynx",
+    "component": "Radix",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "Lynx",
+    "component": "Frost-Star SL",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "M2 Hercules Starlifter",
+    "component": "M7A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "M2 Hercules Starlifter",
+    "component": "M6A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "M2 Hercules Starlifter",
+    "component": "CF-447 Rhino",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "M2 Hercules Starlifter",
+    "component": "Mercury",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "M2 Hercules Starlifter",
+    "component": "SuperDrive",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "M2 Hercules Starlifter",
+    "component": "Pontes",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "M2 Hercules Starlifter",
+    "component": "FullBlock",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "B",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "M50 Interceptor",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "M50 Interceptor",
+    "component": "Marksman I",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "M50 Interceptor",
+    "component": "Targa",
+    "type": "Shield",
+    "class": "Competition",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "M50 Interceptor",
+    "component": "LumaCore",
+    "type": "Power Plant",
+    "class": "Competition",
+    "grade": "A",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "M50 Interceptor",
+    "component": "IcePlunge",
+    "type": "Cooler",
+    "class": "Competition",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "M50 Interceptor",
+    "component": "LightFire",
+    "type": "Quantum Drive",
+    "class": "Competition",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Mantis",
+    "component": "FL-33",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Mantis",
+    "component": "Dominator II",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Mantis",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Mantis",
+    "component": "Reynie QED",
+    "type": "QED",
+    "class": "",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Mantis",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Mantis",
+    "component": "Regulus",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Mantis",
+    "component": "Beacon",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Mantis",
+    "component": "AllStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "MDC",
+    "component": "MRX \"Torrent\"",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "MDC",
+    "component": "PIN",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "MDC",
+    "component": "Defiant",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "B",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "MDC",
+    "component": "Cryo-Star SL",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "B",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "Mercury Star Runner",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Mercury Star Runner",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": false
+  },
+  {
+    "ship": "Mercury Star Runner",
+    "component": "Tempest II",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Mercury Star Runner",
+    "component": "Stronghold",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Mercury Star Runner",
+    "component": "Diligence",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Mercury Star Runner",
+    "component": "CoolCore",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Mercury Star Runner",
+    "component": "Bolon",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Meteor",
+    "component": "FL-33",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Meteor",
+    "component": "Dominator II",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Meteor",
+    "component": "Raptor IV",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Meteor",
+    "component": "Leonids",
+    "type": "Weapon",
+    "class": "Ballistic Cannon",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "Meteor",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Meteor",
+    "component": "Regulus",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Meteor",
+    "component": "Beacon",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Meteor",
+    "component": "AllStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Mole",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Mole",
+    "component": "5CA 'Akura'",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Mole",
+    "component": "Ginzel",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Mole",
+    "component": "ThermalCore",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Mole",
+    "component": "Huracan",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "B",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Mole Carbon",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Mole Carbon",
+    "component": "5CA 'Akura'",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Mole Carbon",
+    "component": "Ginzel",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Mole Carbon",
+    "component": "ThermalCore",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Mole Carbon",
+    "component": "Huracan",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "B",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Mole Talus",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Mole Talus",
+    "component": "5CA 'Akura'",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Mole Talus",
+    "component": "Ginzel",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Mole Talus",
+    "component": "ThermalCore",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Mole Talus",
+    "component": "Huracan",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "B",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Moth",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Moth",
+    "component": "Tempest II",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Moth",
+    "component": "5CA 'Akura'",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Moth",
+    "component": "Ginzel",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Moth",
+    "component": "ThermalCore",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Moth",
+    "component": "Huracan",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "B",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "MPUV Cargo",
+    "component": "Bulwark",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "MPUV Cargo",
+    "component": "IonWave",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "B",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "MPUV Cargo",
+    "component": "Frost-Star SL",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "MPUV Personnel",
+    "component": "Bulwark",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "MPUV Personnel",
+    "component": "IonWave",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "B",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "MPUV Personnel",
+    "component": "Frost-Star SL",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "MPUV Tractor",
+    "component": "Bulwark",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "MPUV Tractor",
+    "component": "IonWave",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "B",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "MPUV Tractor",
+    "component": "Frost-Star SL",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "MTC",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "MTC",
+    "component": "PIN",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "MTC",
+    "component": "Defiant",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "B",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "MTC",
+    "component": "Cryo-Star SL",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "B",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "Mule",
+    "component": "Steadfast",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "Mule",
+    "component": "Winter-Star SL",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "D",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "Mustang Alpha",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Mustang Alpha",
+    "component": "INK",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "D",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Mustang Alpha",
+    "component": "ZapJet",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "D",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Mustang Alpha",
+    "component": "Winter-Star",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "D",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Mustang Alpha",
+    "component": "Rush",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Mustang Beta",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Mustang Beta",
+    "component": "INK",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "D",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Mustang Beta",
+    "component": "Roughneck",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "D",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Mustang Beta",
+    "component": "Hydrocel",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "D",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Mustang Beta",
+    "component": "Rush",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Mustang Delta",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Mustang Delta",
+    "component": "Jericho XL",
+    "type": "Weapon",
+    "class": "Rocket Pod",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Mustang Delta",
+    "component": "OverDrive",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Mustang Delta",
+    "component": "SecureHyde",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "D",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Mustang Delta",
+    "component": "Winter-Star",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "D",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Mustang Delta",
+    "component": "Rush",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Mustang Gamma",
+    "component": "CF-117 Bulldog",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Mustang Gamma",
+    "component": "Falco",
+    "type": "Shield",
+    "class": "Competition",
+    "grade": "D",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Mustang Gamma",
+    "component": "LumaCore",
+    "type": "Power Plant",
+    "class": "Competition",
+    "grade": "A",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Mustang Gamma",
+    "component": "QuikCool",
+    "type": "Cooler",
+    "class": "Competition",
+    "grade": "D",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Mustang Gamma",
+    "component": "Rush",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Mustang Omega",
+    "component": "CF-117 Bulldog",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Mustang Omega",
+    "component": "Falco",
+    "type": "Shield",
+    "class": "Competition",
+    "grade": "D",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Mustang Omega",
+    "component": "LumaCore",
+    "type": "Power Plant",
+    "class": "Competition",
+    "grade": "A",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Mustang Omega",
+    "component": "QuikCool",
+    "type": "Cooler",
+    "class": "Competition",
+    "grade": "D",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Mustang Omega",
+    "component": "Rush",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Nomad",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Nomad",
+    "component": "StrikeForce II",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Nomad",
+    "component": "WEB",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Nomad",
+    "component": "IonBurst",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "B",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Nomad",
+    "component": "Ultra-Flow",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "A",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Nomad",
+    "component": "Expedition",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Nova",
+    "component": "Slayer",
+    "type": "Weapon",
+    "class": "Ballistic Cannon",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "Nova",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Nova",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Nova",
+    "component": "PIN",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Nova",
+    "component": "Radix",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "Nova",
+    "component": "Frost-Star SL",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Nox",
+    "component": "Radix",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Nox",
+    "component": "Fridan",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Nox Kue",
+    "component": "Radix",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Nox Kue",
+    "component": "Fridan",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "P-52 Merlin",
+    "component": "Tigerstrike T-19P",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "P-52 Merlin",
+    "component": "CF-117 Bulldog",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "P-52 Merlin",
+    "component": "SecureHyde",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "D",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "P-52 Merlin",
+    "component": "LightBlossom",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "P-52 Merlin",
+    "component": "Frost-Star",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "P-72 Archimedes",
+    "component": "CF-117 Bulldog",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "P-72 Archimedes",
+    "component": "Targa",
+    "type": "Shield",
+    "class": "Competition",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "P-72 Archimedes",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "P-72 Archimedes",
+    "component": "Charger",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "D",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "P-72 Archimedes Emerald",
+    "component": "CF-117 Bulldog",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "P-72 Archimedes Emerald",
+    "component": "Targa",
+    "type": "Shield",
+    "class": "Competition",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "P-72 Archimedes Emerald",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "P-72 Archimedes Emerald",
+    "component": "Charger",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "D",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Paladin",
+    "component": "CF-557 Galdereen",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "Paladin",
+    "component": "CF-447 Rhino",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Paladin",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Paladin",
+    "component": "Raptor IV",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Paladin",
+    "component": "Stronghold",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Paladin",
+    "component": "Maelstrom",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Paladin",
+    "component": "Arctic",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Paladin",
+    "component": "SparkFire",
+    "type": "Quantum Drive",
+    "class": "Competition",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Perseus",
+    "component": "RSI Medusa",
+    "type": "Weapon",
+    "class": "Ballistic Cannon",
+    "grade": "",
+    "size": 8,
+    "accessible": true
+  },
+  {
+    "ship": "Perseus",
+    "component": "Mantis GT-220",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Perseus",
+    "component": "M2C \"Swarm\"",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Perseus",
+    "component": "Reaper V",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "Perseus",
+    "component": "SureStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Perseus",
+    "component": "Mercury",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Perseus",
+    "component": "Centurion",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Perseus",
+    "component": "Pontes",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Polaris",
+    "component": "Maris",
+    "type": "Weapon",
+    "class": "Ballistic Cannon",
+    "grade": "",
+    "size": 6,
+    "accessible": true
+  },
+  {
+    "ship": "Polaris",
+    "component": "Omnisky XII",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Polaris",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Polaris",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Polaris",
+    "component": "M2C \"Swarm\"",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Polaris",
+    "component": "VT-T10 \"Veritas\"",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 10,
+    "accessible": true
+  },
+  {
+    "ship": "Polaris",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Polaris",
+    "component": "Serac",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "A",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Polaris",
+    "component": "Stellate",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "A",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Polaris",
+    "component": "Glacis",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "A",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Polaris",
+    "component": "Erebos",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "A",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Prospector",
+    "component": "CF-117 Bulldog",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Prospector",
+    "component": "Bulwark",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Prospector",
+    "component": "Trommel",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "D",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Prospector",
+    "component": "Snowfall",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "B",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Prospector",
+    "component": "Goliath",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Prowler",
+    "component": "Deadbolt V",
+    "type": "Weapon",
+    "class": "Ballistic Cannon",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "Prowler",
+    "component": "Lightstrike III",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Prowler",
+    "component": "Obscura",
+    "type": "Shield",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Prowler",
+    "component": "Eclipse",
+    "type": "Power Plant",
+    "class": "Stealth",
+    "grade": "A",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Prowler",
+    "component": "HeatSink",
+    "type": "Cooler",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Prowler",
+    "component": "Nova",
+    "type": "Quantum Drive",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Prowler Utility",
+    "component": "Lightstrike IV",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Prowler Utility",
+    "component": "Deadbolt III",
+    "type": "Weapon",
+    "class": "Ballistic Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Prowler Utility",
+    "component": "Obscura",
+    "type": "Shield",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Prowler Utility",
+    "component": "Eclipse",
+    "type": "Power Plant",
+    "class": "Stealth",
+    "grade": "A",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Prowler Utility",
+    "component": "HeatSink",
+    "type": "Cooler",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Prowler Utility",
+    "component": "Nova",
+    "type": "Quantum Drive",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "PTV",
+    "component": "Radix",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "PTV",
+    "component": "Frost-Star SL",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Pulse",
+    "component": "Thlilye Laser",
+    "type": "Weapon",
+    "class": "Laser Gatling",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Pulse",
+    "component": "Radix",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "Pulse",
+    "component": "Fridan",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "Pulse LX",
+    "component": "Radix",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "Pulse LX",
+    "component": "Fridan",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "RAFT",
+    "component": "M5A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "RAFT",
+    "component": "Aspis",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "RAFT",
+    "component": "Diligence",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "RAFT",
+    "component": "CoolCore",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "RAFT",
+    "component": "Bolon",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Razor",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Razor",
+    "component": "Marksman I",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Razor",
+    "component": "Targa",
+    "type": "Shield",
+    "class": "Competition",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Razor",
+    "component": "StarHeart",
+    "type": "Power Plant",
+    "class": "Competition",
+    "grade": "B",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Razor",
+    "component": "IcePlunge",
+    "type": "Cooler",
+    "class": "Competition",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Razor",
+    "component": "LightFire",
+    "type": "Quantum Drive",
+    "class": "Competition",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Razor EX",
+    "component": "Hellion",
+    "type": "Weapon",
+    "class": "Ballistic Scattergun",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Razor EX",
+    "component": "Spark I",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Razor EX",
+    "component": "Shimmer",
+    "type": "Shield",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Razor EX",
+    "component": "SonicLite",
+    "type": "Power Plant",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Razor EX",
+    "component": "HeatSafe",
+    "type": "Cooler",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Razor EX",
+    "component": "Drift",
+    "type": "Quantum Drive",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Razor LX",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Razor LX",
+    "component": "Targa",
+    "type": "Shield",
+    "class": "Competition",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Razor LX",
+    "component": "StarHeart",
+    "type": "Power Plant",
+    "class": "Competition",
+    "grade": "B",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Razor LX",
+    "component": "IcePlunge",
+    "type": "Cooler",
+    "class": "Competition",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Razor LX",
+    "component": "LightFire",
+    "type": "Quantum Drive",
+    "class": "Competition",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Reclaimer",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Reclaimer",
+    "component": "CF-557 Galdereen",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "Reclaimer",
+    "component": "Algid",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "A",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Reclaimer",
+    "component": "Reclaimer PowerPlant",
+    "type": "Power Plant",
+    "class": "",
+    "grade": "A",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Reclaimer",
+    "component": "RS-Barrier",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "A",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Reclaimer",
+    "component": "Kama",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Redeemer",
+    "component": "C-788",
+    "type": "Weapon",
+    "class": "Ballistic Cannon",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Redeemer",
+    "component": "M5A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Redeemer",
+    "component": "AD4B",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Redeemer",
+    "component": "StrikeForce II",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Redeemer",
+    "component": "Blizzard",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "A",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Redeemer",
+    "component": "Centurion",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Redeemer",
+    "component": "Crossfield",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Redeemer",
+    "component": "FullStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Reliant Kore",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Reliant Kore",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Reliant Kore",
+    "component": "WEB",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Reliant Kore",
+    "component": "IonBurst",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "B",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Reliant Kore",
+    "component": "ArcticStorm",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Reliant Kore",
+    "component": "Rush",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Reliant Mako",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Reliant Mako",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Reliant Mako",
+    "component": "Shimmer",
+    "type": "Shield",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Reliant Mako",
+    "component": "IonBurst",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "B",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Reliant Mako",
+    "component": "HeatSafe",
+    "type": "Cooler",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Reliant Mako",
+    "component": "Drift",
+    "type": "Quantum Drive",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Reliant Sen",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Reliant Sen",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Reliant Sen",
+    "component": "Bulwark",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Reliant Sen",
+    "component": "Fortitude",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Reliant Sen",
+    "component": "Thermax",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Reliant Sen",
+    "component": "Goliath",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Reliant Tana",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Reliant Tana",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Reliant Tana",
+    "component": "StrikeForce II",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Reliant Tana",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Reliant Tana",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Reliant Tana",
+    "component": "Regulus",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Reliant Tana",
+    "component": "Beacon",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Reliant Tana",
+    "component": "AllStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Retaliator",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Retaliator",
+    "component": "Arctic",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Retaliator",
+    "component": "Maelstrom",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Retaliator",
+    "component": "Crossfield",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Retaliator",
+    "component": "FullStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "ROC",
+    "component": "Steadfast",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "ROC",
+    "component": "Frost-Star SL",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "ROC-DS",
+    "component": "Steadfast",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "ROC-DS",
+    "component": "Frost-Star SL",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Sabre",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Sabre",
+    "component": "Thunderbolt III",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 3,
+    "accessible": false
+  },
+  {
+    "ship": "Sabre",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": false
+  },
+  {
+    "ship": "Sabre",
+    "component": "Shimmer",
+    "type": "Shield",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Sabre",
+    "component": "SonicLite",
+    "type": "Power Plant",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Sabre",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Sabre",
+    "component": "Drift",
+    "type": "Quantum Drive",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Sabre Comet",
+    "component": "Omnisky IX",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Sabre Comet",
+    "component": "PyroBurst",
+    "type": "Weapon",
+    "class": "Laser Scattergun",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Sabre Comet",
+    "component": "Thunderbolt III",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 3,
+    "accessible": false
+  },
+  {
+    "ship": "Sabre Comet",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": false
+  },
+  {
+    "ship": "Sabre Comet",
+    "component": "Shimmer",
+    "type": "Shield",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Sabre Comet",
+    "component": "SonicLite",
+    "type": "Power Plant",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Sabre Comet",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Sabre Comet",
+    "component": "Drift",
+    "type": "Quantum Drive",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Sabre Firebird",
+    "component": "Mantis GT-220",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Sabre Firebird",
+    "component": "Thunderbolt III",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Sabre Firebird",
+    "component": "Shimmer",
+    "type": "Shield",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Sabre Firebird",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Sabre Firebird",
+    "component": "SonicLite",
+    "type": "Power Plant",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Sabre Firebird",
+    "component": "Charger",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "D",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Sabre Firebird",
+    "component": "Drift",
+    "type": "Quantum Drive",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Sabre Peregrine",
+    "component": "Shimmer",
+    "type": "Shield",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Sabre Peregrine",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Sabre Peregrine",
+    "component": "SonicLite",
+    "type": "Power Plant",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Sabre Peregrine",
+    "component": "Charger",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "D",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Sabre Peregrine",
+    "component": "Drift",
+    "type": "Quantum Drive",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Sabre Raven",
+    "component": "Quarreler",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Sabre Raven",
+    "component": "TroMag Burst Generator",
+    "type": "EMP Generator",
+    "class": "",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Sabre Raven",
+    "component": "Shimmer",
+    "type": "Shield",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Sabre Raven",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Sabre Raven",
+    "component": "SonicLite",
+    "type": "Power Plant",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Sabre Raven",
+    "component": "Charger",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "D",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Sabre Raven",
+    "component": "Drift",
+    "type": "Quantum Drive",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Salvation",
+    "component": "CF-117 Bulldog",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Salvation",
+    "component": "Bulwark",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Salvation",
+    "component": "Eco-Flow",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "B",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Salvation",
+    "component": "Fortitude",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Salvation",
+    "component": "Colossus",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "B",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "San'tok.yāi",
+    "component": "Yeng’tu",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "San'tok.yāi",
+    "component": "Tempest II",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "San'tok.yāi",
+    "component": "Polar",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "B",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "San'tok.yāi",
+    "component": "DynaFlux",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "B",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "San'tok.yāi",
+    "component": "Beacon",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "San'tok.yāi",
+    "component": "FullStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Scorpius",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Scorpius",
+    "component": "Tempest II",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Scorpius",
+    "component": "Polar",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "B",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Scorpius",
+    "component": "Regulus",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Scorpius",
+    "component": "FullStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Scorpius",
+    "component": "Eos",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Scorpius Antares",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Scorpius Antares",
+    "component": "Tempest II",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Scorpius Antares",
+    "component": "Magstrand EMP Generator",
+    "type": "EMP Generator",
+    "class": "",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Scorpius Antares",
+    "component": "Tidelock QD",
+    "type": "QED",
+    "class": "",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Scorpius Antares",
+    "component": "Polar",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "B",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Scorpius Antares",
+    "component": "Regulus",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Scorpius Antares",
+    "component": "FullStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Scorpius Antares",
+    "component": "Eos",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Scythe",
+    "component": "WEAK'",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Scythe",
+    "component": "WAR'",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "Scythe",
+    "component": "WRATH'",
+    "type": "Weapon",
+    "class": "Plasma Cannon",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "Scythe",
+    "component": "Arrow' I",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Scythe",
+    "component": "Bracer",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Scythe",
+    "component": "Fierell Cascade",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "B",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Scythe",
+    "component": "Beacon",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Scythe",
+    "component": "AllStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Shiv",
+    "component": "Breakneck S4",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Shiv",
+    "component": "Tormenter S3",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Shiv",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Shiv",
+    "component": "Tempest II",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Shiv",
+    "component": "STOP",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Shiv",
+    "component": "DayBreak",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Shiv",
+    "component": "ColdSnap",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Shiv",
+    "component": "Odyssey",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Spartan",
+    "component": "Scorpion GT-215",
+    "type": "Weapon",
+    "class": "Ballistic Gatling",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Spartan",
+    "component": "Castra",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "Spartan",
+    "component": "Defiant",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "B",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "Spartan",
+    "component": "Cryo-Star SL",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "B",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "SRV",
+    "component": "5MA 'Chimalli'",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "SRV",
+    "component": "Diligence",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "SRV",
+    "component": "CoolCore",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "SRV",
+    "component": "Huracan",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "B",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Starfarer",
+    "component": "M6A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Starfarer",
+    "component": "CF-447 Rhino",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Starfarer",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Starfarer",
+    "component": "Stronghold",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Starfarer",
+    "component": "Ginzel",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Starfarer",
+    "component": "SuperDrive",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Starfarer",
+    "component": "ThermalCore",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Starfarer",
+    "component": "Kama",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Starfarer Gemini",
+    "component": "M6A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Starfarer Gemini",
+    "component": "CF-557 Galdereen",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "Starfarer Gemini",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Starfarer Gemini",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Starfarer Gemini",
+    "component": "Stronghold",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Starfarer Gemini",
+    "component": "Mercury",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Starfarer Gemini",
+    "component": "SuperDrive",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Starfarer Gemini",
+    "component": "Pontes",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Starlancer Max",
+    "component": "M6A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Starlancer Max",
+    "component": "CF-447 Rhino",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Starlancer Max",
+    "component": "Thunderbolt III",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Starlancer Max",
+    "component": "Stronghold",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Starlancer Max",
+    "component": "AbsoluteZero",
+    "type": "Cooler",
+    "class": "Competition",
+    "grade": "B",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Starlancer Max",
+    "component": "LuxCore",
+    "type": "Power Plant",
+    "class": "Competition",
+    "grade": "A",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Starlancer Max",
+    "component": "SparkFire",
+    "type": "Quantum Drive",
+    "class": "Competition",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Starlancer TAC",
+    "component": "M6A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Starlancer TAC",
+    "component": "CF-447 Rhino",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Starlancer TAC",
+    "component": "CF-557 Galdereen",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "Starlancer TAC",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Starlancer TAC",
+    "component": "Thunderbolt III",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 3,
+    "accessible": false
+  },
+  {
+    "ship": "Starlancer TAC",
+    "component": "Stronghold",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Starlancer TAC",
+    "component": "Blizzard",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "A",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Starlancer TAC",
+    "component": "Centurion",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Starlancer TAC",
+    "component": "SparkFire",
+    "type": "Quantum Drive",
+    "class": "Competition",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Stinger",
+    "component": "Lightstrike IV",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Stinger",
+    "component": "Lightstrike II",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Stinger",
+    "component": "WRATH'",
+    "type": "Weapon",
+    "class": "Plasma Cannon",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "Stinger",
+    "component": "Bullet' II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Stinger",
+    "component": "FullStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Stinger",
+    "component": "Fortitude",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Stinger",
+    "component": "Eco-Flow",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "B",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Stinger",
+    "component": "Bolon",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Storm",
+    "component": "Reign-3",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Storm",
+    "component": "PIN",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "Storm",
+    "component": "Radix",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "Storm",
+    "component": "Frost-Star SL",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "Storm AA",
+    "component": "Marksman I",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 1,
+    "accessible": false
+  },
+  {
+    "ship": "Storm AA",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Storm AA",
+    "component": "PIN",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "Storm AA",
+    "component": "Radix",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "Storm AA",
+    "component": "Frost-Star SL",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "STV",
+    "component": "Radix",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "STV",
+    "component": "Cryo-Star SL",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "B",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "Syulen",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Syulen",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Syulen",
+    "component": "HEX",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "B",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Syulen",
+    "component": "LightBlossom",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Syulen",
+    "component": "BlastChill",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "D",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Syulen",
+    "component": "FoxFire",
+    "type": "Quantum Drive",
+    "class": "Competition",
+    "grade": "B",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Talon",
+    "component": "Lightstrike IV",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Talon",
+    "component": "Tempest II",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Talon",
+    "component": "Shimmer",
+    "type": "Shield",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Talon",
+    "component": "Slipstream",
+    "type": "Power Plant",
+    "class": "Stealth",
+    "grade": "A",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Talon",
+    "component": "VaporBlock",
+    "type": "Cooler",
+    "class": "Stealth",
+    "grade": "B",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Talon",
+    "component": "Drift",
+    "type": "Quantum Drive",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Talon Shrike",
+    "component": "Lightstrike II",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Talon Shrike",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": false
+  },
+  {
+    "ship": "Talon Shrike",
+    "component": "Shimmer",
+    "type": "Shield",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Talon Shrike",
+    "component": "Slipstream",
+    "type": "Power Plant",
+    "class": "Stealth",
+    "grade": "A",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Talon Shrike",
+    "component": "VaporBlock",
+    "type": "Cooler",
+    "class": "Stealth",
+    "grade": "B",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Talon Shrike",
+    "component": "Drift",
+    "type": "Quantum Drive",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Terrapin",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Terrapin",
+    "component": "5MA 'Chimalli'",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Terrapin",
+    "component": "DayBreak",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Terrapin",
+    "component": "Polar",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "B",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Terrapin",
+    "component": "Eos",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Terrapin Medic",
+    "component": "CF-227 Badger",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Terrapin Medic",
+    "component": "5MA 'Chimalli'",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Terrapin Medic",
+    "component": "DayBreak",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Terrapin Medic",
+    "component": "Polar",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "B",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Terrapin Medic",
+    "component": "Eos",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Ursa",
+    "component": "CF-117 Bulldog",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Ursa",
+    "component": "PIN",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Ursa",
+    "component": "Radix",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Ursa",
+    "component": "Frost-Star SL",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Ursa Fortuna",
+    "component": "CF-117 Bulldog",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Ursa Fortuna",
+    "component": "PIN",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Ursa Fortuna",
+    "component": "Radix",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Ursa Fortuna",
+    "component": "Frost-Star SL",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "Ursa Medevac",
+    "component": "CF-117 Bulldog",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Ursa Medevac",
+    "component": "PIN",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "Ursa Medevac",
+    "component": "Radix",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "Ursa Medevac",
+    "component": "Frost-Star SL",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "Valkyrie",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Valkyrie",
+    "component": "CF-447 Rhino",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Valkyrie",
+    "component": "Arctic",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Valkyrie",
+    "component": "Maelstrom",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Valkyrie",
+    "component": "FullStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Valkyrie",
+    "component": "Odyssey",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Vanguard Harbinger",
+    "component": "Deadbolt V",
+    "type": "Weapon",
+    "class": "Ballistic Cannon",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Harbinger",
+    "component": "CVSA",
+    "type": "Weapon",
+    "class": "Ballistic Cannon",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Harbinger",
+    "component": "Jericho XL",
+    "type": "Weapon",
+    "class": "Rocket Pod",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Harbinger",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Harbinger",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Harbinger",
+    "component": "Dominator II",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Harbinger",
+    "component": "Stalker V",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Harbinger",
+    "component": "Permafrost",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "B",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Harbinger",
+    "component": "TurboDrive",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Harbinger",
+    "component": "Yeager",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "B",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Harbinger",
+    "component": "SecureShield",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "D",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Hoplite",
+    "component": "Deadbolt V",
+    "type": "Weapon",
+    "class": "Ballistic Cannon",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Hoplite",
+    "component": "BRVS",
+    "type": "Weapon",
+    "class": "Ballistic Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Hoplite",
+    "component": "SW16BR2 \"Sawbuck\"",
+    "type": "Weapon",
+    "class": "Ballistic Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Hoplite",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Hoplite",
+    "component": "Dominator II",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Hoplite",
+    "component": "Arctic",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Hoplite",
+    "component": "Maelstrom",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Hoplite",
+    "component": "Crossfield",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Hoplite",
+    "component": "FullStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Sentinel",
+    "component": "Attrition-5",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Sentinel",
+    "component": "ATVS",
+    "type": "Weapon",
+    "class": "Distortion Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Sentinel",
+    "component": "Suckerpunch-L",
+    "type": "Weapon",
+    "class": "Distortion Cannon",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Sentinel",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Sentinel",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Sentinel",
+    "component": "Dominator II",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Sentinel",
+    "component": "REP-VS EMP Generator",
+    "type": "EMP Generator",
+    "class": "",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Sentinel",
+    "component": "GammaMax",
+    "type": "Power Plant",
+    "class": "Stealth",
+    "grade": "B",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Sentinel",
+    "component": "Sheut",
+    "type": "Shield",
+    "class": "Stealth",
+    "grade": "B",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Sentinel",
+    "component": "HeatSink",
+    "type": "Cooler",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Sentinel",
+    "component": "Nova",
+    "type": "Quantum Drive",
+    "class": "Stealth",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Warden",
+    "component": "Deadbolt V",
+    "type": "Weapon",
+    "class": "Ballistic Cannon",
+    "grade": "",
+    "size": 5,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Warden",
+    "component": "MVSA",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Warden",
+    "component": "SW16BR2 \"Sawbuck\"",
+    "type": "Weapon",
+    "class": "Ballistic Repeater",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Warden",
+    "component": "Ignite II",
+    "type": "Missile",
+    "class": "Infrared",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Warden",
+    "component": "Arrester III",
+    "type": "Missile",
+    "class": "Crosssection",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Warden",
+    "component": "Dominator II",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Warden",
+    "component": "Arctic",
+    "type": "Cooler",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Warden",
+    "component": "Maelstrom",
+    "type": "Power Plant",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Warden",
+    "component": "Crossfield",
+    "type": "Quantum Drive",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vanguard Warden",
+    "component": "FullStop",
+    "type": "Shield",
+    "class": "Military",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Vulture",
+    "component": "CF-117 Bulldog",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Vulture",
+    "component": "Bulwark",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Vulture",
+    "component": "Fortitude",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Vulture",
+    "component": "Thermax",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "Vulture",
+    "component": "Goliath",
+    "type": "Quantum Drive",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "X1",
+    "component": "M3A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "X1",
+    "component": "Radix",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "X1",
+    "component": "Fridan",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "X1 Force",
+    "component": "M3A",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 1,
+    "accessible": true
+  },
+  {
+    "ship": "X1 Force",
+    "component": "PIN",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "X1 Force",
+    "component": "Radix",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "X1 Force",
+    "component": "Fridan",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": false
+  },
+  {
+    "ship": "X1 Velocity",
+    "component": "Radix",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "X1 Velocity",
+    "component": "Fridan",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 0,
+    "accessible": true
+  },
+  {
+    "ship": "Zeus Mk II CL",
+    "component": "Omnisky XII",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Zeus Mk II CL",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Zeus Mk II CL",
+    "component": "Dominator II",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Zeus Mk II CL",
+    "component": "Aspis",
+    "type": "Shield",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Zeus Mk II CL",
+    "component": "Diligence",
+    "type": "Power Plant",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Zeus Mk II CL",
+    "component": "CoolCore",
+    "type": "Cooler",
+    "class": "Industrial",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Zeus Mk II CL",
+    "component": "Khaos",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Zeus Mk II ES",
+    "component": "Omnisky XII",
+    "type": "Weapon",
+    "class": "Laser Cannon",
+    "grade": "",
+    "size": 4,
+    "accessible": true
+  },
+  {
+    "ship": "Zeus Mk II ES",
+    "component": "CF-337 Panther",
+    "type": "Weapon",
+    "class": "Laser Repeater",
+    "grade": "",
+    "size": 3,
+    "accessible": true
+  },
+  {
+    "ship": "Zeus Mk II ES",
+    "component": "Dominator II",
+    "type": "Missile",
+    "class": "Electromagnetic",
+    "grade": "",
+    "size": 2,
+    "accessible": false
+  },
+  {
+    "ship": "Zeus Mk II ES",
+    "component": "5MA 'Chimalli'",
+    "type": "Shield",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Zeus Mk II ES",
+    "component": "FullForce",
+    "type": "Power Plant",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Zeus Mk II ES",
+    "component": "ColdSnap",
+    "type": "Cooler",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  },
+  {
+    "ship": "Zeus Mk II ES",
+    "component": "Khaos",
+    "type": "Quantum Drive",
+    "class": "Civilian",
+    "grade": "C",
+    "size": 2,
+    "accessible": true
+  }
+];
 
 const sellPoints = [
   // === CONSTRUCTION MATERIAL ===
@@ -2690,6 +14399,115 @@ export default function StarCitizenSalvageGuideWebsite() {
   // Mission detail modal target. null when closed; full mission row
   // when open. Wired to row clicks in the missions table.
   const [missionDetail, setMissionDetail] = useState(null);
+  // Per-popup set of turn-in resource names whose default-ship list
+  // is expanded. Reset when the active mission changes so opening a
+  // different mission doesn't carry over the previous expansion.
+  const [expandedTurnIns, setExpandedTurnIns] = useState(() => new Set());
+  useEffect(() => {
+    setExpandedTurnIns(new Set());
+  }, [missionDetail?.id]);
+  const toggleExpandedTurnIn = (name) => {
+    setExpandedTurnIns((prev) => {
+      const next = new Set(prev);
+      if (next.has(name)) next.delete(name);
+      else next.add(name);
+      return next;
+    });
+  };
+  // Resolve a haulingOrders resource name to the list of ships that
+  // ship with that exact component class + size by default. Each
+  // entry: { ship, accessible }. `accessible` is true if at least
+  // one of the matching component rows for that ship is salvageable
+  // (Lootable !== "Not accessible"). Inaccessible-only ships still
+  // appear in the list so users know the part exists, but the UI
+  // greys them out.
+  //
+  // Returns an empty array for resource names the sheet doesn't
+  // model (RMC, Construction Materials, Salvage Head, Mining Laser).
+  const matchTurnInToShips = (resourceName) => {
+    if (!resourceName) return [];
+    const collect = (pred) => {
+      // Map<ship, accessible>. true wins (ship gains access status if
+      // ANY of its matching rows is salvageable).
+      const byShip = new Map();
+      for (const c of SHIP_COMPONENTS) {
+        if (!pred(c)) continue;
+        const prev = byShip.get(c.ship);
+        const acc = Boolean(c.accessible);
+        if (prev === undefined) byShip.set(c.ship, acc);
+        else if (acc && !prev) byShip.set(c.ship, true);
+      }
+      return Array.from(byShip.entries())
+        .map(([ship, accessible]) => ({ ship, accessible }))
+        .sort((a, b) => a.ship.localeCompare(b.ship));
+    };
+    let m;
+    m = resourceName.match(/^Power Plant,\s*(.+?)\s*Grade\s*\(S(\d+)\)/);
+    if (m) {
+      const klass = m[1], size = Number(m[2]);
+      return collect((c) => c.type === "Power Plant" && c.class === klass && c.size === size);
+    }
+    m = resourceName.match(/^Cooler,\s*(.+?)\s*Grade\s*\(S(\d+)\)/);
+    if (m) {
+      const klass = m[1], size = Number(m[2]);
+      return collect((c) => c.type === "Cooler" && c.class === klass && c.size === size);
+    }
+    // Sheet uses "Shield" for the Type column.
+    m = resourceName.match(/^Shield Generator,\s*(.+?)\s*Grade\s*\(S(\d+)\)/);
+    if (m) {
+      const klass = m[1], size = Number(m[2]);
+      return collect((c) => c.type === "Shield" && c.class === klass && c.size === size);
+    }
+    // Quantum Drive entries omit "Grade" in the source data.
+    m = resourceName.match(/^Quantum Drive,\s*(.+?)\s*\(S(\d+)\)/);
+    if (m) {
+      const klass = m[1], size = Number(m[2]);
+      return collect((c) => c.type === "Quantum Drive" && c.class === klass && c.size === size);
+    }
+    // Class-less variants — match any class at the named size.
+    m = resourceName.match(/^(Power Plant|Cooler|Shield Generator|Quantum Drive)\s*\(S(\d+)\)$/);
+    if (m) {
+      const baseType = m[1];
+      const type = baseType === "Shield Generator" ? "Shield" : baseType;
+      const size = Number(m[2]);
+      return collect((c) => c.type === type && c.size === size);
+    }
+    // "Ship Weapon (S1 or S2)" / "Ship Weapon (S3 or S4)".
+    m = resourceName.match(/^Ship Weapon\s*\(S(\d+)\s+or\s+S(\d+)\)/);
+    if (m) {
+      const a = Number(m[1]);
+      const b = Number(m[2]);
+      return collect((c) => c.type === "Weapon" && (c.size === a || c.size === b));
+    }
+    if (resourceName === "Ship Missile") {
+      return collect((c) => c.type === "Missile");
+    }
+    if (resourceName === "Ship Bomb") {
+      return collect((c) => c.type === "Bomb");
+    }
+    // The Google Sheet doesn't list Salvage Heads or Mining Lasers
+    // as default ship components, so these are hardcoded fallbacks
+    // matching the in-game stock-loadout for those tools.
+    if (resourceName === "Ship Salvage Head") {
+      return [
+        "Aegis Reclaimer",
+        "Argo Moth",
+        "Drake Vulture",
+        "MISC Fortune",
+        "RSI Salvation",
+      ].map((ship) => ({ ship, accessible: true }));
+    }
+    if (resourceName === "Ship Mining Laser") {
+      return [
+        "ARGO Mole",
+        "Drake Golem",
+        "MISC Prospector",
+      ].map((ship) => ({ ship, accessible: true }));
+    }
+    // RMC / Construction Materials / Construction Rubble — no
+    // default-ship matches.
+    return [];
+  };
   // Sortable table state. `key` is one of the column field names; on
   // re-click the same column, direction flips. Default: name asc.
   const [missionSortKey, setMissionSortKey] = useState("name");
@@ -7585,6 +19403,104 @@ export default function StarCitizenSalvageGuideWebsite() {
                       );
                     })()}
 
+                    {/* Turn-ins — what the contract wants you to
+                        deliver at the destination. Component-tier
+                        entries (count-unit) are clickable: clicking
+                        the row expands a list of ships that come
+                        with that exact component class + size by
+                        default, sourced from SHIP_COMPONENTS. Bulk-
+                        material rows (RMC, Construction Materials,
+                        Salvage Head, Mining Laser) don't expand. */}
+                    {Array.isArray(missionDetail.turnIns) && missionDetail.turnIns.length > 0 && (
+                      <div className="mt-5">
+                        <div className="text-[10px] uppercase tracking-wider text-slate-500">
+                          Turn in
+                        </div>
+                        <ul className="mt-1 space-y-1">
+                          {missionDetail.turnIns.map((t, i) => {
+                            const hasMin = Number.isFinite(Number(t.min));
+                            const hasMax = Number.isFinite(Number(t.max));
+                            let qty = "";
+                            if (t.unit === "count") {
+                              if (hasMin && hasMax) {
+                                qty = t.min === t.max ? `×${t.min}` : `×${t.min}–${t.max}`;
+                              } else if (hasMin) {
+                                qty = `×${t.min}+`;
+                              } else if (hasMax) {
+                                qty = `up to ×${t.max}`;
+                              }
+                            } else {
+                              if (hasMin && hasMax) {
+                                qty = t.min === t.max ? `${t.min} SCU` : `${t.min}–${t.max} SCU`;
+                              } else if (hasMin) {
+                                qty = `${t.min}+ SCU`;
+                              } else if (hasMax) {
+                                qty = `up to ${t.max} SCU`;
+                              }
+                            }
+                            const ships = matchTurnInToShips(t.name);
+                            const expandable = ships.length > 0;
+                            const isExpanded = expandedTurnIns.has(t.name);
+                            return (
+                              <li
+                                key={`${t.name}-${i}`}
+                                className="rounded-md border border-amber-500/30 bg-amber-500/5 text-xs"
+                              >
+                                {expandable ? (
+                                  <button
+                                    type="button"
+                                    onClick={() => toggleExpandedTurnIn(t.name)}
+                                    aria-expanded={isExpanded}
+                                    className="flex w-full flex-wrap items-center justify-between gap-2 px-3 py-1.5 text-left hover:bg-amber-500/10"
+                                  >
+                                    <span className="flex items-center gap-1.5 font-semibold text-amber-100">
+                                      <svg
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
+                                        aria-hidden="true"
+                                        className={`h-3 w-3 shrink-0 text-amber-300 transition-transform ${isExpanded ? "rotate-90" : ""}`}
+                                      >
+                                        <path d="M6 4l8 6-8 6V4z" />
+                                      </svg>
+                                      <span className="underline-offset-2 group-hover:underline">{t.name}</span>
+                                    </span>
+                                    {qty && <span className="font-mono text-amber-200">{qty}</span>}
+                                  </button>
+                                ) : (
+                                  <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-1.5">
+                                    <span className="font-semibold text-amber-100">{t.name}</span>
+                                    {qty && <span className="font-mono text-amber-200">{qty}</span>}
+                                  </div>
+                                )}
+                                {expandable && isExpanded && (
+                                  <div className="border-t border-amber-500/20 bg-slate-950/60 px-3 py-2">
+                                    <div className="text-[10px] uppercase tracking-wider text-slate-500">
+                                      Ships that ship with this by default ({ships.length})
+                                    </div>
+                                    <div className="mt-1.5 flex flex-wrap gap-1.5">
+                                      {ships.map((s) => (
+                                        <span
+                                          key={s.ship}
+                                          title={s.accessible ? undefined : "Not accessible / not salvageable"}
+                                          className={
+                                            s.accessible
+                                              ? "rounded border border-slate-700 bg-slate-900 px-2 py-0.5 text-[11px] text-slate-200"
+                                              : "rounded border border-slate-800 bg-slate-900/40 px-2 py-0.5 text-[11px] text-slate-500 line-through opacity-60"
+                                          }
+                                        >
+                                          {s.ship}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </div>
+                    )}
+
                     {/* Flags + cooldowns + sharing crimestat. Hidden
                         when nothing meaningful would render. */}
                     {(() => {
@@ -7626,14 +19542,65 @@ export default function StarCitizenSalvageGuideWebsite() {
                       );
                     })()}
 
-                    {missionDetail.description && (
-                      <div className="mt-5">
-                        <div className="text-[10px] uppercase tracking-wider text-slate-500">Briefing</div>
-                        <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-slate-200">
-                          {missionDetail.description}
-                        </p>
-                      </div>
-                    )}
+                    {missionDetail.description && (() => {
+                      // Substitute [DESTINATION] / [LOCATION] placeholders
+                      // (left in the briefing copy by the in-game contract
+                      // manager) with the resolved location names from
+                      // mission.destinations / mission.locations. Matches
+                      // the scmdb.net behavior: every entry in the array
+                      // renders as its own cyan chip in-line, joined by
+                      // commas, so a multi-leg mission reads "deliver to
+                      // [Lorville Freight Elevator] [, ] [Area18 Trade &
+                      // Development Division]".
+                      const destinationsList = Array.isArray(missionDetail.destinations)
+                        ? missionDetail.destinations.map((d) => d.name).filter(Boolean)
+                        : [];
+                      const locationsList = Array.isArray(missionDetail.locations)
+                        ? missionDetail.locations.map((l) => l.name).filter(Boolean)
+                        : [];
+                      const parts = [];
+                      const re = /\[(DESTINATION|LOCATION)\]/g;
+                      let lastIdx = 0;
+                      let m;
+                      let key = 0;
+                      while ((m = re.exec(missionDetail.description)) !== null) {
+                        if (m.index > lastIdx) {
+                          parts.push(missionDetail.description.slice(lastIdx, m.index));
+                        }
+                        const list = m[1] === "DESTINATION" ? destinationsList : locationsList;
+                        if (list.length > 0) {
+                          // Emit one chip per entry, comma-separated.
+                          list.forEach((name, i) => {
+                            if (i > 0) parts.push(", ");
+                            parts.push(
+                              <span
+                                key={`sub-${key++}`}
+                                className="rounded border border-cyan-500/30 bg-cyan-500/10 px-1.5 py-0.5 text-cyan-200 font-semibold"
+                              >
+                                {name}
+                              </span>
+                            );
+                          });
+                        } else {
+                          // No resolved location — fall back to the
+                          // literal placeholder so the copy still makes
+                          // sense (legacy contracts with empty arrays).
+                          parts.push(`[${m[1]}]`);
+                        }
+                        lastIdx = m.index + m[0].length;
+                      }
+                      if (lastIdx < missionDetail.description.length) {
+                        parts.push(missionDetail.description.slice(lastIdx));
+                      }
+                      return (
+                        <div className="mt-5">
+                          <div className="text-[10px] uppercase tracking-wider text-slate-500">Briefing</div>
+                          <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-slate-200">
+                            {parts}
+                          </p>
+                        </div>
+                      );
+                    })()}
 
                     <div className="mt-5 border-t border-slate-800 pt-3 text-[10px] text-slate-600">
                       ID: <span className="font-mono">{missionDetail.id}</span>
@@ -11068,6 +23035,17 @@ export default function StarCitizenSalvageGuideWebsite() {
               </div>
 
               <div className="mt-5 space-y-7 text-sm text-slate-300 leading-relaxed">
+
+                <section>
+                  <h4 className="text-cyan-300 text-base font-bold">v2.6.1 — April 28, 2026</h4>
+                  <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li>Missions tab → mission detail popup → new <strong>Turn in</strong> section: every Adagio Holdings salvage contract now lists exactly what to deliver at the destination. Bulk material rows show SCU bounds (e.g. RMC 15 SCU); component-tier rows show the exact unit count (e.g. ×2 Cooler, Industrial Grade S2). Sourced from scmdb.net.</li>
+                    <li>Component turn-in rows are clickable — expanding one shows the list of ships that come with that exact component class + size by default. Ships whose copy of the component is marked "Not accessible" render as greyed/strike-through chips so you know the part exists but can't be salvaged.</li>
+                    <li><strong>Ship Salvage Head</strong> turn-ins list all 5 site-supported salvage platforms (Aegis Reclaimer / Argo Moth / Drake Vulture / MISC Fortune / RSI Salvation). <strong>Ship Mining Laser</strong> turn-ins list the MISC Prospector / ARGO Mole / Drake Golem.</li>
+                    <li>Mission briefings now substitute the in-game <code className="rounded bg-slate-800 px-1 text-cyan-200">[LOCATION]</code> and <code className="rounded bg-slate-800 px-1 text-cyan-200">[DESTINATION]</code> placeholders with the resolved location names, rendered as inline cyan chips. Multi-leg missions emit one chip per entry, comma-separated. Matches the scmdb.net briefing format.</li>
+                  </ul>
+                </section>
 
                 <section>
                   <h4 className="text-cyan-300 text-base font-bold">v2.6 — April 28, 2026</h4>

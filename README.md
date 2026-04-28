@@ -5,6 +5,15 @@ Made by Chrissyy · Referral: STAR-CH2W-R73F
 
 ## What's in this build
 
+UPDATE 4/28/2026 v2.6.1
+
+Added:
+- Missions tab → mission detail popup → new **Turn in** section: every Adagio Holdings salvage contract now lists exactly what to deliver at the destination. Bulk material rows show SCU bounds (e.g. RMC 15 SCU, Construction Materials 41 SCU). Component-tier rows show the exact unit count needed (e.g. ×2 Cooler, Industrial Grade S2; ×8 Ship Weapon S3 or S4). Sourced from scmdb.net's haulingOrders catalog.
+- Component turn-in rows are clickable: expanding one shows the list of ships that come with that exact component class + size by default, sourced from the public [Star Citizen ship-components Google Sheet](https://docs.google.com/spreadsheets/d/1fFTnvQc8_i9lur4PB3txqipK1ljRkOgw6kTEimx3xdg). Ships whose copy of the component is marked "Not accessible" in the sheet render as greyed/strike-through chips with a hover tooltip — the part exists on the ship but can't be salvaged off it.
+- Ship Salvage Head turn-ins list all 5 site-supported salvage platforms (Aegis Reclaimer / Argo Moth / Drake Vulture / MISC Fortune / RSI Salvation). Ship Mining Laser turn-ins list the MISC Prospector / ARGO Mole / Drake Golem.
+- Mission briefings now substitute the in-game `[LOCATION]` and `[DESTINATION]` placeholders with the resolved location names, rendered as inline cyan chips. Multi-leg missions emit one chip per entry, comma-separated. Matches scmdb.net so the briefing reads like a real contract instead of a templated one.
+- Daily 6am scheduled diff against the public ship-components Google Sheet — surfaces any ship/component additions, removals, modifications, and accessibility flips so the operator can keep the site's default-component data fresh.
+
 UPDATE 4/28/2026 v2.6
 
 Added:

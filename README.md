@@ -19,7 +19,6 @@ Fixes:
 - Update banner now has a one-click "Update now" button — clicking it clears caches and reloads, no Ctrl+Shift+R required.
 - Discord OAuth login: redirect_uri pinned to the canonical https://scsalvager.net origin in production, and login attempts on non-canonical hosts (www.* / preview deploys) now redirect to canonical first so the CSRF state cookie reaches the callback. Fixes "Invalid OAuth2 redirect_uri" and "Invalid OAuth state" errors.
 - "Connect Discord" for refinery DMs: session cookie issued as SameSite=Lax (was Strict) so the browser carries it on the cross-site OAuth return trip, and the notifications-link handler bounces non-canonical hosts to canonical first. Resolves the "Your login session expired" loop when linking notifications. (Existing users may need to sign out and sign back in once to refresh the cookie.)
-- Admin Panel "Active Users" renamed to "All Users" — now shows every Discord account that has ever signed in to the site (no 24-hour activity cutoff). Online users surface first, then by most-recent login. Table caps at ~10 visible rows with internal scroll + sticky column headers, matching the 30-Day History style.
 
 UPDATE 4/27/2026 v2.5.1
 

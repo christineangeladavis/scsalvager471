@@ -9166,7 +9166,6 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <li>Update banner now has a one-click "Update now" button — clears caches and reloads automatically, no keyboard shortcut needed.</li>
                     <li>Discord login resilience: OAuth redirect now pinned to the canonical site origin so QR-code and web logins work regardless of which host fronted the request.</li>
                     <li>"Connect Discord" for refinery DMs: session cookie loosened from Strict to Lax so the browser carries it across the OAuth return trip. Resolves the "Your login session expired" loop when linking notifications. (You may need to sign out and back in once to pick up the new cookie.)</li>
-                    <li>Admin Panel: "Active Users" tab renamed "All Users" and now lists every account ever signed in (not just last-24h). Online users sort first; table scrolls inside itself after ~10 rows.</li>
                   </ul>
                 </section>
 

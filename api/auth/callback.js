@@ -84,7 +84,14 @@ export default async function handler(req, res) {
 
     res.setHeader("Set-Cookie", [
       buildCookie(STATE_COOKIE, "", { maxAge: 0 }),
-      buildCookie(SESSION_COOKIE, sessionToken, { maxAge: SESSION_TTL_SECONDS, sameSite: "Strict" }),
+      // SameSite=Lax (not Strict) so the cookie still rides on
+      // top-level cross-site navigations like Discord -> our OAuth
+      // callbacks. Strict would block notifications-callback from
+      // ever seeing the session cookie when Discord redirects back,
+      // which surfaced as "Your login session expired" when users
+      // tried to connect Discord DMs. Lax keeps CSRF protection on
+      // POST/iframe-style cross-site requests.
+      buildCookie(SESSION_COOKIE, sessionToken, { maxAge: SESSION_TTL_SECONDS, sameSite: "Lax" }),
     ]);
     res.writeHead(302, { Location: "/" });
     res.end();

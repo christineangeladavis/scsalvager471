@@ -5155,26 +5155,45 @@ export default function StarCitizenSalvageGuideWebsite() {
       {/* Scrollable UI content */}
       <div className="relative mx-auto max-w-7xl px-4 py-8 md:px-8" style={{ zIndex: 10, flex: 1, display: "flex", flexDirection: "column", width: "100%" }}>
         {updateAvailable && (
-          <div
+          // One-click update banner. The button bypasses the HTTP cache
+          // by appending a fresh query string and calling reload(true)
+          // — equivalent to the user manually hitting Ctrl+Shift+R.
+          <button
+            type="button"
             role="status"
             aria-live="polite"
-            className="mb-4 rounded-2xl border border-amber-400/60 bg-amber-500/15 px-4 py-3 text-sm shadow-lg shadow-amber-950/30"
+            onClick={() => {
+              try {
+                // Best-effort: blow away any caches that the browser
+                // would otherwise honor across a reload. Wrapped in
+                // try/catch because Cache API isn't available on every
+                // browser/permission context.
+                if (typeof caches !== "undefined" && caches.keys) {
+                  caches.keys().then((names) => {
+                    names.forEach((n) => caches.delete(n));
+                  });
+                }
+              } catch {}
+              // Append a cache-buster + force a server roundtrip.
+              const url = new URL(window.location.href);
+              url.searchParams.set("_v", Date.now().toString());
+              window.location.replace(url.toString());
+            }}
+            className="mb-4 w-full rounded-2xl border border-amber-400/60 bg-amber-500/15 px-4 py-3 text-left text-sm shadow-lg shadow-amber-950/30 transition hover:border-amber-300 hover:bg-amber-500/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
           >
             <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-              <div className="text-amber-100">
-                <span className="font-bold">A new update has been released.</span>{" "}
-                <span className="text-amber-100/90">
-                  Press{" "}
-                  <kbd className="rounded border border-amber-300/60 bg-amber-500/20 px-1.5 py-0.5 font-mono text-xs text-amber-100">Ctrl</kbd>
-                  {" + "}
-                  <kbd className="rounded border border-amber-300/60 bg-amber-500/20 px-1.5 py-0.5 font-mono text-xs text-amber-100">Shift</kbd>
-                  {" + "}
-                  <kbd className="rounded border border-amber-300/60 bg-amber-500/20 px-1.5 py-0.5 font-mono text-xs text-amber-100">R</kbd>
-                  {" "}to hard-refresh and load the latest version.
-                </span>
-              </div>
+              <span className="text-amber-100">
+                <span className="font-bold">An update is available,</span>{" "}
+                <span className="text-amber-100/90">click here to update.</span>
+              </span>
+              <span
+                aria-hidden="true"
+                className="shrink-0 rounded-md border border-amber-300/60 bg-amber-500/25 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-amber-100"
+              >
+                Update now
+              </span>
             </div>
-          </div>
+          </button>
         )}
         <header className="mb-8 overflow-hidden rounded-3xl border border-cyan-500/30 shadow-2xl shadow-cyan-950/40">
           <img
@@ -9140,6 +9159,8 @@ export default function StarCitizenSalvageGuideWebsite() {
                   <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Fixes</p>
                   <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
                     <li>Vulture and Fortune roles renamed from "Solo Salvage" to "Light Salvage" to match in-game terminology.</li>
+                    <li>Update banner now has a one-click "Update now" button — clears caches and reloads automatically, no keyboard shortcut needed.</li>
+                    <li>Discord login resilience: OAuth redirect now pinned to the canonical site origin so QR-code and web logins work regardless of which host fronted the request.</li>
                   </ul>
                 </section>
 

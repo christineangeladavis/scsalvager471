@@ -16,6 +16,8 @@ Added:
 
 Fixes:
 - Drake Vulture and MISC Fortune roles renamed from "Solo Salvage" to "Light Salvage" to match in-game classification.
+- Update banner now has a one-click "Update now" button — clicking it clears caches and reloads, no Ctrl+Shift+R required.
+- Discord OAuth login: redirect_uri pinned to the canonical https://scsalvager.net origin in production, and login attempts on non-canonical hosts (www.* / preview deploys) now redirect to canonical first so the CSRF state cookie reaches the callback. Fixes "Invalid OAuth2 redirect_uri" and "Invalid OAuth state" errors.
 
 UPDATE 4/27/2026 v2.5.1
 

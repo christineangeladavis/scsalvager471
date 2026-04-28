@@ -550,6 +550,14 @@ export default function StarCitizenSalvageGuideWebsite() {
   // Default shape for a fresh refinery job entry. The Clear button
   // next to Submit Order resets to this exact object — keep them in
   // sync if you add a field to the form.
+  //
+  // `cost` defaults to empty string. The auto-fill from a refinery
+  // screenshot populates this with the in-game TOTAL COST (a string of
+  // the integer aUEC). When set, it overrides the auto-calculated cost
+  // in both the EXPECTED YIELD/COST card and the stored job — the
+  // screenshot's value is the ground truth (it already includes any
+  // refinery surcharge / workload multiplier; the calculator is just a
+  // method × material estimate).
   const blankJobForm = () => ({
     material: "",
     location: "",
@@ -558,6 +566,7 @@ export default function StarCitizenSalvageGuideWebsite() {
     hours: "",
     minutes: "",
     seconds: "",
+    cost: "",
   });
   const [jobForm, setJobForm] = useState(blankJobForm());
   const [isAnalyzingScreenshot, setIsAnalyzingScreenshot] = useState(false);
@@ -2641,6 +2650,14 @@ export default function StarCitizenSalvageGuideWebsite() {
     const timeSeconds = hmsToSeconds(jobForm);
     const timeMs = timeSeconds * 1000;
     const submittedAt = Date.now();
+    // Cost: prefer the user-entered/screenshot value when present
+    // (the in-game cost already includes refinery surcharge / workload
+    // multiplier); otherwise fall back to the method × material estimate.
+    const overrideCost = Number(jobForm.cost);
+    const cost =
+      jobForm.cost !== "" && Number.isFinite(overrideCost) && overrideCost >= 0
+        ? Math.round(overrideCost)
+        : Math.round(result.cost);
     const newJob = {
       id: `job_${submittedAt}_${Math.random().toString(36).slice(2, 8)}`,
       material: jobForm.material,
@@ -2650,7 +2667,7 @@ export default function StarCitizenSalvageGuideWebsite() {
       // `yield` stores the expected output SCU (used by lifetime stats and
       // history display). Computed at submit time from method × material rate.
       yield: result.totalYield,
-      cost: Math.round(result.cost),
+      cost,
       // Keep timeMinutes for legacy reads; new completesAt is the authoritative
       // value (it reflects the user's exact H/M/S input).
       timeMinutes: timeSeconds / 60,
@@ -3811,8 +3828,26 @@ export default function StarCitizenSalvageGuideWebsite() {
                       <div className="mt-0.5 text-sm font-bold text-emerald-300">{jobFormPreview.totalYield.toFixed(1)} SCU</div>
                     </div>
                     <div>
-                      <div className="text-[11px] uppercase tracking-wider text-slate-500">Cost</div>
-                      <div className="mt-0.5 text-sm font-bold text-amber-300">{Math.round(jobFormPreview.cost).toLocaleString()} aUEC</div>
+                      {/* Cost display — prefers the screenshot-extracted
+                          value when present (it includes the in-game
+                          surcharge / workload multiplier the calculator
+                          can't see). Falls back to the method × material
+                          estimate when no screenshot was uploaded. */}
+                      {(() => {
+                        const overrideCost = Number(jobForm.cost);
+                        const usingOverride = jobForm.cost !== "" && Number.isFinite(overrideCost) && overrideCost >= 0;
+                        const displayCost = usingOverride ? overrideCost : Math.round(jobFormPreview.cost);
+                        return (
+                          <>
+                            <div className="text-[11px] uppercase tracking-wider text-slate-500">
+                              Cost{usingOverride ? " · from screenshot" : ""}
+                            </div>
+                            <div className="mt-0.5 text-sm font-bold text-amber-300">
+                              {displayCost.toLocaleString()} aUEC
+                            </div>
+                          </>
+                        );
+                      })()}
                     </div>
                   </div>
                   <div className="mt-1 flex flex-wrap items-center gap-2">
@@ -6263,6 +6298,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <li>Refinery method names with OCR drift now still match via a fuzzy fallback.</li>
                     <li>Sell Orders → Sell Location is always visible (no longer hidden until a material is picked).</li>
                     <li>Sell-side material renamed to "Construction Materials" (plural) to match the in-game Commodities label. Old ledger entries display under the new name automatically.</li>
+                    <li>Refinery cost now uses the exact in-game TOTAL COST from your screenshot (surcharges and workload multipliers included) instead of the calculator estimate.</li>
                   </ul>
                 </section>
 

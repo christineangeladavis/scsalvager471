@@ -27,6 +27,7 @@ Fixes:
 - Refinery method names with OCR drift now still match via a fuzzy fallback.
 - Sell Orders → Sell Location is always visible (no longer hidden until a material is picked).
 - Sell-side material renamed from "Construction Material" → "Construction Materials" to match the in-game Commodities label. Old ledger entries display under the new name and migrate on next edit; community price reports roll forward (old- and new-name reports merge into a single median).
+- Refinery Job Orders cost now reflects the exact in-game TOTAL COST when a screenshot was uploaded (instead of the method × material estimate). The COST display is labelled "from screenshot" so you can see when the auto-fill provided it, and submitting the order stores that exact aUEC value — surcharges and workload multipliers included.
 
 UPDATE 4/26/2026 v2.4
 

@@ -11037,6 +11037,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <li>Privacy Policy + Terms of Service refreshed: anonymous visit pings (user-agent + country only — <strong>no IP</strong>) and the new patch-reset right are both disclosed under "What we collect" / "Your rights".</li>
                     <li>New <strong>notification bell</strong> sits to the left of the user menu (logged-in only). Red badge shows the unread count. Surfaces setup nags (Discord DMs off, RSI handle not linked, RSI handle not verified) plus a "New site update available" entry whenever What's New gets a new release section.</li>
                     <li>Clicking a notification opens the relevant destination (Settings or What's New) and marks it as read. Read items stay visible in the dropdown (greyed with a slate dot) until the underlying setup is fixed. A "Mark all as read" header button clears the badge in one click.</li>
+                    <li>Site-wide <strong>scrollbar styling</strong>: every scrollable surface (page body, modals, tables, dropdowns, custom overflow containers) now uses the same cyan-thumb / slate-track pill-shape style as the Patch History panel.</li>
                   </ul>
                   <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Fixes</p>
                   <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">

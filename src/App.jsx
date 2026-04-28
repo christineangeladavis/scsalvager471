@@ -3732,16 +3732,35 @@ export default function StarCitizenSalvageGuideWebsite() {
       const now = Date.now();
       const min = 60 * 1000;
       const hour = 60 * min;
-      return {
-        fetchedAt: now,
-        entries: [
-          { ts: now - 2 * min,    ua: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",     country: "US" },
-          { ts: now - 27 * min,   ua: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15", country: "DE" },
-          { ts: now - 3 * hour,   ua: "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1", country: "AU" },
-          { ts: now - 9 * hour,   ua: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",                country: "CA" },
-          { ts: now - 22 * hour,  ua: "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0",                                     country: "GB" },
-        ],
-      };
+      // 30 anonymous visits spread across the last ~7 days to
+      // exercise the 15-row cap + scroll. Each entry pulls a UA +
+      // country from a small rotation so the table reads as varied
+      // browser/region traffic.
+      const userAgents = [
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15",
+        "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1",
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0",
+        "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Edg/126.0.0.0",
+        "Mozilla/5.0 (iPad; CPU OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:128.0) Gecko/20100101 Firefox/128.0",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36 OPR/113.0.0.0",
+      ];
+      const countries = ["US", "DE", "AU", "CA", "GB", "FR", "JP", "BR", "NO", "PL", "NL", "SE"];
+      const entries = Array.from({ length: 30 }).map((_, i) => {
+        // Spread oldest-first across ~7d; offset by i so newest sits
+        // at index 0. Add some jitter so timestamps don't line up
+        // exactly on hour boundaries.
+        const ts = now - i * 5.5 * hour - ((i * 17) % 53) * min;
+        return {
+          ts,
+          ua: userAgents[i % userAgents.length],
+          country: countries[(i * 7) % countries.length],
+        };
+      });
+      return { fetchedAt: now, entries };
     };
 
     fetch("/api/admin/guest-logins", { credentials: "same-origin" })
@@ -9297,9 +9316,11 @@ export default function StarCitizenSalvageGuideWebsite() {
               )}
 
               {!adminGuestsLoading && !adminGuestsError && adminGuests && adminGuests.entries.length > 0 && (
-                // Same scrollbar treatment as the All Users + 30-Day
-                // History tables so the admin views feel consistent.
-                <div className="mt-5 overflow-x-auto overflow-y-auto max-h-[32rem] rounded-2xl border border-slate-700 [scrollbar-width:thin] [scrollbar-color:rgb(6_182_212_/_0.7)_rgb(2_6_23)] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-slate-950 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-500/70 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-cyan-400">
+                // Cap visible rows at ~15; remaining entries scroll
+                // inside the panel. Scrollbar styling comes from the
+                // site-wide globals in index.html — no per-element
+                // Tailwind variants needed.
+                <div className="mt-5 overflow-x-auto overflow-y-auto max-h-[44rem] rounded-2xl border border-slate-700">
                   <table className="w-full min-w-[720px] text-left text-sm md:min-w-0">
                     <thead className="bg-slate-950 text-slate-300 sticky top-0 z-10">
                       <tr>

@@ -51,6 +51,12 @@ Modals:
 - Refused with 404 when `userId` isn't in the user-meta index — prevents typos creating phantom ledger keys via the soft-delete write.
 - Vite-dev fallback: when `/api/*` returns the raw JS source instead of JSON, both the success path's content-type sniff and the catch handler fall back to `buildDevMock()` so the modal exercises in preview without a real API. Dev mock seeds 10 refinery jobs + 10 sell orders per user, deterministic per-user-id, spread across ~28 days for variety.
 
+## 2026-04-28 — Guest Logins table cap + dev mock
+
+- Visible row cap raised from 10 → **15** rows; `max-h-[44rem]` on the wrapper. Beyond 15 the table scrolls inside the panel with a sticky `<thead>`.
+- Per-element scrollbar Tailwind variants stripped from the wrapper — site-wide `<style>` block in `index.html` now styles every scrollable surface (cyan-500/70 thumb, slate-950 track, pill-shape, hover cyan-400). Single source of truth instead of inlining per table.
+- Dev mock seeds **30** anonymous visits spread across ~7 days (newest first), rotating through 10 user-agent strings (Chrome/Edge/Firefox/Safari on Windows/macOS/Linux/iOS/Android/iPad + Opera) and 12 country codes (US/DE/AU/CA/GB/FR/JP/BR/NO/PL/NL/SE) so the 15-row cap + scroll behavior is exercisable in `vite dev`.
+
 ## 2026-04-28 — Guest Logins
 
 - New sub-tab between **All Users** and **Patch Exports**.

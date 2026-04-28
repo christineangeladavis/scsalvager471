@@ -68,8 +68,24 @@ export async function fetchDiscordUser(accessToken) {
   return await res.json();
 }
 
+// Canonical production host. The Discord OAuth app's redirect URI
+// allowlist is registered against this exact origin, so we pin it as
+// the default whenever we're running on Vercel production. Without the
+// pin, requests served via www.scsalvager.net or a *.vercel.app preview
+// URL would build a redirect_uri that Discord doesn't recognize and the
+// QR-code / web login bounces with "Invalid OAuth2 redirect_uri".
+const CANONICAL_PRODUCTION_ORIGIN = "https://scsalvager.net";
+
 export function getOrigin(req) {
+  // 1. Explicit override always wins (used in tests + previews).
   if (process.env.SITE_URL) return process.env.SITE_URL;
+  // 2. In production, force the canonical origin regardless of which
+  //    host fronted the request. Single source of truth for OAuth.
+  if (process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production") {
+    return CANONICAL_PRODUCTION_ORIGIN;
+  }
+  // 3. Dev / preview: fall back to whatever host the request came in
+  //    on so localhost / preview deploys still work without extra env.
   const host = req.headers["x-forwarded-host"] || req.headers.host;
   const proto = req.headers["x-forwarded-proto"] || (host && host.startsWith("localhost") ? "http" : "https");
   return `${proto}://${host}`;

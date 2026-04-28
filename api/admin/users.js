@@ -1,10 +1,9 @@
 // GET /api/admin/users
 //
-// Admin-only. Returns every user from the login index whose lastLoginAt is
-// within the last 24h, sorted by lastLoginAt descending. Treats that
-// window as a proxy for "currently logged in" — sessions live for 7 days,
-// so a user who hasn't logged in for 24h+ may or may not still have a
-// valid cookie, but users active inside the window almost certainly do.
+// Admin-only. Returns every user the site has ever indexed, sorted with
+// online users first then by most-recent login. The `isOnline` flag still
+// reflects the ~90s heartbeat window; the previous 24h activity filter
+// has been removed so admins can see the full account roster.
 //
 // Response shape:
 //   {
@@ -33,7 +32,6 @@ import { isAdminSession } from "../_lib/admin.js";
 import { listUserIds, getUserMeta } from "../_lib/userIndex.js";
 import { getPrefs } from "../_lib/prefs.js";
 
-const ACTIVE_WINDOW_MS = 24 * 60 * 60 * 1000;
 // Heartbeat fires every ~30s while the user has the tab open. 90s is
 // 3 missed beats — beyond that we call them offline.
 const ONLINE_WINDOW_MS = 90 * 1000;
@@ -62,7 +60,6 @@ export default async function handler(req, res) {
   }
 
   const now = Date.now();
-  const cutoff = now - ACTIVE_WINDOW_MS;
   const onlineCutoff = now - ONLINE_WINDOW_MS;
   const userIds = await listUserIds(redis);
 
@@ -70,7 +67,6 @@ export default async function handler(req, res) {
   for (const userId of userIds) {
     const meta = await getUserMeta(redis, userId);
     if (!meta || !meta.lastLoginAt) continue;
-    if (meta.lastLoginAt < cutoff) continue;
     // DMs count as "on" when the user is opted in AND has completed the
     // notification-link OAuth flow. Either side missing means we'd have
     // nowhere to deliver, so it's effectively off.
@@ -108,7 +104,6 @@ export default async function handler(req, res) {
 
   return res.status(200).json({
     fetchedAt: Date.now(),
-    activeWindowMs: ACTIVE_WINDOW_MS,
     onlineWindowMs: ONLINE_WINDOW_MS,
     users,
   });

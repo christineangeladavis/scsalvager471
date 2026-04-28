@@ -3340,7 +3340,6 @@ export default function StarCitizenSalvageGuideWebsite() {
       const hour = 60 * min;
       return {
         fetchedAt: now,
-        activeWindowMs: 24 * hour,
         onlineWindowMs: 90 * 1000,
         // Two users online (heartbeat within ~90s), two offline.
         users: [
@@ -7655,7 +7654,7 @@ export default function StarCitizenSalvageGuideWebsite() {
             <div className="flex flex-wrap gap-1 border-b border-cyan-500/20" role="tablist" aria-label="Admin sections">
               {[
                 { id: "refineries", label: "7-Day History" },
-                { id: "users", label: "Active Users" },
+                { id: "users", label: "All Users" },
                 { id: "exports", label: "Patch Exports" },
               ].map((sec) => {
                 const isActive = adminSection === sec.id;
@@ -7852,9 +7851,9 @@ export default function StarCitizenSalvageGuideWebsite() {
             <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                 <div>
-                  <h2 className="text-xl font-bold text-cyan-300">Active Users</h2>
+                  <h2 className="text-xl font-bold text-cyan-300">All Users</h2>
                   <p className="mt-1 text-sm text-slate-400">
-                    Discord users who have logged in to the site within the last 24 hours. Sorted by most recent login. Admin-only view.
+                    Every Discord user who has ever signed in to the site. Online users surface first, then sorted by most recent login. Admin-only view.
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -7906,9 +7905,14 @@ export default function StarCitizenSalvageGuideWebsite() {
               )}
 
               {!adminUsersLoading && !adminUsersError && adminUsers && adminUsers.users.length > 0 && (
-                <div className="mt-5 overflow-x-auto rounded-2xl border border-slate-700">
+                // Cap visible rows at ~10; the remaining users scroll
+                // inside the panel with the same cyan-thumb / slate-950
+                // track scrollbar style as the 30-Day History table.
+                // Sticky thead keeps column titles visible while
+                // scrolling.
+                <div className="mt-5 overflow-x-auto overflow-y-auto max-h-[32rem] rounded-2xl border border-slate-700 [scrollbar-width:thin] [scrollbar-color:rgb(6_182_212_/_0.7)_rgb(2_6_23)] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-slate-950 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-500/70 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-cyan-400">
                   <table className="w-full min-w-[720px] text-left text-sm md:min-w-0">
-                    <thead className="bg-slate-950 text-slate-300">
+                    <thead className="bg-slate-950 text-slate-300 sticky top-0 z-10">
                       <tr>
                         <th className="px-4 py-3">Discord User</th>
                         <th className="px-4 py-3">RSI Handle</th>
@@ -9162,6 +9166,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <li>Update banner now has a one-click "Update now" button — clears caches and reloads automatically, no keyboard shortcut needed.</li>
                     <li>Discord login resilience: OAuth redirect now pinned to the canonical site origin so QR-code and web logins work regardless of which host fronted the request.</li>
                     <li>"Connect Discord" for refinery DMs: session cookie loosened from Strict to Lax so the browser carries it across the OAuth return trip. Resolves the "Your login session expired" loop when linking notifications. (You may need to sign out and back in once to pick up the new cookie.)</li>
+                    <li>Admin Panel: "Active Users" tab renamed "All Users" and now lists every account ever signed in (not just last-24h). Online users sort first; table scrolls inside itself after ~10 rows.</li>
                   </ul>
                 </section>
 

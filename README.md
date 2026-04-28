@@ -19,6 +19,8 @@ Fixes:
 - Update banner now has a one-click "Update now" button — clicking it clears caches and reloads, no Ctrl+Shift+R required.
 - Discord OAuth login: redirect_uri pinned to the canonical https://scsalvager.net origin in production, and login attempts on non-canonical hosts (www.* / preview deploys) now redirect to canonical first so the CSRF state cookie reaches the callback. Fixes "Invalid OAuth2 redirect_uri" and "Invalid OAuth state" errors.
 - "Connect Discord" for refinery DMs: session cookie issued as SameSite=Lax (was Strict) so the browser carries it on the cross-site OAuth return trip, and the notifications-link handler bounces non-canonical hosts to canonical first. Resolves the "Your login session expired" loop when linking notifications. (Existing users may need to sign out and sign back in once to refresh the cookie.)
+- Home → Scraper Module Performance now shows in-game purchase locations per module, sourced from finder.cstone.space. Each detail card has Stanton / Pyro / Nyx buttons — click to reveal locations + prices for that system, click again to collapse. Systems with no stock for that module hide their button automatically (e.g. Trawler is Stanton-only). The comparison table's Price column was renamed Lowest Price and now reflects the cheapest location across all systems (e.g. Abrade 20,188 aUEC at Everus Harbor instead of the 21,250 sticker).
+- Home layout: Scraper Module Performance was lifted out of the left column into its own full-width row beneath Refinery Bonus Yield Calculator + Sell Estimate. Calculator and Sell Estimate now sit side-by-side at the top.
 
 UPDATE 4/27/2026 v2.5.1
 

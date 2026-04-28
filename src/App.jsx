@@ -2231,6 +2231,63 @@ const sellPoints = [
   { name: "Devlin Scrap & Salvage",    region: "MicroTech",                          system: "Stanton", pricePerScu: 5000,  material: "Recycled Material Composite" },
 ];
 
+// Per-module purchase locations + prices. Sourced from
+// finder.cstone.space (Salvage Modifiers detail page per module).
+// Refresh by re-running .claude/extract-mod-prices.cjs and pasting
+// the resulting JSON here.
+const SCRAPER_LOCATIONS = {
+  Abrade: [
+    { system: "Stanton", location: "ARC-L1 - Galleria - Platinum Bay", price: 21250 },
+    { system: "Stanton", location: "ArcCorp - Area18 - Retail bridges - Dumper's Depot", price: 21250 },
+    { system: "Stanton", location: "ArcCorp - Baijini Point - Galleria - Platinum Bay", price: 21250 },
+    { system: "Stanton", location: "CRU-L1 - Galleria - Platinum Bay", price: 21250 },
+    { system: "Stanton", location: "CRU-L4 - Galleria - Platinum Bay", price: 21250 },
+    { system: "Stanton", location: "CRU-L5 - Galleria - Platinum Bay", price: 21250 },
+    { system: "Stanton", location: "Crusader - Orison - Providence Industrial Platform - Cousin Crows", price: 21250 },
+    { system: "Stanton", location: "HUR-L2 - Galleria - Platinum Bay", price: 21250 },
+    { system: "Stanton", location: "HUR-L3 - Galleria - Platinum Bay", price: 21250 },
+    { system: "Stanton", location: "HUR-L5 - Galleria - Platinum Bay", price: 21250 },
+    { system: "Stanton", location: "Hurston - Everus Harbor - Galleria - Platinum Bay", price: 20188 },
+    { system: "Stanton", location: "microTech - Port Tressler - Galleria - Platinum Bay", price: 21250 },
+    { system: "Stanton", location: "Magnus Gateway - Galleria - Platinum Bay", price: 21250 },
+    { system: "Stanton", location: "Nyx Gateway (Stanton) - Galleria - Platinum Bay", price: 21250 },
+    { system: "Stanton", location: "Pyro Gateway (Stanton) - Galleria - Platinum Bay", price: 21250 },
+    { system: "Stanton", location: "Terra Gateway - Galleria - Platinum Bay", price: 21250 },
+    { system: "Pyro",    location: "Nyx Gateway (Pyro) - Galleria - Platinum Bay", price: 21250 },
+    { system: "Pyro",    location: "Stanton Gateway (Pyro) - Galleria - Platinum Bay", price: 21250 },
+    { system: "Nyx",     location: "Pyro Gateway (Nyx) - Galleria - Platinum Bay", price: 21250 },
+    { system: "Nyx",     location: "Stanton Gateway (Nyx) - Galleria - Platinum Bay", price: 21250 },
+  ],
+  Trawler: [
+    { system: "Stanton", location: "ArcCorp - Area18 - Retail bridges - Dumper's Depot", price: 31150 },
+    { system: "Stanton", location: "ArcCorp - Baijini Point - Galleria - Platinum Bay", price: 31150 },
+    { system: "Stanton", location: "Crusader - Orison - Providence Industrial Platform - Cousin Crows", price: 31150 },
+    { system: "Stanton", location: "Hurston - Everus Harbor - Galleria - Platinum Bay", price: 29593 },
+    { system: "Stanton", location: "microTech - New Babbage - The Commons - Plaza - Omega Pro", price: 31150 },
+    { system: "Stanton", location: "microTech - Port Tressler - Galleria - Platinum Bay", price: 31150 },
+  ],
+  Cinch: [
+    { system: "Stanton", location: "ARC-L1 - Galleria - Platinum Bay", price: 11150 },
+    { system: "Stanton", location: "CRU-L1 - Galleria - Platinum Bay", price: 11150 },
+    { system: "Stanton", location: "CRU-L4 - Galleria - Platinum Bay", price: 11150 },
+    { system: "Stanton", location: "CRU-L5 - Galleria - Platinum Bay", price: 11150 },
+    { system: "Stanton", location: "Crusader - Orison - Providence Industrial Platform - Cousin Crows", price: 11150 },
+    { system: "Stanton", location: "Crusader - Yela - Grim HEX - Main Concourse - Dumper's Depot", price: 11150 },
+    { system: "Stanton", location: "HUR-L2 - Galleria - Platinum Bay", price: 11150 },
+    { system: "Stanton", location: "HUR-L3 - Galleria - Platinum Bay", price: 11150 },
+    { system: "Stanton", location: "HUR-L5 - Galleria - Platinum Bay", price: 11150 },
+    { system: "Stanton", location: "microTech - New Babbage - The Commons - Plaza - Omega Pro", price: 11150 },
+    { system: "Stanton", location: "Magnus Gateway - Galleria - Platinum Bay", price: 11150 },
+    { system: "Stanton", location: "Nyx Gateway (Stanton) - Galleria - Platinum Bay", price: 11150 },
+    { system: "Stanton", location: "Pyro Gateway (Stanton) - Galleria - Platinum Bay", price: 11150 },
+    { system: "Stanton", location: "Terra Gateway - Galleria - Platinum Bay", price: 11150 },
+    { system: "Pyro",    location: "Nyx Gateway (Pyro) - Galleria - Platinum Bay", price: 11150 },
+    { system: "Pyro",    location: "Stanton Gateway (Pyro) - Galleria - Platinum Bay", price: 11150 },
+    { system: "Nyx",     location: "Pyro Gateway (Nyx) - Galleria - Platinum Bay", price: 11150 },
+    { system: "Nyx",     location: "Stanton Gateway (Nyx) - Galleria - Platinum Bay", price: 11150 },
+  ],
+};
+
 const salvageHeads = [
   {
     head: "Abrade",
@@ -2523,6 +2580,10 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [scuInput, setScuInput] = useState("0");
   const [search, setSearch] = useState("");
   const [imageLoadErrors, setImageLoadErrors] = useState({});
+  // Per-scraper-module system filter for the Scraper Module Performance
+  // detail cards. Keyed by row.head ("Abrade" | "Trawler" | "Cinch").
+  // Empty string means "Any system" — show every location.
+  const [scraperSystemFilter, setScraperSystemFilter] = useState({});
   const [selectedSellMaterial, setSelectedSellMaterial] = useState("");
   const [estimatePlayerName, setEstimatePlayerName] = useState("");
   const [selectedSellPointName, setSelectedSellPointName] = useState("");
@@ -5677,55 +5738,6 @@ export default function StarCitizenSalvageGuideWebsite() {
                 </div>
               </div>
             </div>
-
-            <div className="flex flex-1 flex-col rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
-              <h2 className="text-xl font-bold text-cyan-300">Scraper Module Performance</h2>
-              <p className="mt-1 text-sm text-slate-400">All modules manufactured by Greycat Industrial. Data sourced from CStone Universal Item Finder.</p>
-
-              {/* Comparison table */}
-              <div className="mt-4 overflow-x-auto rounded-2xl border border-slate-700">
-                <table className="w-full min-w-[600px] text-left text-sm md:min-w-0">
-                  <thead className="bg-slate-950 text-slate-300">
-                    <tr>
-                      <th className="px-3 py-3">Module</th>
-                      <th className="px-3 py-3 text-center">Speed ×</th>
-                      <th className="px-3 py-3 text-center">Radius</th>
-                      <th className="px-3 py-3 text-center">Efficiency</th>
-                      <th className="px-3 py-3 text-center">Power</th>
-                      <th className="px-3 py-3 text-right">Price</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {salvageHeads.map((row) => (
-                      <tr key={row.head} className="border-t border-slate-800 bg-slate-900/40">
-                        <td className="px-3 py-3 font-bold text-white">{row.head}</td>
-                        <td className="px-3 py-3 text-center text-amber-300 font-bold">{row.speedMultiplier.toFixed(1)}×</td>
-                        <td className="px-3 py-3 text-center text-cyan-300">{row.radius.toFixed(1)} m</td>
-                        <td className="px-3 py-3 text-center text-slate-300">{row.efficiency}</td>
-                        <td className="px-3 py-3 text-center text-slate-300">{row.powerDraw.toFixed(2)}</td>
-                        <td className="px-3 py-3 text-right text-emerald-300 font-bold">{row.price.toLocaleString()} aUEC</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Per-module detail cards */}
-              <div className="mt-4 space-y-3">
-                {salvageHeads.map((row) => (
-                  <div key={row.head} className="rounded-2xl border border-slate-700 bg-slate-950/60 p-4">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <div className="font-bold text-white">{row.head} Scraper Module</div>
-                        <div className="text-xs text-slate-400 mt-0.5">{row.manufacturer}</div>
-                      </div>
-                      <span className="rounded-lg border border-cyan-500/25 bg-cyan-500/10 px-2.5 py-1 text-xs font-semibold text-cyan-300 shrink-0">{row.bestFor}</span>
-                    </div>
-                    <p className="mt-2 text-xs text-slate-400 leading-relaxed">{row.description}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
 
           <div className="flex h-full flex-col">
@@ -5896,6 +5908,152 @@ export default function StarCitizenSalvageGuideWebsite() {
             </div>
           </div>
         </DesktopGrid>
+
+        {/* Full-width row: Scraper Module Performance — moved out
+            of the left column so the panel spans the page. */}
+        <div className="mb-8">
+        <div className="flex flex-1 flex-col rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
+          <h2 className="text-xl font-bold text-cyan-300">Scraper Module Performance</h2>
+          <p className="mt-1 text-sm text-slate-400">All modules manufactured by Greycat Industrial. Data sourced from CStone Universal Item Finder.</p>
+
+          {/* Comparison table — same cyan-thumb / slate-950 track
+              scrollbar style as the 30-Day History table when the
+              table overflows on narrow viewports. */}
+          <div className="mt-4 overflow-x-auto rounded-2xl border border-slate-700 [scrollbar-width:thin] [scrollbar-color:rgb(6_182_212_/_0.7)_rgb(2_6_23)] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-slate-950 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-500/70 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-cyan-400">
+            <table className="w-full min-w-[600px] text-left text-sm md:min-w-0">
+              <thead className="bg-slate-950 text-slate-300">
+                <tr>
+                  <th className="px-3 py-3">Module</th>
+                  <th className="px-3 py-3 text-center">Speed ×</th>
+                  <th className="px-3 py-3 text-center">Radius</th>
+                  <th className="px-3 py-3 text-center">Efficiency</th>
+                  <th className="px-3 py-3 text-center">Power</th>
+                  <th className="px-3 py-3 text-right">Lowest Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                {salvageHeads.map((row) => (
+                  <tr key={row.head} className="border-t border-slate-800 bg-slate-900/40">
+                    <td className="px-3 py-3 font-bold text-white">{row.head}</td>
+                    <td className="px-3 py-3 text-center text-amber-300 font-bold">{row.speedMultiplier.toFixed(1)}×</td>
+                    <td className="px-3 py-3 text-center text-cyan-300">{row.radius.toFixed(1)} m</td>
+                    <td className="px-3 py-3 text-center text-slate-300">{row.efficiency}</td>
+                    <td className="px-3 py-3 text-center text-slate-300">{row.powerDraw.toFixed(2)}</td>
+                    <td className="px-3 py-3 text-right text-emerald-300 font-bold">
+                      {(() => {
+                        // Surface the lowest in-game price across every
+                        // location that stocks this module. Falls back
+                        // to the static row.price (sticker rate) if we
+                        // somehow have no resolved locations.
+                        const locs = SCRAPER_LOCATIONS[row.head] || [];
+                        const minPrice = locs.length
+                          ? Math.min(...locs.map((l) => l.price))
+                          : row.price;
+                        return `${minPrice.toLocaleString()} aUEC`;
+                      })()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Per-module detail cards.
+              Each card shows the module description plus a system
+              filter dropdown and the list of in-game purchase
+              locations (sourced from finder.cstone.space). Filter
+              defaults to "All" (every location); user can narrow
+              to Stanton / Pyro / Nyx via the dropdown. */}
+          <div className="mt-4 space-y-3">
+            {salvageHeads.map((row) => {
+              const allLocs = SCRAPER_LOCATIONS[row.head] || [];
+              // "" means no system picked → location list hidden.
+              // Clicking the active system again collapses back to "".
+              const systemPick = scraperSystemFilter[row.head] || "";
+              const filteredLocs = systemPick
+                ? allLocs.filter((l) => l.system === systemPick)
+                : [];
+              // Only render buttons for systems that actually stock
+              // this module. e.g. Trawler is Stanton-only, so Pyro
+              // and Nyx buttons hide.
+              const SYSTEMS = ["Stanton", "Pyro", "Nyx"].filter((sys) =>
+                allLocs.some((l) => l.system === sys)
+              );
+              const togglePick = (sys) =>
+                setScraperSystemFilter((s) => ({
+                  ...s,
+                  [row.head]: s[row.head] === sys ? "" : sys,
+                }));
+              return (
+                <div key={row.head} className="rounded-2xl border border-slate-700 bg-slate-950/60 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="font-bold text-white">{row.head} Scraper Module</div>
+                      <div className="text-xs text-slate-400 mt-0.5">{row.manufacturer}</div>
+                    </div>
+                    <span className="rounded-lg border border-cyan-500/25 bg-cyan-500/10 px-2.5 py-1 text-xs font-semibold text-cyan-300 shrink-0">{row.bestFor}</span>
+                  </div>
+                  <p className="mt-2 text-xs text-slate-400 leading-relaxed">{row.description}</p>
+
+                  {allLocs.length > 0 && (
+                    <div className="mt-3 border-t border-slate-800 pt-3">
+                      {/* System pick buttons. Click = show locations
+                          for that system. Click again on the active
+                          one = collapse back to hidden. */}
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="text-[10px] uppercase tracking-wider text-slate-500">
+                          In-game purchase
+                        </div>
+                        <div className="flex gap-1.5">
+                          {SYSTEMS.map((sys) => {
+                            const active = systemPick === sys;
+                            return (
+                              <button
+                                key={sys}
+                                type="button"
+                                onClick={() => togglePick(sys)}
+                                className={
+                                  active
+                                    ? "rounded-md border border-cyan-400 bg-cyan-500/25 px-2.5 py-1 text-xs font-semibold text-cyan-100"
+                                    : "rounded-md border border-slate-700 bg-slate-900 px-2.5 py-1 text-xs font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                                }
+                                aria-pressed={active}
+                              >
+                                {sys}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                      {systemPick && (
+                        filteredLocs.length === 0 ? (
+                          <p className="mt-2 text-xs italic text-slate-500">
+                            No {systemPick} location stocks this module.
+                          </p>
+                        ) : (
+                          <ul className="mt-2 max-h-48 overflow-y-auto space-y-1 pr-1 [scrollbar-width:thin] [scrollbar-color:rgb(6_182_212_/_0.7)_rgb(2_6_23)] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-slate-950 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-500/70 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-cyan-400">
+                            {filteredLocs.map((l) => (
+                              <li
+                                key={`${l.system}-${l.location}`}
+                                className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-800/60 pt-1 first:border-t-0 first:pt-0 text-xs"
+                              >
+                                <span className="text-slate-300">{l.location}</span>
+                                <span className="font-semibold text-emerald-300">
+                                  {l.price.toLocaleString()} aUEC
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        )
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        </div>
 
         </>)}
 
@@ -9166,6 +9324,8 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <li>Update banner now has a one-click "Update now" button — clears caches and reloads automatically, no keyboard shortcut needed.</li>
                     <li>Discord login resilience: OAuth redirect now pinned to the canonical site origin so QR-code and web logins work regardless of which host fronted the request.</li>
                     <li>"Connect Discord" for refinery DMs: session cookie loosened from Strict to Lax so the browser carries it across the OAuth return trip. Resolves the "Your login session expired" loop when linking notifications. (You may need to sign out and back in once to pick up the new cookie.)</li>
+                    <li>Home → <strong>Scraper Module Performance</strong>: each module card now has Stanton / Pyro / Nyx buttons that reveal in-game purchase locations + prices (sourced from finder.cstone.space). Empty systems hide their button. Comparison table's Price column renamed <strong>Lowest Price</strong> and shows the cheapest location across all systems.</li>
+                    <li>Home layout: Scraper Module Performance moved to its own full-width row below the Refinery Calculator + Sell Estimate row.</li>
                   </ul>
                 </section>
 

@@ -2,7 +2,12 @@
 // Starts Discord OAuth. Sets a short-lived CSRF state cookie, then 302s to Discord.
 
 import { generateToken, buildCookie, STATE_COOKIE, STATE_TTL_SECONDS } from "../_lib/session.js";
-import { getDiscordCredentials, buildAuthorizeUrl, getCallbackUri } from "../_lib/discord.js";
+import { getDiscordCredentials, buildAuthorizeUrl, getCallbackUri, getOrigin } from "../_lib/discord.js";
+
+// Canonical production host. Discord OAuth redirect_uri is pinned to
+// this exact origin (see api/_lib/discord.js), so the state cookie
+// MUST also be set on this host or the callback can't read it.
+const CANONICAL_HOST = "scsalvager.net";
 
 export default async function handler(req, res) {
   let credentials;
@@ -13,8 +18,34 @@ export default async function handler(req, res) {
     return res.status(503).send(e.message);
   }
 
+  // If the user hit /api/auth/login on a non-canonical host (e.g.
+  // www.scsalvager.net or a *.vercel.app preview), bounce them to the
+  // canonical host first. Otherwise the state cookie ends up scoped
+  // to the wrong host and the callback (which lands on canonical via
+  // the pinned redirect_uri) can't read it -> "Invalid OAuth state".
+  const incomingHost = (req.headers["x-forwarded-host"] || req.headers.host || "").toLowerCase();
+  const isProd =
+    process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production";
+  if (isProd && incomingHost && incomingHost !== CANONICAL_HOST) {
+    const canonicalLogin = `https://${CANONICAL_HOST}/api/auth/login`;
+    console.log("[oauth/login] non-canonical host=%s, redirecting to %s", incomingHost, canonicalLogin);
+    res.writeHead(302, { Location: canonicalLogin });
+    res.end();
+    return;
+  }
+
   const state = generateToken();
   const redirectUri = getCallbackUri(req);
+  // Log the resolved redirect_uri + the host headers that fed it so we
+  // can diagnose "Invalid OAuth2 redirect_uri" errors by grepping
+  // Vercel logs. Stays in production — pure observability, no PII.
+  console.log("[oauth/login] redirect_uri=%s host=%s xfh=%s xfp=%s SITE_URL=%s",
+    redirectUri,
+    req.headers.host,
+    req.headers["x-forwarded-host"],
+    req.headers["x-forwarded-proto"],
+    process.env.SITE_URL || "(unset)"
+  );
   const authorizeUrl = buildAuthorizeUrl({
     clientId: credentials.clientId,
     redirectUri,

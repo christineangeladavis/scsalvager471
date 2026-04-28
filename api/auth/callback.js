@@ -25,6 +25,18 @@ export default async function handler(req, res) {
   const storedState = cookies[STATE_COOKIE];
 
   if (!code || !state || !storedState || state !== storedState) {
+    // Log the diagnostic details so we can grep Vercel logs when this
+    // fires. Doesn't leak the actual state values — just presence + the
+    // host/cookie context that explains *why* the cookie didn't match.
+    console.warn("[oauth/callback] state mismatch", {
+      hasCode: !!code,
+      hasQueryState: !!state,
+      hasCookieState: !!storedState,
+      stateMatched: !!storedState && state === storedState,
+      host: req.headers.host,
+      xfh: req.headers["x-forwarded-host"],
+      cookieHeaderLen: (req.headers.cookie || "").length,
+    });
     return res
       .status(400)
       .send("Invalid OAuth state. Please return to the home page and try logging in again.");

@@ -2148,6 +2148,17 @@ const MISSIONS = [
 const SELL_MATERIALS = ["Construction Materials", "Recycled Material Composite"];
 const PLAYER_SELL_POINT = "Sold to Player";
 
+// Bumped on every release that ships a new What's New section. The
+// notification bell surfaces a "new site update available" entry until
+// the user opens the What's New modal (or marks it read). Per-browser
+// pointer is stored at localStorage["scs_whatsnew_seen_version"].
+const LATEST_WHATSNEW_VERSION = "v2.6";
+
+// localStorage key for explicitly dismissed notification ids. Lets
+// users hide the red badge without changing their underlying setup
+// (e.g. dismiss the "Discord DMs off" nag without enabling DMs).
+const DISMISSED_NOTIFICATIONS_KEY = "scs_dismissed_notifications";
+
 const sellPoints = [
   // === CONSTRUCTION MATERIAL ===
   // 16,000 aUEC/SCU
@@ -2817,6 +2828,11 @@ export default function StarCitizenSalvageGuideWebsite() {
 
   // --- UI state for the user menu and Settings modal ---
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  // Notification bell — left of the user menu in the header. Surfaces
+  // setup nags (DMs not enabled, RSI handle not linked/verified) so
+  // logged-in users have a one-click path to the Settings section
+  // that fixes each one.
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   // Privacy Policy modal — opens from the footer link. Stays decoupled
   // from auth state so anonymous visitors can read it too.
@@ -2828,6 +2844,78 @@ export default function StarCitizenSalvageGuideWebsite() {
   // (Added/Removed reads roughly the same; Fixes is condensed to
   // user-relevant summaries instead of "renamed X to Y" specifics).
   const [isWhatsNewOpen, setIsWhatsNewOpen] = useState(false);
+  // Per-browser "I've seen the changelog through version X" pointer.
+  // The notification bell surfaces a "site update available" entry
+  // until this matches LATEST_WHATSNEW_VERSION. Bump that constant
+  // every time you ship a new What's New section.
+  const [whatsNewSeenVersion, setWhatsNewSeenVersion] = useState(() => {
+    if (typeof window === "undefined") return "";
+    try {
+      return localStorage.getItem("scs_whatsnew_seen_version") || "";
+    } catch {
+      return "";
+    }
+  });
+  const markWhatsNewSeen = () => {
+    setWhatsNewSeenVersion(LATEST_WHATSNEW_VERSION);
+    try {
+      localStorage.setItem("scs_whatsnew_seen_version", LATEST_WHATSNEW_VERSION);
+    } catch {}
+  };
+  // Notification ids the user has explicitly marked as read. Stored
+  // in localStorage so the dismiss persists across reloads. Dismissing
+  // hides the entry from the bell dropdown and stops it counting
+  // toward the red badge — even if the underlying setup state hasn't
+  // changed (e.g. dismissing "Discord DMs off" while leaving DMs off).
+  const [dismissedNotifications, setDismissedNotifications] = useState(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const raw = localStorage.getItem(DISMISSED_NOTIFICATIONS_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  });
+  const persistDismissed = (next) => {
+    try {
+      localStorage.setItem(DISMISSED_NOTIFICATIONS_KEY, JSON.stringify(next));
+    } catch {}
+  };
+  const dismissNotification = (id) => {
+    if (id === "whatsnew") markWhatsNewSeen();
+    setDismissedNotifications((prev) => {
+      if (prev.includes(id)) return prev;
+      const next = [...prev, id];
+      persistDismissed(next);
+      return next;
+    });
+  };
+  const dismissAllNotifications = (ids) => {
+    if (ids.includes("whatsnew")) markWhatsNewSeen();
+    setDismissedNotifications((prev) => {
+      const set = new Set(prev);
+      for (const id of ids) set.add(id);
+      const next = Array.from(set);
+      persistDismissed(next);
+      return next;
+    });
+  };
+  // Inverse of dismiss — flip an item back to unread. For whatsnew
+  // that means clearing the seen-version pointer; for state-derived
+  // items it means dropping the id from dismissedNotifications.
+  const undismissNotification = (id) => {
+    if (id === "whatsnew") {
+      setWhatsNewSeenVersion("");
+      try { localStorage.removeItem("scs_whatsnew_seen_version"); } catch {}
+    }
+    setDismissedNotifications((prev) => {
+      if (!prev.includes(id)) return prev;
+      const next = prev.filter((x) => x !== id);
+      persistDismissed(next);
+      return next;
+    });
+  };
 
   // Transient feedback for notification actions (test DM result, disconnect, etc.)
   // Shape: { kind: "success" | "error" | "info", text: string } | null
@@ -3189,6 +3277,74 @@ export default function StarCitizenSalvageGuideWebsite() {
     }
     setShowLoginPrompt(false);
   };
+
+  // --- Header notification bell — derived setup-nag list. Each entry
+  // points the user at a Settings section they haven't completed
+  // (Discord DMs not enabled, RSI handle missing or unverified). The
+  // count drives the red badge on the bell button.
+  const userNotifications = useMemo(() => {
+    if (!user) return [];
+    const out = [];
+    // "Site update available" is always present in the dropdown so
+    // users can find What's New from the bell at any time. Read state
+    // is derived from whatsNewSeenVersion so it auto-resurfaces as
+    // unread the next time LATEST_WHATSNEW_VERSION bumps.
+    out.push({
+      id: "whatsnew",
+      target: "whatsnew",
+      title: "New site update available",
+      body: `Check What's New for the ${LATEST_WHATSNEW_VERSION} update notes.`,
+    });
+    const dmsEnabled = Boolean(
+      prefs?.discordNotifications && prefs?.notificationLinkedAt
+    );
+    if (!dmsEnabled) {
+      out.push({
+        id: "dms-off",
+        target: "settings",
+        title: "Discord DMs off",
+        body: "Enable Discord DMs in Settings to get a ping the moment your refinery jobs finish.",
+      });
+    }
+    const hasHandle = Boolean(prefs?.rsiHandle);
+    const verified = Boolean(prefs?.rsiHandleVerified);
+    if (!hasHandle) {
+      out.push({
+        id: "rsi-not-linked",
+        target: "settings",
+        title: "RSI handle not linked",
+        body: "Set your Star Citizen handle in Settings so you display under your in-game name on the Statistics leaderboard.",
+      });
+    } else if (!verified) {
+      out.push({
+        id: "rsi-not-verified",
+        target: "settings",
+        title: "RSI handle not verified",
+        body: "Your handle is set but unverified. Paste the one-time token into your RSI Short Bio so your verified name shows on the leaderboard.",
+      });
+    }
+    // Tag (don't filter) so read items stay visible in the dropdown
+    // but stop counting toward the red badge. The user explicitly
+    // asked to keep them on screen after Mark-as-read.
+    //   - whatsnew: read state tracks the seen-version pointer, so a
+    //     future release naturally resurfaces it as unread.
+    //   - state-derived items (dms-off, rsi-*): read state comes from
+    //     dismissedNotifications. The notification stops appearing
+    //     entirely once the underlying condition is fixed (because
+    //     it's no longer pushed above), at which point dismissed
+    //     state is irrelevant.
+    const dismissed = new Set(dismissedNotifications);
+    return out.map((n) => {
+      const isRead =
+        n.id === "whatsnew"
+          ? whatsNewSeenVersion === LATEST_WHATSNEW_VERSION
+          : dismissed.has(n.id);
+      return { ...n, isRead };
+    });
+  }, [user, prefs, whatsNewSeenVersion, dismissedNotifications]);
+
+  // Unread count drives the red bell badge.
+  const unreadNotificationCount = userNotifications.filter((n) => !n.isRead).length;
 
   // --- Presence heartbeat: while a user is logged in and the tab is
   // visible, POST /api/me/heartbeat every 30s so the admin Active Users
@@ -6054,6 +6210,131 @@ export default function StarCitizenSalvageGuideWebsite() {
                 {authLoading ? (
                   <div className="rounded-lg border border-slate-700 bg-slate-800/50 px-3 py-1.5 text-xs text-slate-500">Loading…</div>
                 ) : user ? (
+                  <>
+                  {/* Notification bell — sits to the LEFT of the user
+                      menu. Red badge surfaces when setup nags are
+                      pending (DMs off, RSI handle missing or
+                      unverified). Clicking an item opens the Settings
+                      modal where the user can fix it. */}
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setIsNotificationsOpen((v) => !v)}
+                      aria-haspopup="menu"
+                      aria-expanded={isNotificationsOpen}
+                      aria-label={
+                        unreadNotificationCount > 0
+                          ? `Notifications (${unreadNotificationCount} unread)`
+                          : "Notifications"
+                      }
+                      title={
+                        unreadNotificationCount > 0
+                          ? `${unreadNotificationCount} unread ${unreadNotificationCount === 1 ? "notification" : "notifications"}`
+                          : "No unread notifications"
+                      }
+                      className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-cyan-500/25 bg-slate-900/70 text-slate-300 hover:border-cyan-400/50 hover:text-cyan-200"
+                    >
+                      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="h-4 w-4">
+                        <path d="M12 22a2.5 2.5 0 0 0 2.45-2H9.55A2.5 2.5 0 0 0 12 22zm6.36-6V11a6.37 6.37 0 0 0-5-6.32V4a1.36 1.36 0 1 0-2.72 0v.68A6.37 6.37 0 0 0 5.64 11v5l-1.92 1.92A1 1 0 0 0 4.43 19.5h15.14a1 1 0 0 0 .71-1.58z" />
+                      </svg>
+                      {unreadNotificationCount > 0 && (
+                        <span
+                          aria-hidden="true"
+                          className="pointer-events-none absolute -right-1.5 -top-1.5 flex h-4 min-w-[1rem] items-center justify-center rounded-full border border-slate-900 bg-rose-500 px-1 text-[10px] font-bold text-white shadow-[0_0_0_1px_rgba(244,63,94,0.4)]"
+                        >
+                          {unreadNotificationCount > 9 ? "9+" : unreadNotificationCount}
+                        </span>
+                      )}
+                    </button>
+                    {isNotificationsOpen && (
+                      <>
+                        <div
+                          className="fixed inset-0 z-40"
+                          onClick={() => setIsNotificationsOpen(false)}
+                        />
+                        <div
+                          role="menu"
+                          className="absolute right-0 bottom-full z-50 mb-1 w-80 overflow-hidden rounded-lg border border-cyan-500/25 bg-slate-900 shadow-xl shadow-cyan-950/40"
+                        >
+                          <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950/60 px-3 py-2">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-300">
+                              Notifications
+                            </span>
+                            {unreadNotificationCount > 0 && (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  dismissAllNotifications(
+                                    userNotifications
+                                      .filter((n) => !n.isRead)
+                                      .map((n) => n.id)
+                                  )
+                                }
+                                className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                              >
+                                Mark all as read
+                              </button>
+                            )}
+                          </div>
+                          {userNotifications.length === 0 ? (
+                            <div className="px-3 py-3 text-xs text-slate-400">
+                              All caught up.
+                            </div>
+                          ) : (
+                            userNotifications.map((n) => {
+                              // Resolve where the click takes the user.
+                              // "whatsnew" entries open the changelog
+                              // modal (and stamp it as seen); everything
+                              // else opens Settings.
+                              const onOpen = () => {
+                                setIsNotificationsOpen(false);
+                                // Click = open target AND mark read.
+                                if (n.target === "whatsnew") {
+                                  setIsWhatsNewOpen(true);
+                                  markWhatsNewSeen();
+                                } else {
+                                  setIsSettingsOpen(true);
+                                  dismissNotification(n.id);
+                                }
+                              };
+                              const ctaLabel =
+                                n.target === "whatsnew"
+                                  ? "Open What's New →"
+                                  : "Open Settings →";
+                              return (
+                                <div
+                                  key={n.id}
+                                  role="menuitem"
+                                  className={`flex items-start gap-2 border-b border-slate-800 px-3 py-2.5 last:border-b-0 hover:bg-slate-800/60 ${n.isRead ? "opacity-60" : ""}`}
+                                >
+                                  <span
+                                    className={`mt-1 inline-block h-1.5 w-1.5 shrink-0 rounded-full ${
+                                      n.isRead
+                                        ? "bg-slate-600"
+                                        : "bg-rose-400 shadow-[0_0_4px_rgba(244,63,94,0.7)]"
+                                    }`}
+                                  />
+                                  <div className="min-w-0 flex-1">
+                                    <button
+                                      type="button"
+                                      onClick={onOpen}
+                                      className="block w-full text-left"
+                                    >
+                                      <div className={`text-xs font-semibold ${n.isRead ? "text-slate-300" : "text-slate-100"}`}>
+                                        {n.title}
+                                      </div>
+                                      <div className="mt-0.5 text-[11px] leading-snug text-slate-400">{n.body}</div>
+                                      <div className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-cyan-300">{ctaLabel}</div>
+                                    </button>
+                                  </div>
+                                </div>
+                              );
+                            })
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
                   <div className="relative">
                     <button
                       type="button"
@@ -6117,6 +6398,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                       </>
                     )}
                   </div>
+                  </>
                 ) : (
                   <a
                     href="/api/auth/login"
@@ -10251,7 +10533,10 @@ export default function StarCitizenSalvageGuideWebsite() {
               {" · "}
               <button
                 type="button"
-                onClick={() => setIsWhatsNewOpen(true)}
+                onClick={() => {
+                  setIsWhatsNewOpen(true);
+                  markWhatsNewSeen();
+                }}
                 className="text-cyan-300 underline-offset-2 hover:underline hover:text-cyan-200"
               >
                 What's New
@@ -10750,6 +11035,8 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <li>Patch History → Clear History dropdown now offers <strong>per-patch wipes</strong>: a "Current patch (everything on screen)" option plus a separate entry for each older released patch (clears entries from earlier cycles that no longer render in the panel but are still in your stored ledger).</li>
                     <li>Settings → <strong>Patch reset</strong>: on the day a new Star Citizen patch goes live, a one-click "Clear ledger for new patch" button appears so you can start the new cycle empty. Available only on patch drop day, once per cycle. Hidden every other day. Two-step confirmation + result summary.</li>
                     <li>Privacy Policy + Terms of Service refreshed: anonymous visit pings (user-agent + country only — <strong>no IP</strong>) and the new patch-reset right are both disclosed under "What we collect" / "Your rights".</li>
+                    <li>New <strong>notification bell</strong> sits to the left of the user menu (logged-in only). Red badge shows the unread count. Surfaces setup nags (Discord DMs off, RSI handle not linked, RSI handle not verified) plus a "New site update available" entry whenever What's New gets a new release section.</li>
+                    <li>Clicking a notification opens the relevant destination (Settings or What's New) and marks it as read. Read items stay visible in the dropdown (greyed with a slate dot) until the underlying setup is fixed. A "Mark all as read" header button clears the badge in one click.</li>
                   </ul>
                   <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Fixes</p>
                   <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">

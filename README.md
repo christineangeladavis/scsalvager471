@@ -18,6 +18,8 @@ Added:
 - Patch History → Clear History dropdown now offers per-patch wipes: a "Current patch · 4.7.2 (everything on screen)" option that empties the panel for the current cycle, plus a separate entry for each older released patch (clears entries from earlier cycles that no longer render in the panel but are still in your stored ledger).
 - Settings → **Patch reset** section appears on the day a new Star Citizen patch goes live, with a one-click "Clear ledger for new patch" button so you can start the new cycle with an empty ledger. Available only on patch drop day, once per patch cycle. Hidden every other day. Two-step confirmation flow with a result summary.
 - Privacy Policy + Terms of Service refreshed: anonymous visit pings (user-agent + country only — **no IP collected**) and the new patch-reset right are both disclosed under "What we collect" / "Your rights".
+- New **notification bell** sits to the left of the user menu (logged-in only). Red badge shows the unread count. Surfaces setup nags (Discord DMs off, RSI handle not linked, RSI handle not verified) plus a "New site update available" entry every time What's New gets a new release section.
+- Clicking a notification opens the relevant destination (Settings or What's New) and marks it as read. Read items stay visible in the dropdown — greyed with a slate dot — until the underlying setup is fixed. A "Mark all as read" header button clears the badge in one click.
 
 Fixes:
 - Drake Vulture and MISC Fortune roles renamed from "Solo Salvage" to "Light Salvage" to match in-game classification.

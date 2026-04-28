@@ -643,6 +643,7 @@ export default function StarCitizenSalvageGuideWebsite() {
     discordNotifications: false,
     notificationLinkedAt: null,
     rsiHandle: "",
+    displayName: "",
   });
   const [prefsLoading, setPrefsLoading] = useState(false);
   const [prefsError, setPrefsError] = useState("");
@@ -653,6 +654,11 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [rsiHandleDraft, setRsiHandleDraft] = useState("");
   const [rsiHandleSaving, setRsiHandleSaving] = useState(false);
   const [rsiHandleSaved, setRsiHandleSaved] = useState(false);
+  // Display Name draft — separate from prefs.displayName so typing
+  // doesn't fire a save per keystroke. Reseeded from prefs on load.
+  const [displayNameDraft, setDisplayNameDraft] = useState("");
+  const [displayNameSaving, setDisplayNameSaving] = useState(false);
+  const [displayNameSaved, setDisplayNameSaved] = useState(false);
   // RSI Short-Bio verification flow state. `feedback` is a transient
   // banner shown after the most recent verify attempt; cleared whenever
   // the handle changes or the modal is reopened.
@@ -1306,10 +1312,10 @@ export default function StarCitizenSalvageGuideWebsite() {
         onlineWindowMs: 90 * 1000,
         // Two users online (heartbeat within ~90s), two offline.
         users: [
-          { userId: "dev-1", username: "Chrissyy",     rsiHandle: "Chrissyy",      rsiHandleVerified: true,  lastLoginAt: now - 4 * min,   lastSeenAt: now - 8 * 1000,   isOnline: true,  dmsEnabled: true },
-          { userId: "dev-3", username: "TestPilot42",  rsiHandle: "TP_FortyTwo",   rsiHandleVerified: true,  lastLoginAt: now - 11 * hour, lastSeenAt: now - 45 * 1000,  isOnline: true,  dmsEnabled: true },
-          { userId: "dev-2", username: "Denavago",     rsiHandle: "",              rsiHandleVerified: false, lastLoginAt: now - 95 * min,  lastSeenAt: now - 30 * min,   isOnline: false, dmsEnabled: false },
-          { userId: "dev-4", username: "RefiningQueen", rsiHandle: "RefineQueen-X", rsiHandleVerified: false, lastLoginAt: now - 22 * hour, lastSeenAt: now - 18 * hour,  isOnline: false, dmsEnabled: false },
+          { userId: "dev-1", username: "Chrissyy",     displayName: "",          rsiHandle: "Chrissyy",      rsiHandleVerified: true,  lastLoginAt: now - 4 * min,   lastSeenAt: now - 8 * 1000,   isOnline: true,  dmsEnabled: true },
+          { userId: "dev-3", username: "TestPilot42",  displayName: "",          rsiHandle: "TP_FortyTwo",   rsiHandleVerified: true,  lastLoginAt: now - 11 * hour, lastSeenAt: now - 45 * 1000,  isOnline: true,  dmsEnabled: true },
+          { userId: "dev-2", username: "Denavago",     displayName: "Denav",     rsiHandle: "",              rsiHandleVerified: false, lastLoginAt: now - 95 * min,  lastSeenAt: now - 30 * min,   isOnline: false, dmsEnabled: false },
+          { userId: "dev-4", username: "RefiningQueen", displayName: "",         rsiHandle: "RefineQueen-X", rsiHandleVerified: false, lastLoginAt: now - 22 * hour, lastSeenAt: now - 18 * hour,  isOnline: false, dmsEnabled: false },
         ],
       };
     };
@@ -1519,8 +1525,10 @@ export default function StarCitizenSalvageGuideWebsite() {
         rsiHandleToken: "",
         rsiHandleVerified: false,
         rsiHandleVerifiedAt: null,
+        displayName: "",
       });
       setRsiHandleDraft("");
+      setDisplayNameDraft("");
       setPrefsLoading(false);
       return;
     }
@@ -1537,6 +1545,7 @@ export default function StarCitizenSalvageGuideWebsite() {
       rsiHandleToken: "",
       rsiHandleVerified: false,
       rsiHandleVerifiedAt: null,
+      displayName: "",
     });
     fetch("/api/me/prefs", { credentials: "same-origin" })
       .then(async (res) => {
@@ -1548,6 +1557,7 @@ export default function StarCitizenSalvageGuideWebsite() {
         if (data && data.prefs) {
           setPrefs(data.prefs);
           setRsiHandleDraft(typeof data.prefs.rsiHandle === "string" ? data.prefs.rsiHandle : "");
+          setDisplayNameDraft(typeof data.prefs.displayName === "string" ? data.prefs.displayName : "");
         }
         setPrefsLoading(false);
       })
@@ -1557,6 +1567,7 @@ export default function StarCitizenSalvageGuideWebsite() {
           const mock = devMockPrefs();
           setPrefs(mock);
           setRsiHandleDraft(mock.rsiHandle || "");
+          setDisplayNameDraft(mock.displayName || "");
           setPrefsLoading(false);
           return;
         }
@@ -1585,6 +1596,65 @@ export default function StarCitizenSalvageGuideWebsite() {
     } catch (e) {
       setPrefs(previous);
       setPrefsError(e && e.message ? e.message : "Could not save preferences");
+    }
+  };
+
+  // --- Save the Display Name draft ---
+  // The custom display name shown on the leaderboard when the user
+  // hasn't (yet) verified an RSI handle. Verifying always overrides
+  // this value at render time — the displayName field stays in storage
+  // either way, so unverifying their handle later restores the custom
+  // name. Same trim/cap/no-op pattern as saveRsiHandle.
+  const saveDisplayName = async () => {
+    const next = (displayNameDraft || "").trim().slice(0, 32);
+    if (next === (prefs.displayName || "")) {
+      setDisplayNameDraft(next);
+      return;
+    }
+    setDisplayNameSaving(true);
+    setDisplayNameSaved(false);
+    setPrefsError("");
+    const previous = prefs;
+    setPrefs({ ...prefs, displayName: next });
+    setDisplayNameDraft(next);
+    const devMockSave = () => {
+      const mocked = { ...previous, displayName: next };
+      setPrefs(mocked);
+      setDisplayNameDraft(mocked.displayName || "");
+      setDisplayNameSaved(true);
+      setTimeout(() => setDisplayNameSaved(false), 2000);
+    };
+    try {
+      const res = await fetch("/api/me/prefs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ displayName: next }),
+      });
+      if (!res.ok) {
+        if (import.meta.env.DEV && (res.status === 401 || res.status === 404 || res.status === 503)) {
+          devMockSave();
+          return;
+        }
+        throw new Error(`HTTP ${res.status}`);
+      }
+      const data = await res.json();
+      if (data && data.prefs) {
+        setPrefs(data.prefs);
+        setDisplayNameDraft(typeof data.prefs.displayName === "string" ? data.prefs.displayName : "");
+      }
+      setDisplayNameSaved(true);
+      setTimeout(() => setDisplayNameSaved(false), 2000);
+    } catch (e) {
+      if (import.meta.env.DEV) {
+        devMockSave();
+        return;
+      }
+      setPrefs(previous);
+      setDisplayNameDraft(previous.displayName || "");
+      setPrefsError(e && e.message ? e.message : "Could not save display name");
+    } finally {
+      setDisplayNameSaving(false);
     }
   };
 
@@ -1958,6 +2028,27 @@ export default function StarCitizenSalvageGuideWebsite() {
       })
       .catch(() => {
         if (cancelled) return;
+        // In `vite dev` /api/ledger isn't reachable — fall back to a
+        // localStorage-backed ledger keyed on the dummy DevAdmin user
+        // so the preview can exercise full ledger CRUD (seed entries,
+        // edit, delete, export) without the API. Production users hit
+        // the catch above only on real network failures, so we keep
+        // the loud error message there.
+        if (import.meta.env.DEV) {
+          try {
+            const raw = localStorage.getItem("__dev_ledger__");
+            const data = raw ? JSON.parse(raw) : {};
+            setRefineryJobs(Array.isArray(data.refineryJobs) ? data.refineryJobs : []);
+            setSellOrders(
+              Array.isArray(data.sellOrders)
+                ? data.sellOrders.map(canonicalizeSellOrder)
+                : []
+            );
+            hydratedForUserRef.current = user.id;
+            setIsLedgerLoading(false);
+            return;
+          } catch {}
+        }
         // Load failed — leave ref as null so we never save empty data back.
         setLedgerSaveError("Could not load your ledger. Refresh to retry.");
         setIsLedgerLoading(false);
@@ -1987,6 +2078,17 @@ export default function StarCitizenSalvageGuideWebsite() {
       return;
     }
     if (hydratedForUserRef.current !== user.id) return;
+    // In dev preview mirror writes to localStorage so seeded ledger
+    // state survives page reloads. Production stays Redis-only.
+    const persistDev = () => {
+      if (!import.meta.env.DEV) return;
+      try {
+        localStorage.setItem(
+          "__dev_ledger__",
+          JSON.stringify({ refineryJobs: nextRefineryJobs, sellOrders: nextSellOrders })
+        );
+      } catch {}
+    };
     try {
       const res = await fetch("/api/ledger", {
         method: "POST",
@@ -1996,11 +2098,13 @@ export default function StarCitizenSalvageGuideWebsite() {
       });
       const info = await res.json().catch(() => ({}));
       if (!res.ok) {
+        if (import.meta.env.DEV) { persistDev(); setLedgerSaveError(""); return; }
         setLedgerSaveError(info.error || `Could not save ledger (HTTP ${res.status}).`);
       } else {
         setLedgerSaveError("");
       }
     } catch (e) {
+      if (import.meta.env.DEV) { persistDev(); setLedgerSaveError(""); return; }
       setLedgerSaveError("Could not save ledger (network error).");
     }
   };
@@ -4267,7 +4371,13 @@ export default function StarCitizenSalvageGuideWebsite() {
                 // 32rem ≈ 512px — header + ~10 standard-height rows. The
                 // <thead> below stays pinned at the top of the scroll
                 // box so column titles remain visible while scrolling.
-                <div className="mt-4 overflow-x-auto overflow-y-auto max-h-[32rem] rounded-2xl border border-slate-700">
+                //
+                // Custom scrollbar: cyan thumb on a slate-950 track, both
+                // pill-shaped, matching the rest of the panel's palette.
+                // The arbitrary Tailwind variants here cover Webkit
+                // (Chrome/Edge/Safari) and the `[scrollbar-width]` /
+                // `[scrollbar-color]` props handle Firefox.
+                <div className="mt-4 overflow-x-auto overflow-y-auto max-h-[32rem] rounded-2xl border border-slate-700 [scrollbar-width:thin] [scrollbar-color:rgb(6_182_212_/_0.7)_rgb(2_6_23)] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-slate-950 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-500/70 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-cyan-400">
                   <table className="w-full min-w-[640px] text-left text-sm md:min-w-0">
                     <thead className="bg-slate-950 text-slate-300 sticky top-0 z-10">
                       <tr>
@@ -5459,6 +5569,61 @@ export default function StarCitizenSalvageGuideWebsite() {
                 </button>
               </div>
 
+              {/* Display Name section.
+                  Free-form override for users who don't have an RSI
+                  handle linked yet. Shown on the Statistics leaderboard
+                  in place of the Discord username. Hidden once the
+                  user has a verified RSI handle, since the verified
+                  handle takes priority and overrides this anyway.
+                  Placed first so the user sees identity controls
+                  before notification preferences. */}
+              {!prefs.rsiHandleVerified && (
+                <section className="mt-6">
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Display Name</h4>
+                  <div className="mt-3 rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+                    <p className="text-xs text-slate-400">
+                      Optional name shown on the Statistics leaderboard. Leave blank to use your Discord username. Verifying an RSI handle below replaces this with your in-game identity.
+                    </p>
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <input
+                        type="text"
+                        value={displayNameDraft}
+                        onChange={(e) => {
+                          setDisplayNameDraft(e.target.value);
+                          if (displayNameSaved) setDisplayNameSaved(false);
+                        }}
+                        onBlur={saveDisplayName}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            saveDisplayName();
+                          }
+                        }}
+                        maxLength={32}
+                        placeholder={user?.username || "Display name"}
+                        disabled={prefsLoading || displayNameSaving}
+                        className="flex-1 min-w-[160px] rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-100 placeholder-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-1 focus:ring-cyan-400/40 disabled:cursor-not-allowed disabled:opacity-50"
+                      />
+                      <button
+                        type="button"
+                        onClick={saveDisplayName}
+                        disabled={
+                          prefsLoading ||
+                          displayNameSaving ||
+                          (displayNameDraft || "").trim() === (prefs.displayName || "")
+                        }
+                        className="rounded-md border border-cyan-400/30 bg-cyan-500/10 px-3 py-1.5 text-xs font-semibold text-cyan-200 hover:bg-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        {displayNameSaving ? "Saving…" : "Save"}
+                      </button>
+                      {displayNameSaved && !displayNameSaving && (
+                        <span className="text-xs text-emerald-300">Saved</span>
+                      )}
+                    </div>
+                  </div>
+                </section>
+              )}
+
               {/* Notifications section */}
               <section className="mt-6">
                 <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Notifications</h4>
@@ -6276,6 +6441,18 @@ export default function StarCitizenSalvageGuideWebsite() {
               </div>
 
               <div className="mt-5 space-y-7 text-sm text-slate-300 leading-relaxed">
+
+                <section>
+                  <h4 className="text-cyan-300 text-base font-bold">v2.5.1 — April 27, 2026</h4>
+                  <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li>Settings → <strong>Display Name</strong>: pick a custom name for the Statistics leaderboard if you haven't linked an RSI handle yet. Verifying an RSI handle still overrides any custom name. Display Name now sits at the top of Settings.</li>
+                  </ul>
+                  <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Fixes</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li>30-Day History scrollbar restyled to match the site palette — cyan thumb on a recessed dark track, both pill-shaped.</li>
+                  </ul>
+                </section>
 
                 <section>
                   <h4 className="text-cyan-300 text-base font-bold">v2.5 — April 27, 2026</h4>

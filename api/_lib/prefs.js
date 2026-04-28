@@ -21,6 +21,12 @@
 //                                        whenever the handle changes.
 //   rsiHandleVerifiedAt    : number    — ms timestamp of last successful verify;
 //                                        null when never verified.
+//   displayName            : string    — optional free-form name shown in
+//                                        place of the Discord username when
+//                                        no verified RSI handle is set.
+//                                        Verified RSI handle ALWAYS overrides
+//                                        this. Empty string falls back to
+//                                        Discord username. 32-char cap.
 
 import crypto from "node:crypto";
 
@@ -28,6 +34,9 @@ import crypto from "node:crypto";
 // validator. We're permissive on length and only enforce a sane upper cap so
 // nobody jams a novel into the field.
 const RSI_HANDLE_MAX_LEN = 32;
+// Display name has the same cap as the RSI handle for consistency on the
+// leaderboard; layout assumes ~32 chars max per row.
+const DISPLAY_NAME_MAX_LEN = 32;
 
 // 8 hex chars = 32 bits of entropy, plenty for our purposes (collision odds
 // at our user count are trivial and the token is just a "did the user paste
@@ -45,6 +54,7 @@ export function defaultPrefs() {
     rsiHandleToken: "",
     rsiHandleVerified: false,
     rsiHandleVerifiedAt: null,
+    displayName: "",
   };
 }
 
@@ -85,7 +95,15 @@ export function sanitizePrefsUpdate(input) {
     const trimmed = input.rsiHandle.trim().slice(0, RSI_HANDLE_MAX_LEN);
     out.rsiHandle = trimmed;
   }
-  // notificationLinkedAt is server-managed; clients cannot set it directly.
+  if (typeof input.displayName === "string") {
+    // Trim + cap. Empty string is a valid value — it means "clear the
+    // custom name" and the leaderboard falls back to the Discord
+    // username (assuming no verified RSI handle is set).
+    out.displayName = input.displayName.trim().slice(0, DISPLAY_NAME_MAX_LEN);
+  }
+  // notificationLinkedAt, rsiHandleVerified, rsiHandleVerifiedAt,
+  // rsiHandleToken are all server-managed; clients cannot set them
+  // directly through this update path.
   return out;
 }
 

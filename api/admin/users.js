@@ -12,14 +12,16 @@
 //     activeWindowMs: 86400000,
 //     onlineWindowMs: 90000,
 //     users: [
-//       { userId, username, rsiHandle, rsiHandleVerified, lastLoginAt,
-//         lastSeenAt, isOnline, dmsEnabled }
+//       { userId, username, displayName, rsiHandle, rsiHandleVerified,
+//         lastLoginAt, lastSeenAt, isOnline, dmsEnabled }
 //     ]
 //   }
 //
 // rsiHandle is the user-entered Star Citizen handle (from prefs); empty
 // string when not set. rsiHandleVerified is true only after the user
-// has passed the RSI Short-Bio token check.
+// has passed the RSI Short-Bio token check. displayName is the
+// optional free-form override the user can set in Settings; empty
+// string when not set.
 //
 // isOnline is derived from lastSeenAt — true when the heartbeat fired
 // within the last ~90 seconds (covers a missed beat at the default 30s
@@ -82,9 +84,12 @@ export default async function handler(req, res) {
     const rsiHandleVerified = Boolean(
       rsiHandle && prefs && prefs.rsiHandleVerified
     );
+    const displayName =
+      prefs && typeof prefs.displayName === "string" ? prefs.displayName : "";
     users.push({
       userId,
       username: meta.username,
+      displayName,
       rsiHandle,
       rsiHandleVerified,
       lastLoginAt: meta.lastLoginAt,

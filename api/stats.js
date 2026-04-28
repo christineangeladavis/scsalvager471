@@ -137,19 +137,23 @@ export default async function handler(req, res) {
     if (userScu > 0 || userProfit > 0) {
       const meta = await getUserMeta(redis, userId);
       const prefs = await getPrefs(redis, userId);
-      // Display the RSI handle ONLY after the user has passed the
-      // Short-Bio token check. An unverified handle is just a string
-      // someone typed into Settings — letting it override the Discord
-      // username would let anyone impersonate anyone. Falling back to
-      // the Discord username until verified makes the verification
-      // flow load-bearing (and is the incentive to complete it).
+      // Display name priority:
+      //   1. Verified RSI handle  (load-bearing — proves identity)
+      //   2. User-set displayName (free-form override for users who
+      //      haven't linked an RSI profile yet)
+      //   3. Discord username      (default fallback)
+      // The verified RSI handle wins over displayName so a successful
+      // verify always reflects the user's in-game identity, regardless
+      // of any custom name they had set previously.
       const rsiHandle = prefs && typeof prefs.rsiHandle === "string"
         ? prefs.rsiHandle.trim()
         : "";
       const verified = Boolean(rsiHandle && prefs && prefs.rsiHandleVerified);
-      const displayName = verified
-        ? rsiHandle
-        : (meta && meta.username) || "Unknown";
+      const customName = prefs && typeof prefs.displayName === "string"
+        ? prefs.displayName.trim()
+        : "";
+      const fallbackName = customName || (meta && meta.username) || "Unknown";
+      const displayName = verified ? rsiHandle : fallbackName;
       perUser.push({
         username: displayName,
         scuRefined: userScu,

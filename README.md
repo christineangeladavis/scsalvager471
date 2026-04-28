@@ -5,6 +5,14 @@ Made by Chrissyy · Referral: STAR-CH2W-R73F
 
 ## What's in this build
 
+UPDATE 4/27/2026 v2.5.1
+
+Added:
+- Settings → Display Name: free-form name shown on the Statistics leaderboard for users who haven't linked an RSI handle yet. Verifying an RSI handle still overrides any custom display name. Display Name section sits at the top of Settings, above Notifications.
+
+Fixes:
+- 30-Day History scrollbar now matches the site's color scheme — pill-shaped cyan thumb (hover lighter) on a recessed slate-950 track. Firefox + Chromium/Webkit both styled.
+
 UPDATE 4/27/2026 v2.5
 
 Added:

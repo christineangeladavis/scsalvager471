@@ -27,6 +27,13 @@
 //                                        Verified RSI handle ALWAYS overrides
 //                                        this. Empty string falls back to
 //                                        Discord username. 32-char cap.
+//   lastPatchClearAt       : number    — ms timestamp of the user's last
+//                                        self-service "clear my ledger for
+//                                        this patch" action. Null when the
+//                                        user has never used the feature.
+//                                        Compared against the current
+//                                        patch's startedAt to enforce a
+//                                        once-per-patch limit.
 
 import crypto from "node:crypto";
 
@@ -55,6 +62,7 @@ export function defaultPrefs() {
     rsiHandleVerified: false,
     rsiHandleVerifiedAt: null,
     displayName: "",
+    lastPatchClearAt: null,
   };
 }
 

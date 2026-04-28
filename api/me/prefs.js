@@ -12,6 +12,7 @@ import {
   sanitizePrefsUpdate,
   generateRsiHandleToken,
 } from "../_lib/prefs.js";
+import { currentPatch, isPatchDropDay } from "../_lib/patches.js";
 
 export default async function handler(req, res) {
   let redis;
@@ -32,7 +33,22 @@ export default async function handler(req, res) {
   if (req.method === "GET") {
     try {
       const prefs = await getPrefs(redis, session.userId);
-      return res.status(200).json({ prefs });
+      // Surface patch-cycle info alongside prefs so the client can
+      // decide whether to show the "Clear my ledger because a new
+      // patch dropped" button without a second round-trip.
+      const now = Date.now();
+      const cp = currentPatch(now);
+      const dropDay = isPatchDropDay(now);
+      const lastClear = Number(prefs.lastPatchClearAt);
+      const alreadyClearedThisCycle =
+        Number.isFinite(lastClear) && cp && lastClear >= cp.startedAt;
+      const patchStatus = {
+        version: cp ? cp.version : null,
+        startedAt: cp ? cp.startedAt : null,
+        isDropDay: Boolean(cp && dropDay),
+        alreadyClearedThisCycle: Boolean(alreadyClearedThisCycle),
+      };
+      return res.status(200).json({ prefs, patchStatus });
     } catch (e) {
       console.error("GET /api/me/prefs failed:", e && e.message ? e.message : e);
       return res.status(500).json({ error: "Could not load preferences" });

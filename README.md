@@ -13,6 +13,11 @@ Added:
 - Mission Reward column shows fee-bearing missions as a negative aUEC line under the reward (e.g. main reward + `-5,000 aUEC` buy-in).
 - Ship Details now includes the pledge price in USD and every in-game purchase location with its aUEC price, sourced from finder.cstone.space. Lorville rows display a "10% discount" badge.
 - Ship Details lists Teach's Special editions (Levski / Teach's Ship Shop) for ships that have them: Reclaimer (33,339,600 aUEC), Vulture (2,778,300 aUEC), Fortune (1,984,500 aUEC).
+- Ledger → 30-Day History panel renamed **Patch History** — now scopes to entries from the current Star Citizen patch (4.7.2) instead of a rolling 30-day window. Header label and footer pill both show the active patch version so it's obvious which game cycle you're looking at. A "Live" badge marks the active patch.
+- Patch History now includes a patch dropdown next to the panel header. Switch the panel to view any past patch's entries; future patches are listed but locked until they go live. Title rewrites to match the selected version, and an "everything on screen" Clear option always targets whatever patch is currently displayed.
+- Patch History → Clear History dropdown now offers per-patch wipes: a "Current patch · 4.7.2 (everything on screen)" option that empties the panel for the current cycle, plus a separate entry for each older released patch (clears entries from earlier cycles that no longer render in the panel but are still in your stored ledger).
+- Settings → **Patch reset** section appears on the day a new Star Citizen patch goes live, with a one-click "Clear ledger for new patch" button so you can start the new cycle with an empty ledger. Available only on patch drop day, once per patch cycle. Hidden every other day. Two-step confirmation flow with a result summary.
+- Privacy Policy + Terms of Service refreshed: anonymous visit pings (user-agent + country only — **no IP collected**) and the new patch-reset right are both disclosed under "What we collect" / "Your rights".
 
 Fixes:
 - Drake Vulture and MISC Fortune roles renamed from "Solo Salvage" to "Light Salvage" to match in-game classification.

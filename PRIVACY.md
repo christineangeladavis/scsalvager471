@@ -10,6 +10,7 @@ SCSalvager.net is a community salvage companion for Star Citizen. This page expl
 - **Custom display name (optional)** — a free-form name you can set in Settings to use on the Statistics leaderboard instead of your Discord handle, until you verify an RSI handle.
 - **RSI handle (optional)** — the Roberts Space Industries citizen handle you choose to link for in-game identity verification.
 - **Session data (IP address, user-agent)** — retained only while your session is active to prevent unauthorised access.
+- **Anonymous visit ping (user-agent, country code)** — when you load the site without being signed in, your browser fires a single ping that records the user-agent string and country code (from the CDN) so the operator can see how much anonymous traffic the site receives. **IP addresses are not collected** for these pings. We store at most the 1,000 most recent pings, deduped per-browser to one ping per 24 hours via an HTTP-only cookie (`scs_guest_visit`). Once you sign in, no further anonymous pings are recorded for that browser.
 
 Anything else you see on the site is content you've authored yourself (ledger entries, community price reports, your preference toggles) — we keep it associated with your Discord handle so it's there the next time you sign in, and you can wipe all of it via Settings → Danger Zone at any time.
 
@@ -29,6 +30,7 @@ We collect only what is needed to operate the service:
 - All account data — sessions, ledgers, preferences, login events, user index — lives in **Upstash Redis**, a hosted Redis service.
 - Session cookies (`scs_session`) are **HTTP-only**, marked `Secure` in production, set with `SameSite=Lax`, and expire **7 days** after issue. The cookie is scoped to the canonical site origin (`scsalvager.net`) regardless of which front the request arrives on.
 - The global login event log is capped at **100,000 entries**; older entries are trimmed automatically.
+- The anonymous visit log is capped at the **1,000 most recent entries** (oldest dropped on each new write). Each entry holds only the three fields above (timestamp, user-agent, country code) and is never associated with a user account.
 - **Screenshots are not stored.** Both full uploads and any cropped subset you choose before submitting exist only in server memory for the duration of the single vision-API call, then are released to be garbage-collected. They never reach Redis or any log.
 - The site is hosted on **Vercel**, which runs the serverless API.
 
@@ -52,6 +54,7 @@ You can:
 - **View your data** at any time — your full Ledger is on the Ledger tab; your preferences and RSI handle state are in Settings.
 - **Opt out of Discord DMs** at any time in Settings — delivery stops immediately.
 - **Disconnect Discord notifications** without losing your account.
+- **Reset your ledger when a new Star Citizen patch drops** — Settings → Patch reset offers a one-click "Clear ledger for new patch" button on the day a new patch goes live. It soft-deletes every refinery job and sell order so you start the new cycle clean, while keeping your account, RSI handle, and DM preferences intact. The button only appears on the patch's release date and can be used at most once per patch cycle. We store a single timestamp (`lastPatchClearAt`) so the once-per-cycle guard works.
 - **Permanently delete your account** via Settings → Danger Zone. The flow walks through two explicit confirmation prompts and then wipes:
   - your ledger (refinery jobs + sell orders)
   - your preferences (RSI handle, verification, DM opt-in)

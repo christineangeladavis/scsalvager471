@@ -2714,13 +2714,16 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [updateAvailable, setUpdateAvailable] = useState(false);
 
   // --- Admin Panel data ---
-  const [adminSection, setAdminSection] = useState("refineries"); // "refineries" | "users" | "exports"
+  const [adminSection, setAdminSection] = useState("users"); // "users" | "guests" | "refineries" | "exports"
   const [adminRefineries, setAdminRefineries] = useState(null);
   const [adminRefineriesLoading, setAdminRefineriesLoading] = useState(false);
   const [adminRefineriesError, setAdminRefineriesError] = useState("");
   const [adminUsers, setAdminUsers] = useState(null);
   const [adminUsersLoading, setAdminUsersLoading] = useState(false);
   const [adminUsersError, setAdminUsersError] = useState("");
+  const [adminGuests, setAdminGuests] = useState(null);
+  const [adminGuestsLoading, setAdminGuestsLoading] = useState(false);
+  const [adminGuestsError, setAdminGuestsError] = useState("");
   const [showForceLogoutConfirm, setShowForceLogoutConfirm] = useState(false);
   const [isForceLogoutInFlight, setIsForceLogoutInFlight] = useState(false);
   const [forceLogoutFeedback, setForceLogoutFeedback] = useState(null);
@@ -2739,6 +2742,50 @@ export default function StarCitizenSalvageGuideWebsite() {
     displayName: "",
   });
   const [prefsLoading, setPrefsLoading] = useState(false);
+  // Patch-cycle metadata returned alongside /api/me/prefs. Drives the
+  // "Clear my ledger because a new patch dropped" button visibility +
+  // once-per-cycle guard. Shape:
+  //   { version, startedAt, isDropDay, alreadyClearedThisCycle }
+  // Null until the prefs request resolves.
+  const [patchStatus, setPatchStatus] = useState(null);
+  // Full list of Star Citizen patches with resolved [from, to) windows.
+  // Loaded from /api/patches when the user logs in. Powers the
+  // per-patch options in the Clear History dropdown so users can
+  // wipe data scoped to one game version (4.7.2, 4.8, …). Shape
+  // matches /api/admin/patches: { patches: [{ version, from, to,
+  // isCurrent, isReleased }] }.
+  const [userPatches, setUserPatches] = useState(null);
+  // Which patch the Patch History panel is currently showing. Null
+  // means "auto-track the current patch" — when patchStatus.version
+  // updates (e.g. a new patch drop) the panel follows. Setting it to
+  // a specific version pins the view to that historical cycle.
+  // Future (un-released) patches are not selectable from the
+  // dropdown, so this should always resolve to a released window.
+  const [selectedPatchVersion, setSelectedPatchVersion] = useState(null);
+  const [patchClearOpen, setPatchClearOpen] = useState(false);
+  const [patchClearStep, setPatchClearStep] = useState(1);
+  const [patchClearInFlight, setPatchClearInFlight] = useState(false);
+  const [patchClearError, setPatchClearError] = useState("");
+  const [patchClearResult, setPatchClearResult] = useState(null);
+  // Admin: clicking a row in All Users opens this user's last 30 days
+  // of refinery + sell activity. Backed by /api/admin/user-history.
+  const [adminUserDetail, setAdminUserDetail] = useState(null);
+  const [adminUserDetailLoading, setAdminUserDetailLoading] = useState(false);
+  const [adminUserDetailError, setAdminUserDetailError] = useState("");
+  const [adminClearLedgerStep, setAdminClearLedgerStep] = useState(0); // 0=picker visible,1=first confirm,2=second confirm
+  const [adminClearLedgerInFlight, setAdminClearLedgerInFlight] = useState(false);
+  const [adminClearLedgerError, setAdminClearLedgerError] = useState("");
+  // Which clear scope is being confirmed. Null when nothing is pending
+  // (step 0). Shape:
+  //   { kind: "all", label: "all ledger data" }
+  //   { kind: "patch", patchVersion, label: "patch 4.7.2 data" }
+  //   { kind: "row", rowKind: "job"|"sale", entryId, label: "..." }
+  const [adminClearLedgerTarget, setAdminClearLedgerTarget] = useState(null);
+  // Inline-edit state for a single row in the user-detail modal.
+  // Null when no row is being edited. While editing, the row in the
+  // table renders input fields backed by `draft`.
+  //   { rowKind: "job"|"sale", entryId, draft: {...}, saving: bool, error: "" }
+  const [adminEditEntry, setAdminEditEntry] = useState(null);
   const [prefsError, setPrefsError] = useState("");
   // Local draft of the RSI handle input — separated from `prefs.rsiHandle`
   // so typing doesn't fire a server save on every keystroke. We commit on
@@ -3171,6 +3218,58 @@ export default function StarCitizenSalvageGuideWebsite() {
     };
   }, [user]);
 
+  // --- Fetch the patch list once the user is logged in. Powers the
+  // per-patch options on the 30-Day History → Clear History dropdown.
+  // Reuses devMockPatches() in `vite dev` so the dropdown renders
+  // without a real API.
+  useEffect(() => {
+    if (!user) {
+      setUserPatches(null);
+      return;
+    }
+    let cancelled = false;
+    fetch("/api/patches", { credentials: "same-origin" })
+      .then(async (res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const ct = res.headers.get("content-type") || "";
+        if (!ct.includes("application/json")) throw new Error("non-JSON");
+        return res.json();
+      })
+      .then((data) => {
+        if (cancelled) return;
+        setUserPatches(data);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        if (import.meta.env.DEV) {
+          setUserPatches(devMockPatches());
+        }
+      });
+    return () => { cancelled = true; };
+  }, [user]);
+
+  // --- Guest-visit ping: when the page mounts without a signed-in user,
+  // fire a single POST to /api/guest-login so admins can see anonymous
+  // traffic on the Guest Logins admin sub-tab. The server dedupes via a
+  // 24h cookie, so re-mounting on the same browser within the window
+  // won't add duplicate rows.
+  useEffect(() => {
+    if (user) return;
+    if (typeof window === "undefined") return;
+    let cancelled = false;
+    const t = setTimeout(() => {
+      if (cancelled) return;
+      fetch("/api/guest-login", {
+        method: "POST",
+        credentials: "same-origin",
+      }).catch(() => {});
+    }, 0);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [user]);
+
   // --- Statistics tab: site-wide aggregate stats + top salvagers leaderboard.
   // Loads when the user opens the Statistics tab while logged in. Dev mock
   // backs the layout when the API isn't reachable.
@@ -3444,6 +3543,64 @@ export default function StarCitizenSalvageGuideWebsite() {
     };
   }, [activeTab, adminSection, user]);
 
+  // --- Admin Guest Logins: load when the admin tab + guests sub-section
+  // is opened. Same dev-mock fallback pattern as the other admin fetches.
+  useEffect(() => {
+    if (activeTab !== "admin") return;
+    if (adminSection !== "guests") return;
+    if (!(user?.isAdmin || import.meta.env.DEV)) return;
+    let cancelled = false;
+    setAdminGuestsLoading(true);
+    setAdminGuestsError("");
+
+    const devMockGuests = () => {
+      const now = Date.now();
+      const min = 60 * 1000;
+      const hour = 60 * min;
+      return {
+        fetchedAt: now,
+        entries: [
+          { ts: now - 2 * min,    ua: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",     country: "US" },
+          { ts: now - 27 * min,   ua: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15", country: "DE" },
+          { ts: now - 3 * hour,   ua: "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1", country: "AU" },
+          { ts: now - 9 * hour,   ua: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",                country: "CA" },
+          { ts: now - 22 * hour,  ua: "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:128.0) Gecko/20100101 Firefox/128.0",                                     country: "GB" },
+        ],
+      };
+    };
+
+    fetch("/api/admin/guest-logins", { credentials: "same-origin" })
+      .then((res) => {
+        if (res.status === 401 || res.status === 403) {
+          if (import.meta.env.DEV) return { __useMock: true };
+          throw new Error(
+            res.status === 401 ? "Not signed in." : "You don't have admin access."
+          );
+        }
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        if (cancelled) return;
+        setAdminGuests(data && data.__useMock ? devMockGuests() : data);
+        setAdminGuestsLoading(false);
+      })
+      .catch((e) => {
+        if (cancelled) return;
+        if (import.meta.env.DEV) {
+          setAdminGuests(devMockGuests());
+          setAdminGuestsLoading(false);
+          return;
+        }
+        setAdminGuestsError(e.message || "Could not load.");
+        setAdminGuestsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab, adminSection, user]);
+
   // --- Admin force-logout: nuke every active session in Redis except
   // the caller's. The dev branch fakes a count for preview testing.
   const performForceLogoutAll = async () => {
@@ -3487,6 +3644,38 @@ export default function StarCitizenSalvageGuideWebsite() {
     }
   };
 
+  // Mirror the real dates from api/_lib/patches.js so dev previews
+  // show the same dropdown the production admin sees. Hoisted above
+  // the useEffect that consumes it so it can also be reused by the
+  // user-detail modal's per-patch clear UI when the Patch Exports
+  // tab hasn't been opened yet.
+  const devMockPatches = () => {
+    const now = Date.now();
+    const v472Start = Date.UTC(2026, 3, 22); // 2026-04-22
+    const v48Start = Date.UTC(2026, 4, 14); // 2026-05-14
+    const v48Released = v48Start <= now;
+    return {
+      patches: [
+        {
+          version: "4.8",
+          startedAt: v48Start,
+          from: v48Released ? v48Start : null,
+          to: v48Released ? now : null,
+          isCurrent: v48Released,
+          isReleased: v48Released,
+        },
+        {
+          version: "4.7.2",
+          startedAt: v472Start,
+          from: v472Start,
+          to: v48Released ? v48Start : now,
+          isCurrent: !v48Released,
+          isReleased: true,
+        },
+      ],
+    };
+  };
+
   // --- Admin Patch Exports: load the patch list when the exports sub-tab
   // is opened. Same dev-mock fallback pattern.
   useEffect(() => {
@@ -3496,35 +3685,6 @@ export default function StarCitizenSalvageGuideWebsite() {
     let cancelled = false;
     setAdminPatchesLoading(true);
     setAdminPatchesError("");
-
-    const devMockPatches = () => {
-      const now = Date.now();
-      // Mirror the real dates from api/_lib/patches.js so the dev preview
-      // shows the same dropdown the production admin sees.
-      const v472Start = Date.UTC(2026, 3, 22); // 2026-04-22
-      const v48Start = Date.UTC(2026, 4, 14); // 2026-05-14
-      const v48Released = v48Start <= now;
-      return {
-        patches: [
-          {
-            version: "4.8",
-            startedAt: v48Start,
-            from: v48Released ? v48Start : null,
-            to: v48Released ? now : null,
-            isCurrent: v48Released,
-            isReleased: v48Released,
-          },
-          {
-            version: "4.7.2",
-            startedAt: v472Start,
-            from: v472Start,
-            to: v48Released ? v48Start : now,
-            isCurrent: !v48Released,
-            isReleased: true,
-          },
-        ],
-      };
-    };
 
     fetch("/api/admin/patches", { credentials: "same-origin" })
       .then((res) => {
@@ -3651,6 +3811,9 @@ export default function StarCitizenSalvageGuideWebsite() {
           setRsiHandleDraft(typeof data.prefs.rsiHandle === "string" ? data.prefs.rsiHandle : "");
           setDisplayNameDraft(typeof data.prefs.displayName === "string" ? data.prefs.displayName : "");
         }
+        if (data && data.patchStatus) {
+          setPatchStatus(data.patchStatus);
+        }
         setPrefsLoading(false);
       })
       .catch((e) => {
@@ -3660,6 +3823,19 @@ export default function StarCitizenSalvageGuideWebsite() {
           setPrefs(mock);
           setRsiHandleDraft(mock.rsiHandle || "");
           setDisplayNameDraft(mock.displayName || "");
+          // Dev mock for patch status — version mirrors the live
+          // current patch in api/_lib/patches.js (4.7.2). isDropDay
+          // is FALSE by default so the Settings → Patch reset
+          // section stays hidden in preview until the operator
+          // ships a new patch (advance api/_lib/patches.js with the
+          // next version + today's startedAt and Vercel redeploy
+          // flips it true on the production server).
+          setPatchStatus({
+            version: "4.7.2",
+            startedAt: Date.now(),
+            isDropDay: false,
+            alreadyClearedThisCycle: false,
+          });
           setPrefsLoading(false);
           return;
         }
@@ -3977,6 +4153,449 @@ export default function StarCitizenSalvageGuideWebsite() {
     }
   };
 
+  // --- Self-service patch reset: wipe my own ledger because a new
+  // patch just dropped. Server enforces the patch-drop-day window and
+  // the once-per-cycle limit; the client is just the trigger.
+  const performPatchClear = async () => {
+    setPatchClearInFlight(true);
+    setPatchClearError("");
+    setPatchClearResult(null);
+    try {
+      const res = await fetch("/api/me/clear-ledger", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ confirm: "CLEAR_LEDGER" }),
+      });
+      let data = null;
+      try { data = await res.json(); } catch {}
+      if (!res.ok) {
+        if (
+          import.meta.env.DEV &&
+          (res.status === 401 || res.status === 403 || res.status === 404 || res.status === 503)
+        ) {
+          // Dev mock: pretend success so the flow is exercisable.
+          setRefineryJobs([]);
+          setSellOrders([]);
+          setPatchStatus((s) => (s ? { ...s, alreadyClearedThisCycle: true } : s));
+          setPatchClearResult({
+            jobsCleared: refineryJobs.length,
+            salesCleared: sellOrders.length,
+            patchVersion: patchStatus?.version || "—",
+          });
+          setPatchClearStep(3);
+          setPatchClearInFlight(false);
+          return;
+        }
+        throw new Error((data && data.error) || `HTTP ${res.status}`);
+      }
+      // Success: drop everything locally so the UI matches the
+      // soft-deleted server state without a reload, and lock the
+      // gate via local patchStatus mirror.
+      setRefineryJobs([]);
+      setSellOrders([]);
+      setPatchStatus((s) => (s ? { ...s, alreadyClearedThisCycle: true } : s));
+      setPatchClearResult({
+        jobsCleared: Number(data?.jobsCleared) || 0,
+        salesCleared: Number(data?.salesCleared) || 0,
+        patchVersion: data?.patchVersion || patchStatus?.version || "—",
+      });
+      setPatchClearStep(3);
+    } catch (e) {
+      setPatchClearError(e && e.message ? e.message : "Could not clear ledger.");
+    } finally {
+      setPatchClearInFlight(false);
+    }
+  };
+
+  // --- Admin: open a user's last-30-days history modal (refinery
+  // jobs + sell orders for that single user). Backed by
+  // /api/admin/user-history. In `vite dev`, /api/* isn't routed and
+  // returns the raw JS source instead of JSON, so res.json() throws —
+  // the catch falls through to the dev-mock builder so the modal still
+  // exercises in preview.
+  const openAdminUserDetail = async (u) => {
+    setAdminUserDetail({ userId: u.userId, username: u.username, refineryJobs: null, sellOrders: null });
+    setAdminUserDetailLoading(true);
+    setAdminUserDetailError("");
+    setAdminClearLedgerStep(0);
+    setAdminClearLedgerError("");
+
+    // Dev mock — seed 10 refinery jobs + 10 sell orders spread across
+    // the last ~28 days so the modal exercises sorting, scrolling, and
+    // a realistic mix of materials/locations. Deterministic per-user
+    // (seed derived from userId) so different dev users surface
+    // visibly different ledgers.
+    const buildDevMock = () => {
+      const now = Date.now();
+      const day = 24 * 60 * 60 * 1000;
+      const min = 60 * 1000;
+      const materials = [
+        "Construction Salvage",
+        "Construction Pieces",
+        "Construction Rubble",
+      ];
+      const refLocations = ["Levski", "Magnus", "ARC-L1", "Hur-L1", "CRU-L1", "Pyro Ruin Station", "Endgame", "Checkmate"];
+      const methods = ["Cormack Method", "Dinyx Solventation", "Kazen Winnowing", "Gaskin Process"];
+      const sellLocations = ["Area18", "New Babbage", "Lorville", "Orison", "GrimHEX", "Ruin Station", "Megumi", "Bloom"];
+      const seed = String(u.userId || "")
+        .split("")
+        .reduce((acc, ch) => (acc * 31 + ch.charCodeAt(0)) >>> 0, 7);
+      const pick = (arr, i) => arr[(seed + i * 7) % arr.length];
+      const refineryJobs = Array.from({ length: 10 }).map((_, i) => {
+        const submittedAt = now - (i * 2.6 + 1) * day - ((seed >> i) & 0xff) * min;
+        const timeMinutes = 45 + ((seed + i * 13) % 240);
+        const materialScu = 30 + ((seed + i * 17) % 220);
+        const cost = Math.round(materialScu * (1500 + ((seed + i * 41) % 1700)));
+        return {
+          id: `j-mock-${u.userId}-${i + 1}`,
+          material: pick(materials, i),
+          materialScu,
+          location: pick(refLocations, i),
+          method: pick(methods, i),
+          yield: 0.7 + ((seed + i * 5) % 30) / 100,
+          cost,
+          timeMinutes,
+          submittedAt,
+          completesAt: submittedAt + timeMinutes * min,
+          deletedAt: null,
+        };
+      });
+      const sellOrders = Array.from({ length: 10 }).map((_, i) => {
+        const submittedAt = now - (i * 2.4 + 0.5) * day - ((seed >> (i + 1)) & 0xff) * min;
+        const scu = 24 + ((seed + i * 23) % 180);
+        const aUEC = Math.round(scu * (2400 + ((seed + i * 29) % 1500)));
+        return {
+          id: `s-mock-${u.userId}-${i + 1}`,
+          material: "Construction Materials",
+          scu,
+          location: pick(sellLocations, i),
+          playerName: "",
+          aUEC,
+          submittedAt,
+          deletedAt: null,
+        };
+      });
+      return {
+        userId: u.userId,
+        username: u.username,
+        windowDays: 30,
+        refineryJobs,
+        sellOrders,
+      };
+    };
+
+    // Make sure the patch list is available for the per-patch clear
+    // buttons in the modal. If the admin hasn't opened Patch Exports
+    // yet, fire-and-forget a fetch (with the same dev-mock fallback)
+    // so the buttons render without a second click.
+    if (!adminPatches) {
+      fetch("/api/admin/patches", { credentials: "same-origin" })
+        .then(async (res) => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const ct = res.headers.get("content-type") || "";
+          if (!ct.includes("application/json")) throw new Error("non-JSON");
+          return res.json();
+        })
+        .then((data) => setAdminPatches(data))
+        .catch(() => {
+          if (import.meta.env.DEV) setAdminPatches(devMockPatches());
+        });
+    }
+
+    try {
+      const res = await fetch(`/api/admin/user-history?userId=${encodeURIComponent(u.userId)}&days=30`, {
+        credentials: "same-origin",
+      });
+      if (!res.ok) {
+        if (import.meta.env.DEV) {
+          setAdminUserDetail(buildDevMock());
+          setAdminUserDetailLoading(false);
+          return;
+        }
+        throw new Error(`HTTP ${res.status}`);
+      }
+      // Vite dev serves /api/* as the raw JS source, so the body
+      // starts with "// GET ..." — content-type check catches that
+      // before we try to parse it as JSON.
+      const ct = res.headers.get("content-type") || "";
+      if (!ct.includes("application/json")) {
+        if (import.meta.env.DEV) {
+          setAdminUserDetail(buildDevMock());
+          setAdminUserDetailLoading(false);
+          return;
+        }
+        throw new Error("Unexpected response format");
+      }
+      const data = await res.json();
+      setAdminUserDetail({
+        userId: data.userId,
+        username: data.username,
+        windowDays: data.windowDays,
+        refineryJobs: Array.isArray(data.refineryJobs) ? data.refineryJobs : [],
+        sellOrders: Array.isArray(data.sellOrders) ? data.sellOrders : [],
+      });
+      setAdminUserDetailLoading(false);
+    } catch (e) {
+      if (import.meta.env.DEV) {
+        setAdminUserDetail(buildDevMock());
+        setAdminUserDetailLoading(false);
+        return;
+      }
+      setAdminUserDetailError(e && e.message ? e.message : "Could not load user history.");
+      setAdminUserDetailLoading(false);
+    }
+  };
+
+  const closeAdminUserDetail = () => {
+    setAdminUserDetail(null);
+    setAdminUserDetailLoading(false);
+    setAdminUserDetailError("");
+    setAdminClearLedgerStep(0);
+    setAdminClearLedgerTarget(null);
+    setAdminClearLedgerError("");
+    setAdminClearLedgerInFlight(false);
+    setAdminEditEntry(null);
+  };
+
+  // --- Admin clear with scope. The pending scope lives in
+  // adminClearLedgerTarget; this fires after step 2 confirmation.
+  // Three target shapes are handled:
+  //   { kind: "all" }                                 — wipe everything
+  //   { kind: "patch", patchVersion }                 — wipe one cycle
+  //   { kind: "row",   rowKind, entryId }             — soft-delete one row
+  const performAdminClearUserLedger = async () => {
+    if (!adminUserDetail?.userId) return;
+    const target = adminClearLedgerTarget;
+    if (!target) return;
+    setAdminClearLedgerInFlight(true);
+    setAdminClearLedgerError("");
+    try {
+      let url, payload;
+      if (target.kind === "row") {
+        url = "/api/admin/delete-ledger-entry";
+        payload = {
+          userId: adminUserDetail.userId,
+          kind: target.rowKind,
+          entryId: target.entryId,
+          confirm: "DELETE_ENTRY",
+        };
+      } else if (target.kind === "patch") {
+        url = "/api/admin/clear-user-ledger";
+        payload = {
+          userId: adminUserDetail.userId,
+          scope: "patch",
+          patchVersion: target.patchVersion,
+          confirm: "CLEAR_USER_LEDGER",
+        };
+      } else {
+        url = "/api/admin/clear-user-ledger";
+        payload = {
+          userId: adminUserDetail.userId,
+          scope: "all",
+          confirm: "CLEAR_USER_LEDGER",
+        };
+      }
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify(payload),
+      });
+      // Vite dev serves /api/* as raw JS source (200 + non-JSON), so
+      // detect that up front and treat it as a dev-success — the
+      // production path takes the JSON parse below.
+      const ct = res.headers.get("content-type") || "";
+      const isJsonResponse = ct.includes("application/json");
+      let data = null;
+      if (isJsonResponse) {
+        try { data = await res.json(); } catch {}
+      }
+      if (!res.ok) {
+        if (import.meta.env.DEV) {
+          // vite-dev has no /api runtime; any failure status falls
+          // back to a local apply so the modal exercises in preview.
+          applyAdminClearLocally(target);
+          setAdminClearLedgerStep(0);
+          setAdminClearLedgerTarget(null);
+          setAdminClearLedgerInFlight(false);
+          return;
+        }
+        throw new Error((data && data.error) || `HTTP ${res.status}`);
+      }
+      if (!isJsonResponse && import.meta.env.DEV) {
+        // 200 OK from vite-dev w/ non-JSON body — apply locally and
+        // pretend the API succeeded so the modal updates.
+        applyAdminClearLocally(target);
+        setAdminClearLedgerStep(0);
+        setAdminClearLedgerTarget(null);
+        return;
+      }
+      applyAdminClearLocally(target);
+      setAdminClearLedgerStep(0);
+      setAdminClearLedgerTarget(null);
+    } catch (e) {
+      setAdminClearLedgerError(e && e.message ? e.message : "Could not clear ledger.");
+    } finally {
+      setAdminClearLedgerInFlight(false);
+    }
+  };
+
+  // Updates the local user-detail copy after a server-side clear
+  // succeeds, so the modal reflects the new empty/filtered state
+  // without a refetch round-trip.
+  const applyAdminClearLocally = (target) => {
+    setAdminUserDetail((d) => {
+      if (!d) return d;
+      if (target.kind === "row") {
+        if (target.rowKind === "job") {
+          return { ...d, refineryJobs: d.refineryJobs.filter((j) => j.id !== target.entryId) };
+        }
+        return { ...d, sellOrders: d.sellOrders.filter((o) => o.id !== target.entryId) };
+      }
+      if (target.kind === "patch") {
+        const range = adminPatches?.patches?.find((p) => p.version === target.patchVersion);
+        if (!range || !Number.isFinite(Number(range.from)) || !Number.isFinite(Number(range.to))) {
+          return { ...d, refineryJobs: [], sellOrders: [] };
+        }
+        const inRange = (ts) => Number(ts) >= Number(range.from) && Number(ts) < Number(range.to);
+        return {
+          ...d,
+          refineryJobs: d.refineryJobs.filter((j) => !inRange(j.submittedAt)),
+          sellOrders: d.sellOrders.filter((o) => !inRange(o.submittedAt)),
+        };
+      }
+      return { ...d, refineryJobs: [], sellOrders: [] };
+    });
+  };
+
+  // --- Admin: open inline edit for a single ledger row.
+  const beginAdminEditEntry = (rowKind, entry) => {
+    if (rowKind === "job") {
+      setAdminEditEntry({
+        rowKind,
+        entryId: entry.id,
+        draft: {
+          material: entry.material || "",
+          materialScu: entry.materialScu ?? "",
+          location: entry.location || "",
+          method: entry.method || "",
+          cost: entry.cost ?? "",
+          timeMinutes: entry.timeMinutes ?? "",
+          submittedAt: entry.submittedAt ?? "",
+        },
+        saving: false,
+        error: "",
+      });
+    } else {
+      setAdminEditEntry({
+        rowKind,
+        entryId: entry.id,
+        draft: {
+          material: entry.material || "",
+          scu: entry.scu ?? "",
+          aUEC: entry.aUEC ?? "",
+          location: entry.location || "",
+          playerName: entry.playerName || "",
+          submittedAt: entry.submittedAt ?? "",
+        },
+        saving: false,
+        error: "",
+      });
+    }
+  };
+
+  const updateAdminEditDraft = (field, value) => {
+    setAdminEditEntry((s) => (s ? { ...s, draft: { ...s.draft, [field]: value } } : s));
+  };
+
+  const cancelAdminEditEntry = () => {
+    setAdminEditEntry(null);
+  };
+
+  const saveAdminEditEntry = async () => {
+    if (!adminEditEntry || !adminUserDetail?.userId) return;
+    const { rowKind, entryId, draft } = adminEditEntry;
+    // Coerce numerics; leave strings as-is. Empty strings on numeric
+    // fields are dropped from the patch so server-side sanitize doesn't
+    // see NaN and reject the update.
+    const patch = {};
+    const numericFields = rowKind === "job"
+      ? ["materialScu", "cost", "timeMinutes", "submittedAt"]
+      : ["scu", "aUEC", "submittedAt"];
+    const stringFields = rowKind === "job"
+      ? ["material", "location", "method"]
+      : ["material", "location", "playerName"];
+    for (const f of numericFields) {
+      const v = draft[f];
+      if (v === "" || v == null) continue;
+      const n = Number(v);
+      if (Number.isFinite(n)) patch[f] = n;
+    }
+    for (const f of stringFields) {
+      const v = draft[f];
+      if (typeof v === "string") patch[f] = v;
+    }
+
+    setAdminEditEntry((s) => (s ? { ...s, saving: true, error: "" } : s));
+    try {
+      const res = await fetch("/api/admin/edit-ledger-entry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({
+          userId: adminUserDetail.userId,
+          kind: rowKind,
+          entryId,
+          patch,
+          confirm: "EDIT_ENTRY",
+        }),
+      });
+      const ct = res.headers.get("content-type") || "";
+      const isJsonResponse = ct.includes("application/json");
+      let data = null;
+      if (isJsonResponse) {
+        try { data = await res.json(); } catch {}
+      }
+      if (!res.ok) {
+        if (import.meta.env.DEV) {
+          applyAdminEditLocally(rowKind, entryId, patch);
+          setAdminEditEntry(null);
+          return;
+        }
+        throw new Error((data && data.error) || `HTTP ${res.status}`);
+      }
+      // In DEV vite returns 200 + JS source; fall back to applying
+      // the local patch since no server-canonical entry is returned.
+      if (!isJsonResponse && import.meta.env.DEV) {
+        applyAdminEditLocally(rowKind, entryId, patch);
+        setAdminEditEntry(null);
+        return;
+      }
+      // Apply the canonical server-returned entry so any sanitize-time
+      // coercion (e.g. clipped strings) is visible in the modal.
+      const entry = data?.entry;
+      if (entry) {
+        applyAdminEditLocally(rowKind, entryId, entry);
+      } else if (import.meta.env.DEV) {
+        applyAdminEditLocally(rowKind, entryId, patch);
+      }
+      setAdminEditEntry(null);
+    } catch (e) {
+      setAdminEditEntry((s) => (s ? { ...s, saving: false, error: e && e.message ? e.message : "Save failed." } : s));
+    }
+  };
+
+  const applyAdminEditLocally = (rowKind, entryId, patch) => {
+    setAdminUserDetail((d) => {
+      if (!d) return d;
+      const apply = (list) =>
+        list.map((row) => (row.id === entryId ? { ...row, ...patch } : row));
+      if (rowKind === "job") return { ...d, refineryJobs: apply(d.refineryJobs) };
+      return { ...d, sellOrders: apply(d.sellOrders) };
+    });
+  };
+
   // --- Detect return from notifications OAuth on mount ---
   // /api/auth/notifications-callback redirects here with one of:
   //   ?notifications=linked              → success, show confirmation
@@ -4269,10 +4888,61 @@ export default function StarCitizenSalvageGuideWebsite() {
     .reduce((sum, j) => sum + (Number(j.cost) || 0), 0);
   const lifetimeAUEC = visibleSellOrders.reduce((sum, o) => sum + (Number(o.aUEC) || 0), 0);
 
-  const historyCutoff = now - 30 * 24 * 60 * 60 * 1000;
+  // Patch History panel — by default shows entries from the live
+  // current patch. When the user picks a different patch from the
+  // dropdown, scope flips to that patch's [from, to) window. Future
+  // (un-released) patches are disabled in the dropdown so this never
+  // resolves to a window in the future.
+  //
+  // Resolution priority:
+  //   1. selectedPatchVersion present + matches a released patch in
+  //      userPatches → use that patch's [from, to)
+  //   2. else patchStatus from /api/me/prefs → live current patch,
+  //      open-ended (to = now)
+  //   3. else fall back to a 30-day rolling window so the panel
+  //      still renders during anonymous browsing or first-load.
+  const selectedPatch = useMemo(() => {
+    const list = Array.isArray(userPatches?.patches) ? userPatches.patches : [];
+    if (selectedPatchVersion) {
+      const hit = list.find(
+        (p) => p.version === selectedPatchVersion && p.isReleased
+      );
+      if (hit) {
+        return {
+          version: hit.version,
+          from: Number(hit.from),
+          to: Number(hit.to),
+          isCurrent: Boolean(hit.isCurrent),
+        };
+      }
+    }
+    if (patchStatus && Number.isFinite(Number(patchStatus.startedAt))) {
+      return {
+        version: patchStatus.version || "current",
+        from: Number(patchStatus.startedAt),
+        to: Number.POSITIVE_INFINITY,
+        isCurrent: true,
+      };
+    }
+    return {
+      version: null,
+      from: now - 30 * 24 * 60 * 60 * 1000,
+      to: Number.POSITIVE_INFINITY,
+      isCurrent: false,
+    };
+  }, [userPatches, selectedPatchVersion, patchStatus, now]);
+
+  // Whether the panel is parked on the live current patch (auto-track
+  // mode). Drives copy + the "Live" badge on the dropdown.
+  const isViewingCurrentPatch = selectedPatch.isCurrent && !selectedPatchVersion;
+  const inSelectedWindow = (ts) => {
+    if (!Number.isFinite(Number(ts))) return false;
+    const t = Number(ts);
+    return t >= selectedPatch.from && t < selectedPatch.to;
+  };
   const historyEntries = useMemo(() => {
     const refinery = refineryJobs
-      .filter((j) => !j.deletedAt && j.pickedUpAt && j.pickedUpAt >= historyCutoff)
+      .filter((j) => !j.deletedAt && j.pickedUpAt && inSelectedWindow(j.pickedUpAt))
       .map((j) => {
         const parts = [];
         if (j.location) parts.push(j.location);
@@ -4289,7 +4959,7 @@ export default function StarCitizenSalvageGuideWebsite() {
         };
       });
     const sells = sellOrders
-      .filter((o) => !o.deletedAt && o.submittedAt && o.submittedAt >= historyCutoff)
+      .filter((o) => !o.deletedAt && o.submittedAt && inSelectedWindow(o.submittedAt))
       .map((o) => {
         const materialLabel = o.material || "Construction Materials";
         const isPlayer = o.location === PLAYER_SELL_POINT;
@@ -4306,7 +4976,7 @@ export default function StarCitizenSalvageGuideWebsite() {
         };
       });
     return [...refinery, ...sells].sort((a, b) => b.ts - a.ts);
-  }, [refineryJobs, sellOrders, historyCutoff]);
+  }, [refineryJobs, sellOrders, selectedPatch.from, selectedPatch.to]);
 
   // --- Ledger: form validity (requires login + load complete + all fields valid) ---
   // Cost and time are auto-derived from materialScu + method, so no need to validate them.
@@ -4947,22 +5617,98 @@ export default function StarCitizenSalvageGuideWebsite() {
   // predicate runs against the canonical entry ts (refinery: pickedUpAt
   // || completesAt || submittedAt; sell: submittedAt) — same value the
   // history table sorts by.
-  const CLEAR_HISTORY_SCOPES = {
-    lastEntry: { label: "Last entry", description: "Clear only the single most recent history entry." },
-    "1d":      { label: "Last day",   description: "Clear every history entry from the last 24 hours.",   days: 1 },
-    "5d":      { label: "Last 5 days",  description: "Clear every history entry from the last 5 days.",  days: 5 },
-    "10d":     { label: "Last 10 days", description: "Clear every history entry from the last 10 days.", days: 10 },
-    "30d":     { label: "Last 30 days (everything)", description: "Clear the entire 30-day history. This empties the panel.", days: 30 },
-  };
+  // Patch History clear scopes. Built dynamically because the
+  // per-patch options come from /api/patches and the "current patch"
+  // label needs to surface the live version string.
+  //
+  // Keys:
+  //   lastEntry             — single most recent visible entry
+  //   1d / 5d / 10d         — rolling windows inside the current patch
+  //   currentPatch          — every entry in the current patch (the
+  //                           full panel contents)
+  //   patch:<version>       — every entry whose ts falls inside the
+  //                           given patch's [from, to). Includes
+  //                           older patches whose entries no longer
+  //                           render in the panel.
+  const CLEAR_HISTORY_SCOPES = useMemo(() => {
+    // What's on screen right now — could be the live current patch
+    // or a past patch the user pinned via the dropdown.
+    const onScreenVersion = selectedPatch?.version || patchStatus?.version || "current patch";
+    const onScreenIsLive = Boolean(isViewingCurrentPatch);
+    const scopes = {
+      lastEntry: { label: "Last entry", description: "Clear only the single most recent history entry." },
+      "1d":      { label: "Last day",     description: "Clear every history entry from the last 24 hours.", days: 1 },
+      "5d":      { label: "Last 5 days",  description: "Clear every history entry from the last 5 days.",  days: 5 },
+      "10d":     { label: "Last 10 days", description: "Clear every history entry from the last 10 days.", days: 10 },
+      currentPatch: {
+        label: onScreenIsLive
+          ? `Current patch · ${onScreenVersion} (everything on screen)`
+          : `Patch ${onScreenVersion} (everything on screen)`,
+        description: `Clear every Patch History entry currently visible in the panel (Star Citizen patch ${onScreenVersion}).`,
+      },
+    };
+    // Other released patches whose entries aren't on screen right
+    // now. Sorted newest-first to match the Patch Exports dropdown.
+    const list = Array.isArray(userPatches?.patches) ? userPatches.patches : [];
+    for (const p of list) {
+      if (!p.isReleased) continue;
+      // Skip the patch currently displayed — its entries are already
+      // covered by the "everything on screen" option above.
+      if (p.version === onScreenVersion) continue;
+      scopes[`patch:${p.version}`] = {
+        label: `Patch ${p.version}`,
+        description: `Clear every entry recorded during Star Citizen patch ${p.version}. These entries are not currently visible in the Patch History panel but remain in your stored ledger until cleared.`,
+        patchVersion: p.version,
+        from: Number(p.from),
+        to: Number(p.to),
+      };
+    }
+    return scopes;
+  }, [patchStatus, userPatches, selectedPatch, isViewingCurrentPatch]);
 
   // Returns the set of entry IDs that fall inside the chosen scope,
   // grouped by source. Caller uses these to soft-delete the right
-  // refinery jobs / sell orders. Pulls from `historyEntries` directly
-  // so the cutoff math matches what the user sees on screen.
+  // refinery jobs / sell orders.
+  //
+  // Visible-panel scopes (lastEntry, 1d/5d/10d, currentPatch) pull
+  // from `historyEntries` so the cutoff math matches what the user
+  // sees on screen.
+  //
+  // Per-patch scopes (`patch:<version>`) target older patches whose
+  // entries are NOT currently visible — those iterate refineryJobs +
+  // sellOrders directly with the patch's [from, to) range.
   const collectClearTargets = (scope) => {
     const refineryIds = new Set();
     const sellIds = new Set();
-    if (!scope || !CLEAR_HISTORY_SCOPES[scope] || historyEntries.length === 0) {
+    const def = scope ? CLEAR_HISTORY_SCOPES[scope] : null;
+    if (!def) return { refineryIds, sellIds };
+
+    // Historical patch scope — iterate stored ledger directly.
+    if (typeof scope === "string" && scope.startsWith("patch:")) {
+      const fromMs = Number(def.from);
+      const toMs = Number(def.to);
+      if (!Number.isFinite(fromMs) || !Number.isFinite(toMs) || toMs <= fromMs) {
+        return { refineryIds, sellIds };
+      }
+      const inRange = (ts) =>
+        Number.isFinite(Number(ts)) && Number(ts) >= fromMs && Number(ts) < toMs;
+      for (const j of refineryJobs) {
+        if (!j || j.deletedAt) continue;
+        // Refinery entries surface in the panel by `pickedUpAt`, so
+        // that's the canonical timestamp to bucket them by. Fall back
+        // to completesAt / submittedAt if pickedUpAt is missing
+        // (e.g. unfinished job at the time of the patch boundary).
+        const ts = j.pickedUpAt || j.completesAt || j.submittedAt;
+        if (inRange(ts)) refineryIds.add(j.id);
+      }
+      for (const o of sellOrders) {
+        if (!o || o.deletedAt) continue;
+        if (inRange(o.submittedAt)) sellIds.add(o.id);
+      }
+      return { refineryIds, sellIds };
+    }
+
+    if (historyEntries.length === 0) {
       return { refineryIds, sellIds };
     }
     if (scope === "lastEntry") {
@@ -4971,7 +5717,16 @@ export default function StarCitizenSalvageGuideWebsite() {
       else sellIds.add(top.id);
       return { refineryIds, sellIds };
     }
-    const days = CLEAR_HISTORY_SCOPES[scope].days;
+    if (scope === "currentPatch") {
+      // Wipe everything currently rendering in the Patch History panel.
+      for (const e of historyEntries) {
+        if (e.source === "refinery") refineryIds.add(e.id);
+        else sellIds.add(e.id);
+      }
+      return { refineryIds, sellIds };
+    }
+    const days = def.days;
+    if (!Number.isFinite(Number(days))) return { refineryIds, sellIds };
     const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
     for (const e of historyEntries) {
       if (typeof e.ts !== "number" || e.ts < cutoff) continue;
@@ -5174,7 +5929,7 @@ export default function StarCitizenSalvageGuideWebsite() {
       const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
       ws["!cols"] = [{ wch: 18 }, { wch: 10 }, { wch: 38 }, { wch: 42 }];
       const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "30-Day History");
+      XLSX.utils.book_append_sheet(wb, ws, "Patch History");
       const dateStr = new Date().toISOString().slice(0, 10);
       XLSX.writeFile(wb, `scsalvager-history-${dateStr}.xlsx`);
     } catch (err) {
@@ -5365,6 +6120,9 @@ export default function StarCitizenSalvageGuideWebsite() {
           {[
             { id: "home", label: "Home" },
             { id: "ships", label: "Ship Details" },
+            // Missions is guest-accessible by design — no login required
+            // to browse the salvage contract list. Don't add a user-gate
+            // here; Ledger and Statistics are the only login-locked tabs.
             { id: "missions", label: "Missions" },
             { id: "ledger", label: "Ledger" },
             { id: "stats", label: "Statistics" },
@@ -7135,14 +7893,66 @@ export default function StarCitizenSalvageGuideWebsite() {
               </div>
             </div>
 
-            {/* --- 30-day history --- */}
+            {/* --- Patch History --- */}
             <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                  <h2 className="text-xl font-bold text-cyan-300">30-Day History</h2>
-                  <p className="mt-1 text-sm text-slate-400">Collected refinery jobs and sell orders from the last 30 days.</p>
+                  <h2 className="text-xl font-bold text-cyan-300">
+                    Patch History{selectedPatch.version ? ` · ${selectedPatch.version}` : ""}
+                    {isViewingCurrentPatch && (
+                      <span className="ml-2 align-middle rounded-md border border-emerald-500/40 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-200">
+                        Live
+                      </span>
+                    )}
+                  </h2>
+                  <p className="mt-1 text-sm text-slate-400">
+                    {isViewingCurrentPatch ? (
+                      <>
+                        Collected refinery jobs and sell orders from the current Star Citizen patch
+                        {selectedPatch.version ? ` (${selectedPatch.version})` : ""}. Use the patch dropdown to look back at earlier cycles, or the Clear History dropdown to wipe per-patch data.
+                      </>
+                    ) : (
+                      <>
+                        Showing entries from Star Citizen patch <span className="font-semibold text-slate-200">{selectedPatch.version}</span>. Switch back to the live patch with the dropdown on the right.
+                      </>
+                    )}
+                  </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
+                  {/* Patch selector — labeled with the active version,
+                      lists every patch newest-first. Future patches are
+                      disabled until the operator advances the PATCHES
+                      list (see feedback_patch_drop_trigger.md). */}
+                  {Array.isArray(userPatches?.patches) && userPatches.patches.length > 0 && (
+                    <select
+                      value={selectedPatchVersion ?? (patchStatus?.version || "")}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        // If the user picks the current live patch,
+                        // clear the override so the panel auto-tracks
+                        // future drops.
+                        if (v === (patchStatus?.version || "")) {
+                          setSelectedPatchVersion(null);
+                        } else {
+                          setSelectedPatchVersion(v);
+                        }
+                      }}
+                      title="Switch which Star Citizen patch the Patch History panel is showing"
+                      className="shrink-0 rounded-lg border border-cyan-500/30 bg-slate-900 px-3 py-1.5 text-xs font-semibold text-cyan-100 outline-none focus:border-cyan-400"
+                    >
+                      {userPatches.patches.map((p) => (
+                        <option
+                          key={p.version}
+                          value={p.version}
+                          disabled={!p.isReleased}
+                        >
+                          {p.version}
+                          {p.isCurrent ? " · current" : ""}
+                          {!p.isReleased ? " · not yet released" : ""}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                   {historyEntries.length > 0 && (
                     <>
                       <button
@@ -7213,7 +8023,9 @@ export default function StarCitizenSalvageGuideWebsite() {
 
               {historyEntries.length === 0 ? (
                 <div className="mt-4 rounded-xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">
-                  Nothing in your 30-day history yet. Collect a refinery job or log a sale to get started.
+                  {isViewingCurrentPatch
+                    ? "Nothing in your Patch History yet. Collect a refinery job or log a sale to get started."
+                    : `Nothing logged for patch ${selectedPatch.version || "this cycle"}.`}
                 </div>
               ) : (
                 // Cap the visible height at ~10 rows so the panel doesn't
@@ -7811,8 +8623,9 @@ export default function StarCitizenSalvageGuideWebsite() {
             {/* Admin sub-nav */}
             <div className="flex flex-wrap gap-1 border-b border-cyan-500/20" role="tablist" aria-label="Admin sections">
               {[
-                { id: "refineries", label: "7-Day History" },
                 { id: "users", label: "All Users" },
+                { id: "guests", label: "Guest Logins" },
+                { id: "refineries", label: "7-Day History" },
                 { id: "exports", label: "Patch Exports" },
               ].map((sec) => {
                 const isActive = adminSection === sec.id;
@@ -8082,7 +8895,12 @@ export default function StarCitizenSalvageGuideWebsite() {
                     </thead>
                     <tbody>
                       {adminUsers.users.map((u) => (
-                        <tr key={u.userId} className="border-t border-slate-800 bg-slate-900/40">
+                        <tr
+                          key={u.userId}
+                          className="border-t border-slate-800 bg-slate-900/40 cursor-pointer hover:bg-cyan-500/10"
+                          onClick={() => openAdminUserDetail(u)}
+                          title="Click to view this user's last 30 days of activity"
+                        >
                           <td className="px-4 py-3 font-semibold text-white">{u.username}</td>
                           <td className="px-4 py-3 text-slate-300">
                             {u.rsiHandle ? (
@@ -8133,6 +8951,77 @@ export default function StarCitizenSalvageGuideWebsite() {
                           </td>
                           <td className="px-4 py-3 text-right text-slate-400 whitespace-nowrap">
                             {formatTimeAgo(u.lastLoginAt) || "just now"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+            )}
+
+            {adminSection === "guests" && (
+            <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <h2 className="text-xl font-bold text-cyan-300">Guest Logins</h2>
+                  <p className="mt-1 text-sm text-slate-400">
+                    Anonymous visits captured the first time each browser hits the site within a 24-hour window. Newest first. Admin-only view.
+                  </p>
+                </div>
+                <div className="text-xs text-slate-500">
+                  {adminGuests?.fetchedAt
+                    ? `Updated ${formatTimeAgo(adminGuests.fetchedAt) || "just now"}`
+                    : ""}
+                </div>
+              </div>
+
+              {adminGuestsLoading && (
+                <div className="mt-6 rounded-2xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">
+                  Loading guest visits…
+                </div>
+              )}
+
+              {!adminGuestsLoading && adminGuestsError && (
+                <div className="mt-6 rounded-2xl border border-rose-500/40 bg-rose-500/10 p-4 text-sm text-rose-200">
+                  {adminGuestsError}
+                </div>
+              )}
+
+              {!adminGuestsLoading && !adminGuestsError && adminGuests && adminGuests.entries.length === 0 && (
+                <div className="mt-6 rounded-2xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">
+                  No anonymous visits recorded yet.
+                </div>
+              )}
+
+              {!adminGuestsLoading && !adminGuestsError && adminGuests && adminGuests.entries.length > 0 && (
+                // Same scrollbar treatment as the All Users + 30-Day
+                // History tables so the admin views feel consistent.
+                <div className="mt-5 overflow-x-auto overflow-y-auto max-h-[32rem] rounded-2xl border border-slate-700 [scrollbar-width:thin] [scrollbar-color:rgb(6_182_212_/_0.7)_rgb(2_6_23)] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-slate-950 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-500/70 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-cyan-400">
+                  <table className="w-full min-w-[720px] text-left text-sm md:min-w-0">
+                    <thead className="bg-slate-950 text-slate-300 sticky top-0 z-10">
+                      <tr>
+                        <th className="px-4 py-3">When</th>
+                        <th className="px-4 py-3">Timestamp</th>
+                        <th className="px-4 py-3">Country</th>
+                        <th className="px-4 py-3">User Agent</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {adminGuests.entries.map((g, i) => (
+                        <tr key={`${g.ts}_${i}`} className="border-t border-slate-800 bg-slate-900/40">
+                          <td className="px-4 py-3 text-slate-400 whitespace-nowrap">
+                            {formatTimeAgo(g.ts) || "just now"}
+                          </td>
+                          <td className="px-4 py-3 text-slate-300 whitespace-nowrap">
+                            {formatTimestamp(g.ts)}
+                          </td>
+                          <td className="px-4 py-3 text-slate-300 whitespace-nowrap">
+                            {g.country || <span className="text-slate-600">—</span>}
+                          </td>
+                          <td className="px-4 py-3 text-slate-400 text-xs max-w-[28rem] truncate" title={g.ua}>
+                            {g.ua || <span className="text-slate-600">—</span>}
                           </td>
                         </tr>
                       ))}
@@ -8337,6 +9226,461 @@ export default function StarCitizenSalvageGuideWebsite() {
                   {isForceLogoutInFlight ? "Logging out…" : "Force Logout All"}
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* --- Patch reset confirmation modal ---
+            Two-step confirmation (step 1 → step 2 → in-flight) with a
+            success summary screen (step 3) showing how many entries
+            were cleared. Server enforces drop-day window + once-per-
+            patch cap; client steps are pure UX safety. */}
+        {patchClearOpen && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+            onClick={() => !patchClearInFlight && setPatchClearOpen(false)}
+          >
+            <div
+              className="w-full max-w-md rounded-3xl border border-amber-500/40 bg-slate-900 p-6 shadow-2xl shadow-amber-950/40"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="patch-clear-title"
+            >
+              <h3 id="patch-clear-title" className="text-lg font-bold text-amber-200">
+                Clear ledger for {patchStatus?.version || "new patch"}?
+              </h3>
+
+              {patchClearStep === 1 && (
+                <>
+                  <p className="mt-3 text-sm text-slate-300">
+                    This soft-deletes <strong className="text-white">every</strong> refinery job and sell order on your ledger. Admin Patch Exports still see the records in the audit-trail CSV, but your ledger view will be empty for the new patch cycle.
+                  </p>
+                  <p className="mt-2 text-xs text-slate-500">
+                    Available only on patch drop day. You can use this once per patch.
+                  </p>
+                  <div className="mt-5 flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPatchClearOpen(false)}
+                      className="rounded-xl border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-slate-500 hover:bg-slate-700"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPatchClearStep(2)}
+                      className="rounded-xl border border-amber-400 bg-amber-500/40 px-4 py-2 text-sm font-bold text-amber-50 hover:bg-amber-500/50"
+                    >
+                      Yes, continue
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {patchClearStep === 2 && (
+                <>
+                  <p className="mt-3 text-sm text-slate-300">
+                    Last chance — clear every ledger entry for the new patch cycle?
+                  </p>
+                  <div className="mt-5 flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPatchClearOpen(false)}
+                      disabled={patchClearInFlight}
+                      className="rounded-xl border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-slate-500 hover:bg-slate-700 disabled:opacity-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={performPatchClear}
+                      disabled={patchClearInFlight}
+                      className="rounded-xl border border-amber-400 bg-amber-500 px-4 py-2 text-sm font-bold text-slate-900 hover:bg-amber-400 disabled:opacity-50"
+                    >
+                      {patchClearInFlight ? "Clearing…" : "Clear ledger now"}
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {patchClearStep === 3 && patchClearResult && (
+                <>
+                  <p className="mt-3 text-sm text-slate-300">
+                    Cleared <strong className="text-white">{patchClearResult.jobsCleared}</strong> refinery {patchClearResult.jobsCleared === 1 ? "job" : "jobs"} and <strong className="text-white">{patchClearResult.salesCleared}</strong> sell {patchClearResult.salesCleared === 1 ? "order" : "orders"} for patch <strong className="text-white">{patchClearResult.patchVersion}</strong>. Welcome to the new cycle.
+                  </p>
+                  <div className="mt-5 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPatchClearOpen(false);
+                        setPatchClearStep(1);
+                        setPatchClearResult(null);
+                      }}
+                      className="rounded-xl border border-amber-400 bg-amber-500/40 px-4 py-2 text-sm font-bold text-amber-50 hover:bg-amber-500/50"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {patchClearError && (
+                <p className="mt-3 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+                  {patchClearError}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* --- Admin user-detail (30-day history) modal ---
+            Opens when an admin clicks any row in All Users. Lists that
+            user's last 30 days of refinery jobs + sell orders. The
+            embedded "Clear Ledger" button soft-deletes every entry
+            after a 2-step confirmation; `adminClearLedgerStep` drives
+            the inline state machine (0 = button, 1 = first confirm,
+            2 = last-chance, then result re-loads to step 0). */}
+        {adminUserDetail && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+            onClick={() => !adminClearLedgerInFlight && closeAdminUserDetail()}
+          >
+            <div
+              className="w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-3xl border border-cyan-500/30 bg-slate-900 p-6 shadow-2xl shadow-cyan-950/40"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="admin-user-detail-title"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h3 id="admin-user-detail-title" className="text-lg font-bold text-cyan-300">
+                    {adminUserDetail.username}
+                  </h3>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Last 30 days of refinery jobs + sell orders. Soft-deleted entries are filtered out.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={closeAdminUserDetail}
+                  disabled={adminClearLedgerInFlight}
+                  aria-label="Close user detail"
+                  className="rounded-md border border-slate-700 bg-slate-800/60 px-2 py-1 text-xs text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200 disabled:opacity-50"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {adminUserDetailLoading && (
+                <div className="mt-6 rounded-2xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">
+                  Loading 30-day history…
+                </div>
+              )}
+
+              {!adminUserDetailLoading && adminUserDetailError && (
+                <div className="mt-6 rounded-2xl border border-rose-500/40 bg-rose-500/10 p-4 text-sm text-rose-200">
+                  {adminUserDetailError}
+                </div>
+              )}
+
+              {!adminUserDetailLoading && !adminUserDetailError && Array.isArray(adminUserDetail.refineryJobs) && (
+                <>
+                  <section className="mt-5">
+                    <h4 className="text-cyan-300 text-sm font-semibold">
+                      Refinery jobs ({adminUserDetail.refineryJobs.length})
+                    </h4>
+                    {adminUserDetail.refineryJobs.length === 0 ? (
+                      <div className="mt-2 rounded-2xl border border-dashed border-slate-700 p-4 text-xs text-slate-500">
+                        No refinery jobs in the last 30 days.
+                      </div>
+                    ) : (
+                      <div className="mt-3 overflow-x-auto rounded-2xl border border-slate-700 [scrollbar-width:thin] [scrollbar-color:rgb(6_182_212_/_0.7)_rgb(2_6_23)] [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-slate-950 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-500/70 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-cyan-400">
+                        <table className="w-full min-w-[760px] text-left text-xs md:min-w-0">
+                          <thead className="bg-slate-950 text-slate-300">
+                            <tr>
+                              <th className="px-3 py-2">Material</th>
+                              <th className="px-3 py-2 text-right">SCU</th>
+                              <th className="px-3 py-2">Location</th>
+                              <th className="px-3 py-2">Method</th>
+                              <th className="px-3 py-2 text-right">Cost</th>
+                              <th className="px-3 py-2">Submitted</th>
+                              <th className="px-3 py-2 text-right">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {adminUserDetail.refineryJobs.map((j) => {
+                              const editing = adminEditEntry?.rowKind === "job" && adminEditEntry?.entryId === j.id;
+                              if (editing) {
+                                const d = adminEditEntry.draft;
+                                return (
+                                  <tr key={j.id} className="border-t border-slate-800 bg-cyan-500/5">
+                                    <td className="px-2 py-2"><input className="w-full rounded border border-cyan-500/40 bg-slate-900 px-2 py-1 text-xs text-slate-100 outline-none focus:border-cyan-400" value={d.material} onChange={(e) => updateAdminEditDraft("material", e.target.value)} /></td>
+                                    <td className="px-2 py-2"><input type="number" inputMode="decimal" className="w-20 rounded border border-cyan-500/40 bg-slate-900 px-2 py-1 text-right text-xs text-amber-200 outline-none focus:border-cyan-400" value={d.materialScu} onChange={(e) => updateAdminEditDraft("materialScu", e.target.value)} /></td>
+                                    <td className="px-2 py-2"><input className="w-full rounded border border-cyan-500/40 bg-slate-900 px-2 py-1 text-xs text-slate-100 outline-none focus:border-cyan-400" value={d.location} onChange={(e) => updateAdminEditDraft("location", e.target.value)} /></td>
+                                    <td className="px-2 py-2"><input className="w-full rounded border border-cyan-500/40 bg-slate-900 px-2 py-1 text-xs text-slate-100 outline-none focus:border-cyan-400" value={d.method} onChange={(e) => updateAdminEditDraft("method", e.target.value)} /></td>
+                                    <td className="px-2 py-2"><input type="number" inputMode="decimal" className="w-24 rounded border border-cyan-500/40 bg-slate-900 px-2 py-1 text-right text-xs text-rose-200 outline-none focus:border-cyan-400" value={d.cost} onChange={(e) => updateAdminEditDraft("cost", e.target.value)} /></td>
+                                    <td className="px-2 py-2 text-slate-400 whitespace-nowrap">{formatTimestamp(j.submittedAt)}</td>
+                                    <td className="px-2 py-2 whitespace-nowrap text-right">
+                                      <button type="button" onClick={saveAdminEditEntry} disabled={adminEditEntry.saving} className="mr-1 rounded border border-emerald-500/50 bg-emerald-500/15 px-2 py-1 text-xs font-semibold text-emerald-100 hover:bg-emerald-500/25 disabled:opacity-50">{adminEditEntry.saving ? "Saving…" : "Save"}</button>
+                                      <button type="button" onClick={cancelAdminEditEntry} disabled={adminEditEntry.saving} className="rounded border border-slate-600 bg-slate-800 px-2 py-1 text-xs text-slate-200 hover:border-slate-500 disabled:opacity-50">Cancel</button>
+                                      {adminEditEntry.error && (
+                                        <div className="mt-1 text-[10px] text-rose-300">{adminEditEntry.error}</div>
+                                      )}
+                                    </td>
+                                  </tr>
+                                );
+                              }
+                              return (
+                                <tr key={j.id} className="border-t border-slate-800 bg-slate-900/40">
+                                  <td className="px-3 py-2 text-slate-200">{j.material || "—"}</td>
+                                  <td className="px-3 py-2 text-right text-amber-300">{Number.isFinite(j.materialScu) ? j.materialScu.toLocaleString() : "—"}</td>
+                                  <td className="px-3 py-2 text-slate-300">{j.location || "—"}</td>
+                                  <td className="px-3 py-2 text-slate-300">{j.method || "—"}</td>
+                                  <td className="px-3 py-2 text-right text-rose-300">{Number.isFinite(j.cost) ? j.cost.toLocaleString() : "—"}</td>
+                                  <td className="px-3 py-2 text-slate-400 whitespace-nowrap">{formatTimestamp(j.submittedAt)}</td>
+                                  <td className="px-3 py-2 text-right whitespace-nowrap">
+                                    <button
+                                      type="button"
+                                      onClick={() => beginAdminEditEntry("job", j)}
+                                      disabled={Boolean(adminEditEntry) || adminClearLedgerInFlight}
+                                      title="Edit row"
+                                      aria-label="Edit row"
+                                      className="mr-1 rounded border border-cyan-500/40 bg-cyan-500/10 px-2 py-1 text-xs text-cyan-100 hover:bg-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-40"
+                                    >✏</button>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setAdminClearLedgerError("");
+                                        setAdminClearLedgerTarget({
+                                          kind: "row",
+                                          rowKind: "job",
+                                          entryId: j.id,
+                                          label: `refinery job (${j.material || "?"} · ${formatTimestamp(j.submittedAt) || "?"})`,
+                                        });
+                                        setAdminClearLedgerStep(1);
+                                      }}
+                                      disabled={Boolean(adminEditEntry) || adminClearLedgerInFlight}
+                                      title="Delete row"
+                                      aria-label="Delete row"
+                                      className="rounded border border-rose-500/40 bg-rose-500/10 px-2 py-1 text-xs text-rose-200 hover:bg-rose-500/20 disabled:cursor-not-allowed disabled:opacity-40"
+                                    >✕</button>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </section>
+
+                  <section className="mt-5">
+                    <h4 className="text-cyan-300 text-sm font-semibold">
+                      Sell orders ({adminUserDetail.sellOrders.length})
+                    </h4>
+                    {adminUserDetail.sellOrders.length === 0 ? (
+                      <div className="mt-2 rounded-2xl border border-dashed border-slate-700 p-4 text-xs text-slate-500">
+                        No sell orders in the last 30 days.
+                      </div>
+                    ) : (
+                      <div className="mt-3 overflow-x-auto rounded-2xl border border-slate-700 [scrollbar-width:thin] [scrollbar-color:rgb(6_182_212_/_0.7)_rgb(2_6_23)] [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-slate-950 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-500/70 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-cyan-400">
+                        <table className="w-full min-w-[720px] text-left text-xs md:min-w-0">
+                          <thead className="bg-slate-950 text-slate-300">
+                            <tr>
+                              <th className="px-3 py-2">Material</th>
+                              <th className="px-3 py-2 text-right">SCU</th>
+                              <th className="px-3 py-2 text-right">aUEC</th>
+                              <th className="px-3 py-2">Location</th>
+                              <th className="px-3 py-2">Submitted</th>
+                              <th className="px-3 py-2 text-right">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {adminUserDetail.sellOrders.map((o) => {
+                              const editing = adminEditEntry?.rowKind === "sale" && adminEditEntry?.entryId === o.id;
+                              if (editing) {
+                                const d = adminEditEntry.draft;
+                                return (
+                                  <tr key={o.id} className="border-t border-slate-800 bg-cyan-500/5">
+                                    <td className="px-2 py-2"><input className="w-full rounded border border-cyan-500/40 bg-slate-900 px-2 py-1 text-xs text-slate-100 outline-none focus:border-cyan-400" value={d.material} onChange={(e) => updateAdminEditDraft("material", e.target.value)} /></td>
+                                    <td className="px-2 py-2"><input type="number" inputMode="decimal" className="w-20 rounded border border-cyan-500/40 bg-slate-900 px-2 py-1 text-right text-xs text-amber-200 outline-none focus:border-cyan-400" value={d.scu} onChange={(e) => updateAdminEditDraft("scu", e.target.value)} /></td>
+                                    <td className="px-2 py-2"><input type="number" inputMode="decimal" className="w-28 rounded border border-cyan-500/40 bg-slate-900 px-2 py-1 text-right text-xs text-emerald-200 outline-none focus:border-cyan-400" value={d.aUEC} onChange={(e) => updateAdminEditDraft("aUEC", e.target.value)} /></td>
+                                    <td className="px-2 py-2"><input className="w-full rounded border border-cyan-500/40 bg-slate-900 px-2 py-1 text-xs text-slate-100 outline-none focus:border-cyan-400" value={d.location} onChange={(e) => updateAdminEditDraft("location", e.target.value)} /></td>
+                                    <td className="px-2 py-2 text-slate-400 whitespace-nowrap">{formatTimestamp(o.submittedAt)}</td>
+                                    <td className="px-2 py-2 whitespace-nowrap text-right">
+                                      <button type="button" onClick={saveAdminEditEntry} disabled={adminEditEntry.saving} className="mr-1 rounded border border-emerald-500/50 bg-emerald-500/15 px-2 py-1 text-xs font-semibold text-emerald-100 hover:bg-emerald-500/25 disabled:opacity-50">{adminEditEntry.saving ? "Saving…" : "Save"}</button>
+                                      <button type="button" onClick={cancelAdminEditEntry} disabled={adminEditEntry.saving} className="rounded border border-slate-600 bg-slate-800 px-2 py-1 text-xs text-slate-200 hover:border-slate-500 disabled:opacity-50">Cancel</button>
+                                      {adminEditEntry.error && (
+                                        <div className="mt-1 text-[10px] text-rose-300">{adminEditEntry.error}</div>
+                                      )}
+                                    </td>
+                                  </tr>
+                                );
+                              }
+                              const playerSuffix =
+                                o.location === PLAYER_SELL_POINT && o.playerName
+                                  ? ` (${o.playerName})`
+                                  : "";
+                              return (
+                                <tr key={o.id} className="border-t border-slate-800 bg-slate-900/40">
+                                  <td className="px-3 py-2 text-slate-200">{o.material || "—"}</td>
+                                  <td className="px-3 py-2 text-right text-amber-300">{Number.isFinite(o.scu) ? o.scu.toLocaleString() : "—"}</td>
+                                  <td className="px-3 py-2 text-right text-emerald-300">{Number.isFinite(o.aUEC) ? o.aUEC.toLocaleString() : "—"}</td>
+                                  <td className="px-3 py-2 text-slate-300">{(o.location || "—") + playerSuffix}</td>
+                                  <td className="px-3 py-2 text-slate-400 whitespace-nowrap">{formatTimestamp(o.submittedAt)}</td>
+                                  <td className="px-3 py-2 text-right whitespace-nowrap">
+                                    <button
+                                      type="button"
+                                      onClick={() => beginAdminEditEntry("sale", o)}
+                                      disabled={Boolean(adminEditEntry) || adminClearLedgerInFlight}
+                                      title="Edit row"
+                                      aria-label="Edit row"
+                                      className="mr-1 rounded border border-cyan-500/40 bg-cyan-500/10 px-2 py-1 text-xs text-cyan-100 hover:bg-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-40"
+                                    >✏</button>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setAdminClearLedgerError("");
+                                        setAdminClearLedgerTarget({
+                                          kind: "row",
+                                          rowKind: "sale",
+                                          entryId: o.id,
+                                          label: `sell order (${o.material || "?"} · ${formatTimestamp(o.submittedAt) || "?"})`,
+                                        });
+                                        setAdminClearLedgerStep(1);
+                                      }}
+                                      disabled={Boolean(adminEditEntry) || adminClearLedgerInFlight}
+                                      title="Delete row"
+                                      aria-label="Delete row"
+                                      className="rounded border border-rose-500/40 bg-rose-500/10 px-2 py-1 text-xs text-rose-200 hover:bg-rose-500/20 disabled:cursor-not-allowed disabled:opacity-40"
+                                    >✕</button>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </section>
+
+                  {/* Per-patch / all-data clear options + inline 2-step
+                      confirm for whichever target was just selected
+                      (including a per-row delete fired from the tables
+                      above). */}
+                  <section className="mt-6 rounded-2xl border border-rose-500/30 bg-rose-500/5 p-4">
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-rose-400">Admin actions</h4>
+
+                    {adminClearLedgerStep === 0 && (
+                      <div className="mt-3">
+                        <p className="text-xs text-slate-400">
+                          Soft-delete options. Cleared records are hidden from the user's view but retained in the admin Patch Exports audit-trail CSV. In-flight Discord DM schedules are cancelled.
+                        </p>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {(adminPatches?.patches || [])
+                            .filter((p) => p.isReleased)
+                            .map((p) => (
+                              <button
+                                key={p.version}
+                                type="button"
+                                onClick={() => {
+                                  setAdminClearLedgerError("");
+                                  setAdminClearLedgerTarget({
+                                    kind: "patch",
+                                    patchVersion: p.version,
+                                    label: `patch ${p.version} data`,
+                                  });
+                                  setAdminClearLedgerStep(1);
+                                }}
+                                className="rounded-md border border-rose-500/40 bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-100 hover:bg-rose-500/20"
+                              >
+                                Clear patch {p.version}
+                              </button>
+                            ))}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setAdminClearLedgerError("");
+                              setAdminClearLedgerTarget({
+                                kind: "all",
+                                label: "all ledger data (every patch cycle)",
+                              });
+                              setAdminClearLedgerStep(1);
+                            }}
+                            className="rounded-md border border-rose-500/60 bg-rose-500/20 px-3 py-1.5 text-xs font-bold text-rose-50 hover:bg-rose-500/30"
+                          >
+                            Clear ALL ledger data
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {adminClearLedgerStep === 1 && adminClearLedgerTarget && (
+                      <div className="mt-3">
+                        <p className="text-sm font-semibold text-rose-100">
+                          Soft-delete <span className="text-white">{adminClearLedgerTarget.label}</span> for <span className="text-white">{adminUserDetail.username}</span>?
+                        </p>
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setAdminClearLedgerStep(2)}
+                            className="rounded-md border border-rose-500/50 bg-rose-500/20 px-3 py-1.5 text-xs font-semibold text-rose-100 hover:bg-rose-500/30"
+                          >
+                            Yes, continue
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setAdminClearLedgerStep(0);
+                              setAdminClearLedgerTarget(null);
+                            }}
+                            className="rounded-md border border-slate-700 bg-slate-800/60 px-3 py-1.5 text-xs text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {adminClearLedgerStep === 2 && adminClearLedgerTarget && (
+                      <div className="mt-3">
+                        <p className="text-sm font-semibold text-rose-100">
+                          Last chance — clear <span className="text-white">{adminClearLedgerTarget.label}</span> for <span className="text-white">{adminUserDetail.username}</span>?
+                        </p>
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={performAdminClearUserLedger}
+                            disabled={adminClearLedgerInFlight}
+                            className="rounded-md border border-rose-500/60 bg-rose-500/30 px-3 py-1.5 text-xs font-semibold text-rose-50 hover:bg-rose-500/40 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            {adminClearLedgerInFlight ? "Clearing…" : "Clear now"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setAdminClearLedgerStep(0);
+                              setAdminClearLedgerTarget(null);
+                            }}
+                            disabled={adminClearLedgerInFlight}
+                            className="rounded-md border border-slate-700 bg-slate-800/60 px-3 py-1.5 text-xs text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200 disabled:opacity-50"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {adminClearLedgerError && (
+                      <p className="mt-3 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+                        {adminClearLedgerError}
+                      </p>
+                    )}
+                  </section>
+                </>
+              )}
             </div>
           </div>
         )}
@@ -8744,6 +10088,55 @@ export default function StarCitizenSalvageGuideWebsite() {
                 </div>
               </section>
 
+              {/* Patch reset — once per patch cycle, only on the patch
+                  drop day itself. Server enforces both gates; client
+                  hides the section entirely outside the window so the
+                  UI doesn't dangle a button that always errors. */}
+              {patchStatus?.isDropDay && !patchStatus?.alreadyClearedThisCycle && (
+                <section className="mt-6">
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-amber-400">
+                    Patch reset · {patchStatus.version || "new patch"}
+                  </h4>
+                  <div className="mt-3 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div className="flex-1 min-w-[180px]">
+                        <p className="text-sm font-semibold text-amber-200">
+                          Star Citizen {patchStatus.version || ""} just dropped — clear my ledger
+                        </p>
+                        <p className="mt-1 text-xs text-slate-400">
+                          Soft-deletes every refinery job and sell order so you start the new patch with a clean slate. Your account, RSI handle, and DM preferences are kept. Available only on patch drop day, once per patch.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPatchClearError("");
+                          setPatchClearResult(null);
+                          setPatchClearStep(1);
+                          setPatchClearOpen(true);
+                        }}
+                        className="rounded-md border border-amber-500/40 bg-amber-500/15 px-3 py-1.5 text-xs font-semibold text-amber-100 hover:bg-amber-500/25"
+                      >
+                        Clear ledger for new patch
+                      </button>
+                    </div>
+                  </div>
+                </section>
+              )}
+
+              {patchStatus?.isDropDay && patchStatus?.alreadyClearedThisCycle && (
+                <section className="mt-6">
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-amber-400">
+                    Patch reset · {patchStatus.version || "current patch"}
+                  </h4>
+                  <div className="mt-3 rounded-xl border border-slate-700 bg-slate-800/40 p-4">
+                    <p className="text-xs text-slate-400">
+                      You've already used the patch reset for {patchStatus.version || "this patch"}. The option will be available again the next time a new Star Citizen patch drops.
+                    </p>
+                  </div>
+                </section>
+              )}
+
               {/* Danger Zone — account deletion.
                   Two-step confirmation flow:
                     step 0: collapsed, just the "Delete my account" button
@@ -8916,6 +10309,9 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <li>
                       <strong className="text-slate-200">Session data (IP address, user-agent)</strong> — retained only while your session is active to prevent unauthorised access.
                     </li>
+                    <li>
+                      <strong className="text-slate-200">Anonymous visit ping (user-agent, country code)</strong> — when you load the site without being signed in, your browser fires a single ping that records the user-agent string and country code (from the CDN) so the operator can see how much anonymous traffic the site receives. <strong className="text-slate-200">IP addresses are not collected</strong> for these pings. We store at most the 1,000 most recent pings, deduped per-browser to one ping per 24 hours via an HTTP-only cookie (<code className="rounded bg-slate-800 px-1 text-cyan-200">scs_guest_visit</code>). Once you sign in, no further anonymous pings are recorded for that browser.
+                    </li>
                   </ul>
                   <p className="mt-3 text-slate-400">
                     Anything else you see on the site is content you've authored yourself (ledger entries, community price reports, your preference toggles) — we keep it associated with your Discord handle so it's there the next time you sign in, and you can wipe all of it via Settings → Danger Zone at any time.
@@ -8942,6 +10338,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <li>All account data — sessions, ledgers, preferences, login events, user index — lives in <strong className="text-slate-200">Upstash Redis</strong>, a hosted Redis service.</li>
                     <li>Session cookies (<code className="rounded bg-slate-800 px-1 text-cyan-200">scs_session</code>) are <strong className="text-slate-200">HTTP-only</strong>, marked <code className="rounded bg-slate-800 px-1 text-cyan-200">Secure</code> in production, set with <code className="rounded bg-slate-800 px-1 text-cyan-200">SameSite=Lax</code>, and expire <strong className="text-slate-200">7 days</strong> after issue. The cookie is scoped to the canonical site origin (<code className="rounded bg-slate-800 px-1 text-cyan-200">scsalvager.net</code>) regardless of which front the request arrives on.</li>
                     <li>The global login event log is capped at <strong className="text-slate-200">100,000 entries</strong>; older entries are trimmed automatically.</li>
+                    <li>The anonymous visit log is capped at the <strong className="text-slate-200">1,000 most recent entries</strong> (oldest dropped on each new write). Each entry holds only the three fields above (timestamp, user-agent, country code) and is never associated with a user account.</li>
                     <li><strong className="text-slate-200">Screenshots are not stored.</strong> Both full uploads and any cropped subset you choose before submitting exist only in server memory for the duration of the single vision-API call, then are released to be garbage-collected. They never reach Redis or any log.</li>
                     <li>The site is hosted on <strong className="text-slate-200">Vercel</strong>, which runs the serverless API.</li>
                   </ul>
@@ -8970,6 +10367,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <li><strong className="text-slate-200">View your data</strong> at any time — your full Ledger is on the Ledger tab; your preferences and RSI handle state are in Settings.</li>
                     <li><strong className="text-slate-200">Opt out of Discord DMs</strong> at any time in Settings — delivery stops immediately.</li>
                     <li><strong className="text-slate-200">Disconnect Discord notifications</strong> without losing your account.</li>
+                    <li><strong className="text-slate-200">Reset your ledger when a new Star Citizen patch drops</strong> — Settings → Patch reset offers a one-click "Clear ledger for new patch" button on the day a new patch goes live. It soft-deletes every refinery job and sell order so you start the new cycle clean, while keeping your account, RSI handle, and DM preferences intact. The button only appears on the patch's release date and can be used at most once per patch cycle. We store a single timestamp (<code className="rounded bg-slate-800 px-1 text-cyan-200">lastPatchClearAt</code>) so the once-per-cycle guard works.</li>
                     <li>
                       <strong className="text-slate-200">Permanently delete your account</strong> via Settings → Danger Zone. The flow walks through two explicit confirmation prompts and then wipes:
                       <ul className="mt-1 list-disc pl-5 space-y-1">
@@ -9093,6 +10491,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <li>The site is provided <strong className="text-slate-200">as-is</strong>, with <strong className="text-slate-200">no uptime guarantee</strong>. It's a free tool maintained by a small team (currently one person).</li>
                     <li>We may change, suspend, or shut down the site or any feature at any time, with or without notice.</li>
                     <li>We may rate-limit, throttle, or block traffic we believe is harmful to the service or other users.</li>
+                    <li>We may clear a user's ledger entries (refinery jobs, sell orders) when responding to abuse, fixing account-wide errors (e.g. corrupted data), or at the user's request. Cleared entries are soft-deleted (hidden from the user's view, retained in the admin audit-trail CSV); we do not edit individual entries.</li>
                   </ul>
                 </section>
 
@@ -9327,6 +10726,11 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <li>Reward column shows fee-bearing missions with the buy-in displayed as a negative line under the reward.</li>
                     <li><strong>Ship Details</strong> now lists the pledge price (USD) and every in-game purchase location with its aUEC price, sourced from finder.cstone.space. Lorville rows are tagged with a "10% discount" badge.</li>
                     <li>Ship Details now includes <strong>Teach's Special</strong> editions (Levski / Teach's Ship Shop) for the Reclaimer, Vulture, and Fortune.</li>
+                    <li>Ledger → 30-Day History renamed <strong>Patch History</strong> — automatically scopes to entries from the current Star Citizen patch (4.7.2) instead of a rolling 30-day window. The header carries a "Live" badge so you can see at a glance you're on the active patch.</li>
+                    <li>Patch History gets a <strong>patch dropdown</strong>: switch the panel to view any past patch's entries. Future patches are listed but locked until they go live. The title rewrites to match the selected patch, and the "everything on screen" Clear option always targets whatever patch you're viewing.</li>
+                    <li>Patch History → Clear History dropdown now offers <strong>per-patch wipes</strong>: a "Current patch (everything on screen)" option plus a separate entry for each older released patch (clears entries from earlier cycles that no longer render in the panel but are still in your stored ledger).</li>
+                    <li>Settings → <strong>Patch reset</strong>: on the day a new Star Citizen patch goes live, a one-click "Clear ledger for new patch" button appears so you can start the new cycle empty. Available only on patch drop day, once per cycle. Hidden every other day. Two-step confirmation + result summary.</li>
+                    <li>Privacy Policy + Terms of Service refreshed: anonymous visit pings (user-agent + country only — <strong>no IP</strong>) and the new patch-reset right are both disclosed under "What we collect" / "Your rights".</li>
                   </ul>
                   <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Fixes</p>
                   <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">

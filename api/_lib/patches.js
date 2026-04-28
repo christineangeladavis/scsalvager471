@@ -58,3 +58,40 @@ export function patchRange(version) {
     isCurrent: nextStartedAt === null,
   };
 }
+
+/**
+ * Returns the most recent already-released patch (the "current" patch).
+ * PATCHES is ordered newest-first; we walk from the top and return the
+ * first entry whose startedAt is in the past.
+ *
+ * Returns null if no patch in the list has started yet.
+ */
+export function currentPatch(now = Date.now()) {
+  for (const p of PATCHES) {
+    if (p.startedAt && p.startedAt <= now) {
+      return { version: p.version, startedAt: p.startedAt };
+    }
+  }
+  return null;
+}
+
+/**
+ * True when `now` falls on the same UTC calendar date as the current
+ * patch's startedAt. Used to gate the user-facing "Clear my ledger
+ * because a new patch just dropped" button: visible/usable only on the
+ * patch's release day, hidden on every other day.
+ *
+ * UTC-based so the window is identical for every player worldwide and
+ * doesn't drift with the operator's local timezone.
+ */
+export function isPatchDropDay(now = Date.now()) {
+  const cp = currentPatch(now);
+  if (!cp) return false;
+  const a = new Date(now);
+  const b = new Date(cp.startedAt);
+  return (
+    a.getUTCFullYear() === b.getUTCFullYear() &&
+    a.getUTCMonth() === b.getUTCMonth() &&
+    a.getUTCDate() === b.getUTCDate()
+  );
+}

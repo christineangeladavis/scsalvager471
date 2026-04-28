@@ -47,6 +47,7 @@ We may suspend or permanently ban any account that violates these rules. Severe 
 - The site is provided **as-is**, with **no uptime guarantee**. It's a free tool maintained by a small team (currently one person).
 - We may change, suspend, or shut down the site or any feature at any time, with or without notice.
 - We may rate-limit, throttle, or block traffic we believe is harmful to the service or other users.
+- We may clear a user's ledger entries (refinery jobs, sell orders) when responding to abuse, fixing account-wide errors (e.g. corrupted data), or at the user's request. Cleared entries are soft-deleted (hidden from the user's view, retained in the admin audit-trail CSV); we do not edit individual entries.
 
 ## No warranties, no liability
 

@@ -12,11 +12,55 @@ Internal log of every change shipped to the Admin Panel since the tab launched. 
 
 | Tab id            | Label                  | Backed by                                    |
 |-------------------|------------------------|----------------------------------------------|
-| `refineries`      | Active Refineries      | `GET /api/admin/active-refineries`           |
 | `users`           | All Users              | `GET /api/admin/users`                       |
+| `guests`          | Guest Logins           | `GET /api/admin/guest-logins`                |
+| `refineries`      | 7-Day History          | `GET /api/admin/active-refineries`           |
 | `exports`         | Patch Exports          | `GET /api/admin/patches`, `GET /api/admin/export` |
 
+Tab order: **All Users → Guest Logins → 7-Day History → Patch Exports**. Default `adminSection` is `"users"` so a fresh admin lands on the user roster.
+
+Modals:
+- **All Users → row click** → user-detail modal showing 30-day history. Per-row edit + delete plus per-patch and all-data clear actions. Backed by `GET /api/admin/user-history`, `POST /api/admin/clear-user-ledger`, `POST /api/admin/delete-ledger-entry`, `POST /api/admin/edit-ledger-entry`.
+
 ---
+
+## 2026-04-28 — Per-row edit + delete in the user-detail modal
+
+- Each row in the user-detail modal's Refinery jobs and Sell orders tables now has an **Edit (✏)** and **Delete (✕)** button.
+- **Delete** fires `POST /api/admin/delete-ledger-entry` body `{ userId, kind: "job"|"sale", entryId, confirm: "DELETE_ENTRY" }`. Soft-deletes the single entry, cancels its in-flight QStash schedule if any.
+- **Edit** swaps the row to inline input fields backed by `adminEditEntry.draft`, with **Save** + **Cancel**. Save fires `POST /api/admin/edit-ledger-entry` body `{ userId, kind, entryId, patch, confirm: "EDIT_ENTRY" }`. Patch is whitelist-filtered server-side; any non-editable field is dropped silently. Server runs the merged entry through the same `sanitizeRefineryJob` / `sanitizeSellOrder` helper used by `/api/ledger.js` so length caps + numeric coercion stay aligned.
+- Editable fields:
+  - **Refinery job:** `material`, `materialScu`, `location`, `method`, `yield`, `cost`, `timeMinutes`, `submittedAt`, `completesAt`, `pickedUpAt`.
+  - **Sell order:** `material`, `scu`, `location`, `playerName`, `aUEC`, `submittedAt`.
+- Shared library: `api/_lib/ledgerOps.js` now exports `softDeleteLedgerEntry` and `editLedgerEntry` alongside `softClearLedger`.
+
+## 2026-04-28 — Per-patch + all-data clear options
+
+- The user-detail modal's Admin actions section now lists a button per released patch (e.g. **Clear patch 4.7.2**, **Clear patch 4.8**) plus a separate **Clear ALL ledger data** option.
+- Per-patch: `POST /api/admin/clear-user-ledger` body `{ userId, scope: "patch", patchVersion, confirm: "CLEAR_USER_LEDGER" }`. Server resolves `patchRange(version)` and only soft-deletes entries whose `submittedAt` falls in `[from, to)`. Returns 400 on `scope=patch` without a recognised `patchVersion`.
+- All-data: `{ userId, scope: "all", confirm: "CLEAR_USER_LEDGER" }` (legacy default if `scope` is omitted).
+- Shared `softClearLedger(redis, userId, opts?)` accepts `{from, to}` to scope the wipe; admin clear-all and the self-service patch reset both call it without a window for "wipe everything".
+- Client: inline confirm flow uses a single `adminClearLedgerTarget` state shape `{ kind: "all" | "patch" | "row", patchVersion?, rowKind?, entryId?, label }`. Step 0 = picker visible, step 1 = first confirm, step 2 = last-chance, fire on click.
+- The patch list comes from `/api/admin/patches`. The user-detail open handler triggers a fetch when `adminPatches` is null so the buttons appear without the admin first opening the Patch Exports tab. Dev fallback uses the hoisted `devMockPatches()` helper.
+
+## 2026-04-28 — All Users row drill-down + per-user clear ledger
+
+- Clicking any row in **All Users** opens a modal with that user's last 30 days of refinery jobs + sell orders. Backed by `GET /api/admin/user-history?userId=<id>&days=30` (default 30, capped at 365). Soft-deleted entries are filtered out — the admin sees what the user sees.
+- Endpoint `POST /api/admin/clear-user-ledger` — soft-deletes scoped entries (see per-patch+all entry above for current scope semantics) and cancels in-flight QStash schedules.
+- Implementation in `api/_lib/ledgerOps.js` (`softClearLedger`) is shared between admin clears and the user-self-service patch reset.
+- Refused with 404 when `userId` isn't in the user-meta index — prevents typos creating phantom ledger keys via the soft-delete write.
+- Vite-dev fallback: when `/api/*` returns the raw JS source instead of JSON, both the success path's content-type sniff and the catch handler fall back to `buildDevMock()` so the modal exercises in preview without a real API. Dev mock seeds 10 refinery jobs + 10 sell orders per user, deterministic per-user-id, spread across ~28 days for variety.
+
+## 2026-04-28 — Guest Logins
+
+- New sub-tab between **All Users** and **Patch Exports**.
+- Captures anonymous (non-signed-in) visits so admins can see traffic that never made it through the Discord OAuth flow.
+- `POST /api/guest-login` is fired once per page mount when no user session is present. Server-side dedupe via the `scs_guest_visit` cookie (24h `Max-Age`, `HttpOnly`, `SameSite=Lax`); the cookie always refreshes so the dedupe window slides forward as the visitor browses, but the Redis write only happens on first hit per window.
+- Records `{ ts, ua, country }` to a Redis list `guests:logins` via `LPUSH` + `LTRIM 0 999` (keeps the most recent 1000 entries; older entries drop off on the next write). `country` from `x-vercel-ip-country` when available. **IP is deliberately not collected** — the admin view only needs traffic volume + browser/region, not source addresses.
+- Logged-in callers are skipped — their activity is already in `logins:global` / All Users.
+- `GET /api/admin/guest-logins` returns the list newest-first, default `limit=200` (capped at 1000 to match the LTRIM bound).
+- Client: standard admin sub-tab layout — sticky cyan-thumb scrollbar, sticky `<thead>`, columns: When / Timestamp / Country / User Agent (UA truncated with `title` for hover full-text).
+- Dev mock seeds 5 sample anonymous visits (US / DE / AU / CA / GB) so the preview can exercise the table without hitting the API.
 
 ## 2026-04-28 — All Users (was Active Users)
 

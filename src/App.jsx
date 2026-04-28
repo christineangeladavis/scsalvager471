@@ -10579,9 +10579,22 @@ export default function StarCitizenSalvageGuideWebsite() {
                 Terms of Service
               </button>
             </span>
-            <span className="rounded-xl border border-cyan-500/25 bg-cyan-500/10 px-4 py-2 font-mono tracking-widest text-cyan-300">
-              STAR CITIZEN REFERRAL CODE: <span className="font-bold text-white">STAR-CH2W-R73F</span>
-            </span>
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Donate pill — sits inline with the rest of the
+                  footer. Opens StreamElements tipping page in a new
+                  tab. */}
+              <a
+                href="https://streamelements.com/chrissynightingale/tip"
+                target="_blank"
+                rel="noreferrer noopener"
+                className="rounded-full border border-cyan-400 bg-cyan-500 px-5 py-2 text-sm font-bold text-slate-950 shadow-lg shadow-cyan-950/40 hover:bg-cyan-400 hover:border-cyan-300"
+              >
+                Donate
+              </a>
+              <span className="rounded-xl border border-cyan-500/25 bg-cyan-500/10 px-4 py-2 font-mono tracking-widest text-cyan-300">
+                STAR CITIZEN REFERRAL CODE: <span className="font-bold text-white">STAR-CH2W-R73F</span>
+              </span>
+            </div>
           </div>
         </footer>
 
@@ -11059,6 +11072,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <li>New <strong>notification bell</strong> sits to the left of the user menu (logged-in only). Red badge shows the unread count. Surfaces setup nags (Discord DMs off, RSI handle not linked, RSI handle not verified) plus a "New site update available" entry whenever What's New gets a new release section.</li>
                     <li>Clicking a notification opens the relevant destination (Settings or What's New) and marks it as read. Read items stay visible in the dropdown (greyed with a slate dot) until the underlying setup is fixed. A "Mark all as read" header button clears the badge in one click.</li>
                     <li>Site-wide <strong>scrollbar styling</strong>: every scrollable surface (page body, modals, tables, dropdowns, custom overflow containers) now uses the same cyan-thumb / slate-track pill-shape style as the Patch History panel.</li>
+                    <li>New <strong>Donate</strong> button in the footer — cyan pill that opens StreamElements tip page in a new tab. Sits inline with the Star Citizen referral code pill. Tips help keep the site running.</li>
                   </ul>
                   <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Fixes</p>
                   <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">

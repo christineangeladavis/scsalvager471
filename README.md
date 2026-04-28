@@ -21,6 +21,7 @@ Added:
 - New **notification bell** sits to the left of the user menu (logged-in only). Red badge shows the unread count. Surfaces setup nags (Discord DMs off, RSI handle not linked, RSI handle not verified) plus a "New site update available" entry every time What's New gets a new release section.
 - Clicking a notification opens the relevant destination (Settings or What's New) and marks it as read. Read items stay visible in the dropdown — greyed with a slate dot — until the underlying setup is fixed. A "Mark all as read" header button clears the badge in one click.
 - Site-wide scrollbar styling: every scrollable surface (page body, modals, tables, dropdowns, custom overflow containers) now uses the same cyan-thumb / slate-track pill-shape style as the Patch History panel. Firefox + Chromium/Webkit both styled.
+- New **Donate** button in the footer — cyan pill that opens [streamelements.com/chrissynightingale/tip](https://streamelements.com/chrissynightingale/tip) in a new tab. Sits inline with the Star Citizen referral code pill. Tips help keep the site running.
 
 Fixes:
 - Drake Vulture and MISC Fortune roles renamed from "Solo Salvage" to "Light Salvage" to match in-game classification.

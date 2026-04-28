@@ -1,6 +1,6 @@
 # Terms of Service
 
-_Last updated: April 27, 2026_
+_Last updated: April 28, 2026_
 
 SCSalvager.net ("the site", "we", "us") is a free community tool for Star Citizen players. By using the site you agree to the terms below. If any of them don't work for you, please don't use the site.
 
@@ -14,7 +14,10 @@ SCSalvager.net ("the site", "we", "us") is a free community tool for Star Citize
 
 - Track your refinery jobs and sell orders in your personal Ledger.
 - Submit anonymous community price reports that go into the site's median pricing.
-- Verify your RSI handle to display it on the Statistics leaderboard.
+- Upload screenshots (or a crop you select) of refinery and sell-order screens; the image is sent once to a vision AI service for parsing and immediately discarded.
+- Set an optional custom display name to appear on the Statistics leaderboard until you verify an RSI handle.
+- Verify your RSI handle to display it on the Statistics leaderboard. A verified RSI handle replaces both your Discord handle and any custom display name.
+- Browse Missions, Ship Details, and Scraper Module Performance panels populated from public Star Citizen reference sites.
 - Opt in to Discord DMs for refinery-completion notifications.
 - Delete your account at any time via Settings → Danger Zone.
 
@@ -23,7 +26,7 @@ SCSalvager.net ("the site", "we", "us") is a free community tool for Star Citize
 Don't use the site to:
 
 - **Impersonate** another player. Verification exists for a reason; trying to bypass it is a violation.
-- **Submit fake or misleading data** — bogus price reports, fabricated ledger entries to game the Statistics leaderboard, or anything intended to mislead other users.
+- **Submit fake or misleading data** — bogus price reports, fabricated ledger entries to game the Statistics leaderboard, misleading custom display names chosen to impersonate another player, or anything intended to mislead other users.
 - **Abuse the API** — automated scraping, hammering endpoints, evading rate limits, or running anything that puts unreasonable load on the service.
 - **Attempt to break the site.** Reporting a vulnerability you discover via the [Discord community](https://discord.gg/GkQU7AbfBS) is welcome. Exploiting one is not.
 - **Harass or threaten** other users via Discord DMs we send on your behalf, or in any other context tied to your SCSalvager account.
@@ -35,6 +38,8 @@ We may suspend or permanently ban any account that violates these rules. Severe 
 
 - **Ledger entries** (refinery jobs, sell orders) belong to you. We don't share them with anyone except as described in the Privacy Policy. Deleting your account wipes them.
 - **Community price reports** are stored anonymously, with no link to your user ID. By submitting a report, you grant SCSalvager.net a perpetual, non-exclusive license to display and aggregate that report as part of the community price data. Because the report carries no identifier, deleting your account does not retract reports you previously submitted — they are already irreversibly anonymous and continue to inform the community median.
+- **Screenshot uploads** (and any crop you select before submitting) are processed once by the vision AI parser and discarded. They are never written to disk, stored in Redis, or logged. Don't upload screenshots that contain content you don't have the right to share with the parser.
+- **Custom display names** must not impersonate another player or the site itself. We may reset a custom display name that violates these rules without notice.
 - You are responsible for the content you submit. Don't submit anything you don't have the right to.
 
 ## Service availability
@@ -45,7 +50,7 @@ We may suspend or permanently ban any account that violates these rules. Severe 
 
 ## No warranties, no liability
 
-- All numbers on the site — refinery yields, sell-point prices, profit estimates, completion times — are **best-effort** values pulled from community reports and patch data. They are not authoritative; verify in-game before making decisions you can't undo.
+- All numbers on the site — refinery yields, sell-point prices, profit estimates, completion times, mission rewards, ship aUEC values, scraper-module pricing — are **best-effort** values pulled from community reports, patch data, and public Star Citizen reference sites (scmdb.net, finder.cstone.space). They are not authoritative; verify in-game before making decisions you can't undo.
 - We are **not liable** for losses you experience from relying on the site, including (but not limited to) bad price estimates, missed refinery pickups, lost ledger data during outages, or DMs that didn't deliver.
 - SCSalvager.net is a Star Citizen helper tool. It is not financial, legal, or professional advice of any kind.
 

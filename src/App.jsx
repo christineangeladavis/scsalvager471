@@ -8884,7 +8884,7 @@ export default function StarCitizenSalvageGuideWebsite() {
               <div className="flex items-start justify-between">
                 <div>
                   <h3 id="privacy-title" className="text-lg font-bold text-cyan-300">Privacy Policy</h3>
-                  <p className="mt-1 text-xs text-slate-500">Last updated: April 27, 2026</p>
+                  <p className="mt-1 text-xs text-slate-500">Last updated: April 28, 2026</p>
                 </div>
                 <button
                   type="button"
@@ -8908,6 +8908,9 @@ export default function StarCitizenSalvageGuideWebsite() {
                       <strong className="text-slate-200">Discord handle (display name)</strong> — required to identify you to other salvagers.
                     </li>
                     <li>
+                      <strong className="text-slate-200">Custom display name (optional)</strong> — a free-form name you can set in Settings to use on the Statistics leaderboard instead of your Discord handle, until you verify an RSI handle.
+                    </li>
+                    <li>
                       <strong className="text-slate-200">RSI handle (optional)</strong> — the Roberts Space Industries citizen handle you choose to link for in-game identity verification.
                     </li>
                     <li>
@@ -8918,7 +8921,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     Anything else you see on the site is content you've authored yourself (ledger entries, community price reports, your preference toggles) — we keep it associated with your Discord handle so it's there the next time you sign in, and you can wipe all of it via Settings → Danger Zone at any time.
                   </p>
                   <p className="mt-3 text-slate-400">
-                    Screenshots you upload to auto-fill refinery or sell orders are sent once to a vision AI service for parsing and immediately discarded — they are never written to disk, stored in Redis, or logged.
+                    Screenshots you upload to auto-fill refinery or sell orders — including any cropped subset you select before sending — are sent once to a vision AI service for parsing and immediately discarded. They are never written to disk, stored in Redis, or logged.
                   </p>
                 </section>
 
@@ -8927,7 +8930,8 @@ export default function StarCitizenSalvageGuideWebsite() {
                   <p className="mt-2 text-slate-400">We collect only what is needed to operate the service:</p>
                   <ul className="mt-2 list-disc pl-5 space-y-2 text-slate-400">
                     <li>Only your Discord handle is required to create and authenticate your account.</li>
-                    <li>RSI handle is collected solely to verify your in-game identity when you choose to do so. Verification is optional.</li>
+                    <li>Custom display name is collected only when you set one, solely to render that label on the Statistics leaderboard in place of your Discord handle.</li>
+                    <li>RSI handle is collected solely to verify your in-game identity when you choose to do so. Verification is optional. A verified RSI handle replaces both your Discord handle and any custom display name on the leaderboard.</li>
                     <li>Session data (IP, user-agent) is retained only while your session is active to prevent unauthorised access.</li>
                   </ul>
                 </section>
@@ -8936,9 +8940,9 @@ export default function StarCitizenSalvageGuideWebsite() {
                   <h4 className="text-cyan-300 text-xs font-semibold uppercase tracking-wider">How it is stored</h4>
                   <ul className="mt-2 list-disc pl-5 space-y-1 text-slate-400">
                     <li>All account data — sessions, ledgers, preferences, login events, user index — lives in <strong className="text-slate-200">Upstash Redis</strong>, a hosted Redis service.</li>
-                    <li>Session cookies (<code className="rounded bg-slate-800 px-1 text-cyan-200">scs_session</code>) are <strong className="text-slate-200">HTTP-only</strong>, marked <code className="rounded bg-slate-800 px-1 text-cyan-200">Secure</code> in production, and expire <strong className="text-slate-200">7 days</strong> after issue.</li>
+                    <li>Session cookies (<code className="rounded bg-slate-800 px-1 text-cyan-200">scs_session</code>) are <strong className="text-slate-200">HTTP-only</strong>, marked <code className="rounded bg-slate-800 px-1 text-cyan-200">Secure</code> in production, set with <code className="rounded bg-slate-800 px-1 text-cyan-200">SameSite=Lax</code>, and expire <strong className="text-slate-200">7 days</strong> after issue. The cookie is scoped to the canonical site origin (<code className="rounded bg-slate-800 px-1 text-cyan-200">scsalvager.net</code>) regardless of which front the request arrives on.</li>
                     <li>The global login event log is capped at <strong className="text-slate-200">100,000 entries</strong>; older entries are trimmed automatically.</li>
-                    <li><strong className="text-slate-200">Screenshots are not stored.</strong> They exist only in server memory for the duration of the single vision-API call, then are released to be garbage-collected. They never reach Redis or any log.</li>
+                    <li><strong className="text-slate-200">Screenshots are not stored.</strong> Both full uploads and any cropped subset you choose before submitting exist only in server memory for the duration of the single vision-API call, then are released to be garbage-collected. They never reach Redis or any log.</li>
                     <li>The site is hosted on <strong className="text-slate-200">Vercel</strong>, which runs the serverless API.</li>
                   </ul>
                 </section>
@@ -8948,10 +8952,11 @@ export default function StarCitizenSalvageGuideWebsite() {
                   <p className="mt-2 text-slate-400">We share data only with the services required for the site to function:</p>
                   <ul className="mt-2 list-disc pl-5 space-y-1 text-slate-400">
                     <li><strong className="text-slate-200">Discord</strong> — OAuth login provider. Discord knows you've authorized this app. If you opt in to refinery-completion DMs, we deliver those messages through Discord's API.</li>
-                    <li><strong className="text-slate-200">Anthropic</strong> — when you upload a screenshot, the image is sent once to Anthropic's Claude API for parsing. Under Anthropic's commercial terms, API inputs are not used to train models and are not retained beyond the request.</li>
+                    <li><strong className="text-slate-200">Anthropic</strong> — when you upload a screenshot (including a crop you select before submitting), the image is sent once to Anthropic's Claude API for parsing. Under Anthropic's commercial terms, API inputs are not used to train models and are not retained beyond the request.</li>
                     <li><strong className="text-slate-200">Roberts Space Industries</strong> — when you click "Verify Now" on your RSI handle, our server fetches your public RSI profile page (<code className="rounded bg-slate-800 px-1 text-cyan-200">robertsspaceindustries.com/citizens/&#123;handle&#125;</code>). RSI sees a request from our server's IP address; we do not send any of your data to RSI.</li>
+                    <li><strong className="text-slate-200">Cloud Imperium Games / scmdb.net / finder.cstone.space</strong> — the Missions, Ship Details, and Scraper Module Performance panels render data scraped from these public Star Citizen reference sites. Requests run server-side from our infrastructure (or are baked into the build); your browser does not contact those sites directly because of you using SCSalvager.net.</li>
                     <li><strong className="text-slate-200">Upstash</strong> — operates the Redis instance where your account data lives.</li>
-                    <li><strong className="text-slate-200">Vercel</strong> — hosts the application and serverless functions. Server logs may include standard request metadata (IP, user agent, path).</li>
+                    <li><strong className="text-slate-200">Vercel</strong> — hosts the application and serverless functions. Server logs may include standard request metadata (IP, user agent, path) plus diagnostic OAuth logs (request host, redirect URI, presence flags for cookies — never the cookie values themselves).</li>
                   </ul>
                   <p className="mt-3 text-slate-400">
                     We do <strong className="text-slate-200">not</strong> sell, rent, or trade your data to anyone, ever.
@@ -9015,7 +9020,7 @@ export default function StarCitizenSalvageGuideWebsite() {
               <div className="flex items-start justify-between">
                 <div>
                   <h3 id="terms-title" className="text-lg font-bold text-cyan-300">Terms of Service</h3>
-                  <p className="mt-1 text-xs text-slate-500">Last updated: April 27, 2026</p>
+                  <p className="mt-1 text-xs text-slate-500">Last updated: April 28, 2026</p>
                 </div>
                 <button
                   type="button"
@@ -9046,7 +9051,10 @@ export default function StarCitizenSalvageGuideWebsite() {
                   <ul className="mt-2 list-disc pl-5 space-y-1 text-slate-400">
                     <li>Track your refinery jobs and sell orders in your personal Ledger.</li>
                     <li>Submit anonymous community price reports that go into the site's median pricing.</li>
-                    <li>Verify your RSI handle to display it on the Statistics leaderboard.</li>
+                    <li>Upload screenshots (or a crop you select) of refinery and sell-order screens; the image is sent once to a vision AI service for parsing and immediately discarded.</li>
+                    <li>Set an optional custom display name to appear on the Statistics leaderboard until you verify an RSI handle.</li>
+                    <li>Verify your RSI handle to display it on the Statistics leaderboard. A verified RSI handle replaces both your Discord handle and any custom display name.</li>
+                    <li>Browse Missions, Ship Details, and Scraper Module Performance panels populated from public Star Citizen reference sites.</li>
                     <li>Opt in to Discord DMs for refinery-completion notifications.</li>
                     <li>Delete your account at any time via Settings → Danger Zone.</li>
                   </ul>
@@ -9057,7 +9065,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                   <p className="mt-2 text-slate-400">Don't use the site to:</p>
                   <ul className="mt-2 list-disc pl-5 space-y-1 text-slate-400">
                     <li><strong className="text-slate-200">Impersonate</strong> another player. Verification exists for a reason; trying to bypass it is a violation.</li>
-                    <li><strong className="text-slate-200">Submit fake or misleading data</strong> — bogus price reports, fabricated ledger entries to game the Statistics leaderboard, or anything intended to mislead other users.</li>
+                    <li><strong className="text-slate-200">Submit fake or misleading data</strong> — bogus price reports, fabricated ledger entries to game the Statistics leaderboard, misleading custom display names chosen to impersonate another player, or anything intended to mislead other users.</li>
                     <li><strong className="text-slate-200">Abuse the API</strong> — automated scraping, hammering endpoints, evading rate limits, or running anything that puts unreasonable load on the service.</li>
                     <li><strong className="text-slate-200">Attempt to break the site.</strong> Reporting a vulnerability you discover via the Discord community is welcome. Exploiting one is not.</li>
                     <li><strong className="text-slate-200">Harass or threaten</strong> other users via Discord DMs we send on your behalf, or in any other context tied to your SCSalvager account.</li>
@@ -9073,6 +9081,8 @@ export default function StarCitizenSalvageGuideWebsite() {
                   <ul className="mt-2 list-disc pl-5 space-y-2 text-slate-400">
                     <li><strong className="text-slate-200">Ledger entries</strong> (refinery jobs, sell orders) belong to you. We don't share them with anyone except as described in the Privacy Policy. Deleting your account wipes them.</li>
                     <li><strong className="text-slate-200">Community price reports</strong> are stored anonymously, with no link to your user ID. By submitting a report, you grant SCSalvager.net a perpetual, non-exclusive license to display and aggregate that report as part of the community price data. Because the report carries no identifier, deleting your account does not retract reports you previously submitted — they are already irreversibly anonymous and continue to inform the community median.</li>
+                    <li><strong className="text-slate-200">Screenshot uploads</strong> (and any crop you select before submitting) are processed once by the vision AI parser and discarded. They are never written to disk, stored in Redis, or logged. Don't upload screenshots that contain content you don't have the right to share with the parser.</li>
+                    <li><strong className="text-slate-200">Custom display names</strong> must not impersonate another player or the site itself. We may reset a custom display name that violates these rules without notice.</li>
                     <li>You are responsible for the content you submit. Don't submit anything you don't have the right to.</li>
                   </ul>
                 </section>
@@ -9089,7 +9099,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                 <section>
                   <h4 className="text-cyan-300 text-xs font-semibold uppercase tracking-wider">No warranties, no liability</h4>
                   <ul className="mt-2 list-disc pl-5 space-y-1 text-slate-400">
-                    <li>All numbers on the site — refinery yields, sell-point prices, profit estimates, completion times — are <strong className="text-slate-200">best-effort</strong> values pulled from community reports and patch data. They are not authoritative; verify in-game before making decisions you can't undo.</li>
+                    <li>All numbers on the site — refinery yields, sell-point prices, profit estimates, completion times, mission rewards, ship aUEC values, scraper-module pricing — are <strong className="text-slate-200">best-effort</strong> values pulled from community reports, patch data, and public Star Citizen reference sites (scmdb.net, finder.cstone.space). They are not authoritative; verify in-game before making decisions you can't undo.</li>
                     <li>We are <strong className="text-slate-200">not liable</strong> for losses you experience from relying on the site, including (but not limited to) bad price estimates, missed refinery pickups, lost ledger data during outages, or DMs that didn't deliver.</li>
                     <li>SCSalvager.net is a Star Citizen helper tool. It is not financial, legal, or professional advice of any kind.</li>
                   </ul>
@@ -9326,6 +9336,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <li>"Connect Discord" for refinery DMs: session cookie loosened from Strict to Lax so the browser carries it across the OAuth return trip. Resolves the "Your login session expired" loop when linking notifications. (You may need to sign out and back in once to pick up the new cookie.)</li>
                     <li>Home → <strong>Scraper Module Performance</strong>: each module card now has Stanton / Pyro / Nyx buttons that reveal in-game purchase locations + prices (sourced from finder.cstone.space). Empty systems hide their button. Comparison table's Price column renamed <strong>Lowest Price</strong> and shows the cheapest location across all systems.</li>
                     <li>Home layout: Scraper Module Performance moved to its own full-width row below the Refinery Calculator + Sell Estimate row.</li>
+                    <li><strong>Privacy Policy</strong> and <strong>Terms of Service</strong> refreshed for v2.6 — now cover the optional custom display name, screenshot crop uploads, the canonical-host SameSite=Lax session cookie, and the public Star Citizen reference sites (scmdb.net / finder.cstone.space) used by the Missions, Ship Details, and Scraper Module Performance panels.</li>
                   </ul>
                 </section>
 

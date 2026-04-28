@@ -9161,6 +9161,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <li>Vulture and Fortune roles renamed from "Solo Salvage" to "Light Salvage" to match in-game terminology.</li>
                     <li>Update banner now has a one-click "Update now" button — clears caches and reloads automatically, no keyboard shortcut needed.</li>
                     <li>Discord login resilience: OAuth redirect now pinned to the canonical site origin so QR-code and web logins work regardless of which host fronted the request.</li>
+                    <li>"Connect Discord" for refinery DMs: session cookie loosened from Strict to Lax so the browser carries it across the OAuth return trip. Resolves the "Your login session expired" loop when linking notifications. (You may need to sign out and back in once to pick up the new cookie.)</li>
                   </ul>
                 </section>
 

@@ -19176,9 +19176,6 @@ export default function StarCitizenSalvageGuideWebsite() {
                           >
                             <td className="px-4 py-3">
                               <div className="font-semibold text-white">{m.name}</div>
-                              {m.notes && (
-                                <div className="mt-0.5 text-xs text-slate-500">{m.notes}</div>
-                              )}
                             </td>
                             <td className="px-4 py-3 whitespace-nowrap text-slate-300">{m.system}</td>
                             <td className="px-4 py-3 whitespace-nowrap text-slate-300">{m.faction}</td>
@@ -23044,6 +23041,10 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <li>Component turn-in rows are clickable — expanding one shows the list of ships that come with that exact component class + size by default. Ships whose copy of the component is marked "Not accessible" render as greyed/strike-through chips so you know the part exists but can't be salvaged.</li>
                     <li><strong>Ship Salvage Head</strong> turn-ins list all 5 site-supported salvage platforms (Aegis Reclaimer / Argo Moth / Drake Vulture / MISC Fortune / RSI Salvation). <strong>Ship Mining Laser</strong> turn-ins list the MISC Prospector / ARGO Mole / Drake Golem.</li>
                     <li>Mission briefings now substitute the in-game <code className="rounded bg-slate-800 px-1 text-cyan-200">[LOCATION]</code> and <code className="rounded bg-slate-800 px-1 text-cyan-200">[DESTINATION]</code> placeholders with the resolved location names, rendered as inline cyan chips. Multi-leg missions emit one chip per entry, comma-separated. Matches the scmdb.net briefing format.</li>
+                  </ul>
+                  <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Fixes</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li>Salvage Missions table rows shortened: the truncated first-sentence briefing line under each mission title was removed to keep rows compact. Full briefing copy still lives in the mission detail popup.</li>
                   </ul>
                 </section>
 

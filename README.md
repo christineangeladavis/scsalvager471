@@ -14,6 +14,9 @@ Added:
 - Mission briefings now substitute the in-game `[LOCATION]` and `[DESTINATION]` placeholders with the resolved location names, rendered as inline cyan chips. Multi-leg missions emit one chip per entry, comma-separated. Matches scmdb.net so the briefing reads like a real contract instead of a templated one.
 - Daily 6am scheduled diff against the public ship-components Google Sheet — surfaces any ship/component additions, removals, modifications, and accessibility flips so the operator can keep the site's default-component data fresh.
 
+Fixes:
+- Salvage Missions table rows shortened: the truncated first-sentence briefing line under each mission title was removed to keep rows compact. Full briefing copy still lives in the mission detail popup (click any row to see it).
+
 UPDATE 4/28/2026 v2.6
 
 Added:

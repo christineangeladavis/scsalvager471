@@ -22,6 +22,8 @@ Added:
 - Clicking a notification opens the relevant destination (Settings or What's New) and marks it as read. Read items stay visible in the dropdown — greyed with a slate dot — until the underlying setup is fixed. A "Mark all as read" header button clears the badge in one click.
 - Site-wide scrollbar styling: every scrollable surface (page body, modals, tables, dropdowns, custom overflow containers) now uses the same cyan-thumb / slate-track pill-shape style as the Patch History panel. Firefox + Chromium/Webkit both styled.
 - New **Donate** button in the footer — cyan pill that opens [streamelements.com/chrissynightingale/tip](https://streamelements.com/chrissynightingale/tip) in a new tab. Sits inline with the Star Citizen referral code pill. Tips help keep the site running.
+- Header gains a matching **Donate** tile next to the "Join our Discord" button — same shape and palette as the "Patch Verified" pill on the right side of the header, so the two read as a matched pair. Same StreamElements tip target as the footer button.
+- "Join our Discord" button reshaped to a rounded-full pill so it lines up cleanly with the new header Donate tile.
 
 Fixes:
 - Drake Vulture and MISC Fortune roles renamed from "Solo Salvage" to "Light Salvage" to match in-game classification.

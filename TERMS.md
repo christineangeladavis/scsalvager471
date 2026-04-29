@@ -55,7 +55,7 @@ We may suspend or permanently ban any account that violates these rules. Severe 
 
 ## No warranties, no liability
 
-- All numbers on the site — refinery yields, sell-point prices, profit estimates, completion times, mission rewards, ship aUEC values, scraper-module pricing — are **best-effort** values pulled from community reports, patch data, and public Star Citizen reference sites (scmdb.net, finder.cstone.space). They are not authoritative; verify in-game before making decisions you can't undo.
+- All numbers on the site — refinery yields, sell-point prices, profit estimates, completion times, mission rewards, ship aUEC values, scraper-module pricing — are **best-effort** values pulled from community reports, patch data, and public Star Citizen reference sites (scmdb.net, finder.cstone.space, spviewer.eu, uexcorp.space). They are not authoritative; verify in-game before making decisions you can't undo.
 - We are **not liable** for losses you experience from relying on the site, including (but not limited to) bad price estimates, missed refinery pickups, lost ledger data during outages, or DMs that didn't deliver.
 - SCSalvager.net is a Star Citizen helper tool. It is not financial, legal, or professional advice of any kind.
 

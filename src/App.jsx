@@ -2223,1106 +2223,884 @@ const LATEST_WHATSNEW_VERSION = "v2.7.0";
 // (e.g. dismiss the "Discord DMs off" nag without enabling DMs).
 const DISMISSED_NOTIFICATIONS_KEY = "scs_dismissed_notifications";
 
-// Auto-generated from .claude/rsi-ship-matrix.json
-// Source: https://robertsspaceindustries.com/ship-matrix/index
-// Re-run .claude/build-rsi-ships.cjs after refreshing the JSON.
-const RSI_SHIPS = [
+// Auto-generated from .claude/uex-vehicles.json
+// Source: https://api.uexcorp.uk/2.0/vehicles (upstream of spviewer.eu)
+// Re-run .claude/build-spviewer-ships.cjs after refreshing the JSON.
+const SPVIEWER_SHIPS = [
   {
     "name": "Avenger Stalker",
-    "manufacturer": "Aegis Dynamics",
-    "status": "flight-ready"
+    "manufacturer": "Aegis Dynamics"
   },
   {
     "name": "Avenger Titan",
-    "manufacturer": "Aegis Dynamics",
-    "status": "flight-ready"
+    "manufacturer": "Aegis Dynamics"
   },
   {
     "name": "Avenger Titan Renegade",
-    "manufacturer": "Aegis Dynamics",
-    "status": "flight-ready"
+    "manufacturer": "Aegis Dynamics"
   },
   {
     "name": "Avenger Warlock",
-    "manufacturer": "Aegis Dynamics",
-    "status": "flight-ready"
+    "manufacturer": "Aegis Dynamics"
   },
   {
     "name": "Eclipse",
-    "manufacturer": "Aegis Dynamics",
-    "status": "flight-ready"
+    "manufacturer": "Aegis Dynamics"
   },
   {
     "name": "Gladius",
-    "manufacturer": "Aegis Dynamics",
-    "status": "flight-ready"
+    "manufacturer": "Aegis Dynamics"
   },
   {
-    "name": "Gladius Pirate Edition",
-    "manufacturer": "Aegis Dynamics",
-    "status": "flight-ready"
+    "name": "Gladius Pirate",
+    "manufacturer": "Aegis Dynamics"
   },
   {
     "name": "Gladius Valiant",
-    "manufacturer": "Aegis Dynamics",
-    "status": "flight-ready"
+    "manufacturer": "Aegis Dynamics"
   },
   {
     "name": "Hammerhead",
-    "manufacturer": "Aegis Dynamics",
-    "status": "flight-ready"
+    "manufacturer": "Aegis Dynamics"
   },
   {
-    "name": "Hammerhead Best In Show Edition 2949",
-    "manufacturer": "Aegis Dynamics",
-    "status": "flight-ready"
+    "name": "Hammerhead Best In Show Edition",
+    "manufacturer": "Aegis Dynamics"
   },
   {
     "name": "Idris-M",
-    "manufacturer": "Aegis Dynamics",
-    "status": "flight-ready"
+    "manufacturer": "Aegis Dynamics"
   },
   {
     "name": "Idris-P",
-    "manufacturer": "Aegis Dynamics",
-    "status": "flight-ready"
+    "manufacturer": "Aegis Dynamics"
   },
   {
     "name": "Reclaimer",
-    "manufacturer": "Aegis Dynamics",
-    "status": "flight-ready"
+    "manufacturer": "Aegis Dynamics"
   },
   {
-    "name": "Reclaimer Best In Show Edition 2949",
-    "manufacturer": "Aegis Dynamics",
-    "status": "flight-ready"
+    "name": "Reclaimer Best In Show Edition",
+    "manufacturer": "Aegis Dynamics"
   },
   {
     "name": "Redeemer",
-    "manufacturer": "Aegis Dynamics",
-    "status": "flight-ready"
+    "manufacturer": "Aegis Dynamics"
   },
   {
     "name": "Retaliator",
-    "manufacturer": "Aegis Dynamics",
-    "status": "flight-ready"
+    "manufacturer": "Aegis Dynamics"
   },
   {
     "name": "Sabre",
-    "manufacturer": "Aegis Dynamics",
-    "status": "flight-ready"
+    "manufacturer": "Aegis Dynamics"
   },
   {
     "name": "Sabre Comet",
-    "manufacturer": "Aegis Dynamics",
-    "status": "flight-ready"
+    "manufacturer": "Aegis Dynamics"
   },
   {
     "name": "Sabre Firebird",
-    "manufacturer": "Aegis Dynamics",
-    "status": "flight-ready"
+    "manufacturer": "Aegis Dynamics"
   },
   {
     "name": "Sabre Peregrine",
-    "manufacturer": "Aegis Dynamics",
-    "status": "flight-ready"
+    "manufacturer": "Aegis Dynamics"
   },
   {
     "name": "Sabre Raven",
-    "manufacturer": "Aegis Dynamics",
-    "status": "flight-ready"
+    "manufacturer": "Aegis Dynamics"
   },
   {
     "name": "Vanguard Harbinger",
-    "manufacturer": "Aegis Dynamics",
-    "status": "flight-ready"
+    "manufacturer": "Aegis Dynamics"
   },
   {
     "name": "Vanguard Hoplite",
-    "manufacturer": "Aegis Dynamics",
-    "status": "flight-ready"
+    "manufacturer": "Aegis Dynamics"
   },
   {
     "name": "Vanguard Sentinel",
-    "manufacturer": "Aegis Dynamics",
-    "status": "flight-ready"
+    "manufacturer": "Aegis Dynamics"
   },
   {
     "name": "Vanguard Warden",
-    "manufacturer": "Aegis Dynamics",
-    "status": "flight-ready"
-  },
-  {
-    "name": "Anvil Ballista Dunestalker",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
-  },
-  {
-    "name": "Anvil Ballista Snowblind",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Aegis Dynamics"
   },
   {
     "name": "Arrow",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
   },
   {
     "name": "Asgard",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
   },
   {
     "name": "Ballista",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
+  },
+  {
+    "name": "Ballista Dunestalker",
+    "manufacturer": "Anvil Aerospace"
+  },
+  {
+    "name": "Ballista Snowblind",
+    "manufacturer": "Anvil Aerospace"
   },
   {
     "name": "C8 Pisces",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
   },
   {
-    "name": "C8R Pisces",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "name": "C8R Pisces Rescue",
+    "manufacturer": "Anvil Aerospace"
   },
   {
     "name": "C8X Pisces Expedition",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
   },
   {
     "name": "Carrack",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
   },
   {
     "name": "Carrack Expedition",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
-  },
-  {
-    "name": "Carrack Expedition w/C8X",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
-  },
-  {
-    "name": "Carrack w/C8X",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
   },
   {
     "name": "Centurion",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
   },
   {
     "name": "F7A Hornet Mk I",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
   },
   {
     "name": "F7A Hornet Mk II",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
   },
   {
     "name": "F7C Hornet Mk I",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
   },
   {
     "name": "F7C Hornet Mk II",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
   },
   {
     "name": "F7C Hornet Wildfire Mk I",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
   },
   {
     "name": "F7C-M Super Hornet Heartseeker Mk I",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
   },
   {
     "name": "F7C-M Super Hornet Mk I",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
   },
   {
     "name": "F7C-M Super Hornet Mk II",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
   },
   {
     "name": "F7C-R Hornet Tracker Mk I",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
   },
   {
     "name": "F7C-R Hornet Tracker Mk II",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
   },
   {
     "name": "F7C-S Hornet Ghost Mk I",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
   },
   {
     "name": "F7C-S Hornet Ghost Mk II",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
   },
   {
     "name": "F8C Lightning",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
   },
   {
     "name": "F8C Lightning Executive Edition",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
   },
   {
     "name": "Gladiator",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
   },
   {
     "name": "Hawk",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
   },
   {
     "name": "Hurricane",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
   },
   {
     "name": "Paladin",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
   },
   {
     "name": "Spartan",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
   },
   {
     "name": "Terrapin",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
   },
   {
     "name": "Terrapin Medic",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
   },
   {
     "name": "Valkyrie",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
   },
   {
     "name": "Valkyrie Liberator Edition",
-    "manufacturer": "Anvil Aerospace",
-    "status": "flight-ready"
+    "manufacturer": "Anvil Aerospace"
   },
   {
-    "name": "Khartu-Al",
-    "manufacturer": "Aopoa",
-    "status": "flight-ready"
+    "name": "Khartu-al",
+    "manufacturer": "Aopoa"
   },
   {
     "name": "Nox",
-    "manufacturer": "Aopoa",
-    "status": "flight-ready"
+    "manufacturer": "Aopoa"
   },
   {
     "name": "Nox Kue",
-    "manufacturer": "Aopoa",
-    "status": "flight-ready"
+    "manufacturer": "Aopoa"
   },
   {
-    "name": "San'tok.yāi",
-    "manufacturer": "Aopoa",
-    "status": "flight-ready"
-  },
-  {
-    "name": "Argo Mole Carbon Edition",
-    "manufacturer": "Argo Astronautics",
-    "status": "flight-ready"
-  },
-  {
-    "name": "Argo Mole Talus Edition",
-    "manufacturer": "Argo Astronautics",
-    "status": "flight-ready"
+    "name": "San tok.Yāi",
+    "manufacturer": "Aopoa"
   },
   {
     "name": "ATLS",
-    "manufacturer": "Argo Astronautics",
-    "status": "flight-ready"
+    "manufacturer": "Argo Astronautics"
   },
   {
     "name": "ATLS GEO",
-    "manufacturer": "Argo Astronautics",
-    "status": "flight-ready"
+    "manufacturer": "Argo Astronautics"
   },
   {
     "name": "CSV-SM",
-    "manufacturer": "Argo Astronautics",
-    "status": "flight-ready"
+    "manufacturer": "Argo Astronautics"
   },
   {
     "name": "MOLE",
-    "manufacturer": "Argo Astronautics",
-    "status": "flight-ready"
+    "manufacturer": "Argo Astronautics"
+  },
+  {
+    "name": "MOLE Carbon Edition",
+    "manufacturer": "Argo Astronautics"
+  },
+  {
+    "name": "MOLE Talus Edition",
+    "manufacturer": "Argo Astronautics"
   },
   {
     "name": "MOTH",
-    "manufacturer": "Argo Astronautics",
-    "status": "flight-ready"
+    "manufacturer": "Argo Astronautics"
   },
   {
     "name": "MPUV Cargo",
-    "manufacturer": "Argo Astronautics",
-    "status": "flight-ready"
+    "manufacturer": "Argo Astronautics"
   },
   {
     "name": "MPUV Personnel",
-    "manufacturer": "Argo Astronautics",
-    "status": "flight-ready"
+    "manufacturer": "Argo Astronautics"
   },
   {
     "name": "MPUV Tractor",
-    "manufacturer": "Argo Astronautics",
-    "status": "flight-ready"
+    "manufacturer": "Argo Astronautics"
   },
   {
     "name": "RAFT",
-    "manufacturer": "Argo Astronautics",
-    "status": "flight-ready"
+    "manufacturer": "Argo Astronautics"
   },
   {
     "name": "SRV",
-    "manufacturer": "Argo Astronautics",
-    "status": "flight-ready"
+    "manufacturer": "Argo Astronautics"
   },
   {
     "name": "Defender",
-    "manufacturer": "Banu",
-    "status": "flight-ready"
+    "manufacturer": "Banu Souli"
   },
   {
     "name": "HoverQuad",
-    "manufacturer": "Consolidated Outland",
-    "status": "flight-ready"
+    "manufacturer": "Consolidated Outland"
   },
   {
     "name": "Mustang Alpha",
-    "manufacturer": "Consolidated Outland",
-    "status": "flight-ready"
+    "manufacturer": "Consolidated Outland"
   },
   {
     "name": "Mustang Alpha Vindicator",
-    "manufacturer": "Consolidated Outland",
-    "status": "flight-ready"
+    "manufacturer": "Consolidated Outland"
   },
   {
     "name": "Mustang Beta",
-    "manufacturer": "Consolidated Outland",
-    "status": "flight-ready"
+    "manufacturer": "Consolidated Outland"
   },
   {
     "name": "Mustang Delta",
-    "manufacturer": "Consolidated Outland",
-    "status": "flight-ready"
+    "manufacturer": "Consolidated Outland"
   },
   {
     "name": "Mustang Gamma",
-    "manufacturer": "Consolidated Outland",
-    "status": "flight-ready"
+    "manufacturer": "Consolidated Outland"
   },
   {
     "name": "Mustang Omega",
-    "manufacturer": "Consolidated Outland",
-    "status": "flight-ready"
+    "manufacturer": "Consolidated Outland"
   },
   {
     "name": "Nomad",
-    "manufacturer": "Consolidated Outland",
-    "status": "flight-ready"
+    "manufacturer": "Consolidated Outland"
   },
   {
     "name": "A1 Spirit",
-    "manufacturer": "Crusader Industries",
-    "status": "flight-ready"
+    "manufacturer": "Crusader Industries"
   },
   {
-    "name": "A2 Hercules",
-    "manufacturer": "Crusader Industries",
-    "status": "flight-ready"
+    "name": "A2 Hercules Starlifter",
+    "manufacturer": "Crusader Industries"
   },
   {
-    "name": "Ares Inferno",
-    "manufacturer": "Crusader Industries",
-    "status": "flight-ready"
+    "name": "Ares Inferno Starfighter",
+    "manufacturer": "Crusader Industries"
   },
   {
-    "name": "Ares Ion",
-    "manufacturer": "Crusader Industries",
-    "status": "flight-ready"
+    "name": "Ares Ion Starfighter",
+    "manufacturer": "Crusader Industries"
   },
   {
     "name": "C1 Spirit",
-    "manufacturer": "Crusader Industries",
-    "status": "flight-ready"
+    "manufacturer": "Crusader Industries"
   },
   {
-    "name": "C2 Hercules",
-    "manufacturer": "Crusader Industries",
-    "status": "flight-ready"
+    "name": "C2 Hercules Starlifter",
+    "manufacturer": "Crusader Industries"
   },
   {
     "name": "Intrepid",
-    "manufacturer": "Crusader Industries",
-    "status": "flight-ready"
+    "manufacturer": "Crusader Industries"
   },
   {
-    "name": "M2 Hercules",
-    "manufacturer": "Crusader Industries",
-    "status": "flight-ready"
+    "name": "M2 Hercules Starlifter",
+    "manufacturer": "Crusader Industries"
   },
   {
-    "name": "Mercury",
-    "manufacturer": "Crusader Industries",
-    "status": "flight-ready"
+    "name": "Mercury Star Runner",
+    "manufacturer": "Crusader Industries"
   },
   {
     "name": "Buccaneer",
-    "manufacturer": "Drake Interplanetary",
-    "status": "flight-ready"
+    "manufacturer": "Drake Interplanetary"
   },
   {
     "name": "Caterpillar",
-    "manufacturer": "Drake Interplanetary",
-    "status": "flight-ready"
+    "manufacturer": "Drake Interplanetary"
   },
   {
-    "name": "Caterpillar Best In Show Edition 2949",
-    "manufacturer": "Drake Interplanetary",
-    "status": "flight-ready"
+    "name": "Caterpillar Best In Show Edition",
+    "manufacturer": "Drake Interplanetary"
   },
   {
     "name": "Caterpillar Pirate Edition",
-    "manufacturer": "Drake Interplanetary",
-    "status": "flight-ready"
+    "manufacturer": "Drake Interplanetary"
   },
   {
     "name": "Clipper",
-    "manufacturer": "Drake Interplanetary",
-    "status": "flight-ready"
+    "manufacturer": "Drake Interplanetary"
   },
   {
     "name": "Corsair",
-    "manufacturer": "Drake Interplanetary",
-    "status": "flight-ready"
+    "manufacturer": "Drake Interplanetary"
   },
   {
     "name": "Cutlass Black",
-    "manufacturer": "Drake Interplanetary",
-    "status": "flight-ready"
+    "manufacturer": "Drake Interplanetary"
   },
   {
-    "name": "Cutlass Black Best In Show Edition 2949",
-    "manufacturer": "Drake Interplanetary",
-    "status": "flight-ready"
+    "name": "Cutlass Black Best In Show Edition",
+    "manufacturer": "Drake Interplanetary"
   },
   {
     "name": "Cutlass Blue",
-    "manufacturer": "Drake Interplanetary",
-    "status": "flight-ready"
+    "manufacturer": "Drake Interplanetary"
   },
   {
     "name": "Cutlass Red",
-    "manufacturer": "Drake Interplanetary",
-    "status": "flight-ready"
+    "manufacturer": "Drake Interplanetary"
   },
   {
     "name": "Cutlass Steel",
-    "manufacturer": "Drake Interplanetary",
-    "status": "flight-ready"
+    "manufacturer": "Drake Interplanetary"
   },
   {
     "name": "Cutter",
-    "manufacturer": "Drake Interplanetary",
-    "status": "flight-ready"
+    "manufacturer": "Drake Interplanetary"
   },
   {
     "name": "Cutter Rambler",
-    "manufacturer": "Drake Interplanetary",
-    "status": "flight-ready"
+    "manufacturer": "Drake Interplanetary"
   },
   {
     "name": "Cutter Scout",
-    "manufacturer": "Drake Interplanetary",
-    "status": "flight-ready"
+    "manufacturer": "Drake Interplanetary"
   },
   {
     "name": "Dragonfly Black",
-    "manufacturer": "Drake Interplanetary",
-    "status": "flight-ready"
+    "manufacturer": "Drake Interplanetary"
   },
   {
     "name": "Dragonfly Yellowjacket",
-    "manufacturer": "Drake Interplanetary",
-    "status": "flight-ready"
+    "manufacturer": "Drake Interplanetary"
   },
   {
     "name": "Golem",
-    "manufacturer": "Drake Interplanetary",
-    "status": "flight-ready"
+    "manufacturer": "Drake Interplanetary"
   },
   {
-    "name": "Golem OX",
-    "manufacturer": "Drake Interplanetary",
-    "status": "flight-ready"
+    "name": "Golem Ox",
+    "manufacturer": "Drake Interplanetary"
   },
   {
     "name": "Herald",
-    "manufacturer": "Drake Interplanetary",
-    "status": "flight-ready"
+    "manufacturer": "Drake Interplanetary"
   },
   {
-    "name": "Mule",
-    "manufacturer": "Drake Interplanetary",
-    "status": "flight-ready"
+    "name": "MULE",
+    "manufacturer": "Drake Interplanetary"
   },
   {
     "name": "Vulture",
-    "manufacturer": "Drake Interplanetary",
-    "status": "flight-ready"
+    "manufacturer": "Drake Interplanetary"
   },
   {
     "name": "Blade",
-    "manufacturer": "Esperia",
-    "status": "flight-ready"
+    "manufacturer": "Esperia Incorporation"
   },
   {
     "name": "Glaive",
-    "manufacturer": "Esperia",
-    "status": "flight-ready"
+    "manufacturer": "Esperia Incorporation"
   },
   {
     "name": "Prowler",
-    "manufacturer": "Esperia",
-    "status": "flight-ready"
+    "manufacturer": "Esperia Incorporation"
   },
   {
     "name": "Prowler Utility",
-    "manufacturer": "Esperia",
-    "status": "flight-ready"
+    "manufacturer": "Esperia Incorporation"
   },
   {
     "name": "Stinger",
-    "manufacturer": "Esperia",
-    "status": "flight-ready"
+    "manufacturer": "Esperia Incorporation"
   },
   {
     "name": "Talon",
-    "manufacturer": "Esperia",
-    "status": "flight-ready"
+    "manufacturer": "Esperia Incorporation"
   },
   {
     "name": "Talon Shrike",
-    "manufacturer": "Esperia",
-    "status": "flight-ready"
+    "manufacturer": "Esperia Incorporation"
   },
   {
     "name": "Syulen",
-    "manufacturer": "Gatac Manufacture",
-    "status": "flight-ready"
+    "manufacturer": "Gatac Manufacture"
   },
   {
     "name": "Shiv",
-    "manufacturer": "Grey's Market",
-    "status": "flight-ready"
+    "manufacturer": "Grey's Market"
   },
   {
     "name": "MDC",
-    "manufacturer": "Greycat Industrial",
-    "status": "flight-ready"
+    "manufacturer": "Greycat Industrial"
   },
   {
     "name": "MTC",
-    "manufacturer": "Greycat Industrial",
-    "status": "flight-ready"
+    "manufacturer": "Greycat Industrial"
   },
   {
     "name": "PTV",
-    "manufacturer": "Greycat Industrial",
-    "status": "flight-ready"
+    "manufacturer": "Greycat Industrial"
   },
   {
     "name": "ROC",
-    "manufacturer": "Greycat Industrial",
-    "status": "flight-ready"
+    "manufacturer": "Greycat Industrial"
   },
   {
     "name": "ROC-DS",
-    "manufacturer": "Greycat Industrial",
-    "status": "flight-ready"
+    "manufacturer": "Greycat Industrial"
   },
   {
     "name": "STV",
-    "manufacturer": "Greycat Industrial",
-    "status": "flight-ready"
+    "manufacturer": "Greycat Industrial"
   },
   {
     "name": "UTV",
-    "manufacturer": "Greycat Industrial",
-    "status": "flight-ready"
+    "manufacturer": "Greycat Industrial"
   },
   {
     "name": "L-21 Wolf",
-    "manufacturer": "Kruger Intergalactic",
-    "status": "flight-ready"
+    "manufacturer": "Kruger Intergalactic"
   },
   {
     "name": "L-22 Alpha Wolf",
-    "manufacturer": "Kruger Intergalactic",
-    "status": "flight-ready"
+    "manufacturer": "Kruger Intergalactic"
   },
   {
     "name": "P-52 Merlin",
-    "manufacturer": "Kruger Intergalactic",
-    "status": "flight-ready"
+    "manufacturer": "Kruger Intergalactic"
   },
   {
     "name": "P-72 Archimedes",
-    "manufacturer": "Kruger Intergalactic",
-    "status": "flight-ready"
+    "manufacturer": "Kruger Intergalactic"
   },
   {
     "name": "P-72 Archimedes Emerald",
-    "manufacturer": "Kruger Intergalactic",
-    "status": "flight-ready"
+    "manufacturer": "Kruger Intergalactic"
   },
   {
     "name": "Fury",
-    "manufacturer": "Mirai",
-    "status": "flight-ready"
+    "manufacturer": "Mirai"
   },
   {
     "name": "Fury LX",
-    "manufacturer": "Mirai",
-    "status": "flight-ready"
+    "manufacturer": "Mirai"
   },
   {
     "name": "Fury MX",
-    "manufacturer": "Mirai",
-    "status": "flight-ready"
+    "manufacturer": "Mirai"
   },
   {
     "name": "Guardian",
-    "manufacturer": "Mirai",
-    "status": "flight-ready"
+    "manufacturer": "Mirai"
   },
   {
     "name": "Guardian MX",
-    "manufacturer": "Mirai",
-    "status": "flight-ready"
+    "manufacturer": "Mirai"
   },
   {
     "name": "Guardian QI",
-    "manufacturer": "Mirai",
-    "status": "flight-ready"
+    "manufacturer": "Mirai"
   },
   {
     "name": "Pulse",
-    "manufacturer": "Mirai",
-    "status": "flight-ready"
+    "manufacturer": "Mirai"
   },
   {
     "name": "Pulse LX",
-    "manufacturer": "Mirai",
-    "status": "flight-ready"
+    "manufacturer": "Mirai"
   },
   {
     "name": "Razor",
-    "manufacturer": "Mirai",
-    "status": "flight-ready"
+    "manufacturer": "Mirai"
   },
   {
     "name": "Razor EX",
-    "manufacturer": "Mirai",
-    "status": "flight-ready"
+    "manufacturer": "Mirai"
   },
   {
     "name": "Razor LX",
-    "manufacturer": "Mirai",
-    "status": "flight-ready"
+    "manufacturer": "Mirai"
   },
   {
     "name": "Fortune",
-    "manufacturer": "MISC",
-    "status": "flight-ready"
+    "manufacturer": "Musashi Industrial and Starflight Concern"
   },
   {
     "name": "Freelancer",
-    "manufacturer": "MISC",
-    "status": "flight-ready"
+    "manufacturer": "Musashi Industrial and Starflight Concern"
   },
   {
     "name": "Freelancer DUR",
-    "manufacturer": "MISC",
-    "status": "flight-ready"
+    "manufacturer": "Musashi Industrial and Starflight Concern"
   },
   {
     "name": "Freelancer MAX",
-    "manufacturer": "MISC",
-    "status": "flight-ready"
+    "manufacturer": "Musashi Industrial and Starflight Concern"
   },
   {
     "name": "Freelancer MIS",
-    "manufacturer": "MISC",
-    "status": "flight-ready"
+    "manufacturer": "Musashi Industrial and Starflight Concern"
   },
   {
     "name": "Hull A",
-    "manufacturer": "MISC",
-    "status": "flight-ready"
+    "manufacturer": "Musashi Industrial and Starflight Concern"
   },
   {
     "name": "Hull B",
-    "manufacturer": "MISC",
-    "status": "flight-ready"
+    "manufacturer": "Musashi Industrial and Starflight Concern"
   },
   {
     "name": "Hull C",
-    "manufacturer": "MISC",
-    "status": "flight-ready"
+    "manufacturer": "Musashi Industrial and Starflight Concern"
   },
   {
     "name": "Prospector",
-    "manufacturer": "MISC",
-    "status": "flight-ready"
+    "manufacturer": "Musashi Industrial and Starflight Concern"
   },
   {
     "name": "Reliant Kore",
-    "manufacturer": "MISC",
-    "status": "flight-ready"
+    "manufacturer": "Musashi Industrial and Starflight Concern"
   },
   {
     "name": "Reliant Mako",
-    "manufacturer": "MISC",
-    "status": "flight-ready"
+    "manufacturer": "Musashi Industrial and Starflight Concern"
   },
   {
     "name": "Reliant Sen",
-    "manufacturer": "MISC",
-    "status": "flight-ready"
+    "manufacturer": "Musashi Industrial and Starflight Concern"
   },
   {
     "name": "Reliant Tana",
-    "manufacturer": "MISC",
-    "status": "flight-ready"
+    "manufacturer": "Musashi Industrial and Starflight Concern"
   },
   {
     "name": "Starfarer",
-    "manufacturer": "MISC",
-    "status": "flight-ready"
+    "manufacturer": "Musashi Industrial and Starflight Concern"
   },
   {
     "name": "Starfarer Gemini",
-    "manufacturer": "MISC",
-    "status": "flight-ready"
+    "manufacturer": "Musashi Industrial and Starflight Concern"
   },
   {
     "name": "Starlancer MAX",
-    "manufacturer": "MISC",
-    "status": "flight-ready"
+    "manufacturer": "Musashi Industrial and Starflight Concern"
   },
   {
     "name": "Starlancer TAC",
-    "manufacturer": "MISC",
-    "status": "flight-ready"
+    "manufacturer": "Musashi Industrial and Starflight Concern"
   },
   {
     "name": "100i",
-    "manufacturer": "Origin Jumpworks",
-    "status": "flight-ready"
+    "manufacturer": "Origin Jumpworks"
   },
   {
     "name": "125a",
-    "manufacturer": "Origin Jumpworks",
-    "status": "flight-ready"
+    "manufacturer": "Origin Jumpworks"
   },
   {
     "name": "135c",
-    "manufacturer": "Origin Jumpworks",
-    "status": "flight-ready"
+    "manufacturer": "Origin Jumpworks"
   },
   {
     "name": "300i",
-    "manufacturer": "Origin Jumpworks",
-    "status": "flight-ready"
+    "manufacturer": "Origin Jumpworks"
   },
   {
     "name": "315p",
-    "manufacturer": "Origin Jumpworks",
-    "status": "flight-ready"
+    "manufacturer": "Origin Jumpworks"
   },
   {
     "name": "325a",
-    "manufacturer": "Origin Jumpworks",
-    "status": "flight-ready"
+    "manufacturer": "Origin Jumpworks"
   },
   {
     "name": "350r",
-    "manufacturer": "Origin Jumpworks",
-    "status": "flight-ready"
+    "manufacturer": "Origin Jumpworks"
   },
   {
     "name": "400i",
-    "manufacturer": "Origin Jumpworks",
-    "status": "flight-ready"
+    "manufacturer": "Origin Jumpworks"
+  },
+  {
+    "name": "600i Executive Edition",
+    "manufacturer": "Origin Jumpworks"
   },
   {
     "name": "600i Explorer",
-    "manufacturer": "Origin Jumpworks",
-    "status": "flight-ready"
+    "manufacturer": "Origin Jumpworks"
   },
   {
     "name": "600i Touring",
-    "manufacturer": "Origin Jumpworks",
-    "status": "flight-ready"
+    "manufacturer": "Origin Jumpworks"
   },
   {
     "name": "85X",
-    "manufacturer": "Origin Jumpworks",
-    "status": "flight-ready"
+    "manufacturer": "Origin Jumpworks"
   },
   {
     "name": "890 Jump",
-    "manufacturer": "Origin Jumpworks",
-    "status": "flight-ready"
+    "manufacturer": "Origin Jumpworks"
   },
   {
     "name": "M50",
-    "manufacturer": "Origin Jumpworks",
-    "status": "flight-ready"
+    "manufacturer": "Origin Jumpworks"
   },
   {
     "name": "X1",
-    "manufacturer": "Origin Jumpworks",
-    "status": "flight-ready"
+    "manufacturer": "Origin Jumpworks"
   },
   {
     "name": "X1 Force",
-    "manufacturer": "Origin Jumpworks",
-    "status": "flight-ready"
+    "manufacturer": "Origin Jumpworks"
   },
   {
     "name": "X1 Velocity",
-    "manufacturer": "Origin Jumpworks",
-    "status": "flight-ready"
+    "manufacturer": "Origin Jumpworks"
   },
   {
     "name": "Apollo Medivac",
-    "manufacturer": "Roberts Space Industries",
-    "status": "flight-ready"
+    "manufacturer": "Roberts Space Industries"
   },
   {
     "name": "Apollo Triage",
-    "manufacturer": "Roberts Space Industries",
-    "status": "flight-ready"
+    "manufacturer": "Roberts Space Industries"
   },
   {
     "name": "Aurora Mk I CL",
-    "manufacturer": "Roberts Space Industries",
-    "status": "flight-ready"
+    "manufacturer": "Roberts Space Industries"
   },
   {
     "name": "Aurora Mk I ES",
-    "manufacturer": "Roberts Space Industries",
-    "status": "flight-ready"
+    "manufacturer": "Roberts Space Industries"
   },
   {
     "name": "Aurora Mk I LN",
-    "manufacturer": "Roberts Space Industries",
-    "status": "flight-ready"
+    "manufacturer": "Roberts Space Industries"
   },
   {
     "name": "Aurora Mk I LX",
-    "manufacturer": "Roberts Space Industries",
-    "status": "flight-ready"
+    "manufacturer": "Roberts Space Industries"
   },
   {
     "name": "Aurora Mk I MR",
-    "manufacturer": "Roberts Space Industries",
-    "status": "flight-ready"
+    "manufacturer": "Roberts Space Industries"
   },
   {
     "name": "Aurora Mk I SE",
-    "manufacturer": "Roberts Space Industries",
-    "status": "flight-ready"
+    "manufacturer": "Roberts Space Industries"
   },
   {
     "name": "Aurora Mk II",
-    "manufacturer": "Roberts Space Industries",
-    "status": "flight-ready"
+    "manufacturer": "Roberts Space Industries"
   },
   {
     "name": "Constellation Andromeda",
-    "manufacturer": "Roberts Space Industries",
-    "status": "flight-ready"
+    "manufacturer": "Roberts Space Industries"
   },
   {
     "name": "Constellation Aquila",
-    "manufacturer": "Roberts Space Industries",
-    "status": "flight-ready"
+    "manufacturer": "Roberts Space Industries"
   },
   {
     "name": "Constellation Phoenix",
-    "manufacturer": "Roberts Space Industries",
-    "status": "flight-ready"
+    "manufacturer": "Roberts Space Industries"
   },
   {
     "name": "Constellation Phoenix Emerald",
-    "manufacturer": "Roberts Space Industries",
-    "status": "flight-ready"
+    "manufacturer": "Roberts Space Industries"
   },
   {
     "name": "Constellation Taurus",
-    "manufacturer": "Roberts Space Industries",
-    "status": "flight-ready"
+    "manufacturer": "Roberts Space Industries"
   },
   {
     "name": "Hermes",
-    "manufacturer": "Roberts Space Industries",
-    "status": "flight-ready"
+    "manufacturer": "Roberts Space Industries"
   },
   {
     "name": "Lynx",
-    "manufacturer": "Roberts Space Industries",
-    "status": "flight-ready"
+    "manufacturer": "Roberts Space Industries"
   },
   {
     "name": "Mantis",
-    "manufacturer": "Roberts Space Industries",
-    "status": "flight-ready"
+    "manufacturer": "Roberts Space Industries"
   },
   {
     "name": "Meteor",
-    "manufacturer": "Roberts Space Industries",
-    "status": "flight-ready"
+    "manufacturer": "Roberts Space Industries"
   },
   {
     "name": "Perseus",
-    "manufacturer": "Roberts Space Industries",
-    "status": "flight-ready"
+    "manufacturer": "Roberts Space Industries"
   },
   {
     "name": "Polaris",
-    "manufacturer": "Roberts Space Industries",
-    "status": "flight-ready"
+    "manufacturer": "Roberts Space Industries"
   },
   {
     "name": "Salvation",
-    "manufacturer": "Roberts Space Industries",
-    "status": "flight-ready"
+    "manufacturer": "Roberts Space Industries"
   },
   {
     "name": "Scorpius",
-    "manufacturer": "Roberts Space Industries",
-    "status": "flight-ready"
+    "manufacturer": "Roberts Space Industries"
   },
   {
     "name": "Scorpius Antares",
-    "manufacturer": "Roberts Space Industries",
-    "status": "flight-ready"
+    "manufacturer": "Roberts Space Industries"
   },
   {
     "name": "Ursa",
-    "manufacturer": "Roberts Space Industries",
-    "status": "flight-ready"
+    "manufacturer": "Roberts Space Industries"
   },
   {
     "name": "Ursa Fortuna",
-    "manufacturer": "Roberts Space Industries",
-    "status": "flight-ready"
+    "manufacturer": "Roberts Space Industries"
   },
   {
     "name": "Ursa Medivac",
-    "manufacturer": "Roberts Space Industries",
-    "status": "flight-ready"
+    "manufacturer": "Roberts Space Industries"
   },
   {
     "name": "Zeus Mk II CL",
-    "manufacturer": "Roberts Space Industries",
-    "status": "flight-ready"
+    "manufacturer": "Roberts Space Industries"
   },
   {
     "name": "Zeus Mk II ES",
-    "manufacturer": "Roberts Space Industries",
-    "status": "flight-ready"
+    "manufacturer": "Roberts Space Industries"
   },
   {
     "name": "Cyclone",
-    "manufacturer": "Tumbril",
-    "status": "flight-ready"
+    "manufacturer": "Tumbril Land Systems"
   },
   {
     "name": "Cyclone AA",
-    "manufacturer": "Tumbril",
-    "status": "flight-ready"
+    "manufacturer": "Tumbril Land Systems"
   },
   {
     "name": "Cyclone MT",
-    "manufacturer": "Tumbril",
-    "status": "flight-ready"
+    "manufacturer": "Tumbril Land Systems"
   },
   {
     "name": "Cyclone RC",
-    "manufacturer": "Tumbril",
-    "status": "flight-ready"
+    "manufacturer": "Tumbril Land Systems"
   },
   {
     "name": "Cyclone RN",
-    "manufacturer": "Tumbril",
-    "status": "flight-ready"
+    "manufacturer": "Tumbril Land Systems"
   },
   {
     "name": "Cyclone TR",
-    "manufacturer": "Tumbril",
-    "status": "flight-ready"
+    "manufacturer": "Tumbril Land Systems"
   },
   {
-    "name": "Nova",
-    "manufacturer": "Tumbril",
-    "status": "flight-ready"
+    "name": "Nova Tank",
+    "manufacturer": "Tumbril Land Systems"
   },
   {
     "name": "Storm",
-    "manufacturer": "Tumbril",
-    "status": "flight-ready"
+    "manufacturer": "Tumbril Land Systems"
   },
   {
     "name": "Storm AA",
-    "manufacturer": "Tumbril",
-    "status": "flight-ready"
-  },
-  {
-    "name": "Scythe",
-    "manufacturer": "Vanduul",
-    "status": "flight-ready"
+    "manufacturer": "Tumbril Land Systems"
   }
-];
+];;;;
+// Backwards-compat alias — older code in this file still
+// references RSI_SHIPS as the master ship list. SPViewer's
+// dataset is now authoritative; keep the old name pointing at
+// it so existing memos do not break.
+const RSI_SHIPS = SPVIEWER_SHIPS;
 
 // Auto-generated from .claude/ship-components.csv
 // Star Citizen ship default-component table sourced from
@@ -15408,6 +15186,20 @@ export default function StarCitizenSalvageGuideWebsite() {
   // detail cards. Keyed by row.head ("Abrade" | "Trawler" | "Cinch").
   // Empty string means "Any system" — show every location.
   const [scraperSystemFilter, setScraperSystemFilter] = useState({});
+  // Per-scraper-module power level slider (4.8+). Range 500–1000:
+  //   500  → +0% modifier
+  //   1000 → +20% modifier on Speed / Radius / Efficiency
+  // Default 500 = baseline behavior. Hidden until the live patch is
+  // 4.8 or newer (gated downstream by isPatchAtLeast).
+  const [scraperBoosts, setScraperBoosts] = useState({});
+  const setScraperBoost = (head, val) =>
+    setScraperBoosts((s) => ({ ...s, [head]: Number(val) || 500 }));
+  const scraperBoostFor = (head) => {
+    const v = Number(scraperBoosts[head]);
+    return Number.isFinite(v) ? Math.max(500, Math.min(1000, v)) : 500;
+  };
+  // Modifier = 0..0.2 linear from 500..1000.
+  const scraperBoostMultiplier = (head) => (scraperBoostFor(head) - 500) / 500 * 0.20;
   const [selectedSellMaterial, setSelectedSellMaterial] = useState("");
   const [estimatePlayerName, setEstimatePlayerName] = useState("");
   const [selectedSellPointName, setSelectedSellPointName] = useState("");
@@ -15917,11 +15709,12 @@ export default function StarCitizenSalvageGuideWebsite() {
     const v = patchStatus?.version;
     return PENDING_SHIPS.filter((s) => isPatchAtLeast(v, s.sinceVersion));
   }, [PENDING_SHIPS, patchStatus]);
-  // Manufacturer-by-name map sourced from the canonical RSI ship
-  // matrix dump, plus any pending ships that have gone live.
+  // Manufacturer-by-name map sourced exclusively from SPVIEWER_SHIPS
+  // (upstream: api.uexcorp.uk/2.0/vehicles), plus any pending ships
+  // that have gone live for the current patch.
   const RSI_SHIP_MANUFACTURER_BY_NAME = useMemo(() => {
     const map = new Map();
-    for (const r of RSI_SHIPS) {
+    for (const r of SPVIEWER_SHIPS) {
       if (r && r.name) map.set(r.name, r.manufacturer || "Other");
     }
     for (const r of livePendingShips) {
@@ -15931,48 +15724,42 @@ export default function StarCitizenSalvageGuideWebsite() {
   }, [livePendingShips]);
   const getShipManufacturer = (shipName) => {
     if (!shipName) return "Other";
-    const exact = RSI_SHIP_MANUFACTURER_BY_NAME.get(shipName);
-    if (exact) return exact;
-    const lower = shipName.toLowerCase();
-    for (const [maker, kws] of Object.entries(SHIP_MANUFACTURER_KEYWORDS)) {
-      for (const kw of kws) {
-        if (lower.includes(kw.toLowerCase())) return maker;
-      }
-    }
-    return "Other";
+    return RSI_SHIP_MANUFACTURER_BY_NAME.get(shipName) || "Other";
   };
-  // Master list of flyable Star Citizen ships, sourced from the
-  // RSI ship matrix (robertsspaceindustries.com/ship-matrix).
-  // SHIP_COMPONENTS entries that aren't in RSI_SHIPS (legacy names,
-  // variants the matrix doesn't expose) are merged in so the Crew
-  // Salvage picker covers every vehicle the site knows.
+  // Master list of flyable Star Citizen ships, sourced exclusively
+  // from SPViewer.eu's vehicle dataset (upstream:
+  // https://api.uexcorp.uk/2.0/vehicles, regenerated via
+  // .claude/build-spviewer-ships.cjs into SPVIEWER_SHIPS). Concept
+  // ships are dropped at build time. The picker only shows what
+  // SPViewer ships — no hand-curated overrides, no SHIP_COMPONENTS
+  // fallback, no RSI matrix variants — so the list stays in lockstep
+  // with the upstream community dataset.
   // Memoized so the alphabetical sort doesn't re-run every render.
   const allKnownShips = useMemo(() => {
     const set = new Set();
-    for (const r of RSI_SHIPS) {
+    for (const r of SPVIEWER_SHIPS) {
       if (r && r.name) set.add(r.name);
-    }
-    for (const c of SHIP_COMPONENTS) {
-      if (c && c.ship) set.add(c.ship);
     }
     for (const p of livePendingShips) {
       if (p && p.name) set.add(p.name);
     }
     return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [livePendingShips]);
-  // Sorted list of every manufacturer that has at least one ship
-  // in allKnownShips, plus "Other" as a catch-all for anything that
-  // didn't match a keyword.
+  // Sorted list of every manufacturer that ships in SPVIEWER_SHIPS
+  // (plus any pending-patch manufacturers that have gone live).
+  // Drives the manufacturer-filter dropdown on the Ships Salvaged
+  // picker. No "Other" bucket — every entry maps to a real
+  // SPViewer-tagged company.
   const allKnownManufacturers = useMemo(() => {
     const set = new Set();
-    for (const ship of allKnownShips) set.add(getShipManufacturer(ship));
-    return Array.from(set).sort((a, b) => {
-      if (a === "Other") return 1;
-      if (b === "Other") return -1;
-      return a.localeCompare(b);
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allKnownShips, SHIP_MANUFACTURER_KEYWORDS]);
+    for (const r of SPVIEWER_SHIPS) {
+      if (r && r.manufacturer) set.add(r.manufacturer);
+    }
+    for (const p of livePendingShips) {
+      if (p && p.manufacturer) set.add(p.manufacturer);
+    }
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [livePendingShips]);
   // Full list of Star Citizen patches with resolved [from, to) windows.
   // Loaded from /api/patches when the user logs in. Powers the
   // per-patch options in the Clear History dropdown so users can
@@ -20596,12 +20383,18 @@ export default function StarCitizenSalvageGuideWebsite() {
                 </tr>
               </thead>
               <tbody>
-                {salvageHeads.map((row) => (
+                {salvageHeads.map((row) => {
+                  const boostActive = isPatchAtLeast(patchStatus?.version, "4.8");
+                  const mult = boostActive ? 1 + scraperBoostMultiplier(row.head) : 1;
+                  const speed = row.speedMultiplier * mult;
+                  const radius = row.radius * mult;
+                  const efficiency = row.efficiency * mult;
+                  return (
                   <tr key={row.head} className="border-t border-slate-800 bg-slate-900/40">
                     <td className="px-3 py-3 font-bold text-white">{row.head}</td>
-                    <td className="px-3 py-3 text-center text-amber-300 font-bold">{row.speedMultiplier.toFixed(1)}×</td>
-                    <td className="px-3 py-3 text-center text-cyan-300">{row.radius.toFixed(1)} m</td>
-                    <td className="px-3 py-3 text-center text-slate-300">{row.efficiency}</td>
+                    <td className="px-3 py-3 text-center text-amber-300 font-bold">{speed.toFixed(1)}×</td>
+                    <td className="px-3 py-3 text-center text-cyan-300">{radius.toFixed(2)} m</td>
+                    <td className="px-3 py-3 text-center text-slate-300">{Math.round(efficiency)}</td>
                     <td className="px-3 py-3 text-center text-slate-300">{row.powerDraw.toFixed(2)}</td>
                     <td className="px-3 py-3 text-right text-emerald-300 font-bold">
                       {(() => {
@@ -20617,7 +20410,8 @@ export default function StarCitizenSalvageGuideWebsite() {
                       })()}
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -20658,6 +20452,55 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <span className="rounded-lg border border-cyan-500/25 bg-cyan-500/10 px-2.5 py-1 text-xs font-semibold text-cyan-300 shrink-0">{row.bestFor}</span>
                   </div>
                   <p className="mt-2 text-xs text-slate-400 leading-relaxed">{row.description}</p>
+
+                  {/* Quality-level slider — 4.8+ only. 500 → +0%,
+                      1000 → +20% on Speed / Radius / Efficiency.
+                      Reflects in the comparison table above as the
+                      slider moves. */}
+                  {isPatchAtLeast(patchStatus?.version, "4.8") && (() => {
+                    const slider = scraperBoostFor(row.head);
+                    const pct = ((slider - 500) / 500 * 20).toFixed(1);
+                    return (
+                      <div className="mt-3 rounded-xl border border-cyan-500/25 bg-cyan-500/5 p-3">
+                        <div className="flex items-center justify-between text-[10px] uppercase tracking-wider">
+                          <span className="text-cyan-300/80">Quality Level</span>
+                          <span className="font-mono text-cyan-200">
+                            {slider} · +{pct}% Speed / Radius / Efficiency
+                          </span>
+                        </div>
+                        <div className="mt-1.5 flex items-center gap-2">
+                          <input
+                            type="range"
+                            min={500}
+                            max={1000}
+                            step={10}
+                            value={slider}
+                            onChange={(e) => setScraperBoost(row.head, e.target.value)}
+                            className="w-1/3 accent-cyan-400"
+                            aria-label={`${row.head} quality level`}
+                          />
+                          <input
+                            type="number"
+                            min={500}
+                            max={1000}
+                            step={10}
+                            value={slider}
+                            onChange={(e) => {
+                              const n = Number(e.target.value);
+                              if (!Number.isFinite(n)) return;
+                              setScraperBoost(row.head, Math.max(500, Math.min(1000, n)));
+                            }}
+                            className="w-20 rounded-md border border-slate-700 bg-slate-900/70 px-2 py-1 text-xs font-mono text-cyan-200 focus:border-cyan-500/60 focus:outline-none"
+                            aria-label={`${row.head} quality level numeric`}
+                          />
+                        </div>
+                        <div className="mt-0.5 flex w-1/3 justify-between text-[10px] text-slate-500">
+                          <span>500 · base</span>
+                          <span>1000 · +20%</span>
+                        </div>
+                      </div>
+                    );
+                  })()}
 
                   {allLocs.length > 0 && (
                     <div className="mt-3 border-t border-slate-800 pt-3">
@@ -25483,7 +25326,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <li><strong className="text-slate-200">Discord</strong> — OAuth login provider. Discord knows you've authorized this app. If you opt in to refinery-completion DMs, we deliver those messages through Discord's API.</li>
                     <li><strong className="text-slate-200">Anthropic</strong> — when you upload a screenshot (including a crop you select before submitting), the image is sent once to Anthropic's Claude API for parsing. Under Anthropic's commercial terms, API inputs are not used to train models and are not retained beyond the request.</li>
                     <li><strong className="text-slate-200">Roberts Space Industries</strong> — when you click "Verify Now" on your RSI handle, our server fetches your public RSI profile page (<code className="rounded bg-slate-800 px-1 text-cyan-200">robertsspaceindustries.com/citizens/&#123;handle&#125;</code>). RSI sees a request from our server's IP address; we do not send any of your data to RSI.</li>
-                    <li><strong className="text-slate-200">Cloud Imperium Games / scmdb.net / finder.cstone.space</strong> — the Missions, Ship Details, and Scraper Module Performance panels render data scraped from these public Star Citizen reference sites. Requests run server-side from our infrastructure (or are baked into the build); your browser does not contact those sites directly because of you using SCSalvager.net.</li>
+                    <li><strong className="text-slate-200">Cloud Imperium Games / scmdb.net / finder.cstone.space / spviewer.eu / uexcorp.space</strong> — the Missions, Ship Details, Scraper Module Performance, and Crew Salvage panels render data sourced from these public Star Citizen reference sites. Requests run server-side from our infrastructure (or are baked into the build); your browser does not contact those sites directly because of you using SCSalvager.net.</li>
                     <li><strong className="text-slate-200">Upstash</strong> — operates the Redis instance where your account data lives.</li>
                     <li><strong className="text-slate-200">Vercel</strong> — hosts the application and serverless functions. Server logs may include standard request metadata (IP, user agent, path) plus diagnostic OAuth logs (request host, redirect URI, presence flags for cookies — never the cookie values themselves).</li>
                   </ul>
@@ -25634,7 +25477,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                 <section>
                   <h4 className="text-cyan-300 text-xs font-semibold uppercase tracking-wider">No warranties, no liability</h4>
                   <ul className="mt-2 list-disc pl-5 space-y-1 text-slate-400">
-                    <li>All numbers on the site — refinery yields, sell-point prices, profit estimates, completion times, mission rewards, ship aUEC values, scraper-module pricing — are <strong className="text-slate-200">best-effort</strong> values pulled from community reports, patch data, and public Star Citizen reference sites (scmdb.net, finder.cstone.space). They are not authoritative; verify in-game before making decisions you can't undo.</li>
+                    <li>All numbers on the site — refinery yields, sell-point prices, profit estimates, completion times, mission rewards, ship aUEC values, scraper-module pricing — are <strong className="text-slate-200">best-effort</strong> values pulled from community reports, patch data, and public Star Citizen reference sites (scmdb.net, finder.cstone.space, spviewer.eu, uexcorp.space). They are not authoritative; verify in-game before making decisions you can't undo.</li>
                     <li>We are <strong className="text-slate-200">not liable</strong> for losses you experience from relying on the site, including (but not limited to) bad price estimates, missed refinery pickups, lost ledger data during outages, or DMs that didn't deliver.</li>
                     <li>SCSalvager.net is a Star Citizen helper tool. It is not financial, legal, or professional advice of any kind.</li>
                   </ul>
@@ -25876,8 +25719,9 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <li><strong>Crew Salvage</strong>: build multi-pilot runs from the Ledger. Pick Reclaimer or Moth, assign every station (Pilot / Claw Operator on Reclaimer only / Salvage Operators 1–2 Reclaimer / 1–3 Moth / Cargo Operator), pick salvaged ships with quantity steppers, manufacturer + name filters, Clear Search Filters / Clear ships shortcuts.</li>
                     <li>Crew Salvage three SCU buckets — <strong>Construction Salvage</strong> (Reclaimer-only), <strong>Construction Pieces</strong> (Moth-only), <strong>Recycled Material Composite</strong> (1:1, no refinery). Refinery + Sales Calculator + Split Calculator produce projected take per crew share.</li>
                     <li>Save Session → in-flight session card in the left sidebar (grouped by day, newest first); click to expand. Edit pops back into the draft. <strong>Mark Complete</strong> locks the session and writes a Crew Salvage row into Patch History (cyan pill).</li>
-                    <li>Ships Salvaged picker pulls from the live RSI Ship Matrix — every flight-ready ship and vehicle in the catalog (219 entries). Concept ships hidden until flight-ready.</li>
+                    <li>Ships Salvaged picker now sources exclusively from the <strong>SPViewer.eu</strong> vehicle dataset (upstream: api.uexcorp.uk/2.0/vehicles) — 217 player-pilotable ships across 18 manufacturers. Concept ships, NPC-only Vanduul Clans hulls, Retaliator Cargo / Torpedo modules, and the Retaliator Bomber loadout variant are filtered out. Manufacturer dropdown drives off the same dataset.</li>
                     <li>Six <strong>patch 4.8</strong> ships pre-staged in the picker, gated on the live patch version: Drake Ironclad, Drake Ironclad Assault, Drake Pitbull, MISC Starlite, Aegis Tiburon, Kruger Intergalactic Stingray. Auto-appear once 4.8 goes live.</li>
+                    <li>Home → Scraper Module Performance: each module's detail card now ships with a <strong>Quality Level</strong> slider (500 → 1000) that lights up on the patch 4.8 drop. 33% width with a paired numeric input, comparison-table Speed / Radius / Efficiency columns update live (linear 0–20% boost). Gated on the live patch version.</li>
                   </ul>
                   <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Changes</p>
                   <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">

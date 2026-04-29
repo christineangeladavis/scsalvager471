@@ -23,6 +23,12 @@ Added:
 - Mission table system pill no longer falls back to "Unknown". Resolution chain: explicit systems → location-resolved system → debugName scan → "Unknown".
 - New **Rough & Ready** faction option in the Missions filter dropdown — covers the `RR_ Wrecked Ships for Sale` family that scmdb.net ships with `factionGuid: null`.
 - Mission table per-row description line removed for compactness — full briefing still in the popup.
+- Ledger restructured into three sub-tabs: **Refinery & Sell Orders** (existing forms + Recent Sales), **Patch History** (per-patch entries + clear scopes + dropdown), and a brand-new **Crew Salvage** page.
+- **Crew Salvage**: build multi-pilot salvage runs from the Ledger tab. Pick the ship (Reclaimer or Moth) and assign each station to a crew member (Pilot, Claw Operator on Reclaimer only, Salvage Operators 1–2 on Reclaimer / 1–3 on Moth, Cargo Operator). Multi-select Ships Salvaged with per-ship quantity steppers, manufacturer dropdown + name search + Clear Search Filters / Clear ships buttons. Total Salvage SCU running total at the top.
+- Crew Salvage three SCU buckets — **Construction Salvage** (Reclaimer-only), **Construction Pieces** (Moth-only), **Recycled Material Composite** (always shown, 1:1 sale ratio, no refinery). Refinery + Sales Calculator computes per-material refined SCU, best aUEC/SCU from the site's known sell points, total refinery cost, and net projected sale. Split Calculator divides total aUEC by crew count for per-share take.
+- Crew Salvage sessions: Save Session → in-flight session card in the left sidebar (grouped by day, newest first); click to expand for full detail. Edit pops back into the draft form; **Mark Complete** locks edits and logs a synthetic *Crew Salvage* row to your Patch History (cyan pill, mission name + total SCU + total aUEC). Recent Sales feed excludes those entries.
+- **Ships Salvaged** picker pulls from the live RSI Ship Matrix (`robertsspaceindustries.com/ship-matrix`) — every flight-ready ship and vehicle in the catalog (219 entries). Concept ships hidden until they go flight-ready.
+- Six **patch 4.8** ships pre-staged in the picker, gated on the live patch version: Drake Ironclad, Drake Ironclad Assault, Drake Pitbull, MISC Starlite, Aegis Tiburon, Kruger Intergalactic Stingray. Auto-appear once 4.8 goes live; no separate code push needed.
 
 Changes:
 - Top Salvagers leaderboard now ranks strictly by **Total SCU Refined**. Profit-only activity (e.g. mission settlements without any refinery work) no longer qualifies a user for the top 5.

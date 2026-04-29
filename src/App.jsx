@@ -2223,6 +2223,1107 @@ const LATEST_WHATSNEW_VERSION = "v2.7.0";
 // (e.g. dismiss the "Discord DMs off" nag without enabling DMs).
 const DISMISSED_NOTIFICATIONS_KEY = "scs_dismissed_notifications";
 
+// Auto-generated from .claude/rsi-ship-matrix.json
+// Source: https://robertsspaceindustries.com/ship-matrix/index
+// Re-run .claude/build-rsi-ships.cjs after refreshing the JSON.
+const RSI_SHIPS = [
+  {
+    "name": "Avenger Stalker",
+    "manufacturer": "Aegis Dynamics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Avenger Titan",
+    "manufacturer": "Aegis Dynamics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Avenger Titan Renegade",
+    "manufacturer": "Aegis Dynamics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Avenger Warlock",
+    "manufacturer": "Aegis Dynamics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Eclipse",
+    "manufacturer": "Aegis Dynamics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Gladius",
+    "manufacturer": "Aegis Dynamics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Gladius Pirate Edition",
+    "manufacturer": "Aegis Dynamics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Gladius Valiant",
+    "manufacturer": "Aegis Dynamics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Hammerhead",
+    "manufacturer": "Aegis Dynamics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Hammerhead Best In Show Edition 2949",
+    "manufacturer": "Aegis Dynamics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Idris-M",
+    "manufacturer": "Aegis Dynamics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Idris-P",
+    "manufacturer": "Aegis Dynamics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Reclaimer",
+    "manufacturer": "Aegis Dynamics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Reclaimer Best In Show Edition 2949",
+    "manufacturer": "Aegis Dynamics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Redeemer",
+    "manufacturer": "Aegis Dynamics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Retaliator",
+    "manufacturer": "Aegis Dynamics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Sabre",
+    "manufacturer": "Aegis Dynamics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Sabre Comet",
+    "manufacturer": "Aegis Dynamics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Sabre Firebird",
+    "manufacturer": "Aegis Dynamics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Sabre Peregrine",
+    "manufacturer": "Aegis Dynamics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Sabre Raven",
+    "manufacturer": "Aegis Dynamics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Vanguard Harbinger",
+    "manufacturer": "Aegis Dynamics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Vanguard Hoplite",
+    "manufacturer": "Aegis Dynamics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Vanguard Sentinel",
+    "manufacturer": "Aegis Dynamics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Vanguard Warden",
+    "manufacturer": "Aegis Dynamics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Anvil Ballista Dunestalker",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Anvil Ballista Snowblind",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Arrow",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Asgard",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Ballista",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "C8 Pisces",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "C8R Pisces",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "C8X Pisces Expedition",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Carrack",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Carrack Expedition",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Carrack Expedition w/C8X",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Carrack w/C8X",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Centurion",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "F7A Hornet Mk I",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "F7A Hornet Mk II",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "F7C Hornet Mk I",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "F7C Hornet Mk II",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "F7C Hornet Wildfire Mk I",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "F7C-M Super Hornet Heartseeker Mk I",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "F7C-M Super Hornet Mk I",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "F7C-M Super Hornet Mk II",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "F7C-R Hornet Tracker Mk I",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "F7C-R Hornet Tracker Mk II",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "F7C-S Hornet Ghost Mk I",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "F7C-S Hornet Ghost Mk II",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "F8C Lightning",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "F8C Lightning Executive Edition",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Gladiator",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Hawk",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Hurricane",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Paladin",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Spartan",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Terrapin",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Terrapin Medic",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Valkyrie",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Valkyrie Liberator Edition",
+    "manufacturer": "Anvil Aerospace",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Khartu-Al",
+    "manufacturer": "Aopoa",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Nox",
+    "manufacturer": "Aopoa",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Nox Kue",
+    "manufacturer": "Aopoa",
+    "status": "flight-ready"
+  },
+  {
+    "name": "San'tok.yāi",
+    "manufacturer": "Aopoa",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Argo Mole Carbon Edition",
+    "manufacturer": "Argo Astronautics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Argo Mole Talus Edition",
+    "manufacturer": "Argo Astronautics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "ATLS",
+    "manufacturer": "Argo Astronautics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "ATLS GEO",
+    "manufacturer": "Argo Astronautics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "CSV-SM",
+    "manufacturer": "Argo Astronautics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "MOLE",
+    "manufacturer": "Argo Astronautics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "MOTH",
+    "manufacturer": "Argo Astronautics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "MPUV Cargo",
+    "manufacturer": "Argo Astronautics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "MPUV Personnel",
+    "manufacturer": "Argo Astronautics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "MPUV Tractor",
+    "manufacturer": "Argo Astronautics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "RAFT",
+    "manufacturer": "Argo Astronautics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "SRV",
+    "manufacturer": "Argo Astronautics",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Defender",
+    "manufacturer": "Banu",
+    "status": "flight-ready"
+  },
+  {
+    "name": "HoverQuad",
+    "manufacturer": "Consolidated Outland",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Mustang Alpha",
+    "manufacturer": "Consolidated Outland",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Mustang Alpha Vindicator",
+    "manufacturer": "Consolidated Outland",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Mustang Beta",
+    "manufacturer": "Consolidated Outland",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Mustang Delta",
+    "manufacturer": "Consolidated Outland",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Mustang Gamma",
+    "manufacturer": "Consolidated Outland",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Mustang Omega",
+    "manufacturer": "Consolidated Outland",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Nomad",
+    "manufacturer": "Consolidated Outland",
+    "status": "flight-ready"
+  },
+  {
+    "name": "A1 Spirit",
+    "manufacturer": "Crusader Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "A2 Hercules",
+    "manufacturer": "Crusader Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Ares Inferno",
+    "manufacturer": "Crusader Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Ares Ion",
+    "manufacturer": "Crusader Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "C1 Spirit",
+    "manufacturer": "Crusader Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "C2 Hercules",
+    "manufacturer": "Crusader Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Intrepid",
+    "manufacturer": "Crusader Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "M2 Hercules",
+    "manufacturer": "Crusader Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Mercury",
+    "manufacturer": "Crusader Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Buccaneer",
+    "manufacturer": "Drake Interplanetary",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Caterpillar",
+    "manufacturer": "Drake Interplanetary",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Caterpillar Best In Show Edition 2949",
+    "manufacturer": "Drake Interplanetary",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Caterpillar Pirate Edition",
+    "manufacturer": "Drake Interplanetary",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Clipper",
+    "manufacturer": "Drake Interplanetary",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Corsair",
+    "manufacturer": "Drake Interplanetary",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Cutlass Black",
+    "manufacturer": "Drake Interplanetary",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Cutlass Black Best In Show Edition 2949",
+    "manufacturer": "Drake Interplanetary",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Cutlass Blue",
+    "manufacturer": "Drake Interplanetary",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Cutlass Red",
+    "manufacturer": "Drake Interplanetary",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Cutlass Steel",
+    "manufacturer": "Drake Interplanetary",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Cutter",
+    "manufacturer": "Drake Interplanetary",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Cutter Rambler",
+    "manufacturer": "Drake Interplanetary",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Cutter Scout",
+    "manufacturer": "Drake Interplanetary",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Dragonfly Black",
+    "manufacturer": "Drake Interplanetary",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Dragonfly Yellowjacket",
+    "manufacturer": "Drake Interplanetary",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Golem",
+    "manufacturer": "Drake Interplanetary",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Golem OX",
+    "manufacturer": "Drake Interplanetary",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Herald",
+    "manufacturer": "Drake Interplanetary",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Mule",
+    "manufacturer": "Drake Interplanetary",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Vulture",
+    "manufacturer": "Drake Interplanetary",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Blade",
+    "manufacturer": "Esperia",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Glaive",
+    "manufacturer": "Esperia",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Prowler",
+    "manufacturer": "Esperia",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Prowler Utility",
+    "manufacturer": "Esperia",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Stinger",
+    "manufacturer": "Esperia",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Talon",
+    "manufacturer": "Esperia",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Talon Shrike",
+    "manufacturer": "Esperia",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Syulen",
+    "manufacturer": "Gatac Manufacture",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Shiv",
+    "manufacturer": "Grey's Market",
+    "status": "flight-ready"
+  },
+  {
+    "name": "MDC",
+    "manufacturer": "Greycat Industrial",
+    "status": "flight-ready"
+  },
+  {
+    "name": "MTC",
+    "manufacturer": "Greycat Industrial",
+    "status": "flight-ready"
+  },
+  {
+    "name": "PTV",
+    "manufacturer": "Greycat Industrial",
+    "status": "flight-ready"
+  },
+  {
+    "name": "ROC",
+    "manufacturer": "Greycat Industrial",
+    "status": "flight-ready"
+  },
+  {
+    "name": "ROC-DS",
+    "manufacturer": "Greycat Industrial",
+    "status": "flight-ready"
+  },
+  {
+    "name": "STV",
+    "manufacturer": "Greycat Industrial",
+    "status": "flight-ready"
+  },
+  {
+    "name": "UTV",
+    "manufacturer": "Greycat Industrial",
+    "status": "flight-ready"
+  },
+  {
+    "name": "L-21 Wolf",
+    "manufacturer": "Kruger Intergalactic",
+    "status": "flight-ready"
+  },
+  {
+    "name": "L-22 Alpha Wolf",
+    "manufacturer": "Kruger Intergalactic",
+    "status": "flight-ready"
+  },
+  {
+    "name": "P-52 Merlin",
+    "manufacturer": "Kruger Intergalactic",
+    "status": "flight-ready"
+  },
+  {
+    "name": "P-72 Archimedes",
+    "manufacturer": "Kruger Intergalactic",
+    "status": "flight-ready"
+  },
+  {
+    "name": "P-72 Archimedes Emerald",
+    "manufacturer": "Kruger Intergalactic",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Fury",
+    "manufacturer": "Mirai",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Fury LX",
+    "manufacturer": "Mirai",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Fury MX",
+    "manufacturer": "Mirai",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Guardian",
+    "manufacturer": "Mirai",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Guardian MX",
+    "manufacturer": "Mirai",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Guardian QI",
+    "manufacturer": "Mirai",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Pulse",
+    "manufacturer": "Mirai",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Pulse LX",
+    "manufacturer": "Mirai",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Razor",
+    "manufacturer": "Mirai",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Razor EX",
+    "manufacturer": "Mirai",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Razor LX",
+    "manufacturer": "Mirai",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Fortune",
+    "manufacturer": "MISC",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Freelancer",
+    "manufacturer": "MISC",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Freelancer DUR",
+    "manufacturer": "MISC",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Freelancer MAX",
+    "manufacturer": "MISC",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Freelancer MIS",
+    "manufacturer": "MISC",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Hull A",
+    "manufacturer": "MISC",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Hull B",
+    "manufacturer": "MISC",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Hull C",
+    "manufacturer": "MISC",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Prospector",
+    "manufacturer": "MISC",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Reliant Kore",
+    "manufacturer": "MISC",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Reliant Mako",
+    "manufacturer": "MISC",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Reliant Sen",
+    "manufacturer": "MISC",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Reliant Tana",
+    "manufacturer": "MISC",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Starfarer",
+    "manufacturer": "MISC",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Starfarer Gemini",
+    "manufacturer": "MISC",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Starlancer MAX",
+    "manufacturer": "MISC",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Starlancer TAC",
+    "manufacturer": "MISC",
+    "status": "flight-ready"
+  },
+  {
+    "name": "100i",
+    "manufacturer": "Origin Jumpworks",
+    "status": "flight-ready"
+  },
+  {
+    "name": "125a",
+    "manufacturer": "Origin Jumpworks",
+    "status": "flight-ready"
+  },
+  {
+    "name": "135c",
+    "manufacturer": "Origin Jumpworks",
+    "status": "flight-ready"
+  },
+  {
+    "name": "300i",
+    "manufacturer": "Origin Jumpworks",
+    "status": "flight-ready"
+  },
+  {
+    "name": "315p",
+    "manufacturer": "Origin Jumpworks",
+    "status": "flight-ready"
+  },
+  {
+    "name": "325a",
+    "manufacturer": "Origin Jumpworks",
+    "status": "flight-ready"
+  },
+  {
+    "name": "350r",
+    "manufacturer": "Origin Jumpworks",
+    "status": "flight-ready"
+  },
+  {
+    "name": "400i",
+    "manufacturer": "Origin Jumpworks",
+    "status": "flight-ready"
+  },
+  {
+    "name": "600i Explorer",
+    "manufacturer": "Origin Jumpworks",
+    "status": "flight-ready"
+  },
+  {
+    "name": "600i Touring",
+    "manufacturer": "Origin Jumpworks",
+    "status": "flight-ready"
+  },
+  {
+    "name": "85X",
+    "manufacturer": "Origin Jumpworks",
+    "status": "flight-ready"
+  },
+  {
+    "name": "890 Jump",
+    "manufacturer": "Origin Jumpworks",
+    "status": "flight-ready"
+  },
+  {
+    "name": "M50",
+    "manufacturer": "Origin Jumpworks",
+    "status": "flight-ready"
+  },
+  {
+    "name": "X1",
+    "manufacturer": "Origin Jumpworks",
+    "status": "flight-ready"
+  },
+  {
+    "name": "X1 Force",
+    "manufacturer": "Origin Jumpworks",
+    "status": "flight-ready"
+  },
+  {
+    "name": "X1 Velocity",
+    "manufacturer": "Origin Jumpworks",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Apollo Medivac",
+    "manufacturer": "Roberts Space Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Apollo Triage",
+    "manufacturer": "Roberts Space Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Aurora Mk I CL",
+    "manufacturer": "Roberts Space Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Aurora Mk I ES",
+    "manufacturer": "Roberts Space Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Aurora Mk I LN",
+    "manufacturer": "Roberts Space Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Aurora Mk I LX",
+    "manufacturer": "Roberts Space Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Aurora Mk I MR",
+    "manufacturer": "Roberts Space Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Aurora Mk I SE",
+    "manufacturer": "Roberts Space Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Aurora Mk II",
+    "manufacturer": "Roberts Space Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Constellation Andromeda",
+    "manufacturer": "Roberts Space Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Constellation Aquila",
+    "manufacturer": "Roberts Space Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Constellation Phoenix",
+    "manufacturer": "Roberts Space Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Constellation Phoenix Emerald",
+    "manufacturer": "Roberts Space Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Constellation Taurus",
+    "manufacturer": "Roberts Space Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Hermes",
+    "manufacturer": "Roberts Space Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Lynx",
+    "manufacturer": "Roberts Space Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Mantis",
+    "manufacturer": "Roberts Space Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Meteor",
+    "manufacturer": "Roberts Space Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Perseus",
+    "manufacturer": "Roberts Space Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Polaris",
+    "manufacturer": "Roberts Space Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Salvation",
+    "manufacturer": "Roberts Space Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Scorpius",
+    "manufacturer": "Roberts Space Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Scorpius Antares",
+    "manufacturer": "Roberts Space Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Ursa",
+    "manufacturer": "Roberts Space Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Ursa Fortuna",
+    "manufacturer": "Roberts Space Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Ursa Medivac",
+    "manufacturer": "Roberts Space Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Zeus Mk II CL",
+    "manufacturer": "Roberts Space Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Zeus Mk II ES",
+    "manufacturer": "Roberts Space Industries",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Cyclone",
+    "manufacturer": "Tumbril",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Cyclone AA",
+    "manufacturer": "Tumbril",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Cyclone MT",
+    "manufacturer": "Tumbril",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Cyclone RC",
+    "manufacturer": "Tumbril",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Cyclone RN",
+    "manufacturer": "Tumbril",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Cyclone TR",
+    "manufacturer": "Tumbril",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Nova",
+    "manufacturer": "Tumbril",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Storm",
+    "manufacturer": "Tumbril",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Storm AA",
+    "manufacturer": "Tumbril",
+    "status": "flight-ready"
+  },
+  {
+    "name": "Scythe",
+    "manufacturer": "Vanduul",
+    "status": "flight-ready"
+  }
+];
+
 // Auto-generated from .claude/ship-components.csv
 // Star Citizen ship default-component table sourced from
 // the public Google Sheet
@@ -14328,6 +15429,182 @@ export default function StarCitizenSalvageGuideWebsite() {
 
   // --- Ledger state ---
   const [activeTab, setActiveTab] = useState("home"); // "home" | "ledger"
+  // Sub-tabs inside the Ledger surface. Three slots:
+  //   "orders"  — refinery jobs + sell orders forms + Recent Sales
+  //   "history" — Patch History panel (per-patch entries + clear)
+  //   "crew"    — Crew Salvage roster (multi-user salvage runs)
+  // Default: orders.
+  const [ledgerSubTab, setLedgerSubTab] = useState("orders");
+  // Crew Salvage state — local-only for now (persistence +
+  // server-side run-splitting comes when this feature graduates out
+  // of preview). Layout:
+  //   crewDraft       — the in-flight session being assembled
+  //   crewSessions    — saved sessions (newest first)
+  //   crewShipFilter  — search filter for the ships-salvaged checkbox list
+  const blankCrewDraft = () => ({
+    ship: "Reclaimer",
+    roles: {},
+    // shipsSalvaged: array of { ship, qty } so each entry can carry
+    // a count (e.g. salvaged 3 Cutlass Blacks in one session).
+    shipsSalvaged: [],
+    // Per-material salvaged-SCU buckets. Construction Salvage is the
+    // Reclaimer's natural input; Construction Pieces is the Moth's.
+    // RMC is already-refined material that can come from either ship
+    // when scraping wrecks. The session's "total SCU salvaged" is the
+    // sum of these three.
+    scuConstructionSalvage: "",
+    scuConstructionPieces: "",
+    scuRMC: "",
+    refMethod: "",
+    refLocation: "",
+    splitCrewCount: "",
+    splitAuec: "",
+  });
+  const [crewDraft, setCrewDraft] = useState(blankCrewDraft);
+  const [crewSessions, setCrewSessions] = useState([]);
+  const [crewShipFilter, setCrewShipFilter] = useState("");
+  // Manufacturer filter for the ships-salvaged checkbox list. ""
+  // means "Any manufacturer".
+  const [crewMfgFilter, setCrewMfgFilter] = useState("");
+  // Set of saved-session ids whose sidebar card is expanded to show
+  // full details. Click toggles in/out.
+  const [expandedCrewSessions, setExpandedCrewSessions] = useState(() => new Set());
+  const toggleExpandedCrewSession = (id) =>
+    setExpandedCrewSessions((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  // Pragmatic ship-name → manufacturer lookup. SHIP_COMPONENTS does
+  // not carry manufacturer in the source CSV, so we substring-match
+  // each ship name against a known manufacturer keyword list. First
+  // match wins. Anything that doesn't match buckets to "Other".
+  const SHIP_MANUFACTURER_KEYWORDS = useMemo(() => ({
+    Aegis: ["Reclaimer", "Avenger", "Hammerhead", "Idris", "Javelin", "Eclipse", "Sabre", "Vanguard", "Retaliator", "Gladius", "Redeemer", "Nautilus"],
+    Anvil: ["Carrack", "Ballista", "Hornet", "Centurion", "Hawk", "Pisces", "Terrapin", "Valkyrie", "Hurricane", "Crucible", "Liberator", "C8", "F7C", "F7A", "F8", "Spartan", "Arrow"],
+    ARGO: ["Mole", "RAFT", "MPUV", "SRV", "Atls", "Moth"],
+    Banu: ["Defender", "Merchantman"],
+    "Consolidated Outland": ["Mustang", "Pioneer", "HoverQuad"],
+    Crusader: ["Starliner", "Mercury", "Hercules", "Spirit", "Intrepid", "Ares", "Ironclad", "A1", "A2", "C1", "C2", "M2", "E1", "Genesis"],
+    Drake: ["Caterpillar", "Cutlass", "Cutter", "Buccaneer", "Corsair", "Dragonfly", "Herald", "Mule", "Vulture", "Golem", "Kraken"],
+    Esperia: ["Glaive", "Talon", "Prowler", "Blade"],
+    Greycat: ["PTV", "ROC", "STV"],
+    Kruger: ["Merlin", "Archimedes", "P-52", "P-72", "P52", "P72"],
+    MISC: ["Endeavor", "Expanse", "Freelancer", "Hull", "Odyssey", "Prospector", "Razor", "Reliant", "Starfarer", "Fortune"],
+    Mirai: ["Pulse", "Fury"],
+    Origin: ["100i", "125a", "135c", "300i", "315p", "325a", "350r", "400i", "600i", "85X", "890 Jump", "X1"],
+    RSI: ["Aurora", "Constellation", "Lynx", "Mantis", "Orion", "Polaris", "Scorpius", "Zeus", "Galaxy", "Apollo", "Perseus", "Salvation", "Ursa"],
+    Tumbril: ["Cyclone", "Nova", "Ranger", "Storm"],
+    Vanduul: ["Scythe"],
+  }), []);
+  const setCrewDraftField = (key, value) =>
+    setCrewDraft((prev) => ({ ...prev, [key]: value }));
+  const setCrewDraftRole = (role, name) =>
+    setCrewDraft((prev) => ({ ...prev, roles: { ...prev.roles, [role]: name } }));
+  const toggleCrewDraftShipSalvaged = (ship) =>
+    setCrewDraft((prev) => ({
+      ...prev,
+      shipsSalvaged: prev.shipsSalvaged.some((e) => e.ship === ship)
+        ? prev.shipsSalvaged.filter((e) => e.ship !== ship)
+        : [...prev.shipsSalvaged, { ship, qty: 1 }],
+    }));
+  const setCrewDraftShipQty = (ship, qty) => {
+    const next = Math.max(1, Math.floor(Number(qty) || 1));
+    setCrewDraft((prev) => ({
+      ...prev,
+      shipsSalvaged: prev.shipsSalvaged.map((e) =>
+        e.ship === ship ? { ...e, qty: next } : e
+      ),
+    }));
+  };
+  const adjustCrewDraftShipQty = (ship, delta) => {
+    setCrewDraft((prev) => ({
+      ...prev,
+      shipsSalvaged: prev.shipsSalvaged.map((e) =>
+        e.ship === ship ? { ...e, qty: Math.max(1, (Number(e.qty) || 1) + delta) } : e
+      ),
+    }));
+  };
+  const saveCrewSession = () => {
+    setCrewSessions((prev) => [
+      {
+        id: `crew-session-${Date.now()}-${Math.floor(Math.random() * 1e6)}`,
+        status: "active",
+        createdAt: Date.now(),
+        completedAt: null,
+        ...crewDraft,
+      },
+      ...prev,
+    ]);
+    setCrewDraft(blankCrewDraft());
+    setCrewShipFilter("");
+  };
+  const deleteCrewSession = (id) =>
+    setCrewSessions((prev) => prev.filter((s) => s.id !== id));
+  // Pop an active session back into the draft for further editing.
+  // Removes it from the saved list — the user re-saves to put it
+  // back. Only allowed for active sessions; completed ones are
+  // locked.
+  const editCrewSession = (id) => {
+    setCrewSessions((prev) => {
+      const target = prev.find((s) => s.id === id);
+      if (!target || target.status !== "active") return prev;
+      // Drop server-managed fields; everything else flows into draft.
+      const { id: _id, status: _st, createdAt: _ca, completedAt: _co, ...draftFields } = target;
+      setCrewDraft({ ...blankCrewDraft(), ...draftFields });
+      return prev.filter((s) => s.id !== id);
+    });
+  };
+  // Mark an active session complete: stamps completedAt, locks
+  // edits, and writes a synthetic sell-order entry so the run
+  // shows up in the user's Patch History (and Statistics
+  // aggregations). No-op when session is already complete.
+  const markCrewSessionComplete = (id) => {
+    setCrewSessions((prev) => {
+      const target = prev.find((s) => s.id === id);
+      if (!target || target.status === "complete") return prev;
+      const completedAt = Date.now();
+      // Total salvaged SCU for the ledger entry = sum of the three
+      // material buckets. Falls back to a legacy single-field
+      // totalScu if a pre-migration session is in flight.
+      const totalScu =
+        (Number(target.scuConstructionSalvage) || 0) +
+        (Number(target.scuConstructionPieces) || 0) +
+        (Number(target.scuRMC) || 0) +
+        (Number(target.totalScu) || 0);
+      const splitAuec = Number(target.splitAuec) || 0;
+      const totalHulls = (target.shipsSalvaged || []).reduce(
+        (n, e) => n + (Number(e.qty) || 1),
+        0
+      );
+      // Synthetic ledger entry for Patch History. Only write when
+      // there's at least some SCU or aUEC to log.
+      if (totalScu > 0 || splitAuec > 0) {
+        const newOrder = {
+          id: `crew-salvage-${completedAt}-${Math.floor(Math.random() * 1e6)}`,
+          material: "Crew Salvage",
+          scu: totalScu,
+          location: `Crew Salvage · ${target.ship}${totalHulls > 0 ? ` · ${totalHulls} hull${totalHulls === 1 ? "" : "s"}` : ""}`,
+          playerName: "",
+          aUEC: splitAuec,
+          submittedAt: completedAt,
+          deletedAt: null,
+          dismissedFromRecentAt: null,
+        };
+        setSellOrders((prevOrders) => {
+          const next = [...prevOrders, newOrder];
+          // Persist to server alongside refineryJobs (passes through
+          // saveLedger which guards against pre-hydration writes).
+          saveLedger(refineryJobs, next);
+          return next;
+        });
+      }
+      return prev.map((s) =>
+        s.id === id ? { ...s, status: "complete", completedAt } : s
+      );
+    });
+  };
   const [refineryJobs, setRefineryJobs] = useState([]);
   const [sellOrders, setSellOrders] = useState([]);
   // Default shape for a fresh refinery job entry. The Clear button
@@ -14607,6 +15884,95 @@ export default function StarCitizenSalvageGuideWebsite() {
   //   { version, startedAt, isDropDay, alreadyClearedThisCycle }
   // Null until the prefs request resolves.
   const [patchStatus, setPatchStatus] = useState(null);
+  // Ships pre-staged for a specific Star Citizen patch. Each entry
+  // is hidden from the Crew Salvage picker until the live patch
+  // catches up with `sinceVersion`. When 4.8 drops (PATCHES list +
+  // Vercel redeploy) these ships start appearing automatically —
+  // no separate code push required.
+  const PENDING_SHIPS = useMemo(() => ([
+    { name: "Drake Ironclad",                manufacturer: "Drake Interplanetary",  sinceVersion: "4.8" },
+    { name: "Drake Ironclad Assault",        manufacturer: "Drake Interplanetary",  sinceVersion: "4.8" },
+    { name: "Drake Pitbull",                 manufacturer: "Drake Interplanetary",  sinceVersion: "4.8" },
+    { name: "MISC Starlite",                 manufacturer: "Musashi Industrial & Starflight Concern", sinceVersion: "4.8" },
+    { name: "Aegis Tiburon",                 manufacturer: "Aegis Dynamics",         sinceVersion: "4.8" },
+    { name: "Kruger Intergalactic Stingray", manufacturer: "Kruger Intergalactic",   sinceVersion: "4.8" },
+  ]), []);
+  // Numeric-segment compare: "4.7.2" < "4.8" < "4.10". Empty /
+  // missing versions sort to "below threshold" so pending ships
+  // stay hidden until the prefs response confirms a live patch.
+  const isPatchAtLeast = (current, threshold) => {
+    if (!current) return false;
+    const c = String(current).split(".").map((n) => parseInt(n, 10) || 0);
+    const t = String(threshold).split(".").map((n) => parseInt(n, 10) || 0);
+    const len = Math.max(c.length, t.length);
+    for (let i = 0; i < len; i++) {
+      const cv = c[i] || 0;
+      const tv = t[i] || 0;
+      if (cv > tv) return true;
+      if (cv < tv) return false;
+    }
+    return true;
+  };
+  const livePendingShips = useMemo(() => {
+    const v = patchStatus?.version;
+    return PENDING_SHIPS.filter((s) => isPatchAtLeast(v, s.sinceVersion));
+  }, [PENDING_SHIPS, patchStatus]);
+  // Manufacturer-by-name map sourced from the canonical RSI ship
+  // matrix dump, plus any pending ships that have gone live.
+  const RSI_SHIP_MANUFACTURER_BY_NAME = useMemo(() => {
+    const map = new Map();
+    for (const r of RSI_SHIPS) {
+      if (r && r.name) map.set(r.name, r.manufacturer || "Other");
+    }
+    for (const r of livePendingShips) {
+      if (r && r.name) map.set(r.name, r.manufacturer || "Other");
+    }
+    return map;
+  }, [livePendingShips]);
+  const getShipManufacturer = (shipName) => {
+    if (!shipName) return "Other";
+    const exact = RSI_SHIP_MANUFACTURER_BY_NAME.get(shipName);
+    if (exact) return exact;
+    const lower = shipName.toLowerCase();
+    for (const [maker, kws] of Object.entries(SHIP_MANUFACTURER_KEYWORDS)) {
+      for (const kw of kws) {
+        if (lower.includes(kw.toLowerCase())) return maker;
+      }
+    }
+    return "Other";
+  };
+  // Master list of flyable Star Citizen ships, sourced from the
+  // RSI ship matrix (robertsspaceindustries.com/ship-matrix).
+  // SHIP_COMPONENTS entries that aren't in RSI_SHIPS (legacy names,
+  // variants the matrix doesn't expose) are merged in so the Crew
+  // Salvage picker covers every vehicle the site knows.
+  // Memoized so the alphabetical sort doesn't re-run every render.
+  const allKnownShips = useMemo(() => {
+    const set = new Set();
+    for (const r of RSI_SHIPS) {
+      if (r && r.name) set.add(r.name);
+    }
+    for (const c of SHIP_COMPONENTS) {
+      if (c && c.ship) set.add(c.ship);
+    }
+    for (const p of livePendingShips) {
+      if (p && p.name) set.add(p.name);
+    }
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [livePendingShips]);
+  // Sorted list of every manufacturer that has at least one ship
+  // in allKnownShips, plus "Other" as a catch-all for anything that
+  // didn't match a keyword.
+  const allKnownManufacturers = useMemo(() => {
+    const set = new Set();
+    for (const ship of allKnownShips) set.add(getShipManufacturer(ship));
+    return Array.from(set).sort((a, b) => {
+      if (a === "Other") return 1;
+      if (b === "Other") return -1;
+      return a.localeCompare(b);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allKnownShips, SHIP_MANUFACTURER_KEYWORDS]);
   // Full list of Star Citizen patches with resolved [from, to) windows.
   // Loaded from /api/patches when the user logs in. Powers the
   // per-patch options in the Clear History dropdown so users can
@@ -17184,11 +18550,12 @@ export default function StarCitizenSalvageGuideWebsite() {
   const recentSellOrders = visibleSellOrders.filter(
     (o) =>
       !o.dismissedFromRecentAt &&
-      // Mission contract settlements are tracked in Patch History
-      // and on the Active Contracts panel; they're not actual sales,
-      // so keep them out of the Recent Sales feed.
+      // Mission contract + Crew Salvage settlements are tracked in
+      // Patch History (and on their respective panels); they're not
+      // actual sales, so keep them out of the Recent Sales feed.
       o.material !== "Mission Reward" &&
       o.material !== "Mission Buy-In" &&
+      o.material !== "Crew Salvage" &&
       Number.isFinite(o.submittedAt) &&
       o.submittedAt >= recentSalesCutoff
   );
@@ -17282,6 +18649,22 @@ export default function StarCitizenSalvageGuideWebsite() {
         // user sees a distinct "Reward" / "Buy-In" line with the
         // aUEC delta and the mission name, instead of a generic
         // "Sold 0 SCU Mission Reward" line.
+        // Crew Salvage entries (written by markCrewSessionComplete)
+        // get a dedicated cyan row so completed crew runs surface
+        // distinctly from solo sales.
+        if (materialLabel === "Crew Salvage") {
+          const totalScu = Number(o.scu) || 0;
+          const totalAuec = Number(o.aUEC) || 0;
+          const locStripped = String(o.location || "").replace(/^Crew Salvage[ ·]*\s*/i, "");
+          return {
+            id: o.id,
+            source: "sell",
+            type: "Crew Salvage",
+            ts: o.submittedAt,
+            primary: `${locStripped || "Crew run"} · ${totalScu.toLocaleString()} SCU · ${totalAuec.toLocaleString()} aUEC`,
+            secondary: "Logged from a completed Crew Salvage session.",
+          };
+        }
         const isMissionReward = materialLabel === "Mission Reward";
         const isMissionBuyIn = materialLabel === "Mission Buy-In";
         if (isMissionReward || isMissionBuyIn) {
@@ -20185,6 +21568,37 @@ export default function StarCitizenSalvageGuideWebsite() {
               </div>
             )}
 
+            {/* --- Ledger sub-tabs ---
+                Splits the Ledger surface into three pages so the
+                forms, the patch-scoped history, and the crew
+                roster don't all stack on one long scroll. */}
+            <nav className="flex gap-1 border-b border-cyan-500/25" role="tablist" aria-label="Ledger sub-sections">
+              {[
+                { id: "orders",  label: "Refinery & Sell Orders" },
+                { id: "history", label: "Patch History" },
+                { id: "crew",    label: "Crew Salvage" },
+              ].map((t) => {
+                const active = ledgerSubTab === t.id;
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={active}
+                    onClick={() => setLedgerSubTab(t.id)}
+                    className={`-mb-px inline-flex items-center gap-1.5 border-b-2 px-3 py-2 text-xs font-semibold uppercase tracking-wider transition sm:px-4 sm:text-sm sm:tracking-[0.18em] ${
+                      active
+                        ? "border-cyan-400 text-cyan-200"
+                        : "border-transparent text-slate-400 hover:border-cyan-500/40 hover:text-slate-200"
+                    }`}
+                  >
+                    {t.label}
+                  </button>
+                );
+              })}
+            </nav>
+
+            {ledgerSubTab === "orders" && (<>
             {/* --- Stats bar --- */}
             <div className="grid gap-4 md:grid-cols-4">
               <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
@@ -20742,7 +22156,10 @@ export default function StarCitizenSalvageGuideWebsite() {
               </div>
             </div>
 
-            {/* --- Patch History --- */}
+            </>)}
+
+            {ledgerSubTab === "history" && (
+            /* --- Patch History --- */
             <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                 <div>
@@ -20907,11 +22324,13 @@ export default function StarCitizenSalvageGuideWebsite() {
                             <span className={`rounded-lg px-2 py-1 text-xs font-semibold ${
                               entry.type === "Refined"
                                 ? "bg-amber-500/15 text-amber-200"
-                                : entry.type?.startsWith("Mission · Abandoned") || entry.type?.startsWith("Mission · Buy-In")
-                                  ? "bg-rose-500/15 text-rose-200"
-                                  : entry.type?.startsWith("Mission")
-                                    ? "bg-cyan-500/15 text-cyan-200"
-                                    : "bg-emerald-500/15 text-emerald-200"
+                                : entry.type === "Crew Salvage"
+                                  ? "bg-cyan-500/15 text-cyan-200"
+                                  : entry.type?.startsWith("Mission · Abandoned") || entry.type?.startsWith("Mission · Buy-In")
+                                    ? "bg-rose-500/15 text-rose-200"
+                                    : entry.type?.startsWith("Mission")
+                                      ? "bg-cyan-500/15 text-cyan-200"
+                                      : "bg-emerald-500/15 text-emerald-200"
                             }`}>
                               {entry.type}
                             </span>
@@ -20958,6 +22377,750 @@ export default function StarCitizenSalvageGuideWebsite() {
                   : "Log in with Discord to save your ledger across devices."}
               </div>
             </div>
+            )}
+
+            {ledgerSubTab === "crew" && (() => {
+              const roleSet =
+                crewDraft.ship === "Reclaimer"
+                  ? [
+                      "Pilot",
+                      "Claw Operator",
+                      "Salvage Operator 1",
+                      "Salvage Operator 2",
+                      "Cargo Operator",
+                    ]
+                  : [
+                      "Pilot",
+                      "Salvage Operator 1",
+                      "Salvage Operator 2",
+                      "Salvage Operator 3",
+                      "Cargo Operator",
+                    ];
+              const crewedCount = Object.values(crewDraft.roles).filter((v) => v && v.trim()).length;
+              const filterTerm = crewShipFilter.trim().toLowerCase();
+              const filteredShipList = allKnownShips.filter((s) => {
+                if (filterTerm && !s.toLowerCase().includes(filterTerm)) return false;
+                if (crewMfgFilter && getShipManufacturer(s) !== crewMfgFilter) return false;
+                return true;
+              });
+              // Per-material refinery + sales preview. Each input
+              // bucket gets its own computeRefineryJob call so the
+              // refinery curve matches the material. RMC is already
+              // refined and passes through unchanged. "Best price"
+              // for a sell-material = the highest sticker across
+              // every known sell point for that material.
+              const csInScu = getSafeScuValue(crewDraft.scuConstructionSalvage);
+              const cpInScu = getSafeScuValue(crewDraft.scuConstructionPieces);
+              const rmcInScu = getSafeScuValue(crewDraft.scuRMC);
+              const csRefResult = computeRefineryJob({
+                scu: csInScu,
+                materialName: "Construction Salvage",
+                methodName: crewDraft.refMethod,
+                locationName: crewDraft.refLocation,
+              });
+              const cpRefResult = computeRefineryJob({
+                scu: cpInScu,
+                materialName: "Construction Pieces",
+                methodName: crewDraft.refMethod,
+                locationName: crewDraft.refLocation,
+              });
+              const bestSellPriceFor = (mat) => {
+                let best = 0;
+                for (const p of sellPoints) {
+                  if (p.material === mat && Number.isFinite(p.pricePerScu) && p.pricePerScu > best) {
+                    best = p.pricePerScu;
+                  }
+                }
+                return best;
+              };
+              const rmcPrice = bestSellPriceFor("Recycled Material Composite");
+              const cmPrice = bestSellPriceFor("Construction Materials");
+              const sessionSaleRows = [
+                ...(crewDraft.ship === "Reclaimer"
+                  ? [{
+                      label: "Construction Salvage",
+                      inputScu: csInScu,
+                      refinedScu: csRefResult.totalYield,
+                      sellAs: "RMC",
+                      bestPrice: rmcPrice,
+                      saleAuec: csRefResult.totalYield * rmcPrice,
+                      refCost: csRefResult.cost,
+                    }]
+                  : []),
+                ...(crewDraft.ship === "Moth"
+                  ? [{
+                      label: "Construction Pieces",
+                      inputScu: cpInScu,
+                      refinedScu: cpRefResult.totalYield,
+                      sellAs: "Construction Materials",
+                      bestPrice: cmPrice,
+                      saleAuec: cpRefResult.totalYield * cmPrice,
+                      refCost: cpRefResult.cost,
+                    }]
+                  : []),
+                {
+                  label: "Recycled Material Composite",
+                  inputScu: rmcInScu,
+                  refinedScu: rmcInScu,
+                  sellAs: "RMC",
+                  bestPrice: rmcPrice,
+                  saleAuec: rmcInScu * rmcPrice,
+                  refCost: 0,
+                },
+              ];
+              const sessionTotalRefCost = sessionSaleRows.reduce((n, r) => n + (r.refCost || 0), 0);
+              const sessionGrossSale = sessionSaleRows.reduce((n, r) => n + (r.saleAuec || 0), 0);
+              const sessionNetSale = sessionGrossSale - sessionTotalRefCost;
+              // Split calculator. Crew count defaults to the number
+              // of assigned roles when the user hasn't typed a value.
+              const splitCount = (() => {
+                const raw = Number(crewDraft.splitCrewCount);
+                if (Number.isFinite(raw) && raw > 0) return raw;
+                return crewedCount > 0 ? crewedCount : 0;
+              })();
+              const splitAuec = Number(crewDraft.splitAuec) || 0;
+              const splitPerShare = splitCount > 0 ? Math.floor(splitAuec / splitCount) : 0;
+              // Sessions grouped by calendar day for the sidebar.
+              // Day key uses toDateString() so timezone-equivalent
+              // entries cluster. Days sorted newest first; sessions
+              // within a day sorted newest first.
+              const sessionsByDay = (() => {
+                const map = new Map();
+                for (const s of crewSessions) {
+                  const ts = s.completedAt || s.createdAt;
+                  const day = new Date(ts).toDateString();
+                  if (!map.has(day)) map.set(day, []);
+                  map.get(day).push(s);
+                }
+                const days = Array.from(map.entries())
+                  .map(([day, list]) => ({
+                    day,
+                    list: list.slice().sort((a, b) => (b.completedAt || b.createdAt) - (a.completedAt || a.createdAt)),
+                    sortKey: Math.max(...list.map((s) => s.completedAt || s.createdAt)),
+                  }))
+                  .sort((a, b) => b.sortKey - a.sortKey);
+                return days;
+              })();
+              const renderSessionCard = (s) => {
+                const totalScuNum =
+                  (Number(s.scuConstructionSalvage) || 0) +
+                  (Number(s.scuConstructionPieces) || 0) +
+                  (Number(s.scuRMC) || 0) +
+                  (Number(s.totalScu) || 0);
+                const splitN = Number(s.splitCrewCount) || Object.values(s.roles || {}).filter((v) => v && v.trim()).length || 0;
+                const splitTotal = Number(s.splitAuec) || 0;
+                const splitShare = splitN > 0 ? Math.floor(splitTotal / splitN) : 0;
+                const isComplete = s.status === "complete";
+                const expanded = expandedCrewSessions.has(s.id);
+                return (
+                  <li
+                    key={s.id}
+                    className={`rounded-2xl border text-xs ${
+                      isComplete
+                        ? "border-emerald-500/30 bg-emerald-500/5"
+                        : "border-slate-700 bg-slate-950/60"
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => toggleExpandedCrewSession(s.id)}
+                      className="flex w-full items-start gap-2 p-3 text-left hover:bg-slate-800/40"
+                      aria-expanded={expanded}
+                    >
+                      <svg
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        aria-hidden="true"
+                        className={`mt-1 h-3 w-3 shrink-0 text-cyan-300 transition-transform ${expanded ? "rotate-90" : ""}`}
+                      >
+                        <path d="M6 4l8 6-8 6V4z" />
+                      </svg>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <span className="rounded-md border border-cyan-500/30 bg-cyan-500/10 px-1.5 py-0.5 font-semibold text-cyan-200">{s.ship}</span>
+                          <span
+                            className={`rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
+                              isComplete
+                                ? "border border-emerald-500/40 bg-emerald-500/15 text-emerald-200"
+                                : "border border-amber-500/40 bg-amber-500/10 text-amber-200"
+                            }`}
+                          >
+                            {isComplete ? "Complete" : "Active"}
+                          </span>
+                        </div>
+                        <div className="mt-1 text-[10px] text-slate-500">
+                          {isComplete && s.completedAt
+                            ? `Completed ${formatTimeAgo(s.completedAt) || "just now"}`
+                            : `Started ${formatTimeAgo(s.createdAt) || "just now"}`}
+                        </div>
+                        {(totalScuNum > 0 || splitTotal > 0) && (
+                          <div className="mt-1 flex flex-wrap gap-1.5 text-[10px]">
+                            {totalScuNum > 0 && (
+                              <span className="text-amber-300 font-semibold">{totalScuNum.toLocaleString()} SCU</span>
+                            )}
+                            {splitTotal > 0 && (
+                              <span className="text-emerald-300 font-semibold">{splitShare.toLocaleString()} aUEC × {splitN}</span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                    {expanded && (
+                      <div className="space-y-2 border-t border-slate-800 px-3 pb-3 pt-2 text-[11px]">
+                        {/* Per-material salvaged SCU */}
+                        {(Number(s.scuConstructionSalvage) > 0 || Number(s.scuConstructionPieces) > 0 || Number(s.scuRMC) > 0) && (
+                          <div>
+                            <div className="text-[9px] uppercase tracking-wider text-slate-500">Salvaged SCU</div>
+                            <ul className="mt-0.5 space-y-0.5">
+                              {Number(s.scuConstructionSalvage) > 0 && (
+                                <li className="flex justify-between">
+                                  <span className="text-slate-400">Construction Salvage</span>
+                                  <span className="text-amber-300">{Number(s.scuConstructionSalvage).toLocaleString()}</span>
+                                </li>
+                              )}
+                              {Number(s.scuConstructionPieces) > 0 && (
+                                <li className="flex justify-between">
+                                  <span className="text-slate-400">Construction Pieces</span>
+                                  <span className="text-amber-300">{Number(s.scuConstructionPieces).toLocaleString()}</span>
+                                </li>
+                              )}
+                              {Number(s.scuRMC) > 0 && (
+                                <li className="flex justify-between">
+                                  <span className="text-slate-400">Recycled Material Composite</span>
+                                  <span className="text-amber-300">{Number(s.scuRMC).toLocaleString()}</span>
+                                </li>
+                              )}
+                            </ul>
+                          </div>
+                        )}
+                        {Object.entries(s.roles || {}).filter(([, v]) => v && v.trim()).length > 0 && (
+                          <div>
+                            <div className="text-[9px] uppercase tracking-wider text-slate-500">Crew</div>
+                            <div className="text-slate-400">
+                              {Object.entries(s.roles)
+                                .filter(([, v]) => v && v.trim())
+                                .map(([role, name]) => `${role}: ${name}`)
+                                .join(" · ")}
+                            </div>
+                          </div>
+                        )}
+                        {(s.shipsSalvaged || []).length > 0 && (
+                          <div>
+                            <div className="text-[9px] uppercase tracking-wider text-slate-500">Ships Salvaged</div>
+                            <div className="text-slate-400">
+                              {s.shipsSalvaged.map((e) => `${e.ship} ×${Number(e.qty) || 1}`).join(", ")}
+                            </div>
+                          </div>
+                        )}
+                        {(s.refMethod || s.refLocation) && (
+                          <div>
+                            <div className="text-[9px] uppercase tracking-wider text-slate-500">Refinery</div>
+                            <div className="text-slate-400">
+                              {[s.refLocation, s.refMethod].filter(Boolean).join(" · ") || "—"}
+                            </div>
+                          </div>
+                        )}
+                        {splitTotal > 0 && (
+                          <div>
+                            <div className="text-[9px] uppercase tracking-wider text-slate-500">Split</div>
+                            <div className="text-slate-400">
+                              {splitTotal.toLocaleString()} aUEC ÷ {splitN} = {splitShare.toLocaleString()} per crew
+                            </div>
+                          </div>
+                        )}
+                        <div className="flex flex-wrap gap-1 pt-1">
+                          {!isComplete && (
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => editCrewSession(s.id)}
+                                className="rounded-md border border-cyan-500/30 bg-cyan-500/10 px-2 py-1 text-[10px] font-semibold text-cyan-200 hover:border-cyan-400/60 hover:bg-cyan-500/20"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => markCrewSessionComplete(s.id)}
+                                className="rounded-md border border-emerald-500/40 bg-emerald-500/15 px-2 py-1 text-[10px] font-bold text-emerald-100 hover:border-emerald-400/60 hover:bg-emerald-500/25"
+                              >
+                                Mark Complete
+                              </button>
+                            </>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => deleteCrewSession(s.id)}
+                            className="rounded-md border border-rose-500/30 bg-rose-500/10 px-2 py-1 text-[10px] font-semibold text-rose-200 hover:border-rose-400/60 hover:bg-rose-500/20"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </li>
+                );
+              };
+              return (
+                <div className="grid gap-5 md:grid-cols-[18rem_1fr]">
+                  {/* Sidebar: saved sessions grouped by day */}
+                  <aside className="space-y-3">
+                    <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-4 shadow-xl shadow-cyan-950/20 backdrop-blur">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-sm font-bold text-cyan-300">Sessions</h3>
+                        <span className="text-[10px] text-slate-500">{crewSessions.length} total</span>
+                      </div>
+                      {crewSessions.length === 0 ? (
+                        <div className="mt-3 rounded-2xl border border-dashed border-slate-700 p-3 text-center text-[11px] text-slate-500">
+                          No sessions yet. Build one on the right and Save to start tracking.
+                        </div>
+                      ) : (
+                        <div className="mt-3 space-y-3 max-h-[calc(100vh-12rem)] overflow-y-auto pr-1">
+                          {sessionsByDay.map((bucket) => (
+                            <section key={bucket.day}>
+                              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                                {bucket.day}
+                              </div>
+                              <ul className="mt-1.5 space-y-1.5">
+                                {bucket.list.map(renderSessionCard)}
+                              </ul>
+                            </section>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </aside>
+
+                  {/* Main: draft form */}
+                  <div className="space-y-5">
+                  <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <h2 className="text-xl font-bold text-cyan-300">Crew Salvage</h2>
+                        <p className="mt-1 text-sm text-slate-400">
+                          Pick a ship, assign each station, log the ships you salvaged, calculate refinery yields, and split the take across the crew. Save a session to keep a record below. Local-only for now.
+                        </p>
+                      </div>
+                      <span className="shrink-0 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-xs font-semibold text-amber-200">
+                        Preview
+                      </span>
+                    </div>
+
+                    {/* Ship picker */}
+                    <div className="mt-5">
+                      <div className="text-[10px] uppercase tracking-wider text-slate-500">Crew Ship</div>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {["Reclaimer", "Moth"].map((s) => {
+                          const active = crewDraft.ship === s;
+                          return (
+                            <button
+                              key={s}
+                              type="button"
+                              onClick={() => setCrewDraftField("ship", s)}
+                              aria-pressed={active}
+                              className={`rounded-md px-3 py-1.5 text-sm font-semibold transition ${
+                                active
+                                  ? "border border-cyan-400 bg-cyan-500/20 text-cyan-100"
+                                  : "border border-slate-700 bg-slate-900 text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                              }`}
+                            >
+                              {s}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Role assignment grid */}
+                    <div className="mt-5">
+                      <div className="flex items-center justify-between">
+                        <div className="text-[10px] uppercase tracking-wider text-slate-500">
+                          Roles · {crewedCount} / {roleSet.length} stations crewed
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setCrewDraftField("roles", {})}
+                          className="rounded-md border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                        >
+                          Clear roles
+                        </button>
+                      </div>
+                      <div className="mt-2 grid gap-3 md:grid-cols-2">
+                        {roleSet.map((role) => (
+                          <div key={role} className="rounded-2xl border border-slate-700 bg-slate-950/60 p-3">
+                            <label className="block text-[10px] uppercase tracking-wider text-cyan-300/80">
+                              {role}
+                            </label>
+                            <input
+                              type="text"
+                              value={crewDraft.roles[role] || ""}
+                              onChange={(e) => setCrewDraftRole(role, e.target.value)}
+                              placeholder="Crew member name…"
+                              className="mt-1.5 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-100 placeholder-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-1 focus:ring-cyan-400/40"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Ships salvaged multi-select with per-ship
+                        quantity. Manufacturer filter narrows the
+                        checkbox list to one brand at a time. */}
+                    <div className="mt-5">
+                      <div className="flex flex-wrap items-end justify-between gap-2">
+                        <div>
+                          <div className="text-[10px] uppercase tracking-wider text-slate-500">
+                            Ships Salvaged
+                          </div>
+                          <div className="text-xs text-slate-400">
+                            {crewDraft.shipsSalvaged.length} ship type{crewDraft.shipsSalvaged.length === 1 ? "" : "s"} ·{" "}
+                            {crewDraft.shipsSalvaged.reduce((n, e) => n + (Number(e.qty) || 1), 0)} total hulls
+                          </div>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <select
+                            value={crewMfgFilter}
+                            onChange={(e) => setCrewMfgFilter(e.target.value)}
+                            className="rounded-md border border-slate-700 bg-slate-900 px-2 py-1 text-xs text-slate-100 focus:border-cyan-400/60 focus:outline-none focus:ring-1 focus:ring-cyan-400/40"
+                            title="Manufacturer filter"
+                          >
+                            <option value="">Any manufacturer</option>
+                            {allKnownManufacturers.map((m) => (
+                              <option key={m} value={m}>{m}</option>
+                            ))}
+                          </select>
+                          <input
+                            type="text"
+                            value={crewShipFilter}
+                            onChange={(e) => setCrewShipFilter(e.target.value)}
+                            placeholder="Filter ships…"
+                            className="w-44 rounded-md border border-slate-700 bg-slate-900 px-3 py-1 text-xs text-slate-100 placeholder-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-1 focus:ring-cyan-400/40"
+                          />
+                          {(crewMfgFilter || crewShipFilter) && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setCrewMfgFilter("");
+                                setCrewShipFilter("");
+                              }}
+                              className="rounded-md border border-slate-700 bg-slate-800/60 px-2 py-1 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                              title="Reset manufacturer + name filters."
+                            >
+                              Clear Search Filters
+                            </button>
+                          )}
+                          {crewDraft.shipsSalvaged.length > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => setCrewDraftField("shipsSalvaged", [])}
+                              className="rounded-md border border-rose-500/30 bg-rose-500/10 px-2 py-1 text-[10px] font-semibold text-rose-200 hover:border-rose-400/60 hover:bg-rose-500/20"
+                              title="Remove every salvaged-ship selection."
+                            >
+                              Clear ships
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      {crewDraft.shipsSalvaged.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          {crewDraft.shipsSalvaged.map((entry) => (
+                            <div
+                              key={entry.ship}
+                              className="inline-flex items-center gap-1 rounded-md border border-cyan-400 bg-cyan-500/20 px-2 py-0.5 text-xs font-semibold text-cyan-100"
+                            >
+                              <span>{entry.ship}</span>
+                              <button
+                                type="button"
+                                onClick={() => adjustCrewDraftShipQty(entry.ship, -1)}
+                                disabled={(Number(entry.qty) || 1) <= 1}
+                                title="Decrease quantity"
+                                aria-label="Decrease quantity"
+                                className="rounded border border-cyan-300/50 bg-slate-900/60 px-1 leading-none text-cyan-100 hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-40"
+                              >−</button>
+                              <input
+                                type="number"
+                                min="1"
+                                value={entry.qty}
+                                onChange={(e) => setCrewDraftShipQty(entry.ship, e.target.value)}
+                                className="w-10 rounded border border-cyan-300/40 bg-slate-900/80 px-1 py-0 text-center text-xs text-cyan-100 outline-none focus:border-cyan-300"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => adjustCrewDraftShipQty(entry.ship, +1)}
+                                title="Increase quantity"
+                                aria-label="Increase quantity"
+                                className="rounded border border-cyan-300/50 bg-slate-900/60 px-1 leading-none text-cyan-100 hover:bg-slate-900"
+                              >+</button>
+                              <button
+                                type="button"
+                                onClick={() => toggleCrewDraftShipSalvaged(entry.ship)}
+                                title="Remove"
+                                aria-label="Remove"
+                                className="ml-0.5 rounded text-rose-200 hover:text-rose-100"
+                              >✕</button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      <div className="mt-2 max-h-48 overflow-y-auto rounded-2xl border border-slate-700 bg-slate-950/40 p-2">
+                        {filteredShipList.length === 0 ? (
+                          <div className="px-2 py-4 text-center text-xs text-slate-500">No matches.</div>
+                        ) : (
+                          <div className="flex flex-wrap gap-1.5">
+                            {filteredShipList.map((s) => {
+                              const checked = crewDraft.shipsSalvaged.some((e) => e.ship === s);
+                              return (
+                                <button
+                                  key={s}
+                                  type="button"
+                                  onClick={() => toggleCrewDraftShipSalvaged(s)}
+                                  aria-pressed={checked}
+                                  className={`rounded-full border px-2.5 py-0.5 text-[11px] font-semibold transition ${
+                                    checked
+                                      ? "border-cyan-400 bg-cyan-500/20 text-cyan-100"
+                                      : "border-slate-700 bg-slate-900 text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                                  }`}
+                                >
+                                  {s}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Total salvaged SCU heading — sum of every
+                        bucket's input SCU. Sits right above the
+                        per-material inputs as a running total. */}
+                    {(() => {
+                      const totalSalvageScu = sessionSaleRows.reduce(
+                        (n, r) => n + (Number(r.inputScu) || 0),
+                        0
+                      );
+                      return (
+                        <div className="mt-5 flex items-baseline justify-between gap-3 rounded-2xl border border-cyan-500/25 bg-cyan-500/5 px-4 py-2">
+                          <h4 className="text-sm font-bold text-cyan-200">
+                            Total Salvage SCU #
+                          </h4>
+                          <span className="font-mono text-lg font-black text-amber-300">
+                            {totalSalvageScu.toLocaleString(undefined, { maximumFractionDigits: 1 })} SCU
+                          </span>
+                        </div>
+                      );
+                    })()}
+
+                    {/* Per-material salvaged SCU. Construction Salvage
+                        is Reclaimer-only; Construction Pieces is
+                        Moth-only. RMC is universal — either ship can
+                        scrape pre-refined RMC off wrecks. */}
+                    <div className="mt-3 grid gap-3 md:grid-cols-2">
+                      {crewDraft.ship === "Reclaimer" && (
+                        <div className="rounded-2xl border border-slate-700 bg-slate-950/60 p-3">
+                          <label className="block text-[10px] uppercase tracking-wider text-white">
+                            Construction Salvage SCU <span className="text-slate-500">(Reclaimer)</span>
+                          </label>
+                          <input
+                            type="number"
+                            min="0"
+                            step="1"
+                            value={crewDraft.scuConstructionSalvage}
+                            onChange={(e) => setCrewDraftField("scuConstructionSalvage", e.target.value)}
+                            placeholder="0"
+                            className="mt-1.5 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-100 placeholder-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-1 focus:ring-cyan-400/40"
+                          />
+                        </div>
+                      )}
+                      {crewDraft.ship === "Moth" && (
+                        <div className="rounded-2xl border border-slate-700 bg-slate-950/60 p-3">
+                          <label className="block text-[10px] uppercase tracking-wider text-white">
+                            Construction Pieces SCU <span className="text-slate-500">(Moth)</span>
+                          </label>
+                          <input
+                            type="number"
+                            min="0"
+                            step="1"
+                            value={crewDraft.scuConstructionPieces}
+                            onChange={(e) => setCrewDraftField("scuConstructionPieces", e.target.value)}
+                            placeholder="0"
+                            className="mt-1.5 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-100 placeholder-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-1 focus:ring-cyan-400/40"
+                          />
+                        </div>
+                      )}
+                      <div className="rounded-2xl border border-slate-700 bg-slate-950/60 p-3">
+                        <label className="block text-[10px] uppercase tracking-wider text-white">
+                          Recycled Material Composite SCU
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          step="1"
+                          value={crewDraft.scuRMC}
+                          onChange={(e) => setCrewDraftField("scuRMC", e.target.value)}
+                          placeholder="0"
+                          className="mt-1.5 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-100 placeholder-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-1 focus:ring-cyan-400/40"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Refinery + Sales calculator. Method + location
+                        apply to both materials; per-input yield is
+                        computed against its own refinery curve.
+                        Sales prices use the highest sticker across
+                        all known sell points so the take is an
+                        upper-bound estimate. */}
+                    <div className="mt-5 rounded-2xl border border-cyan-500/25 bg-cyan-500/5 p-4">
+                      <div className="flex items-center justify-between gap-3">
+                        <h3 className="text-sm font-bold text-cyan-200">Refinery + Sales Calculator</h3>
+                        <span className="text-[10px] text-slate-500">Uses the per-material SCU above</span>
+                      </div>
+                      <div className="mt-3 grid gap-3 md:grid-cols-2">
+                        <div>
+                          <label className="block text-[10px] uppercase tracking-wider text-slate-500">Refinery Location</label>
+                          <select
+                            value={crewDraft.refLocation}
+                            onChange={(e) => setCrewDraftField("refLocation", e.target.value)}
+                            className="mt-1 w-full rounded-md border border-cyan-500/25 bg-slate-900 px-3 py-1.5 text-sm outline-none focus:border-cyan-400"
+                          >
+                            <option value="">(Select a Location)</option>
+                            <optgroup label="Stanton">
+                              {refineryLocations.filter((l) => l.system === "Stanton").map((l) => (
+                                <option key={l.name} value={l.name}>{l.name}</option>
+                              ))}
+                            </optgroup>
+                            <optgroup label="Pyro">
+                              {refineryLocations.filter((l) => l.system === "Pyro").map((l) => (
+                                <option key={l.name} value={l.name}>{l.name}</option>
+                              ))}
+                            </optgroup>
+                            <optgroup label="Nyx">
+                              {refineryLocations.filter((l) => l.system === "Nyx").map((l) => (
+                                <option key={l.name} value={l.name}>{l.name}</option>
+                              ))}
+                            </optgroup>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[10px] uppercase tracking-wider text-slate-500">Refinery Method</label>
+                          <select
+                            value={crewDraft.refMethod}
+                            onChange={(e) => setCrewDraftField("refMethod", e.target.value)}
+                            className="mt-1 w-full rounded-md border border-cyan-500/25 bg-slate-900 px-3 py-1.5 text-sm outline-none focus:border-cyan-400"
+                          >
+                            <option value="">(Select a Method)</option>
+                            {refineryMethods.map((m) => (
+                              <option key={m.name} value={m.name}>{m.name} — {m.speed}/{m.cost}/{m.yieldRating}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                      {/* Per-material results table */}
+                      <div className="mt-4 overflow-x-auto rounded-xl border border-cyan-500/25 bg-slate-950/60">
+                        <table className="w-full text-xs">
+                          <thead className="bg-slate-950/80 text-slate-300">
+                            <tr>
+                              <th className="px-3 py-2 text-left">Salvaged</th>
+                              <th className="px-3 py-2 text-right">Input SCU</th>
+                              <th className="px-3 py-2 text-right">Refined SCU</th>
+                              <th className="px-3 py-2 text-right">Sells As</th>
+                              <th className="px-3 py-2 text-right">Best aUEC/SCU</th>
+                              <th className="px-3 py-2 text-right">Sale aUEC</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {sessionSaleRows.map((r) => (
+                              <tr key={r.label} className="border-t border-slate-800">
+                                <td className="px-3 py-2 text-slate-200">{r.label}</td>
+                                <td className="px-3 py-2 text-right text-amber-300">{r.inputScu.toLocaleString(undefined, { maximumFractionDigits: 1 })}</td>
+                                <td className="px-3 py-2 text-right text-amber-200">{r.refinedScu.toLocaleString(undefined, { maximumFractionDigits: 1 })}</td>
+                                <td className="px-3 py-2 text-right text-slate-300">{r.sellAs}</td>
+                                <td className="px-3 py-2 text-right text-cyan-300">{r.bestPrice ? r.bestPrice.toLocaleString() : "—"}</td>
+                                <td className="px-3 py-2 text-right font-bold text-emerald-300">{Math.round(r.saleAuec).toLocaleString()}</td>
+                              </tr>
+                            ))}
+                            <tr className="border-t border-cyan-500/30 bg-slate-950/80">
+                              <td colSpan={5} className="px-3 py-2 text-right text-[10px] uppercase tracking-wider text-cyan-300/80">
+                                Total Refinery Cost
+                              </td>
+                              <td className="px-3 py-2 text-right font-bold text-rose-300">
+                                {Math.round(sessionTotalRefCost).toLocaleString()} aUEC
+                              </td>
+                            </tr>
+                            <tr className="bg-slate-950/80">
+                              <td colSpan={5} className="px-3 py-2 text-right text-[10px] uppercase tracking-wider text-emerald-300/80">
+                                Net Projected Sale
+                              </td>
+                              <td className="px-3 py-2 text-right font-black text-emerald-300">
+                                {Math.round(sessionNetSale).toLocaleString()} aUEC
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <p className="mt-2 text-[10px] text-slate-500">
+                        Best aUEC/SCU sourced from the site's known sell points. Refinery cost is the sum of all three material refinery jobs at the chosen method/location.
+                      </p>
+                    </div>
+
+                    {/* Split Calculator */}
+                    <div className="mt-5 rounded-2xl border border-emerald-500/25 bg-emerald-500/5 p-4">
+                      <h3 className="text-sm font-bold text-emerald-200">Split Calculator</h3>
+                      <p className="mt-1 text-xs text-slate-400">Divide total aUEC across the crew. Defaults crew count to the number of assigned roles.</p>
+                      <div className="mt-3 grid gap-3 md:grid-cols-3">
+                        <div>
+                          <label className="block text-[10px] uppercase tracking-wider text-slate-500">Total aUEC</label>
+                          <input
+                            type="number"
+                            min="0"
+                            step="1"
+                            value={crewDraft.splitAuec}
+                            onChange={(e) => setCrewDraftField("splitAuec", e.target.value)}
+                            placeholder="0"
+                            className="mt-1 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-100 placeholder-slate-500 focus:border-emerald-400/60 focus:outline-none focus:ring-1 focus:ring-emerald-400/40"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] uppercase tracking-wider text-slate-500">Crew Count</label>
+                          <input
+                            type="number"
+                            min="1"
+                            step="1"
+                            value={crewDraft.splitCrewCount}
+                            onChange={(e) => setCrewDraftField("splitCrewCount", e.target.value)}
+                            placeholder={String(crewedCount || 1)}
+                            className="mt-1 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-100 placeholder-slate-500 focus:border-emerald-400/60 focus:outline-none focus:ring-1 focus:ring-emerald-400/40"
+                          />
+                        </div>
+                        <div className="rounded-xl border border-emerald-500/25 bg-slate-950/60 p-3">
+                          <div className="text-[10px] uppercase tracking-wider text-slate-500">Per Crew Share</div>
+                          <div className="mt-1 text-xl font-black text-emerald-300">{splitPerShare.toLocaleString()} aUEC</div>
+                          <div className="mt-0.5 text-[10px] text-slate-500">{splitCount} crew</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Save Session */}
+                    <div className="mt-5 flex flex-wrap items-center justify-end gap-2">
+                      <button
+                        type="button"
+                        onClick={() => { setCrewDraft(blankCrewDraft()); setCrewShipFilter(""); }}
+                        className="rounded-md border border-slate-700 bg-slate-800/60 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                      >
+                        Reset
+                      </button>
+                      <button
+                        type="button"
+                        onClick={saveCrewSession}
+                        className="rounded-md border border-cyan-400 bg-cyan-500/20 px-3 py-1.5 text-xs font-bold text-cyan-100 hover:bg-cyan-500/30"
+                      >
+                        Save Session
+                      </button>
+                    </div>
+                  </div>
+
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* --- Edit entry modal --- */}
             {editingEntry && (
@@ -23712,6 +25875,12 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <li>Mission table system column no longer falls back to "Unknown" — resolves explicit systems → location systems → debugName scan before giving up.</li>
                     <li>New <strong>Rough & Ready</strong> faction option in the Missions filter, covering the RR_ Wrecked Ships family.</li>
                     <li>Mission table rows shortened — per-row description line removed; full briefing still in the popup.</li>
+                    <li>Ledger split into three sub-tabs: <strong>Refinery & Sell Orders</strong>, <strong>Patch History</strong>, and a brand-new <strong>Crew Salvage</strong> page.</li>
+                    <li><strong>Crew Salvage</strong>: build multi-pilot runs from the Ledger. Pick Reclaimer or Moth, assign every station (Pilot / Claw Operator on Reclaimer only / Salvage Operators 1–2 Reclaimer / 1–3 Moth / Cargo Operator), pick salvaged ships with quantity steppers, manufacturer + name filters, Clear Search Filters / Clear ships shortcuts.</li>
+                    <li>Crew Salvage three SCU buckets — <strong>Construction Salvage</strong> (Reclaimer-only), <strong>Construction Pieces</strong> (Moth-only), <strong>Recycled Material Composite</strong> (1:1, no refinery). Refinery + Sales Calculator + Split Calculator produce projected take per crew share.</li>
+                    <li>Save Session → in-flight session card in the left sidebar (grouped by day, newest first); click to expand. Edit pops back into the draft. <strong>Mark Complete</strong> locks the session and writes a Crew Salvage row into Patch History (cyan pill).</li>
+                    <li>Ships Salvaged picker pulls from the live RSI Ship Matrix — every flight-ready ship and vehicle in the catalog (219 entries). Concept ships hidden until flight-ready.</li>
+                    <li>Six <strong>patch 4.8</strong> ships pre-staged in the picker, gated on the live patch version: Drake Ironclad, Drake Ironclad Assault, Drake Pitbull, MISC Starlite, Aegis Tiburon, Kruger Intergalactic Stingray. Auto-appear once 4.8 goes live.</li>
                   </ul>
                   <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Changes</p>
                   <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">

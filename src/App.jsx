@@ -22700,9 +22700,6 @@ export default function StarCitizenSalvageGuideWebsite() {
                           Pick a ship, assign each station, log the ships you salvaged, calculate refinery yields, and split the take across the crew. Save a session to keep a record below. Local-only for now.
                         </p>
                       </div>
-                      <span className="shrink-0 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-xs font-semibold text-amber-200">
-                        Preview
-                      </span>
                     </div>
 
                     {/* Ship picker */}

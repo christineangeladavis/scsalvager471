@@ -19802,7 +19802,7 @@ export default function StarCitizenSalvageGuideWebsite() {
               </div>
               <div className="rounded-2xl border border-cyan-400/30 bg-cyan-500/10 px-4 py-3 text-sm text-cyan-100">
                 <div className="font-semibold">Patch Verified</div>
-                <div>4.7.2</div>
+                <div>{patchStatus?.version || "4.7.2"}</div>
               </div>
             </div>
           </div>
@@ -25181,7 +25181,7 @@ export default function StarCitizenSalvageGuideWebsite() {
         <footer className="mt-auto border-t border-slate-800 pt-5 pb-6 text-sm text-slate-400" style={{ marginTop: "auto" }}>
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <span>
-              <span className="font-semibold text-slate-200">Made by Chrissyy</span> · Data verified for patch 4.7.2
+              <span className="font-semibold text-slate-200">Made by Chrissyy</span> · Data verified for patch {patchStatus?.version || "4.7.2"}
               {" · "}
               <button
                 type="button"

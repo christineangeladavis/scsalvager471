@@ -1,6 +1,6 @@
 # Terms of Service
 
-_Last updated: April 28, 2026_
+_Last updated: April 29, 2026_
 
 SCSalvager.net ("the site", "we", "us") is a free community tool for Star Citizen players. By using the site you agree to the terms below. If any of them don't work for you, please don't use the site.
 
@@ -16,6 +16,8 @@ SCSalvager.net ("the site", "we", "us") is a free community tool for Star Citize
 - Submit anonymous community price reports that go into the site's median pricing.
 - Upload screenshots (or a crop you select) of refinery and sell-order screens; the image is sent once to a vision AI service for parsing and immediately discarded.
 - Set an optional custom display name to appear on the Statistics leaderboard until you verify an RSI handle.
+- Upload an optional custom avatar that replaces your Discord avatar across the site. We resize and center-crop client-side to 312×312 before storage.
+- Accept salvage mission contracts from the Missions tab and have multiple in-flight contracts at once. Completing a contract applies its reward (and any negative buy-in) to your ledger; abandoning forfeits the positive reward but still applies the negative buy-in.
 - Verify your RSI handle to display it on the Statistics leaderboard. A verified RSI handle replaces both your Discord handle and any custom display name.
 - Browse Missions, Ship Details, and Scraper Module Performance panels populated from public Star Citizen reference sites.
 - Opt in to Discord DMs for refinery-completion notifications.
@@ -40,6 +42,8 @@ We may suspend or permanently ban any account that violates these rules. Severe 
 - **Community price reports** are stored anonymously, with no link to your user ID. By submitting a report, you grant SCSalvager.net a perpetual, non-exclusive license to display and aggregate that report as part of the community price data. Because the report carries no identifier, deleting your account does not retract reports you previously submitted — they are already irreversibly anonymous and continue to inform the community median.
 - **Screenshot uploads** (and any crop you select before submitting) are processed once by the vision AI parser and discarded. They are never written to disk, stored in Redis, or logged. Don't upload screenshots that contain content you don't have the right to share with the parser.
 - **Custom display names** must not impersonate another player or the site itself. We may reset a custom display name that violates these rules without notice.
+- **Custom avatars** must not infringe on third-party copyright, contain pornographic / hateful imagery, or be designed to impersonate another player. We may remove an avatar that violates these rules without notice.
+- **Mission contracts** are personal-tracking entries in your own ledger; they don't represent in-game inventory or aUEC. Don't claim they do.
 - You are responsible for the content you submit. Don't submit anything you don't have the right to.
 
 ## Service availability

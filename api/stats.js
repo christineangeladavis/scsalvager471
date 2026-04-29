@@ -134,7 +134,11 @@ export default async function handler(req, res) {
     totalRefineryFeesAuec += userFees;
     totalProfitAuec += userProfit;
 
-    if (userScu > 0 || userProfit > 0) {
+    // Top Salvagers leaderboard ranks strictly on SCU refined, so a
+    // user only qualifies if they actually refined material. Profit-
+    // only ledger activity (e.g. mission contract settlements) does
+    // not contribute to ranking.
+    if (userScu > 0) {
       const meta = await getUserMeta(redis, userId);
       const prefs = await getPrefs(redis, userId);
       // Display name priority:
@@ -154,11 +158,21 @@ export default async function handler(req, res) {
         : "";
       const fallbackName = customName || (meta && meta.username) || "Unknown";
       const displayName = verified ? rsiHandle : fallbackName;
+      // Include the uploaded avatar (if any) so the leaderboard can
+      // render the user's chosen face next to their name. Empty
+      // string means "fall back to the Discord avatar" — handled
+      // client-side, since stats doesn't know the Discord cdn url
+      // for users other than the caller.
+      const avatarDataUrl =
+        prefs && typeof prefs.avatarDataUrl === "string"
+          ? prefs.avatarDataUrl
+          : "";
       perUser.push({
         username: displayName,
         scuRefined: userScu,
         profitAuec: userProfit,
         verified,
+        avatarDataUrl,
       });
     }
   }
@@ -196,6 +210,7 @@ export default async function handler(req, res) {
       scuRefined: Math.round(u.scuRefined * 100) / 100,
       profitAuec: Math.round(u.profitAuec),
       verified: Boolean(u.verified),
+      avatarDataUrl: u.avatarDataUrl || "",
     })),
   });
 }

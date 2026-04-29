@@ -1,6 +1,6 @@
 # Privacy Policy
 
-_Last updated: April 28, 2026_
+_Last updated: April 29, 2026_
 
 SCSalvager.net is a community salvage companion for Star Citizen. This page explains exactly what we store about you, why, where it lives, who else can see it, and what you can do about it.
 
@@ -11,6 +11,8 @@ SCSalvager.net is a community salvage companion for Star Citizen. This page expl
 - **RSI handle (optional)** — the Roberts Space Industries citizen handle you choose to link for in-game identity verification.
 - **Session data (IP address, user-agent)** — retained only while your session is active to prevent unauthorised access.
 - **Anonymous visit ping (user-agent, country code)** — when you load the site without being signed in, your browser fires a single ping that records the user-agent string and country code (from the CDN) so the operator can see how much anonymous traffic the site receives. **IP addresses are not collected** for these pings. We store at most the 1,000 most recent pings, deduped per-browser to one ping per 24 hours via an HTTP-only cookie (`scs_guest_visit`). Once you sign in, no further anonymous pings are recorded for that browser.
+- **Custom avatar (optional)** — when you upload an avatar in Settings, we resize and center-crop it to a 312×312 JPEG client-side and store the resulting data URL in your preferences hash. The image overrides your Discord avatar across the site (header user menu, Statistics leaderboard, Settings) until you replace or remove it. Capped at 250KB per upload.
+- **Active mission contracts (optional)** — when you click "Accept Offer" on a salvage contract, we store `{ missionId, name, reward, buyIn, acceptedAt }` in your preferences so the Missions tab can resurface your in-flight contracts after you reload. Multiple contracts can be active at once. Removed when you click Complete Contract or Abandon Offer.
 
 Anything else you see on the site is content you've authored yourself (ledger entries, community price reports, your preference toggles) — we keep it associated with your Discord handle so it's there the next time you sign in, and you can wipe all of it via Settings → Danger Zone at any time.
 

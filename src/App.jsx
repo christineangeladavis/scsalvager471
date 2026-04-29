@@ -197,6 +197,9 @@ const ships = [
 //     (each row: { id, name } pointing at another contract).
 // Filter: missionType === "Salvage" (59 entries).
 // Filter: missionType === "Salvage" (59 entries).
+// Filter: missionType === "Salvage" (59 entries).
+// Filter: missionType === "Salvage" (59 entries).
+// Filter: missionType === "Salvage" (59 entries).
 const MISSIONS = [
   {
     id: "7858db48-7eb6-4a6c-b56b-5df1c5235d1d",
@@ -237,7 +240,7 @@ const MISSIONS = [
     name: "Salvager Needed (Lrg. Special Order of RMC / UCM / Components)",
     faction: "Adagio Holdings",
     giver: "Adagio Holdings",
-    system: "Unknown",
+    system: "Stanton",
     reward: 335000,
     buyIn: 0,
     baseXP: 150,
@@ -271,7 +274,7 @@ const MISSIONS = [
     name: "Salvager Needed (Lrg. Special Order of RMC / UCM / Components)",
     faction: "Adagio Holdings",
     giver: "Adagio Holdings",
-    system: "Unknown",
+    system: "Pyro",
     reward: 285000,
     buyIn: 0,
     baseXP: 150,
@@ -373,7 +376,7 @@ const MISSIONS = [
     name: "Salvager Needed (Lrg. Supply of RMC / UCM / Components)",
     faction: "Adagio Holdings",
     giver: "Adagio Holdings",
-    system: "Unknown",
+    system: "Stanton",
     reward: 209500,
     buyIn: 0,
     baseXP: 150,
@@ -407,7 +410,7 @@ const MISSIONS = [
     name: "Salvager Needed (Med. Special Order of RMC / UCM / Components)",
     faction: "Adagio Holdings",
     giver: "Adagio Holdings",
-    system: "Unknown",
+    system: "Pyro",
     reward: 153250,
     buyIn: 0,
     baseXP: 100,
@@ -441,7 +444,7 @@ const MISSIONS = [
     name: "Salvager Needed (Med. Special Order of RMC / UCM / Components)",
     faction: "Adagio Holdings",
     giver: "Adagio Holdings",
-    system: "Unknown",
+    system: "Stanton",
     reward: 153250,
     buyIn: 0,
     baseXP: 100,
@@ -577,7 +580,7 @@ const MISSIONS = [
     name: "Salvager Needed (Med. Supply of RMC / UCM / Components)",
     faction: "Adagio Holdings",
     giver: "Adagio Holdings",
-    system: "Unknown",
+    system: "Stanton",
     reward: 89750,
     buyIn: 0,
     baseXP: 100,
@@ -679,7 +682,7 @@ const MISSIONS = [
     name: "Salvager Needed (Med. Supply of RMC)",
     faction: "Adagio Holdings",
     giver: "Adagio Holdings",
-    system: "Unknown",
+    system: "Stanton",
     reward: 66500,
     buyIn: 0,
     baseXP: 100,
@@ -713,7 +716,7 @@ const MISSIONS = [
     name: "Salvager Needed (Small Special Order of RMC / Components)",
     faction: "Adagio Holdings",
     giver: "Adagio Holdings",
-    system: "Unknown",
+    system: "Stanton",
     reward: 65000,
     buyIn: 0,
     baseXP: 100,
@@ -883,7 +886,7 @@ const MISSIONS = [
     name: "Salvager Needed (Small Supply of RMC / UCM)",
     faction: "Adagio Holdings",
     giver: "Adagio Holdings",
-    system: "Unknown",
+    system: "Pyro",
     reward: 38250,
     buyIn: 0,
     baseXP: 100,
@@ -1019,7 +1022,7 @@ const MISSIONS = [
     name: "Salvager Needed (Small Supply of RMC / UCM)",
     faction: "Adagio Holdings",
     giver: "Adagio Holdings",
-    system: "Unknown",
+    system: "Stanton",
     reward: 33500,
     buyIn: 0,
     baseXP: 100,
@@ -1053,7 +1056,7 @@ const MISSIONS = [
     name: "Salvager Needed (Small Supply of RMC)",
     faction: "Adagio Holdings",
     giver: "Adagio Holdings",
-    system: "Unknown",
+    system: "Stanton",
     reward: 33250,
     buyIn: 0,
     baseXP: 100,
@@ -1121,7 +1124,7 @@ const MISSIONS = [
     name: "Adagio Holdings in Need of Salvagers",
     faction: "Adagio Holdings",
     giver: "Adagio Holdings",
-    system: "Unknown",
+    system: "Pyro",
     reward: 31250,
     buyIn: 0,
     baseXP: 100,
@@ -1155,7 +1158,7 @@ const MISSIONS = [
     name: "Adagio Holdings in Need of Salvagers",
     faction: "Adagio Holdings",
     giver: "Adagio Holdings",
-    system: "Unknown",
+    system: "Stanton",
     reward: 31250,
     buyIn: 0,
     baseXP: 100,
@@ -1629,8 +1632,8 @@ const MISSIONS = [
   {
     id: "fd8e44db-6c4d-4aac-8cd7-6f570254c591",
     name: "Salvage Wrecked Ships on the Drift",
-    faction: "Unknown",
-    giver: "Unknown",
+    faction: "Rough & Ready",
+    giver: "Rough & Ready",
     system: "Pyro",
     reward: 0,
     buyIn: 50000,
@@ -1663,8 +1666,8 @@ const MISSIONS = [
   {
     id: "e054f8ec-0dd0-453e-9bb6-0524e991a5d8",
     name: "Salvage Wrecked Ships on the Drift",
-    faction: "Unknown",
-    giver: "Unknown",
+    faction: "Rough & Ready",
+    giver: "Rough & Ready",
     system: "Pyro",
     reward: 0,
     buyIn: 50000,
@@ -1697,8 +1700,8 @@ const MISSIONS = [
   {
     id: "c0367fb3-fe9a-4d96-a52e-37379fb84c48",
     name: "Wrecked Ships for Sale",
-    faction: "Unknown",
-    giver: "Unknown",
+    faction: "Rough & Ready",
+    giver: "Rough & Ready",
     system: "Pyro",
     reward: 0,
     buyIn: 1000,
@@ -1731,8 +1734,8 @@ const MISSIONS = [
   {
     id: "fb7cdad3-3adf-47db-a9dc-fbc9b8c48f11",
     name: "Wrecked Ships for Sale",
-    faction: "Unknown",
-    giver: "Unknown",
+    faction: "Rough & Ready",
+    giver: "Rough & Ready",
     system: "Pyro",
     reward: 0,
     buyIn: 1000,
@@ -1765,8 +1768,8 @@ const MISSIONS = [
   {
     id: "e4d58696-cb09-4a99-9455-c38c8cea760d",
     name: "Wrecked Ships for Sale",
-    faction: "Unknown",
-    giver: "Unknown",
+    faction: "Rough & Ready",
+    giver: "Rough & Ready",
     system: "Pyro",
     reward: 0,
     buyIn: 1000,
@@ -1799,8 +1802,8 @@ const MISSIONS = [
   {
     id: "16f1f278-25d4-42ae-9720-78de4832963b",
     name: "Wrecked Ships for Sale",
-    faction: "Unknown",
-    giver: "Unknown",
+    faction: "Rough & Ready",
+    giver: "Rough & Ready",
     system: "Pyro",
     reward: 0,
     buyIn: 1000,
@@ -1833,8 +1836,8 @@ const MISSIONS = [
   {
     id: "ae20c909-cc86-46aa-aee3-f2ea70faeff1",
     name: "Wrecked Ships for Sale",
-    faction: "Unknown",
-    giver: "Unknown",
+    faction: "Rough & Ready",
+    giver: "Rough & Ready",
     system: "Pyro",
     reward: 0,
     buyIn: 1000,
@@ -1867,8 +1870,8 @@ const MISSIONS = [
   {
     id: "adada33c-0309-44b1-b0db-1d4421756b49",
     name: "Wrecked Ships for Sale",
-    faction: "Unknown",
-    giver: "Unknown",
+    faction: "Rough & Ready",
+    giver: "Rough & Ready",
     system: "Pyro",
     reward: 0,
     buyIn: 1000,
@@ -1901,8 +1904,8 @@ const MISSIONS = [
   {
     id: "f9d84f75-b48c-4f4b-8f6e-ee59434efee4",
     name: "Wrecked Ships for Sale",
-    faction: "Unknown",
-    giver: "Unknown",
+    faction: "Rough & Ready",
+    giver: "Rough & Ready",
     system: "Pyro",
     reward: 0,
     buyIn: 1000,
@@ -1935,8 +1938,8 @@ const MISSIONS = [
   {
     id: "3fb8de52-6791-4ea9-bf1c-737bf4f7fa78",
     name: "Wrecked Ships for Sale",
-    faction: "Unknown",
-    giver: "Unknown",
+    faction: "Rough & Ready",
+    giver: "Rough & Ready",
     system: "Pyro",
     reward: 0,
     buyIn: 1000,
@@ -1969,8 +1972,8 @@ const MISSIONS = [
   {
     id: "ce3723ef-cc33-41ab-9d36-f8ab0510455b",
     name: "Wrecked Ships for Sale",
-    faction: "Unknown",
-    giver: "Unknown",
+    faction: "Rough & Ready",
+    giver: "Rough & Ready",
     system: "Pyro",
     reward: 0,
     buyIn: 1000,
@@ -2003,8 +2006,8 @@ const MISSIONS = [
   {
     id: "bbb1603f-640a-4061-b75c-7c6c6b4e7d55",
     name: "Wrecked Ships for Sale",
-    faction: "Unknown",
-    giver: "Unknown",
+    faction: "Rough & Ready",
+    giver: "Rough & Ready",
     system: "Pyro",
     reward: 0,
     buyIn: 1000,
@@ -2213,7 +2216,7 @@ const PLAYER_SELL_POINT = "Sold to Player";
 // notification bell surfaces a "new site update available" entry until
 // the user opens the What's New modal (or marks it read). Per-browser
 // pointer is stored at localStorage["scs_whatsnew_seen_version"].
-const LATEST_WHATSNEW_VERSION = "v2.6.1";
+const LATEST_WHATSNEW_VERSION = "v2.7.0";
 
 // localStorage key for explicitly dismissed notification ids. Lets
 // users hide the red badge without changing their underlying setup
@@ -14508,17 +14511,44 @@ export default function StarCitizenSalvageGuideWebsite() {
     // default-ship matches.
     return [];
   };
-  // Sortable table state. `key` is one of the column field names; on
-  // re-click the same column, direction flips. Default: name asc.
-  const [missionSortKey, setMissionSortKey] = useState("name");
-  const [missionSortDir, setMissionSortDir] = useState("asc");
-  const toggleMissionSort = (key) => {
-    if (missionSortKey === key) {
-      setMissionSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    } else {
-      setMissionSortKey(key);
-      setMissionSortDir("asc");
-    }
+  // Sortable table state. Multi-sort: `missionSorts` is an ordered
+  // array of { key, dir } entries. The first entry is the primary
+  // sort, subsequent entries break ties. Default: single primary
+  // sort on `name` asc.
+  //
+  // toggleMissionSort behavior:
+  //   - shift/ctrl/meta-click → add/cycle this column as a secondary
+  //     sort. Already in the list → flip direction; not in the list →
+  //     append asc.
+  //   - plain click → replace the entire list with a single asc/desc
+  //     entry on this column. Re-clicking the current primary flips
+  //     its direction (matches the prior single-sort UX).
+  const [missionSorts, setMissionSorts] = useState([{ key: "name", dir: "asc" }]);
+  const toggleMissionSort = (key, opts = {}) => {
+    const additive = Boolean(opts.additive);
+    setMissionSorts((prev) => {
+      const idx = prev.findIndex((s) => s.key === key);
+      if (additive) {
+        if (idx >= 0) {
+          const next = prev.slice();
+          next[idx] = { key, dir: next[idx].dir === "asc" ? "desc" : "asc" };
+          return next;
+        }
+        return [...prev, { key, dir: "asc" }];
+      }
+      if (idx === 0) {
+        return [{ key, dir: prev[0].dir === "asc" ? "desc" : "asc" }];
+      }
+      return [{ key, dir: "asc" }];
+    });
+  };
+  const removeMissionSort = (key) => {
+    setMissionSorts((prev) => {
+      const next = prev.filter((s) => s.key !== key);
+      // Always keep at least one sort so the table doesn't render in
+      // arbitrary insertion order. Fall back to name asc.
+      return next.length > 0 ? next : [{ key: "name", dir: "asc" }];
+    });
   };
   const [showSubmitJobConfirm, setShowSubmitJobConfirm] = useState(false);
   const [showSubmitSellConfirm, setShowSubmitSellConfirm] = useState(false);
@@ -14628,6 +14658,12 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [displayNameDraft, setDisplayNameDraft] = useState("");
   const [displayNameSaving, setDisplayNameSaving] = useState(false);
   const [displayNameSaved, setDisplayNameSaved] = useState(false);
+  // Avatar upload state — populated when the user picks a file, cleared
+  // on save / cancel. `preview` is a 312×312 JPEG data URL produced by
+  // a hidden canvas resize so the upload size stays small.
+  const [avatarSaving, setAvatarSaving] = useState(false);
+  const [avatarError, setAvatarError] = useState("");
+  const avatarFileInputRef = useRef(null);
   // RSI Short-Bio verification flow state. `feedback` is a transient
   // banner shown after the most recent verify attempt; cleared whenever
   // the handle changes or the modal is reopened.
@@ -15163,6 +15199,25 @@ export default function StarCitizenSalvageGuideWebsite() {
 
   // Unread count drives the red bell badge.
   const unreadNotificationCount = userNotifications.filter((n) => !n.isRead).length;
+
+  // Site-wide effective display name for the current user. Resolution
+  // priority:
+  //   1. verified RSI handle  (Star Citizen identity, takes precedence)
+  //   2. custom displayName   (user-chosen leaderboard label)
+  //   3. Discord username     (fallback)
+  // Drives the header user menu, the Settings "Signed in as" line,
+  // and any other surface that should show the user's chosen identity.
+  // Stays in sync with the Statistics leaderboard logic so users only
+  // see one identity across the whole site.
+  const effectiveUserName = useMemo(() => {
+    if (!user) return "";
+    if (prefs?.rsiHandle && prefs?.rsiHandleVerified) return prefs.rsiHandle;
+    if (prefs?.displayName) return prefs.displayName;
+    return user.username || "";
+  }, [user, prefs]);
+  const isVerifiedRsi = Boolean(
+    user && prefs?.rsiHandle && prefs?.rsiHandleVerified
+  );
 
   // --- Presence heartbeat: while a user is logged in and the tab is
   // visible, POST /api/me/heartbeat every 30s so the admin Active Users
@@ -15877,6 +15932,249 @@ export default function StarCitizenSalvageGuideWebsite() {
       setPrefs(previous);
       setPrefsError(e && e.message ? e.message : "Could not save preferences");
     }
+  };
+
+  // --- Avatar upload helpers ---
+  // Resize/center-crop the picked file to a 312×312 JPEG data URL via
+  // a hidden canvas, then save it to prefs. Doing the resize client-
+  // side lets the server cap the stored payload at ~250KB without
+  // having to add image-processing dependencies to the API.
+  const AVATAR_TARGET_SIZE = 312;
+  const fileToDataUrl = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ""));
+      reader.onerror = () => reject(new Error("Could not read file."));
+      reader.readAsDataURL(file);
+    });
+  const loadImage = (src) =>
+    new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error("Image failed to load."));
+      img.src = src;
+    });
+  const resizeToAvatarDataUrl = async (file) => {
+    const dataUrl = await fileToDataUrl(file);
+    const img = await loadImage(dataUrl);
+    // Center-crop to a square, then draw at AVATAR_TARGET_SIZE.
+    const side = Math.min(img.naturalWidth, img.naturalHeight);
+    const sx = Math.max(0, Math.floor((img.naturalWidth - side) / 2));
+    const sy = Math.max(0, Math.floor((img.naturalHeight - side) / 2));
+    const canvas = document.createElement("canvas");
+    canvas.width = AVATAR_TARGET_SIZE;
+    canvas.height = AVATAR_TARGET_SIZE;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#0f172a"; // slate-900 fill behind transparent PNGs
+    ctx.fillRect(0, 0, AVATAR_TARGET_SIZE, AVATAR_TARGET_SIZE);
+    ctx.drawImage(img, sx, sy, side, side, 0, 0, AVATAR_TARGET_SIZE, AVATAR_TARGET_SIZE);
+    // JPEG @ 85% lands well under the 250KB server cap for typical
+    // photos. PNG would push us over for noisy / detailed inputs.
+    return canvas.toDataURL("image/jpeg", 0.85);
+  };
+  const onAvatarFilePicked = async (file) => {
+    if (!file) return;
+    if (!/^image\//.test(file.type || "")) {
+      setAvatarError("Please pick an image file (PNG, JPEG, or WebP).");
+      return;
+    }
+    setAvatarSaving(true);
+    setAvatarError("");
+    try {
+      const dataUrl = await resizeToAvatarDataUrl(file);
+      await saveAvatarDataUrl(dataUrl);
+    } catch (e) {
+      setAvatarError(e && e.message ? e.message : "Could not process image.");
+    } finally {
+      setAvatarSaving(false);
+      // Reset the file input so picking the same file twice in a row
+      // still fires onChange.
+      if (avatarFileInputRef.current) avatarFileInputRef.current.value = "";
+    }
+  };
+  const saveAvatarDataUrl = async (dataUrl) => {
+    setPrefsError("");
+    const previous = prefs;
+    setPrefs({ ...prefs, avatarDataUrl: dataUrl });
+    try {
+      const res = await fetch("/api/me/prefs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ avatarDataUrl: dataUrl }),
+      });
+      if (!res.ok) {
+        if (import.meta.env.DEV && (res.status === 401 || res.status === 404 || res.status === 503)) {
+          // Dev mock: keep the optimistic update.
+          return;
+        }
+        throw new Error(`HTTP ${res.status}`);
+      }
+      const data = await res.json();
+      if (data && data.prefs) setPrefs(data.prefs);
+    } catch (e) {
+      if (import.meta.env.DEV) return;
+      setPrefs(previous);
+      setAvatarError(e && e.message ? e.message : "Could not save avatar.");
+    }
+  };
+  const clearAvatar = () => saveAvatarDataUrl("");
+
+  // --- Mission contract lifecycle ---
+  // Accept / complete / abandon mission contracts. Multiple
+  // concurrent contracts are allowed; the active list lives at
+  // prefs.activeContracts. The legacy single-slot prefs.currentContract
+  // is migrated into the array on first read so old user data still
+  // surfaces correctly.
+  const activeContracts = useMemo(() => {
+    const list = Array.isArray(prefs?.activeContracts) ? prefs.activeContracts : [];
+    if (list.length > 0) return list;
+    if (prefs?.currentContract && typeof prefs.currentContract === "object") {
+      return [prefs.currentContract];
+    }
+    return [];
+  }, [prefs]);
+  const isMissionActive = (missionId) =>
+    activeContracts.some((c) => c && c.missionId === missionId);
+  const [contractInFlight, setContractInFlight] = useState(false);
+  const [contractError, setContractError] = useState("");
+  const postContract = async (body) => {
+    setContractInFlight(true);
+    setContractError("");
+    try {
+      const res = await fetch("/api/me/contract", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify(body),
+      });
+      let data = null;
+      try { data = await res.json(); } catch {}
+      if (!res.ok) {
+        if (import.meta.env.DEV && (res.status === 401 || res.status === 403 || res.status === 404 || res.status === 503)) {
+          // Dev fallback: simulate the server response shape using
+          // local prefs/ledger state so the flow exercises in vite-dev.
+          return { devMock: true, body };
+        }
+        throw new Error((data && data.error) || `HTTP ${res.status}`);
+      }
+      if (data && data.currentContract !== undefined) {
+        setPrefs((p) => ({ ...p, currentContract: data.currentContract }));
+      }
+      return data;
+    } catch (e) {
+      setContractError(e && e.message ? e.message : "Request failed.");
+      throw e;
+    } finally {
+      setContractInFlight(false);
+    }
+  };
+  // Apply a server response that includes activeContracts to local
+  // prefs state. Also clears the legacy single-slot field.
+  const syncActiveContracts = (next) => {
+    if (!Array.isArray(next)) return;
+    setPrefs((p) => ({ ...p, activeContracts: next, currentContract: null }));
+  };
+  const acceptMissionContract = async (mission) => {
+    if (!mission) return;
+    if (isMissionActive(mission.id)) return; // dedupe per-mission
+    const optimisticEntry = {
+      missionId: String(mission.id || ""),
+      name: String(mission.name || ""),
+      reward: Number(mission.reward) || 0,
+      buyIn: Number(mission.buyIn) || 0,
+      acceptedAt: Date.now(),
+    };
+    const result = await postContract({
+      action: "accept",
+      missionId: optimisticEntry.missionId,
+      name: optimisticEntry.name,
+      reward: optimisticEntry.reward,
+      buyIn: optimisticEntry.buyIn,
+    }).catch(() => null);
+    if (result?.devMock) {
+      syncActiveContracts([...activeContracts, optimisticEntry]);
+      return;
+    }
+    if (result?.activeContracts) syncActiveContracts(result.activeContracts);
+  };
+  const completeMissionContract = async (missionId) => {
+    const target = activeContracts.find((c) => c.missionId === missionId);
+    if (!target) return;
+    const result = await postContract({
+      action: "complete",
+      missionId,
+      confirm: "COMPLETE_CONTRACT",
+    }).catch(() => null);
+    const now = Date.now();
+    const newOrders = [];
+    const reward = Number(target.reward) || 0;
+    const buyIn = Number(target.buyIn) || 0;
+    if (reward !== 0) {
+      newOrders.push({
+        id: `mission-reward-${now}-${Math.floor(Math.random() * 1e6)}`,
+        material: "Mission Reward",
+        scu: 0,
+        location: `Mission: ${target.name}`,
+        playerName: "",
+        aUEC: reward,
+        submittedAt: now,
+        deletedAt: null,
+        dismissedFromRecentAt: null,
+      });
+    }
+    if (buyIn > 0) {
+      newOrders.push({
+        id: `mission-buyin-${now}-${Math.floor(Math.random() * 1e6)}`,
+        material: "Mission Buy-In",
+        scu: 0,
+        location: `Mission: ${target.name}`,
+        playerName: "",
+        aUEC: -Math.abs(buyIn),
+        submittedAt: now,
+        deletedAt: null,
+        dismissedFromRecentAt: null,
+      });
+    }
+    if (result?.devMock) {
+      if (newOrders.length > 0) setSellOrders((prev) => [...prev, ...newOrders]);
+      syncActiveContracts(activeContracts.filter((c) => c.missionId !== missionId));
+      return;
+    }
+    if (newOrders.length > 0) setSellOrders((prev) => [...prev, ...newOrders]);
+    if (result?.activeContracts) syncActiveContracts(result.activeContracts);
+  };
+  const abandonMissionContract = async (missionId) => {
+    const target = activeContracts.find((c) => c.missionId === missionId);
+    if (!target) return;
+    const result = await postContract({
+      action: "abandon",
+      missionId,
+      confirm: "ABANDON_CONTRACT",
+    }).catch(() => null);
+    const now = Date.now();
+    const buyIn = Number(target.buyIn) || 0;
+    const newOrders = [];
+    if (buyIn > 0) {
+      newOrders.push({
+        id: `mission-buyin-${now}-${Math.floor(Math.random() * 1e6)}`,
+        material: "Mission Buy-In",
+        scu: 0,
+        location: `Mission: ${target.name} (abandoned)`,
+        playerName: "",
+        aUEC: -Math.abs(buyIn),
+        submittedAt: now,
+        deletedAt: null,
+        dismissedFromRecentAt: null,
+      });
+    }
+    if (result?.devMock) {
+      if (newOrders.length > 0) setSellOrders((prev) => [...prev, ...newOrders]);
+      syncActiveContracts(activeContracts.filter((c) => c.missionId !== missionId));
+      return;
+    }
+    if (newOrders.length > 0) setSellOrders((prev) => [...prev, ...newOrders]);
+    if (result?.activeContracts) syncActiveContracts(result.activeContracts);
   };
 
   // --- Save the Display Name draft ---
@@ -16886,6 +17184,11 @@ export default function StarCitizenSalvageGuideWebsite() {
   const recentSellOrders = visibleSellOrders.filter(
     (o) =>
       !o.dismissedFromRecentAt &&
+      // Mission contract settlements are tracked in Patch History
+      // and on the Active Contracts panel; they're not actual sales,
+      // so keep them out of the Recent Sales feed.
+      o.material !== "Mission Reward" &&
+      o.material !== "Mission Buy-In" &&
       Number.isFinite(o.submittedAt) &&
       o.submittedAt >= recentSalesCutoff
   );
@@ -16974,6 +17277,35 @@ export default function StarCitizenSalvageGuideWebsite() {
       .filter((o) => !o.deletedAt && o.submittedAt && inSelectedWindow(o.submittedAt))
       .map((o) => {
         const materialLabel = o.material || "Construction Materials";
+        // Mission contract entries (written by /api/me/contract on
+        // complete or abandon) get their own row treatment so the
+        // user sees a distinct "Reward" / "Buy-In" line with the
+        // aUEC delta and the mission name, instead of a generic
+        // "Sold 0 SCU Mission Reward" line.
+        const isMissionReward = materialLabel === "Mission Reward";
+        const isMissionBuyIn = materialLabel === "Mission Buy-In";
+        if (isMissionReward || isMissionBuyIn) {
+          // Strip the "Mission: " prefix the endpoint stamped on the
+          // location field so the row reads cleanly. Preserve any
+          // " (abandoned)" suffix as a separate tag.
+          const rawLoc = String(o.location || "");
+          const stripped = rawLoc.replace(/^Mission:\s*/i, "");
+          const abandoned = / \(abandoned\)$/i.test(stripped);
+          const missionName = stripped.replace(/ \(abandoned\)$/i, "");
+          const delta = Number(o.aUEC) || 0;
+          const sign = delta > 0 ? "+" : "";
+          const typeLabel = isMissionReward
+            ? (abandoned ? "Mission · Abandoned" : "Mission · Reward")
+            : (abandoned ? "Mission · Abandoned" : "Mission · Buy-In");
+          return {
+            id: o.id,
+            source: "sell",
+            type: typeLabel,
+            ts: o.submittedAt,
+            primary: `${missionName} · ${sign}${delta.toLocaleString()} aUEC`,
+            secondary: abandoned ? "Forfeited reward; buy-in still applied." : "Settled to ledger.",
+          };
+        }
         const isPlayer = o.location === PLAYER_SELL_POINT;
         const locationLabel = isPlayer && o.playerName
           ? `${o.location} (${o.playerName})`
@@ -18023,10 +18355,16 @@ export default function StarCitizenSalvageGuideWebsite() {
           </button>
         )}
         <header className="mb-8 overflow-hidden rounded-3xl border border-cyan-500/30 shadow-2xl shadow-cyan-950/40">
+          {/* Banner displayed at ~75% of its natural height (h-80 →
+              320px). object-cover preserves the artwork's center
+              band when the viewport is narrower than 1600px. The
+              radial mask fades the edges to transparent for a soft
+              dissolve into the header background; -webkit-mask
+              mirror covers Safari. */}
           <img
             src="/scsalvager_banner.jpg"
             alt="SCSalvager.net — Salvage · Recover · Profit"
-            className="block w-full"
+            className="block w-full h-80 object-cover [mask-image:radial-gradient(ellipse_at_center,black_55%,transparent_98%)] [-webkit-mask-image:radial-gradient(ellipse_at_center,black_55%,transparent_98%)]"
             width="1600"
             height="565"
           />
@@ -18067,6 +18405,20 @@ export default function StarCitizenSalvageGuideWebsite() {
                       pending (DMs off, RSI handle missing or
                       unverified). Clicking an item opens the Settings
                       modal where the user can fix it. */}
+                  {/* Lifetime aUEC pill — sits to the LEFT of the
+                      notification bell so the user always sees their
+                      running total without opening Statistics. Sums
+                      every visible sell order's aUEC (positive sales
+                      and negative mission buy-ins both included). */}
+                  <div
+                    className="hidden items-center gap-1.5 rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-2.5 py-1.5 text-xs font-semibold text-emerald-200 sm:inline-flex"
+                    title="Lifetime aUEC across every logged sell order + mission settlement"
+                  >
+                    <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" className="h-3 w-3 text-emerald-300">
+                      <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm-1-4V8h2v4h-2zm0-6V6h2v.01H9z" />
+                    </svg>
+                    {Number(lifetimeAUEC || 0).toLocaleString()} aUEC
+                  </div>
                   <div className="relative">
                     <button
                       type="button"
@@ -18194,7 +18546,13 @@ export default function StarCitizenSalvageGuideWebsite() {
                       aria-expanded={isUserMenuOpen}
                       className="flex items-center gap-2 rounded-lg border border-cyan-500/25 bg-slate-900/70 px-2 py-1.5 hover:border-cyan-400/50"
                     >
-                      {user.avatar ? (
+                      {prefs?.avatarDataUrl ? (
+                        <img
+                          src={prefs.avatarDataUrl}
+                          alt=""
+                          className="h-7 w-7 rounded-full object-cover"
+                        />
+                      ) : user.avatar ? (
                         <img
                           src={`https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`}
                           alt=""
@@ -18203,10 +18561,23 @@ export default function StarCitizenSalvageGuideWebsite() {
                         />
                       ) : (
                         <div className="flex h-7 w-7 items-center justify-center rounded-full bg-cyan-500/20 text-xs font-bold text-cyan-200">
-                          {(user.username || "?").charAt(0).toUpperCase()}
+                          {(effectiveUserName || "?").charAt(0).toUpperCase()}
                         </div>
                       )}
-                      <span className="text-xs font-semibold text-slate-200">{user.username}</span>
+                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-slate-200">
+                        {effectiveUserName}
+                        {isVerifiedRsi && (
+                          <span
+                            className="inline-flex items-center text-emerald-400"
+                            title="Verified RSI handle"
+                            aria-label="Verified RSI handle"
+                          >
+                            <svg width="12" height="12" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                            </svg>
+                          </span>
+                        )}
+                      </span>
                       <svg
                         className={`h-3 w-3 text-slate-400 transition-transform ${isUserMenuOpen ? "rotate-180" : ""}`}
                         viewBox="0 0 20 20"
@@ -18975,8 +19346,11 @@ export default function StarCitizenSalvageGuideWebsite() {
           // one system (e.g. cross-system delivery legs). It matches any
           // mission whose `system` field is the literal string "Multi".
           const allSystems = ["Stanton", "Pyro", "Nyx", "Multi"];
-          // Faction list is fixed per spec.
-          const allFactions = ["Adagio Holdings", "Tar Pits"];
+          // Faction list. Rough & Ready covers the RR_ "Wrecked Ships
+          // for Sale" family that the source data ships with a null
+          // factionGuid; build-missions.cjs maps that family to this
+          // label so the filter matches.
+          const allFactions = ["Adagio Holdings", "Rough & Ready", "Tar Pits"];
 
           // Apply every active filter. Any falsy filter value is a
           // pass-through; the empty default state shows everything.
@@ -18995,27 +19369,41 @@ export default function StarCitizenSalvageGuideWebsite() {
             return true;
           });
 
-          // Stable sort over the filtered rows. Numeric columns sort
-          // numerically; string columns use locale-aware compare with
-          // case-insensitive fallback for "—" / empty values.
+          // Stable multi-sort over the filtered rows. Walk the
+          // missionSorts list in order; the first non-zero pairwise
+          // comparison wins. Numeric columns sort numerically;
+          // string columns use locale-aware compare on a lowercased
+          // value so "—" / empty entries collapse cleanly.
           const numericKeys = new Set(["reward", "baseXP"]);
-          const sorted = [...filtered].sort((a, b) => {
-            const aV = a[missionSortKey];
-            const bV = b[missionSortKey];
+          const compareByKey = (a, b, key, dir) => {
+            const aV = a[key];
+            const bV = b[key];
             let cmp;
-            if (numericKeys.has(missionSortKey)) {
+            if (numericKeys.has(key)) {
               cmp = (Number(aV) || 0) - (Number(bV) || 0);
             } else {
               const aS = String(aV ?? "").toLowerCase();
               const bS = String(bV ?? "").toLowerCase();
               cmp = aS.localeCompare(bS);
             }
-            return missionSortDir === "asc" ? cmp : -cmp;
+            return dir === "asc" ? cmp : -cmp;
+          };
+          const sorted = [...filtered].sort((a, b) => {
+            for (const s of missionSorts) {
+              const c = compareByKey(a, b, s.key, s.dir);
+              if (c !== 0) return c;
+            }
+            return 0;
           });
-          // Helper: render a sort indicator on the active column.
+          // Helper: render a sort indicator on each header. Active
+          // columns get an arrow + their position in the sort order
+          // (1, 2, 3…) so the user can see how the keys chain.
           const sortGlyph = (key) => {
-            if (missionSortKey !== key) return "";
-            return missionSortDir === "asc" ? " ▲" : " ▼";
+            const i = missionSorts.findIndex((s) => s.key === key);
+            if (i < 0) return "";
+            const arrow = missionSorts[i].dir === "asc" ? "▲" : "▼";
+            const rank = missionSorts.length > 1 ? ` ${i + 1}` : "";
+            return ` ${arrow}${rank}`;
           };
 
           const filtersActive =
@@ -19023,6 +19411,79 @@ export default function StarCitizenSalvageGuideWebsite() {
 
           return (
             <div className="space-y-6">
+              {/* Active Contracts panel — list of every accepted
+                  mission. Sits ABOVE the table so it's the first
+                  thing the user sees on the Missions tab. Each row
+                  has its own Complete + Abandon buttons. */}
+              {activeContracts.length > 0 && (
+                <div className="rounded-3xl border border-emerald-500/30 bg-emerald-500/5 p-5 shadow-xl shadow-emerald-950/20 backdrop-blur">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="text-[10px] uppercase tracking-[0.25em] text-emerald-300/80">
+                      Active Contracts ({activeContracts.length})
+                    </div>
+                    <span className="text-[10px] text-slate-500">
+                      Multiple contracts can be active at once.
+                    </span>
+                  </div>
+                  <ul className="mt-3 space-y-2">
+                    {activeContracts.map((cc) => (
+                      <li
+                        key={cc.missionId}
+                        className="rounded-2xl border border-emerald-500/20 bg-slate-950/50 p-3"
+                      >
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                          <div className="min-w-0 flex-1">
+                            <h4 className="text-sm font-bold text-white">{cc.name}</h4>
+                            <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px]">
+                              {Number(cc.reward) > 0 && (
+                                <span className="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-2 py-0.5 font-semibold text-emerald-200">
+                                  Reward: {Number(cc.reward).toLocaleString()} aUEC
+                                </span>
+                              )}
+                              {Number(cc.buyIn) > 0 && (
+                                <span className="rounded-md border border-rose-500/40 bg-rose-500/10 px-2 py-0.5 font-semibold text-rose-200">
+                                  Buy-in: -{Number(cc.buyIn).toLocaleString()} aUEC
+                                </span>
+                              )}
+                              {cc.acceptedAt && (
+                                <span className="text-slate-500">
+                                  Accepted {formatTimeAgo(cc.acceptedAt) || "just now"}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex flex-wrap gap-2 sm:flex-col sm:items-end">
+                            <button
+                              type="button"
+                              onClick={() => completeMissionContract(cc.missionId)}
+                              disabled={contractInFlight}
+                              className="rounded-md border border-emerald-500/50 bg-emerald-500/20 px-3 py-1.5 text-xs font-bold text-emerald-100 hover:border-emerald-400/70 hover:bg-emerald-500/30 disabled:cursor-not-allowed disabled:opacity-50"
+                              title="Apply the reward (and any buy-in cost) to your ledger and clear this contract."
+                            >
+                              {contractInFlight ? "Working…" : "Complete Contract"}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => abandonMissionContract(cc.missionId)}
+                              disabled={contractInFlight}
+                              className="rounded-md border border-rose-500/40 bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-200 hover:border-rose-400/60 hover:bg-rose-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+                              title="Cancel this contract. Forfeits the positive reward; any buy-in cost still applies to your ledger."
+                            >
+                              Abandon Offer
+                            </button>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                  {contractError && (
+                    <p className="mt-3 rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+                      {contractError}
+                    </p>
+                  )}
+                </div>
+              )}
+
               <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                   <div>
@@ -19148,23 +19609,37 @@ export default function StarCitizenSalvageGuideWebsite() {
                             { key: "legality", label: "Legal / Illegal", align: "left" },
                             { key: "minRank",  label: "Min Rank",      align: "left"  },
                             { key: "maxRank",  label: "Max Rank",      align: "left"  },
-                          ].map((col) => (
-                            <th
-                              key={col.key}
-                              className={`px-4 py-3 ${col.align === "right" ? "text-right" : ""}`}
-                            >
-                              <button
-                                type="button"
-                                onClick={() => toggleMissionSort(col.key)}
-                                className={`inline-flex items-center gap-1 font-semibold ${
-                                  missionSortKey === col.key ? "text-cyan-300" : "text-slate-300 hover:text-cyan-200"
-                                }`}
-                                title={`Sort by ${col.label}`}
+                          ].map((col) => {
+                            const sortIdx = missionSorts.findIndex((s) => s.key === col.key);
+                            const isActive = sortIdx >= 0;
+                            return (
+                              <th
+                                key={col.key}
+                                className={`px-4 py-3 ${col.align === "right" ? "text-right" : ""}`}
                               >
-                                {col.label}{sortGlyph(col.key)}
-                              </button>
-                            </th>
-                          ))}
+                                <button
+                                  type="button"
+                                  onClick={(e) =>
+                                    toggleMissionSort(col.key, {
+                                      additive: e.shiftKey || e.ctrlKey || e.metaKey,
+                                    })
+                                  }
+                                  onContextMenu={(e) => {
+                                    if (isActive) {
+                                      e.preventDefault();
+                                      removeMissionSort(col.key);
+                                    }
+                                  }}
+                                  className={`inline-flex items-center gap-1 font-semibold ${
+                                    isActive ? "text-cyan-300" : "text-slate-300 hover:text-cyan-200"
+                                  }`}
+                                  title={`Sort by ${col.label}\nShift/Ctrl-click to chain as a secondary sort. Right-click to remove.`}
+                                >
+                                  {col.label}{sortGlyph(col.key)}
+                                </button>
+                              </th>
+                            );
+                          })}
                         </tr>
                       </thead>
                       <tbody>
@@ -19175,7 +19650,35 @@ export default function StarCitizenSalvageGuideWebsite() {
                             className="cursor-pointer border-t border-slate-800 bg-slate-900/40 align-top transition-colors hover:bg-slate-800/60"
                           >
                             <td className="px-4 py-3">
-                              <div className="font-semibold text-white">{m.name}</div>
+                              <div className="font-semibold text-white">
+                                {m.name}
+                                {/* "Wrecked Ships for Sale" missions
+                                    use the title as a generic header;
+                                    the actual destination station is
+                                    in the contract's `locations`
+                                    array (scmdb's `destinations` is
+                                    null for this family). Pull from
+                                    locations first, fall back to
+                                    destinations for any other family
+                                    we apply this label rule to in the
+                                    future. */}
+                                {(() => {
+                                  if (!/Wrecked Ships for Sale/i.test(m.name || "")) return null;
+                                  const list =
+                                    Array.isArray(m.locations) && m.locations.length > 0
+                                      ? m.locations
+                                      : Array.isArray(m.destinations)
+                                        ? m.destinations
+                                        : [];
+                                  const names = list.map((x) => x?.name).filter(Boolean);
+                                  if (names.length === 0) return null;
+                                  return (
+                                    <span className="ml-1 font-normal text-slate-400">
+                                      ({names.join(", ")})
+                                    </span>
+                                  );
+                                })()}
+                              </div>
                             </td>
                             <td className="px-4 py-3 whitespace-nowrap text-slate-300">{m.system}</td>
                             <td className="px-4 py-3 whitespace-nowrap text-slate-300">{m.faction}</td>
@@ -19234,7 +19737,52 @@ export default function StarCitizenSalvageGuideWebsite() {
                     aria-labelledby="mission-detail-title"
                   >
                     <div className="flex items-start justify-between gap-3">
-                      <div>
+                      <div className="min-w-0 flex-1">
+                        {/* Accept Offer — top-left of the modal.
+                            Hidden / disabled / labeled per current
+                            contract state so a stale click can't
+                            override an existing accept. */}
+                        {(() => {
+                          if (!user) {
+                            // Accept-contract is login-gated. Anonymous
+                            // viewers see a Discord login CTA instead
+                            // of a button that would 401 on the server.
+                            return (
+                              <a
+                                href="/api/auth/login"
+                                className="mb-2 inline-block rounded-md border border-indigo-400/40 bg-indigo-500/15 px-3 py-1.5 text-xs font-bold text-indigo-100 hover:border-indigo-300/70 hover:bg-indigo-500/25"
+                                title="Sign in with Discord to accept salvage contracts."
+                              >
+                                Log in to accept contract
+                              </a>
+                            );
+                          }
+                          const isThisActive = isMissionActive(missionDetail.id);
+                          const label = isThisActive
+                            ? "Already accepted"
+                            : contractInFlight
+                              ? "Working…"
+                              : "Accept Offer";
+                          return (
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                if (isThisActive) return;
+                                await acceptMissionContract(missionDetail);
+                                setMissionDetail(null);
+                              }}
+                              disabled={isThisActive || contractInFlight}
+                              title={
+                                isThisActive
+                                  ? "Already in your active contract list."
+                                  : "Bind this mission to your account. Multiple contracts can be active at once."
+                              }
+                              className="mb-2 rounded-md border border-emerald-500/40 bg-emerald-500/15 px-3 py-1.5 text-xs font-bold text-emerald-100 hover:border-emerald-400/60 hover:bg-emerald-500/25 disabled:cursor-not-allowed disabled:opacity-50"
+                            >
+                              {label}
+                            </button>
+                          );
+                        })()}
                         <h3 id="mission-detail-title" className="text-lg font-bold text-cyan-300">
                           {missionDetail.name}
                         </h3>
@@ -19244,6 +19792,9 @@ export default function StarCitizenSalvageGuideWebsite() {
                             {missionDetail.legality}
                           </span>
                         </p>
+                        {contractError && (
+                          <p className="mt-2 text-[11px] text-rose-300">{contractError}</p>
+                        )}
                       </div>
                       <button
                         type="button"
@@ -20206,7 +20757,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                   <p className="mt-1 text-sm text-slate-400">
                     {isViewingCurrentPatch ? (
                       <>
-                        Collected refinery jobs and sell orders from the current Star Citizen patch
+                        Mission history, collected refinery jobs, and sell orders from the current Star Citizen patch
                         {selectedPatch.version ? ` (${selectedPatch.version})` : ""}. Use the patch dropdown to look back at earlier cycles, or the Clear History dropdown to wipe per-patch data.
                       </>
                     ) : (
@@ -20356,7 +20907,11 @@ export default function StarCitizenSalvageGuideWebsite() {
                             <span className={`rounded-lg px-2 py-1 text-xs font-semibold ${
                               entry.type === "Refined"
                                 ? "bg-amber-500/15 text-amber-200"
-                                : "bg-emerald-500/15 text-emerald-200"
+                                : entry.type?.startsWith("Mission · Abandoned") || entry.type?.startsWith("Mission · Buy-In")
+                                  ? "bg-rose-500/15 text-rose-200"
+                                  : entry.type?.startsWith("Mission")
+                                    ? "bg-cyan-500/15 text-cyan-200"
+                                    : "bg-emerald-500/15 text-emerald-200"
                             }`}>
                               {entry.type}
                             </span>
@@ -20882,19 +21437,32 @@ export default function StarCitizenSalvageGuideWebsite() {
                               <tr key={`${u.username}-${idx}`} className="border-t border-slate-800 bg-slate-900/40">
                                 <td className="px-4 py-3 font-bold text-cyan-300">{idx + 1}</td>
                                 <td className="px-4 py-3 font-semibold text-white">
-                                  <span className="inline-flex items-center gap-1.5">
-                                    {u.username}
-                                    {u.verified ? (
-                                      <span
-                                        className="inline-flex items-center text-emerald-400"
-                                        title="Verified RSI handle"
-                                        aria-label="Verified RSI handle"
-                                      >
-                                        <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                        </svg>
+                                  <span className="inline-flex items-center gap-2">
+                                    {u.avatarDataUrl ? (
+                                      <img
+                                        src={u.avatarDataUrl}
+                                        alt=""
+                                        className="h-7 w-7 shrink-0 rounded-full border border-slate-700 object-cover"
+                                      />
+                                    ) : (
+                                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-slate-700 bg-cyan-500/15 text-xs font-bold text-cyan-200">
+                                        {(u.username || "?").charAt(0).toUpperCase()}
                                       </span>
-                                    ) : null}
+                                    )}
+                                    <span className="inline-flex items-center gap-1.5">
+                                      {u.username}
+                                      {u.verified ? (
+                                        <span
+                                          className="inline-flex items-center text-emerald-400"
+                                          title="Verified RSI handle"
+                                          aria-label="Verified RSI handle"
+                                        >
+                                          <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                          </svg>
+                                        </span>
+                                      ) : null}
+                                    </span>
                                   </span>
                                 </td>
                                 <td className="px-4 py-3 text-right font-bold text-amber-300">
@@ -22067,7 +22635,23 @@ export default function StarCitizenSalvageGuideWebsite() {
               <div className="flex items-start justify-between">
                 <div>
                   <h3 id="settings-title" className="text-lg font-bold text-cyan-300">Settings</h3>
-                  <p className="mt-1 text-xs text-slate-400">Signed in as @{user.username}</p>
+                  <p className="mt-1 text-xs text-slate-400">
+                    Signed in as @{effectiveUserName}
+                    {isVerifiedRsi && (
+                      <span
+                        className="ml-1 inline-flex items-center align-middle text-emerald-400"
+                        title="Verified RSI handle"
+                        aria-label="Verified RSI handle"
+                      >
+                        <svg width="11" height="11" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                      </span>
+                    )}
+                    {isVerifiedRsi && user.username && user.username !== effectiveUserName && (
+                      <span className="ml-1 text-slate-600">(Discord: {user.username})</span>
+                    )}
+                  </p>
                 </div>
                 <button
                   type="button"
@@ -22078,6 +22662,72 @@ export default function StarCitizenSalvageGuideWebsite() {
                   ✕
                 </button>
               </div>
+
+              {/* Avatar section. Lets users upload a custom avatar
+                  that overrides their Discord avatar across the
+                  site. Client resizes/center-crops to 312×312 JPEG
+                  before upload so the stored data URL stays small. */}
+              <section className="mt-6">
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Avatar</h4>
+                <div className="mt-3 rounded-xl border border-slate-800 bg-slate-950/60 p-4">
+                  <div className="flex flex-wrap items-start gap-4">
+                    {(() => {
+                      const customAvatar = prefs?.avatarDataUrl || "";
+                      const discordAvatar = user?.avatar
+                        ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=256`
+                        : "";
+                      const src = customAvatar || discordAvatar;
+                      return src ? (
+                        <img
+                          src={src}
+                          alt=""
+                          className="h-20 w-20 shrink-0 rounded-full border border-slate-700 object-cover"
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : (
+                        <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full border border-slate-700 bg-cyan-500/10 text-2xl font-bold text-cyan-200">
+                          {(effectiveUserName || "?").charAt(0).toUpperCase()}
+                        </div>
+                      );
+                    })()}
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs text-slate-400">
+                        Upload an image to use across the site instead of your Discord avatar. We resize and crop to a 312×312 circle automatically. Leave blank to use your Discord avatar.
+                      </p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <input
+                          ref={avatarFileInputRef}
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp"
+                          onChange={(e) => onAvatarFilePicked(e.target.files?.[0])}
+                          className="hidden"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => avatarFileInputRef.current?.click()}
+                          disabled={avatarSaving}
+                          className="rounded-md border border-cyan-500/30 bg-cyan-500/10 px-3 py-1.5 text-xs font-semibold text-cyan-200 hover:border-cyan-400/60 hover:bg-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          {avatarSaving ? "Uploading…" : prefs?.avatarDataUrl ? "Replace avatar" : "Upload avatar"}
+                        </button>
+                        {prefs?.avatarDataUrl && (
+                          <button
+                            type="button"
+                            onClick={clearAvatar}
+                            disabled={avatarSaving}
+                            className="rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-200 hover:border-rose-400/60 hover:bg-rose-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            Remove avatar
+                          </button>
+                        )}
+                      </div>
+                      {avatarError && (
+                        <p className="mt-2 text-xs text-rose-300">{avatarError}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </section>
 
               {/* Display Name section.
                   Free-form override for users who don't have an RSI
@@ -22593,7 +23243,7 @@ export default function StarCitizenSalvageGuideWebsite() {
               <div className="flex items-start justify-between">
                 <div>
                   <h3 id="privacy-title" className="text-lg font-bold text-cyan-300">Privacy Policy</h3>
-                  <p className="mt-1 text-xs text-slate-500">Last updated: April 28, 2026</p>
+                  <p className="mt-1 text-xs text-slate-500">Last updated: April 29, 2026</p>
                 </div>
                 <button
                   type="button"
@@ -22627,6 +23277,12 @@ export default function StarCitizenSalvageGuideWebsite() {
                     </li>
                     <li>
                       <strong className="text-slate-200">Anonymous visit ping (user-agent, country code)</strong> — when you load the site without being signed in, your browser fires a single ping that records the user-agent string and country code (from the CDN) so the operator can see how much anonymous traffic the site receives. <strong className="text-slate-200">IP addresses are not collected</strong> for these pings. We store at most the 1,000 most recent pings, deduped per-browser to one ping per 24 hours via an HTTP-only cookie (<code className="rounded bg-slate-800 px-1 text-cyan-200">scs_guest_visit</code>). Once you sign in, no further anonymous pings are recorded for that browser.
+                    </li>
+                    <li>
+                      <strong className="text-slate-200">Custom avatar (optional)</strong> — when you upload an avatar in Settings, we resize and center-crop it to a 312×312 JPEG client-side and store the resulting data URL in your preferences hash. The image overrides your Discord avatar across the site (header user menu, Statistics leaderboard, Settings) until you replace or remove it. Capped at 250KB per upload.
+                    </li>
+                    <li>
+                      <strong className="text-slate-200">Active mission contracts (optional)</strong> — when you click "Accept Offer" on a salvage contract, we store <code className="rounded bg-slate-800 px-1 text-cyan-200">{`{ missionId, name, reward, buyIn, acceptedAt }`}</code> in your preferences so the Missions tab can resurface your in-flight contracts after you reload. Multiple contracts can be active at once. Removed when you click Complete Contract or Abandon Offer.
                     </li>
                   </ul>
                   <p className="mt-3 text-slate-400">
@@ -22734,7 +23390,7 @@ export default function StarCitizenSalvageGuideWebsite() {
               <div className="flex items-start justify-between">
                 <div>
                   <h3 id="terms-title" className="text-lg font-bold text-cyan-300">Terms of Service</h3>
-                  <p className="mt-1 text-xs text-slate-500">Last updated: April 28, 2026</p>
+                  <p className="mt-1 text-xs text-slate-500">Last updated: April 29, 2026</p>
                 </div>
                 <button
                   type="button"
@@ -22767,6 +23423,8 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <li>Submit anonymous community price reports that go into the site's median pricing.</li>
                     <li>Upload screenshots (or a crop you select) of refinery and sell-order screens; the image is sent once to a vision AI service for parsing and immediately discarded.</li>
                     <li>Set an optional custom display name to appear on the Statistics leaderboard until you verify an RSI handle.</li>
+                    <li>Upload an optional <strong>custom avatar</strong> that replaces your Discord avatar across the site. Resized and center-cropped client-side to 312×312 before storage.</li>
+                    <li>Accept salvage <strong>mission contracts</strong> from the Missions tab and have multiple in-flight contracts at once. Completing applies the reward (and any negative buy-in) to your ledger; abandoning forfeits the positive reward but still applies the negative buy-in.</li>
                     <li>Verify your RSI handle to display it on the Statistics leaderboard. A verified RSI handle replaces both your Discord handle and any custom display name.</li>
                     <li>Browse Missions, Ship Details, and Scraper Module Performance panels populated from public Star Citizen reference sites.</li>
                     <li>Opt in to Discord DMs for refinery-completion notifications.</li>
@@ -22797,6 +23455,8 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <li><strong className="text-slate-200">Community price reports</strong> are stored anonymously, with no link to your user ID. By submitting a report, you grant SCSalvager.net a perpetual, non-exclusive license to display and aggregate that report as part of the community price data. Because the report carries no identifier, deleting your account does not retract reports you previously submitted — they are already irreversibly anonymous and continue to inform the community median.</li>
                     <li><strong className="text-slate-200">Screenshot uploads</strong> (and any crop you select before submitting) are processed once by the vision AI parser and discarded. They are never written to disk, stored in Redis, or logged. Don't upload screenshots that contain content you don't have the right to share with the parser.</li>
                     <li><strong className="text-slate-200">Custom display names</strong> must not impersonate another player or the site itself. We may reset a custom display name that violates these rules without notice.</li>
+                    <li><strong className="text-slate-200">Custom avatars</strong> must not infringe on third-party copyright, contain pornographic / hateful imagery, or be designed to impersonate another player. We may remove an avatar that violates these rules without notice.</li>
+                    <li><strong className="text-slate-200">Mission contracts</strong> are personal-tracking entries in your own ledger; they don't represent in-game inventory or aUEC. Don't claim they do.</li>
                     <li>You are responsible for the content you submit. Don't submit anything you don't have the right to.</li>
                   </ul>
                 </section>
@@ -23032,6 +23692,34 @@ export default function StarCitizenSalvageGuideWebsite() {
               </div>
 
               <div className="mt-5 space-y-7 text-sm text-slate-300 leading-relaxed">
+
+                <section>
+                  <h4 className="text-cyan-300 text-base font-bold">v2.7.0 — April 29, 2026</h4>
+                  <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li><strong>Accept Offer</strong> button at the top-left of every mission detail popup. Logged-in users can take a contract on directly from the Missions tab. Multiple contracts can be active at once.</li>
+                    <li>New <strong>Active Contracts</strong> panel above the Salvage Missions table — lists every accepted contract with reward / buy-in / accepted-time, plus per-row <strong>Complete Contract</strong> and <strong>Abandon Offer</strong> buttons.</li>
+                    <li><strong>Complete Contract</strong> applies the positive reward + the negative buy-in to your ledger as synthetic sell-order entries (flow into Statistics, the Lifetime aUEC pill, and Patch History).</li>
+                    <li><strong>Abandon Offer</strong> forfeits the positive reward but still settles any negative buy-in.</li>
+                    <li>Mission completions / abandonments now appear in <strong>Ledger → Patch History</strong> with cyan <code className="rounded bg-slate-800 px-1 text-cyan-200">Mission · Reward</code>, rose <code className="rounded bg-slate-800 px-1 text-cyan-200">Mission · Buy-In</code>, and rose <code className="rounded bg-slate-800 px-1 text-cyan-200">Mission · Abandoned</code> pills.</li>
+                    <li>Header now shows your <strong>Lifetime aUEC</strong> as an emerald pill, immediately left of the notification bell. Sums every visible sell-order entry (real sales + mission settlements).</li>
+                    <li>Settings → <strong>Avatar</strong>: upload a custom avatar that overrides your Discord avatar across the site. We resize and center-crop to a 312×312 circle automatically.</li>
+                    <li>Statistics leaderboard shows each top salvager's avatar to the left of their name (custom or letter-fallback). Verified-RSI checkmark stays inline.</li>
+                    <li>Verified RSI handles now display <strong>site-wide</strong> — header user menu, Settings "Signed in as" line, and avatar fallback all read your verified Star Citizen identity.</li>
+                    <li><strong>Multi-sort</strong> on the Salvage Missions table: shift / ctrl / cmd-click a column header to chain it as a secondary sort key. Active columns show their priority (▲ 1, ▼ 2). Right-click an active header to drop it from the chain.</li>
+                    <li><strong>Wrecked Ships for Sale</strong> missions now show the destination station in parentheses after the title, e.g. "Wrecked Ships for Sale (Checkmate)".</li>
+                    <li>Header banner trimmed by ~25% with a radial <strong>dissolve mask</strong> at the edges so it blends into the page background.</li>
+                    <li>Mission table system column no longer falls back to "Unknown" — resolves explicit systems → location systems → debugName scan before giving up.</li>
+                    <li>New <strong>Rough & Ready</strong> faction option in the Missions filter, covering the RR_ Wrecked Ships family.</li>
+                    <li>Mission table rows shortened — per-row description line removed; full briefing still in the popup.</li>
+                  </ul>
+                  <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Changes</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li>Top Salvagers leaderboard now ranks strictly by <strong>Total SCU Refined</strong>. Profit-only activity no longer qualifies a user for the top 5.</li>
+                    <li>Patch History panel description updated to "Mission history, collected refinery jobs, and sell orders…" so the new contract entries are front-and-center.</li>
+                    <li>Recent Sales feed excludes mission contract settlements — they're tracked on the Active Contracts panel pre-settlement and in Patch History after.</li>
+                  </ul>
+                </section>
 
                 <section>
                   <h4 className="text-cyan-300 text-base font-bold">v2.6.1 — April 28, 2026</h4>

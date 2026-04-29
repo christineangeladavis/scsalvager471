@@ -5,6 +5,30 @@ Made by Chrissyy · Referral: STAR-CH2W-R73F
 
 ## What's in this build
 
+UPDATE 4/29/2026 v2.7.0
+
+Added:
+- **Accept Offer** button at the top-left of every mission detail popup. Logged-in users can take a contract on directly from the Missions tab. Multiple contracts can be active at once — no single-slot lock.
+- New **Active Contracts** panel above the Salvage Missions table. Lists every accepted contract with its reward, buy-in, and accepted-time, plus per-row **Complete Contract** and **Abandon Offer** buttons. Anonymous viewers see a "Log in to accept contract" CTA instead of the Accept button.
+- **Complete Contract** applies both the positive reward AND the negative buy-in (if any) to your ledger as synthetic sell-order entries — they flow through Statistics, the Lifetime aUEC pill, and Patch History automatically.
+- **Abandon Offer** forfeits the positive reward but still settles any negative buy-in. Use it when you've already paid into a mission you no longer want to chase.
+- Mission completions and abandonments appear in **Ledger → Patch History** with a dedicated row treatment: cyan `Mission · Reward`, rose `Mission · Buy-In`, and rose `Mission · Abandoned` pills. Primary cell shows the mission name + signed aUEC delta; secondary explains whether the reward was forfeited.
+- Header now shows your **Lifetime aUEC** as an emerald pill, immediately left of the notification bell. Sums every visible sell-order entry (real sales + mission settlements). Hidden on mobile to keep the header compact.
+- Settings → **Avatar**: upload your own avatar to use site-wide instead of your Discord avatar. We resize and center-crop to a 312×312 circle automatically. Leave blank to revert to your Discord avatar.
+- Statistics leaderboard now shows each top salvager's avatar to the left of their name (custom upload or letter-fallback initial), and the verified-RSI checkmark stays inline with the name.
+- Verified RSI handles now display **site-wide**, not just on the Statistics leaderboard. Header user menu, Settings "Signed in as" line, and avatar fallback all read your verified Star Citizen identity, with the Discord username surfacing as parenthetical context where it adds value.
+- **Multi-sort** on the Salvage Missions table: shift / ctrl / cmd-click any column header to chain it as a secondary sort key. Active columns show their priority (e.g. `▲ 1`, `▼ 2`). Right-click an active header to drop it from the chain.
+- **Wrecked Ships for Sale** missions now print the destination station in parentheses after the title, e.g. `Wrecked Ships for Sale (Checkmate)` — sourced from the contract's `locations` field.
+- Header banner trimmed to ~75% height (320px) with a radial **dissolve mask** at the edges, so the banner blends into the page instead of cutting off square.
+- Mission table system pill no longer falls back to "Unknown". Resolution chain: explicit systems → location-resolved system → debugName scan → "Unknown".
+- New **Rough & Ready** faction option in the Missions filter dropdown — covers the `RR_ Wrecked Ships for Sale` family that scmdb.net ships with `factionGuid: null`.
+- Mission table per-row description line removed for compactness — full briefing still in the popup.
+
+Changes:
+- Top Salvagers leaderboard now ranks strictly by **Total SCU Refined**. Profit-only activity (e.g. mission settlements without any refinery work) no longer qualifies a user for the top 5.
+- Patch History panel description updated to "Mission history, collected refinery jobs, and sell orders…" so the new contract entries are surfaced front-and-center.
+- Recent Sales feed excludes mission contract settlements — those are tracked on the Active Contracts panel pre-settlement and in Patch History after, so they don't clutter the sales feed.
+
 UPDATE 4/28/2026 v2.6.1
 
 Added:

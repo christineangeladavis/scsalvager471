@@ -34,6 +34,32 @@
 //                                        Compared against the current
 //                                        patch's startedAt to enforce a
 //                                        once-per-patch limit.
+//   currentContract        : object    — DEPRECATED. The single active
+//                                        contract slot. Read on the
+//                                        server side as a one-time
+//                                        migration into activeContracts;
+//                                        no new writes go here. Cleared
+//                                        once the migration runs.
+//   activeContracts        : array     — the in-flight mission contracts
+//                                        the user accepted from the
+//                                        Missions tab. Empty array when
+//                                        none. Each entry:
+//                                        { missionId, name, reward,
+//                                          buyIn, acceptedAt }.
+//                                        Server-managed via the
+//                                        /api/me/contract endpoint;
+//                                        clients cannot set this
+//                                        directly through /api/me/prefs.
+//   avatarDataUrl          : string    — optional user-uploaded avatar.
+//                                        Stored as a data URL so we don't
+//                                        have to add blob storage. Client
+//                                        resizes/center-crops to 312×312
+//                                        and re-encodes to JPEG before
+//                                        upload, so the stored size fits
+//                                        comfortably under the cap. Empty
+//                                        string means "use the Discord
+//                                        avatar instead". Sanitized to
+//                                        data:image/(jpeg|png|webp) only.
 
 import crypto from "node:crypto";
 
@@ -44,6 +70,12 @@ const RSI_HANDLE_MAX_LEN = 32;
 // Display name has the same cap as the RSI handle for consistency on the
 // leaderboard; layout assumes ~32 chars max per row.
 const DISPLAY_NAME_MAX_LEN = 32;
+// Hard cap on the avatar data URL. 312×312 JPEG @ 85% lands ~30–80KB
+// for typical photos; 250KB leaves headroom for darker / noisier
+// images while keeping the prefs hash small enough that Redis reads
+// don't balloon.
+const AVATAR_DATA_URL_MAX_LEN = 250 * 1024;
+const AVATAR_DATA_URL_RE = /^data:image\/(jpeg|jpg|png|webp);base64,[A-Za-z0-9+/=]+$/;
 
 // 8 hex chars = 32 bits of entropy, plenty for our purposes (collision odds
 // at our user count are trivial and the token is just a "did the user paste
@@ -63,6 +95,9 @@ export function defaultPrefs() {
     rsiHandleVerifiedAt: null,
     displayName: "",
     lastPatchClearAt: null,
+    avatarDataUrl: "",
+    currentContract: null,
+    activeContracts: [],
   };
 }
 
@@ -78,7 +113,19 @@ export async function getPrefs(redis, userId) {
   if (!userId) return defaultPrefs();
   try {
     const stored = await redis.get(prefsKey(userId));
-    return { ...defaultPrefs(), ...(stored || {}) };
+    const merged = { ...defaultPrefs(), ...(stored || {}) };
+    // One-time migration: legacy single-slot `currentContract` rolls
+    // into the new `activeContracts` array. Reads stay non-destructive
+    // (we don't write back here); the next contract endpoint call
+    // persists the merged shape.
+    if (
+      (!Array.isArray(merged.activeContracts) || merged.activeContracts.length === 0) &&
+      merged.currentContract && typeof merged.currentContract === "object"
+    ) {
+      merged.activeContracts = [merged.currentContract];
+    }
+    if (!Array.isArray(merged.activeContracts)) merged.activeContracts = [];
+    return merged;
   } catch (e) {
     console.error("getPrefs redis error:", e && e.message ? e.message : e);
     return defaultPrefs();
@@ -108,6 +155,23 @@ export function sanitizePrefsUpdate(input) {
     // custom name" and the leaderboard falls back to the Discord
     // username (assuming no verified RSI handle is set).
     out.displayName = input.displayName.trim().slice(0, DISPLAY_NAME_MAX_LEN);
+  }
+  if (typeof input.avatarDataUrl === "string") {
+    // Empty string clears the avatar (revert to Discord). Otherwise
+    // require a base64 image data URL we recognize and reject anything
+    // larger than the cap to keep the prefs hash bounded.
+    const v = input.avatarDataUrl.trim();
+    if (v === "") {
+      out.avatarDataUrl = "";
+    } else if (
+      v.length <= AVATAR_DATA_URL_MAX_LEN &&
+      AVATAR_DATA_URL_RE.test(v)
+    ) {
+      out.avatarDataUrl = v;
+    }
+    // Anything else: silently dropped — caller sees the unchanged
+    // value on the next GET, which is the same shape the rsiHandle
+    // sanitizer uses for over-cap strings.
   }
   // notificationLinkedAt, rsiHandleVerified, rsiHandleVerifiedAt,
   // rsiHandleToken are all server-managed; clients cannot set them

@@ -2,7 +2,10 @@
 //
 // Admin-only. Returns one user's refinery jobs + sell orders within the
 // last `days` days (default 30, max 365). Soft-deleted entries are
-// filtered out — same view the user themselves sees.
+// filtered out — same view the user themselves sees. Also returns the
+// user's active mission contracts (the in-flight slot from prefs) so
+// the Admin user-detail modal can render a Contracts panel without a
+// second round-trip.
 //
 // Response shape:
 //   {
@@ -11,13 +14,15 @@
 //     username,
 //     windowDays,
 //     refineryJobs: [...],
-//     sellOrders: [...]
+//     sellOrders: [...],
+//     activeContracts: [...]   // raw prefs.activeContracts entries
 //   }
 
 import { getRedis } from "../_lib/redis.js";
 import { getSession } from "../_lib/session.js";
 import { isAdminSession } from "../_lib/admin.js";
 import { getUserMeta } from "../_lib/userIndex.js";
+import { getPrefs } from "../_lib/prefs.js";
 import {
   ledgerKey,
   sanitizeRefineryJob,
@@ -84,6 +89,21 @@ export default async function handler(req, res) {
         .sort((a, b) => b.submittedAt - a.submittedAt)
     : [];
 
+  // Active (in-flight) mission contracts come from the user's prefs
+  // hash, not the ledger. The user-facing Active Contracts panel
+  // reads from this same source via /api/me/prefs.
+  let activeContracts = [];
+  try {
+    const prefs = await getPrefs(redis, userId);
+    activeContracts = Array.isArray(prefs?.activeContracts)
+      ? prefs.activeContracts.filter((c) => c && c.missionId)
+      : [];
+  } catch (e) {
+    // Don't fail the whole request if prefs load hiccups; the
+    // Contracts panel will just show "no active contracts".
+    activeContracts = [];
+  }
+
   return res.status(200).json({
     fetchedAt: Date.now(),
     userId,
@@ -91,5 +111,6 @@ export default async function handler(req, res) {
     windowDays,
     refineryJobs,
     sellOrders,
+    activeContracts,
   });
 }

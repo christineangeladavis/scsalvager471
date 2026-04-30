@@ -2209,6 +2209,420 @@ const MISSIONS = [
   },
 ];
 
+// Auto-generated from scmdb.net 4.8.0-ptu merged catalog.
+// Filter: missionType === "Refueling". Re-run
+// .claude/build-refueling-missions.cjs after refreshing the JSON.
+const REFUELING_MISSIONS = [
+  {
+    id: "33944d03-1b31-4457-8717-75b36a6f0ad6",
+    name: "URGENT FLEET REFUEL",
+    faction: "United Wayfarers Club",
+    giver: "United Wayfarers Club",
+    system: "Stanton",
+    reward: 49250,
+    buyIn: 0,
+    baseXP: 300,
+    legality: "Legal",
+    minRank: "Head Contractor",
+    minRankXP: 38000,
+    maxRank: "Elite Contractor",
+    maxRankXP: 95250,
+    timeToComplete: 20,
+    canBeShared: true,
+    onceOnly: false,
+    canReacceptAfterAbandoning: false,
+    canReacceptAfterFailing: false,
+    hasPersonalCooldown: false,
+    personalCooldownTime: 1,
+    abandonedCooldownTime: 1,
+    crimeStatMin: null,
+    crimeStatMax: null,
+    notes: "Hey again, I've got a beacon at [LOCATION] and this one's a big one.",
+    description: "Hey again,\n\nI've got a beacon at [LOCATION] and this one's a big one. An entire little fleet of ships all burned out of fuel at the same time. Impressive coordination and lack of planning at the same time. \n\nThe client vessel will pay you at the rate of [FUELRATE] aUEC per SCU of Hydrogen and  [QTFUELRATE] aUEC per SCU of Quantum , and as a United Wayfarers Club contractor, you will also qualify for the UWC service fee listed above upon completion.\n\nHopefully since the area they're in is pretty safe, there shouldn't be too much trouble lurking, but these days you never know. Wouldn't hurt to get them back flying again as quick as you're able.\n\nHappy trails,\n\nDina Deloit\nDispatch Hub\nUnited Wayfarers Club\n\"We’ve got your back\"",
+    locations: [{"name":"Hurston","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"Crusader","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"ArcCorp","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"microTech","type":"Planet","system":"Stanton","planet":null,"moon":null}],
+    destinations: [],
+    prereqLocations: [],
+    chainStartsWith: [],
+    requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
+    unlocks: [],
+    turnIns: [],
+  },
+  {
+    id: "1080d9fc-d511-4bda-a567-161797dac491",
+    name: "CRITICAL REFUEL REQUEST: [SHIP]",
+    faction: "United Wayfarers Club",
+    giver: "United Wayfarers Club",
+    system: "Multi",
+    reward: 40750,
+    buyIn: 0,
+    baseXP: 200,
+    legality: "Legal",
+    minRank: "Sr. Contractor",
+    minRankXP: 5800,
+    maxRank: "Elite Contractor",
+    maxRankXP: 95250,
+    timeToComplete: 14,
+    canBeShared: true,
+    onceOnly: false,
+    canReacceptAfterAbandoning: false,
+    canReacceptAfterFailing: false,
+    hasPersonalCooldown: false,
+    personalCooldownTime: 1,
+    abandonedCooldownTime: 1,
+    crimeStatMin: null,
+    crimeStatMax: null,
+    notes: "Hi, Another day another beacon.",
+    description: "Hi,\n\nAnother day another beacon. There's a [SHIP] with an empty tank at [LOCATION].  The client vessel will pay you at the rate of [FUELRATE] aUEC per SCU of Hydrogen and  [QTFUELRATE] aUEC per SCU of Quantum , and as a United Wayfarers Club contractor, you will also qualify for the UWC service fee listed above upon completion.\n\nI can't lie: it's a nasty place to get stuck and a worse place to get caught by surprise. We've lost good people out there - even the ones who got lucky made it home with pieces missing.\n\nIf you decide to take the job, do me a favour and keep everything peeled. If you've got a buddy with time to spare, maybe reach out for a little back-up.\n\nMaybe I'm being paranoid, but that doesn't mean they're not out to get you, as Momma Deloit used to say. \nActually she never said that - but I'm pretty sure she would if she did this for a living.\n\nJust do the job and get home safe, okay?\n\nDina Deloit\nDispatch Hub\nUnited Wayfarers Club\n\"We’ve got your back\"",
+    locations: [{"name":"Nyx","type":"Star","system":null,"planet":null,"moon":null},{"name":"@generic_locations_blank","type":"Default","system":null,"planet":null,"moon":null},{"name":"Nyx I","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx II","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx III","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx System","type":"Default","system":null,"planet":null,"moon":null},{"name":"Hurston","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"HUR L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Arial","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Aberdeen","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Magda","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Ita","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Crusader","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"CRU L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"CRU L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"CRU L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Cellin","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"Daymar","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"Yela","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"ArcCorp","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"ARC L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Lyria","type":"Moon","system":"Stanton","planet":"ArcCorp","moon":null},{"name":"Wala","type":"Moon","system":"Stanton","planet":"ArcCorp","moon":null},{"name":"microTech","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"MIC L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Calliope","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Clio","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Euterpe","type":"Moon","system":"Stanton","planet":"microTech","moon":null}],
+    destinations: [],
+    prereqLocations: [],
+    chainStartsWith: [],
+    requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
+    unlocks: [],
+    turnIns: [],
+  },
+  {
+    id: "82e38ec9-3066-4aac-9363-608a4d67383c",
+    name: "URGENT FLEET REFUEL",
+    faction: "United Wayfarers Club",
+    giver: "United Wayfarers Club",
+    system: "Nyx",
+    reward: 36750,
+    buyIn: 0,
+    baseXP: 50,
+    legality: "Legal",
+    minRank: "Sr. Contractor",
+    minRankXP: 5800,
+    maxRank: "Elite Contractor",
+    maxRankXP: 95250,
+    timeToComplete: 15,
+    canBeShared: true,
+    onceOnly: false,
+    canReacceptAfterAbandoning: false,
+    canReacceptAfterFailing: false,
+    hasPersonalCooldown: false,
+    personalCooldownTime: 1,
+    abandonedCooldownTime: 1,
+    crimeStatMin: null,
+    crimeStatMax: null,
+    notes: "Hey again, I've got a beacon at [LOCATION] and this one's a big one.",
+    description: "Hey again,\n\nI've got a beacon at [LOCATION] and this one's a big one. An entire little fleet of ships all burned out of fuel at the same time. Impressive coordination and lack of planning at the same time. \n\nThe client vessel will pay you at the rate of [FUELRATE] aUEC per SCU of Hydrogen and  [QTFUELRATE] aUEC per SCU of Quantum , and as a United Wayfarers Club contractor, you will also qualify for the UWC service fee listed above upon completion.\n\nHopefully since the area they're in is pretty safe, there shouldn't be too much trouble lurking, but these days you never know. Wouldn't hurt to get them back flying again as quick as you're able.\n\nHappy trails,\n\nDina Deloit\nDispatch Hub\nUnited Wayfarers Club\n\"We’ve got your back\"",
+    locations: [{"name":"Nyx","type":"Star","system":null,"planet":null,"moon":null},{"name":"@generic_locations_blank","type":"Default","system":null,"planet":null,"moon":null},{"name":"Nyx I","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx II","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx III","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx System","type":"Default","system":null,"planet":null,"moon":null}],
+    destinations: [],
+    prereqLocations: [],
+    chainStartsWith: [],
+    requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
+    unlocks: [],
+    turnIns: [],
+  },
+  {
+    id: "b95ac811-ec6b-4027-9294-3e1f8d9107f5",
+    name: "URGENT FLEET REFUEL",
+    faction: "United Wayfarers Club",
+    giver: "United Wayfarers Club",
+    system: "Pyro",
+    reward: 36750,
+    buyIn: 0,
+    baseXP: 50,
+    legality: "Legal",
+    minRank: "Sr. Contractor",
+    minRankXP: 5800,
+    maxRank: "Elite Contractor",
+    maxRankXP: 95250,
+    timeToComplete: 15,
+    canBeShared: true,
+    onceOnly: false,
+    canReacceptAfterAbandoning: false,
+    canReacceptAfterFailing: false,
+    hasPersonalCooldown: false,
+    personalCooldownTime: 1,
+    abandonedCooldownTime: 1,
+    crimeStatMin: null,
+    crimeStatMax: null,
+    notes: "Hey again, I've got a beacon at [LOCATION] and this one's a big one.",
+    description: "Hey again,\n\nI've got a beacon at [LOCATION] and this one's a big one. An entire little fleet of ships all burned out of fuel at the same time. Impressive coordination and lack of planning at the same time. \n\nThe client vessel will pay you at the rate of [FUELRATE] aUEC per SCU of Hydrogen and  [QTFUELRATE] aUEC per SCU of Quantum , and as a United Wayfarers Club contractor, you will also qualify for the UWC service fee listed above upon completion.\n\nHopefully since the area they're in is pretty safe, there shouldn't be too much trouble lurking, but these days you never know. Wouldn't hurt to get them back flying again as quick as you're able.\n\nHappy trails,\n\nDina Deloit\nDispatch Hub\nUnited Wayfarers Club\n\"We’ve got your back\"",
+    locations: [{"name":"PYAM-EXHANG-0-1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-WHISKEY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-CHARLIE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-YORK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-GULF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Asteroid Mining Base","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LEST","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JONG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KNAP","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OXID","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PALL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HELM","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BASK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BUCK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LUNE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-GRAY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MAGE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-GADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-WARB","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HORN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KIFF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MUGG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PEKE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TACK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-AXIL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DARI","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-YEAD","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster BGR-560","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster CAJ-445","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster JWY-925","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-DELTA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-LAMDA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-OVER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ECHO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-POINT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-SIERRA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-HELIO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-VICTORY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ZETA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-XENO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-QUAGMIRE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-JAK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NARY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JUTE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TYRO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SPAW","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MURK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OLLA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KYUS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DORY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RODE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-VERD","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-FLAG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RINE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-ALME","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OAKS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NONG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LANX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SIJO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-ARID","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BORS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LYES","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster FSN-704","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster GRP-839","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster KKE-717","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster RSC-340","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster WDH-387","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster YKA-011","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"RAB-ION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-LYNX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-COOK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-UMUS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MEFF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SOWL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PIZE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-QINS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RAWN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LOWN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-CRUE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MARA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-CHAM","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RAIK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KELT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MOSK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NENE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DIRK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PLEX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TIGS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HARK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SEER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SAIC","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster DLO-486","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster EMM-567","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster HJS-232","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster LHB-976","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster MNK-833","type":"Default","system":"Pyro","planet":null,"moon":null}],
+    destinations: [],
+    prereqLocations: [],
+    chainStartsWith: [],
+    requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
+    unlocks: [],
+    turnIns: [],
+  },
+  {
+    id: "14910f0b-9b69-41ae-bd78-d072725b074a",
+    name: "URGENT FLEET REFUEL",
+    faction: "United Wayfarers Club",
+    giver: "United Wayfarers Club",
+    system: "Stanton",
+    reward: 36750,
+    buyIn: 0,
+    baseXP: 50,
+    legality: "Legal",
+    minRank: "Sr. Contractor",
+    minRankXP: 5800,
+    maxRank: "Elite Contractor",
+    maxRankXP: 95250,
+    timeToComplete: 15,
+    canBeShared: true,
+    onceOnly: false,
+    canReacceptAfterAbandoning: false,
+    canReacceptAfterFailing: false,
+    hasPersonalCooldown: false,
+    personalCooldownTime: 1,
+    abandonedCooldownTime: 1,
+    crimeStatMin: null,
+    crimeStatMax: null,
+    notes: "Hey again, I've got a beacon at [LOCATION] and this one's a big one.",
+    description: "Hey again,\n\nI've got a beacon at [LOCATION] and this one's a big one. An entire little fleet of ships all burned out of fuel at the same time. Impressive coordination and lack of planning at the same time. \n\nThe client vessel will pay you at the rate of [FUELRATE] aUEC per SCU of Hydrogen and  [QTFUELRATE] aUEC per SCU of Quantum , and as a United Wayfarers Club contractor, you will also qualify for the UWC service fee listed above upon completion.\n\nHopefully since the area they're in is pretty safe, there shouldn't be too much trouble lurking, but these days you never know. Wouldn't hurt to get them back flying again as quick as you're able.\n\nHappy trails,\n\nDina Deloit\nDispatch Hub\nUnited Wayfarers Club\n\"We’ve got your back\"",
+    locations: [{"name":"Hurston","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"HUR L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Arial","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Aberdeen","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Magda","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Ita","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Crusader","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"CRU L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"CRU L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"CRU L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Cellin","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"Daymar","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"Yela","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"ArcCorp","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"ARC L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Lyria","type":"Moon","system":"Stanton","planet":"ArcCorp","moon":null},{"name":"Wala","type":"Moon","system":"Stanton","planet":"ArcCorp","moon":null},{"name":"microTech","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"MIC L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Calliope","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Clio","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Euterpe","type":"Moon","system":"Stanton","planet":"microTech","moon":null}],
+    destinations: [],
+    prereqLocations: [],
+    chainStartsWith: [],
+    requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
+    unlocks: [],
+    turnIns: [],
+  },
+  {
+    id: "bed4ea01-87f4-444a-a50a-cb9f60c55bcf",
+    name: "URGENT FLEET REFUEL",
+    faction: "United Wayfarers Club",
+    giver: "United Wayfarers Club",
+    system: "Nyx",
+    reward: 29500,
+    buyIn: 0,
+    baseXP: 150,
+    legality: "Legal",
+    minRank: "Contractor",
+    minRankXP: 2200,
+    maxRank: "Elite Contractor",
+    maxRankXP: 95250,
+    timeToComplete: 12,
+    canBeShared: true,
+    onceOnly: false,
+    canReacceptAfterAbandoning: false,
+    canReacceptAfterFailing: false,
+    hasPersonalCooldown: false,
+    personalCooldownTime: 1,
+    abandonedCooldownTime: 1,
+    crimeStatMin: null,
+    crimeStatMax: null,
+    notes: "Hey again, I've got a beacon at [LOCATION] and this one's a big one.",
+    description: "Hey again,\n\nI've got a beacon at [LOCATION] and this one's a big one. An entire little fleet of ships all burned out of fuel at the same time. Impressive coordination and lack of planning at the same time. \n\nThe client vessel will pay you at the rate of [FUELRATE] aUEC per SCU of Hydrogen and  [QTFUELRATE] aUEC per SCU of Quantum , and as a United Wayfarers Club contractor, you will also qualify for the UWC service fee listed above upon completion.\n\nHopefully since the area they're in is pretty safe, there shouldn't be too much trouble lurking, but these days you never know. Wouldn't hurt to get them back flying again as quick as you're able.\n\nHappy trails,\n\nDina Deloit\nDispatch Hub\nUnited Wayfarers Club\n\"We’ve got your back\"",
+    locations: [{"name":"Nyx","type":"Star","system":null,"planet":null,"moon":null},{"name":"@generic_locations_blank","type":"Default","system":null,"planet":null,"moon":null},{"name":"Nyx I","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx II","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx III","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx System","type":"Default","system":null,"planet":null,"moon":null}],
+    destinations: [],
+    prereqLocations: [],
+    chainStartsWith: [],
+    requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
+    unlocks: [],
+    turnIns: [],
+  },
+  {
+    id: "0d66c038-2136-4c36-8e77-e449eba8e493",
+    name: "URGENT FLEET REFUEL",
+    faction: "United Wayfarers Club",
+    giver: "United Wayfarers Club",
+    system: "Stanton",
+    reward: 29500,
+    buyIn: 0,
+    baseXP: 150,
+    legality: "Legal",
+    minRank: "Contractor",
+    minRankXP: 2200,
+    maxRank: "Elite Contractor",
+    maxRankXP: 95250,
+    timeToComplete: 12,
+    canBeShared: true,
+    onceOnly: false,
+    canReacceptAfterAbandoning: false,
+    canReacceptAfterFailing: false,
+    hasPersonalCooldown: false,
+    personalCooldownTime: 1,
+    abandonedCooldownTime: 1,
+    crimeStatMin: null,
+    crimeStatMax: null,
+    notes: "Hey again, I've got a beacon at [LOCATION] and this one's a big one.",
+    description: "Hey again,\n\nI've got a beacon at [LOCATION] and this one's a big one. An entire little fleet of ships all burned out of fuel at the same time. Impressive coordination and lack of planning at the same time. \n\nThe client vessel will pay you at the rate of [FUELRATE] aUEC per SCU of Hydrogen and  [QTFUELRATE] aUEC per SCU of Quantum , and as a United Wayfarers Club contractor, you will also qualify for the UWC service fee listed above upon completion.\n\nHopefully since the area they're in is pretty safe, there shouldn't be too much trouble lurking, but these days you never know. Wouldn't hurt to get them back flying again as quick as you're able.\n\nHappy trails,\n\nDina Deloit\nDispatch Hub\nUnited Wayfarers Club\n\"We’ve got your back\"",
+    locations: [{"name":"Hurston","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"HUR L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Arial","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Aberdeen","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Magda","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Ita","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Crusader","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"CRU L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"CRU L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"CRU L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Cellin","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"Daymar","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"Yela","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"ArcCorp","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"ARC L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Lyria","type":"Moon","system":"Stanton","planet":"ArcCorp","moon":null},{"name":"Wala","type":"Moon","system":"Stanton","planet":"ArcCorp","moon":null},{"name":"microTech","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"MIC L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Calliope","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Clio","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Euterpe","type":"Moon","system":"Stanton","planet":"microTech","moon":null}],
+    destinations: [],
+    prereqLocations: [],
+    chainStartsWith: [],
+    requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
+    unlocks: [],
+    turnIns: [],
+  },
+  {
+    id: "145a74cc-fda4-4bb9-b274-c6938b32fa71",
+    name: "URGENT REFUEL REQUEST: [SHIP]",
+    faction: "United Wayfarers Club",
+    giver: "United Wayfarers Club",
+    system: "Multi",
+    reward: 19750,
+    buyIn: 0,
+    baseXP: 150,
+    legality: "Legal",
+    minRank: "Jr. Contractor",
+    minRankXP: 800,
+    maxRank: "Elite Contractor",
+    maxRankXP: 95250,
+    timeToComplete: 8,
+    canBeShared: true,
+    onceOnly: false,
+    canReacceptAfterAbandoning: false,
+    canReacceptAfterFailing: false,
+    hasPersonalCooldown: false,
+    personalCooldownTime: 1,
+    abandonedCooldownTime: 1,
+    crimeStatMin: null,
+    crimeStatMax: null,
+    notes: "Hey, you! I've got a beacon at [LOCATION].",
+    description: "Hey, you!\n\nI've got a beacon at [LOCATION]. They say their tanks are dry and they're calling for a full refuel. If you're interested, I get the feeling they'll be really pleased to see you.\n\nThe client vessel will pay you at the rate of [FUELRATE] aUEC per SCU of Hydrogen and  [QTFUELRATE] aUEC per SCU of Quantum , and as a United Wayfarers Club contractor, you will also qualify for the UWC service fee listed above upon completion.\n\nThey're stuck out in an area with a bad reputation, though things have been a bit more quiet recently. Still worth staying alert I'd say, just in case there's still trouble lurking out there. \n\nEither way, the sooner everyone's able to get flying again - and that includes you - the better.\n\nHappy trails,\n\nDina Deloit\nDispatch Hub\nUnited Wayfarers Club\n\"We’ve got your back\"",
+    locations: [{"name":"Nyx","type":"Star","system":null,"planet":null,"moon":null},{"name":"@generic_locations_blank","type":"Default","system":null,"planet":null,"moon":null},{"name":"Nyx I","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx II","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx III","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx System","type":"Default","system":null,"planet":null,"moon":null},{"name":"Hurston","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"HUR L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Arial","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Aberdeen","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Magda","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Ita","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Crusader","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"CRU L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"CRU L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"CRU L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Cellin","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"Daymar","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"Yela","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"ArcCorp","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"ARC L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Lyria","type":"Moon","system":"Stanton","planet":"ArcCorp","moon":null},{"name":"Wala","type":"Moon","system":"Stanton","planet":"ArcCorp","moon":null},{"name":"microTech","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"MIC L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Calliope","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Clio","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Euterpe","type":"Moon","system":"Stanton","planet":"microTech","moon":null}],
+    destinations: [],
+    prereqLocations: [],
+    chainStartsWith: [],
+    requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
+    unlocks: [],
+    turnIns: [],
+  },
+  {
+    id: "02f841ac-ebed-47b6-89e6-8973b37398be",
+    name: "REFUEL REQUEST: [SHIP]",
+    faction: "United Wayfarers Club",
+    giver: "United Wayfarers Club",
+    system: "Multi",
+    reward: 10000,
+    buyIn: 0,
+    baseXP: 100,
+    legality: "Legal",
+    minRank: "Neutral",
+    minRankXP: 0,
+    maxRank: "Elite Contractor",
+    maxRankXP: 95250,
+    timeToComplete: 5,
+    canBeShared: true,
+    onceOnly: false,
+    canReacceptAfterAbandoning: false,
+    canReacceptAfterFailing: false,
+    hasPersonalCooldown: false,
+    personalCooldownTime: 1,
+    abandonedCooldownTime: 1,
+    crimeStatMin: null,
+    crimeStatMax: null,
+    notes: "Hey there, If you're fitted for refueling, you might like this one.",
+    description: "Hey there,\n\nIf you're fitted for refueling, you might like this one. \n\nA beacon has just gone live at [LOCATION], from a client whose [SHIP] is running on empty, so make sure your fuel pods are topped off.\n\nThe client vessel will pay you at the rate of [FUELRATE] aUEC per SCU of Hydrogen and  [QTFUELRATE] aUEC per SCU of Quantum , and as a United Wayfarers Club contractor, you will also qualify for the UWC service fee listed above upon completion.\n\nLooks like a zero-drama one and done, but it never hurts to keep your scanners live.\nLet me know if you're interested and let's get these good people on their way.\n\nWaiting to hear from you,\n\nDina Deloit\nDispatch Hub\nUnited Wayfarers Club\n\"We’ve got your back\"",
+    locations: [{"name":"Nyx","type":"Star","system":null,"planet":null,"moon":null},{"name":"@generic_locations_blank","type":"Default","system":null,"planet":null,"moon":null},{"name":"Nyx I","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx II","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx III","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx System","type":"Default","system":null,"planet":null,"moon":null},{"name":"Stanton","type":"Star","system":null,"planet":null,"moon":null},{"name":"Stanton System","type":"Default","system":null,"planet":null,"moon":null},{"name":"Hurston","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"Crusader","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"ArcCorp","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"microTech","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"CRU L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"CRU L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"CRU L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Cellin","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"Daymar","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"Yela","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"ARC L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Lyria","type":"Moon","system":"Stanton","planet":"ArcCorp","moon":null},{"name":"Wala","type":"Moon","system":"Stanton","planet":"ArcCorp","moon":null},{"name":"MIC L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Calliope","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Clio","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Euterpe","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"HUR L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Arial","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Aberdeen","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Magda","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Ita","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Pyro I","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Monox","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Patch City","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Patch City Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ALPHA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-TUNG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-KILO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-NOVEMBER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-IGNITION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-BRAVO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ROTH","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-FOXTROT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster NBD-102","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Bloom","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Orbituary","type":"Station","system":"Pyro","planet":"Bloom","moon":null},{"name":"Orbituary Clinic","type":"Default","system":"Pyro","planet":"Bloom","moon":null},{"name":"Starlight Service Station","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Starlight Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR5 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Rat's Nest","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Rat's Nest Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-WHISKEY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-CHARLIE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-YORK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-GULF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-MAT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ULTRA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster BGR-560","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster CAJ-445","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster JWY-925","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Pyro IV","type":"Planet","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Pyro V","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Ignis","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Vatra","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Adir","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Fairo","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Fuego","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Vuur","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"PYR5 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR5 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Gaslight","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Gaslight Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-DELTA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-LAMDA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-OVER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ECHO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-POINT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-SIERRA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-HELIO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-VICTORY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ZETA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-XENO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-QUAGMIRE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster FSN-704","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster GRP-839","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster KKE-717","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster RSC-340","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster WDH-387","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster YKA-011","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Terminus","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"PYR6 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR6 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Ruin Station","type":"Station","system":"Pyro","planet":"Terminus","moon":null},{"name":"Ruin Clinic","type":"Default","system":"Pyro","planet":"Terminus","moon":null},{"name":"RAB-ION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-LYNX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-COOK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster DLO-486","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster EMM-567","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster HJS-232","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster LHB-976","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster MNK-833","type":"Default","system":"Pyro","planet":null,"moon":null}],
+    destinations: [],
+    prereqLocations: [],
+    chainStartsWith: [],
+    requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
+    unlocks: [],
+    turnIns: [],
+  },
+  {
+    id: "0ada3f08-3f76-46ec-96e2-fc0f856b8eeb",
+    name: "UWC'S HIRING REFUELERS",
+    faction: "United Wayfarers Club",
+    giver: "United Wayfarers Club",
+    system: "Nyx",
+    reward: 6000,
+    buyIn: 0,
+    baseXP: 200,
+    legality: "Legal",
+    minRank: "Neutral",
+    minRankXP: 0,
+    maxRank: "Jr. Contractor",
+    maxRankXP: 800,
+    timeToComplete: 3,
+    canBeShared: true,
+    onceOnly: false,
+    canReacceptAfterAbandoning: false,
+    canReacceptAfterFailing: false,
+    hasPersonalCooldown: false,
+    personalCooldownTime: 1,
+    abandonedCooldownTime: 1,
+    crimeStatMin: null,
+    crimeStatMax: null,
+    notes: "Hey! DD from the United Wayfarers Club here.",
+    description: "Hey!\n\nDD from the United Wayfarers Club here.\n\nThe UWC offers repair, rearming and refuelling services across the UEE. It just so happens that we're on the look-out for new affiliates whose ships are fitted for refuelling. If you've got the fuel pods and like it when people are pleased to see you, the UWC might be the club for you.\n\nAnd if you think it might be, I've got a live beacon you might like.\n\nIf you do happen to like it, a word to the wise: make sure your fuel pods are full before you head out.\n\nA Club member has run out of fuel at [LOCATION]. I'm not sure on the details, like how they ended up out there with no Go Juice, but the UWC doesn't like to leave folk hanging.\n\nThe client vessel will pay you at the rate of [FUELRATE] aUEC per SCU of Hydrogen and  [QTFUELRATE] aUEC per SCU of Quantum . As a United Wayfarers Club contractor, you will also qualify for the UWC service fee listed above upon completion.\n\nIt's a straightforward run. Perfect if you want to get a feel for this kind of job. Get out there, fill up the tanks of their [SHIP] and get them on their way. Do enough runs like this, and the process becomes muscle memory. Until then, there's a journal entry on your mobiGlas called \"\"Refueling Protocols\"\" that covers the basics.\n\nThere have been no reports of outlaw activity in that sector, but stay alert. I always recommend you aim for a fast turnaround. The sooner you're done, the sooner I can fix you up with another contract. UWC's always looking for new affiliates. \n\nLooking forward to working with you.\n\nDina Deloit\nDispatch Hub\nUnited Wayfarers Club\n\"We’ve got your back\"",
+    locations: [{"name":"Nyx","type":"Star","system":null,"planet":null,"moon":null},{"name":"@generic_locations_blank","type":"Default","system":null,"planet":null,"moon":null},{"name":"Nyx I","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx II","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx III","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx System","type":"Default","system":null,"planet":null,"moon":null}],
+    destinations: [],
+    prereqLocations: [],
+    chainStartsWith: [],
+    requires: [],
+    unlocks: [{"id":"1080d9fc-d511-4bda-a567-161797dac491","name":"CRITICAL REFUEL REQUEST: [SHIP]"},{"id":"02f841ac-ebed-47b6-89e6-8973b37398be","name":"REFUEL REQUEST: [SHIP]"},{"id":"82e38ec9-3066-4aac-9363-608a4d67383c","name":"URGENT FLEET REFUEL"},{"id":"bed4ea01-87f4-444a-a50a-cb9f60c55bcf","name":"URGENT FLEET REFUEL"},{"id":"b95ac811-ec6b-4027-9294-3e1f8d9107f5","name":"URGENT FLEET REFUEL"},{"id":"0d66c038-2136-4c36-8e77-e449eba8e493","name":"URGENT FLEET REFUEL"},{"id":"14910f0b-9b69-41ae-bd78-d072725b074a","name":"URGENT FLEET REFUEL"},{"id":"33944d03-1b31-4457-8717-75b36a6f0ad6","name":"URGENT FLEET REFUEL"},{"id":"145a74cc-fda4-4bb9-b274-c6938b32fa71","name":"URGENT REFUEL REQUEST: [SHIP]"}],
+    turnIns: [],
+  },
+  {
+    id: "68667545-1978-4dbf-95e7-8fcdc03d017e",
+    name: "UWC'S HIRING REFUELERS",
+    faction: "United Wayfarers Club",
+    giver: "United Wayfarers Club",
+    system: "Pyro",
+    reward: 6000,
+    buyIn: 0,
+    baseXP: 200,
+    legality: "Legal",
+    minRank: "Neutral",
+    minRankXP: 0,
+    maxRank: "Jr. Contractor",
+    maxRankXP: 800,
+    timeToComplete: 3,
+    canBeShared: true,
+    onceOnly: false,
+    canReacceptAfterAbandoning: false,
+    canReacceptAfterFailing: false,
+    hasPersonalCooldown: false,
+    personalCooldownTime: 1,
+    abandonedCooldownTime: 1,
+    crimeStatMin: null,
+    crimeStatMax: null,
+    notes: "Hey! DD from the United Wayfarers Club here.",
+    description: "Hey!\n\nDD from the United Wayfarers Club here.\n\nThe UWC offers repair, rearming and refuelling services across the UEE. It just so happens that we're on the look-out for new affiliates whose ships are fitted for refuelling. If you've got the fuel pods and like it when people are pleased to see you, the UWC might be the club for you.\n\nAnd if you think it might be, I've got a live beacon you might like.\n\nIf you do happen to like it, a word to the wise: make sure your fuel pods are full before you head out.\n\nA Club member has run out of fuel at [LOCATION]. I'm not sure on the details, like how they ended up out there with no Go Juice, but the UWC doesn't like to leave folk hanging.\n\nThe client vessel will pay you at the rate of [FUELRATE] aUEC per SCU of Hydrogen and  [QTFUELRATE] aUEC per SCU of Quantum . As a United Wayfarers Club contractor, you will also qualify for the UWC service fee listed above upon completion.\n\nIt's a straightforward run. Perfect if you want to get a feel for this kind of job. Get out there, fill up the tanks of their [SHIP] and get them on their way. Do enough runs like this, and the process becomes muscle memory. Until then, there's a journal entry on your mobiGlas called \"\"Refueling Protocols\"\" that covers the basics.\n\nThere have been no reports of outlaw activity in that sector, but stay alert. I always recommend you aim for a fast turnaround. The sooner you're done, the sooner I can fix you up with another contract. UWC's always looking for new affiliates. \n\nLooking forward to working with you.\n\nDina Deloit\nDispatch Hub\nUnited Wayfarers Club\n\"We’ve got your back\"",
+    locations: [{"name":"Pyro","type":"Star","system":null,"planet":null,"moon":null},{"name":"Pyro System","type":"Default","system":null,"planet":null,"moon":null},{"name":"Pyro I","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Monox","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Bloom","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Pyro IV","type":"Planet","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Pyro V","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Terminus","type":"Planet","system":"Pyro","planet":null,"moon":null}],
+    destinations: [],
+    prereqLocations: [],
+    chainStartsWith: [],
+    requires: [],
+    unlocks: [{"id":"1080d9fc-d511-4bda-a567-161797dac491","name":"CRITICAL REFUEL REQUEST: [SHIP]"},{"id":"02f841ac-ebed-47b6-89e6-8973b37398be","name":"REFUEL REQUEST: [SHIP]"},{"id":"82e38ec9-3066-4aac-9363-608a4d67383c","name":"URGENT FLEET REFUEL"},{"id":"bed4ea01-87f4-444a-a50a-cb9f60c55bcf","name":"URGENT FLEET REFUEL"},{"id":"b95ac811-ec6b-4027-9294-3e1f8d9107f5","name":"URGENT FLEET REFUEL"},{"id":"0d66c038-2136-4c36-8e77-e449eba8e493","name":"URGENT FLEET REFUEL"},{"id":"14910f0b-9b69-41ae-bd78-d072725b074a","name":"URGENT FLEET REFUEL"},{"id":"33944d03-1b31-4457-8717-75b36a6f0ad6","name":"URGENT FLEET REFUEL"},{"id":"145a74cc-fda4-4bb9-b274-c6938b32fa71","name":"URGENT REFUEL REQUEST: [SHIP]"}],
+    turnIns: [],
+  },
+  {
+    id: "66f31bca-1961-47f7-a4af-f7392271b15c",
+    name: "UWC'S HIRING REFUELERS",
+    faction: "United Wayfarers Club",
+    giver: "United Wayfarers Club",
+    system: "Stanton",
+    reward: 6000,
+    buyIn: 0,
+    baseXP: 200,
+    legality: "Legal",
+    minRank: "Neutral",
+    minRankXP: 0,
+    maxRank: "Jr. Contractor",
+    maxRankXP: 800,
+    timeToComplete: 3,
+    canBeShared: true,
+    onceOnly: false,
+    canReacceptAfterAbandoning: false,
+    canReacceptAfterFailing: false,
+    hasPersonalCooldown: false,
+    personalCooldownTime: 1,
+    abandonedCooldownTime: 1,
+    crimeStatMin: null,
+    crimeStatMax: null,
+    notes: "Hey! DD from the United Wayfarers Club here.",
+    description: "Hey!\n\nDD from the United Wayfarers Club here.\n\nThe UWC offers repair, rearming and refuelling services across the UEE. It just so happens that we're on the look-out for new affiliates whose ships are fitted for refuelling. If you've got the fuel pods and like it when people are pleased to see you, the UWC might be the club for you.\n\nAnd if you think it might be, I've got a live beacon you might like.\n\nIf you do happen to like it, a word to the wise: make sure your fuel pods are full before you head out.\n\nA Club member has run out of fuel at [LOCATION]. I'm not sure on the details, like how they ended up out there with no Go Juice, but the UWC doesn't like to leave folk hanging.\n\nThe client vessel will pay you at the rate of [FUELRATE] aUEC per SCU of Hydrogen and  [QTFUELRATE] aUEC per SCU of Quantum . As a United Wayfarers Club contractor, you will also qualify for the UWC service fee listed above upon completion.\n\nIt's a straightforward run. Perfect if you want to get a feel for this kind of job. Get out there, fill up the tanks of their [SHIP] and get them on their way. Do enough runs like this, and the process becomes muscle memory. Until then, there's a journal entry on your mobiGlas called \"\"Refueling Protocols\"\" that covers the basics.\n\nThere have been no reports of outlaw activity in that sector, but stay alert. I always recommend you aim for a fast turnaround. The sooner you're done, the sooner I can fix you up with another contract. UWC's always looking for new affiliates. \n\nLooking forward to working with you.\n\nDina Deloit\nDispatch Hub\nUnited Wayfarers Club\n\"We’ve got your back\"",
+    locations: [{"name":"Stanton","type":"Star","system":null,"planet":null,"moon":null},{"name":"Stanton System","type":"Default","system":null,"planet":null,"moon":null},{"name":"Hurston","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"Crusader","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"ArcCorp","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"microTech","type":"Planet","system":"Stanton","planet":null,"moon":null}],
+    destinations: [],
+    prereqLocations: [],
+    chainStartsWith: [],
+    requires: [],
+    unlocks: [{"id":"1080d9fc-d511-4bda-a567-161797dac491","name":"CRITICAL REFUEL REQUEST: [SHIP]"},{"id":"02f841ac-ebed-47b6-89e6-8973b37398be","name":"REFUEL REQUEST: [SHIP]"},{"id":"82e38ec9-3066-4aac-9363-608a4d67383c","name":"URGENT FLEET REFUEL"},{"id":"bed4ea01-87f4-444a-a50a-cb9f60c55bcf","name":"URGENT FLEET REFUEL"},{"id":"b95ac811-ec6b-4027-9294-3e1f8d9107f5","name":"URGENT FLEET REFUEL"},{"id":"0d66c038-2136-4c36-8e77-e449eba8e493","name":"URGENT FLEET REFUEL"},{"id":"14910f0b-9b69-41ae-bd78-d072725b074a","name":"URGENT FLEET REFUEL"},{"id":"33944d03-1b31-4457-8717-75b36a6f0ad6","name":"URGENT FLEET REFUEL"},{"id":"145a74cc-fda4-4bb9-b274-c6938b32fa71","name":"URGENT REFUEL REQUEST: [SHIP]"}],
+    turnIns: [],
+  },
+];
+
 const SELL_MATERIALS = ["Construction Materials", "Recycled Material Composite"];
 const PLAYER_SELL_POINT = "Sold to Player";
 
@@ -15227,6 +15641,11 @@ export default function StarCitizenSalvageGuideWebsite() {
   //   "crew"    — Crew Salvage roster (multi-user salvage runs)
   // Default: orders.
   const [ledgerSubTab, setLedgerSubTab] = useState("orders");
+  // Missions sub-tab: "salvage" (default — live 4.7.2 catalog) or
+  // "refueling" (4.8 PTU only — UWC contracts). Both share the
+  // same filter / table / modal surface; the sub-tab swaps the
+  // underlying mission array and faction option list.
+  const [missionsSubTab, setMissionsSubTab] = useState("salvage");
   // Crew Salvage state — local-only for now (persistence +
   // server-side run-splitting comes when this feature graduates out
   // of preview). Layout:
@@ -17678,7 +18097,7 @@ export default function StarCitizenSalvageGuideWebsite() {
   // the catch falls through to the dev-mock builder so the modal still
   // exercises in preview.
   const openAdminUserDetail = async (u) => {
-    setAdminUserDetail({ userId: u.userId, username: u.username, refineryJobs: null, sellOrders: null });
+    setAdminUserDetail({ userId: u.userId, username: u.username, refineryJobs: null, sellOrders: null, activeContracts: null });
     setAdminUserDetailLoading(true);
     setAdminUserDetailError("");
     setAdminClearLedgerStep(0);
@@ -17739,12 +18158,93 @@ export default function StarCitizenSalvageGuideWebsite() {
           deletedAt: null,
         };
       });
+      // Synthesize mission settlement entries so the dev-mock
+      // Contracts panel has visible Completed + Abandoned rows
+      // alongside the active-contract list. The Chrissyy account
+      // gets a richer fixture (2 active + 2 completed) per the
+      // operator's preview request; every other dev user gets a
+      // minimal 1+1 sample.
+      const isChrissyy = /chrissyy/i.test(String(u.username || ""));
+      const missionEvents = isChrissyy
+        ? [
+            {
+              id: `m-reward-mock-${u.userId}-1`,
+              material: "Mission Reward",
+              scu: 0,
+              location: "Mission: Wrecked Ships for Sale (Checkmate)",
+              playerName: "",
+              aUEC: 28500,
+              submittedAt: now - 2.1 * day,
+              deletedAt: null,
+            },
+            {
+              id: `m-reward-mock-${u.userId}-2`,
+              material: "Mission Reward",
+              scu: 0,
+              location: "Mission: Salvage Operation: Lyria",
+              playerName: "",
+              aUEC: 41200,
+              submittedAt: now - 6.4 * day,
+              deletedAt: null,
+            },
+          ]
+        : [
+            {
+              id: `m-reward-mock-${u.userId}-1`,
+              material: "Mission Reward",
+              scu: 0,
+              location: "Mission: Wrecked Ships for Sale (Checkmate)",
+              playerName: "",
+              aUEC: 28500,
+              submittedAt: now - 4.2 * day,
+              deletedAt: null,
+            },
+            {
+              id: `m-buyin-mock-${u.userId}-1`,
+              material: "Mission Buy-In",
+              scu: 0,
+              location: "Mission: Adagio Rescue Run (abandoned)",
+              playerName: "",
+              aUEC: -5000,
+              submittedAt: now - 9.5 * day,
+              deletedAt: null,
+            },
+          ];
+      sellOrders.push(...missionEvents);
+      sellOrders.sort((a, b) => b.submittedAt - a.submittedAt);
+      const activeContracts = isChrissyy
+        ? [
+            {
+              missionId: `mock-active-${u.userId}-1`,
+              name: "Salvage Wreckage @ Pyro Outpost",
+              reward: 32000,
+              buyIn: 0,
+              acceptedAt: now - 6 * 60 * 60 * 1000,
+            },
+            {
+              missionId: `mock-active-${u.userId}-2`,
+              name: "Wrecked Ships for Sale (Pinecone)",
+              reward: 27500,
+              buyIn: 5000,
+              acceptedAt: now - 22 * 60 * 60 * 1000,
+            },
+          ]
+        : [
+            {
+              missionId: `mock-active-${u.userId}-1`,
+              name: "Salvage Wreckage @ Pyro Outpost",
+              reward: 32000,
+              buyIn: 0,
+              acceptedAt: now - 6 * 60 * 60 * 1000,
+            },
+          ];
       return {
         userId: u.userId,
         username: u.username,
         windowDays: 30,
         refineryJobs,
         sellOrders,
+        activeContracts,
       };
     };
 
@@ -17797,6 +18297,7 @@ export default function StarCitizenSalvageGuideWebsite() {
         windowDays: data.windowDays,
         refineryJobs: Array.isArray(data.refineryJobs) ? data.refineryJobs : [],
         sellOrders: Array.isArray(data.sellOrders) ? data.sellOrders : [],
+        activeContracts: Array.isArray(data.activeContracts) ? data.activeContracts : [],
       });
       setAdminUserDetailLoading(false);
     } catch (e) {
@@ -20575,13 +21076,24 @@ export default function StarCitizenSalvageGuideWebsite() {
           // Faction list. Rough & Ready covers the RR_ "Wrecked Ships
           // for Sale" family that the source data ships with a null
           // factionGuid; build-missions.cjs maps that family to this
-          // label so the filter matches.
-          const allFactions = ["Adagio Holdings", "Rough & Ready", "Tar Pits"];
+          // label so the filter matches. The Refueling sub-tab swaps
+          // in United Wayfarers Club — the sole faction that ships
+          // refueling contracts as of 4.8.0-ptu.
+          // Refueling Missions ship in the 4.8 PTU dump only — gate
+          // the entire sub-tab on the live patch version. On 4.7.2
+          // the nav collapses to a single Salvage Missions tab and
+          // the Refueling source is unreachable.
+          const refuelingUnlocked = isPatchAtLeast(patchStatus?.version, "4.8");
+          const isRefuelingTab = refuelingUnlocked && missionsSubTab === "refueling";
+          const sourceMissions = isRefuelingTab ? REFUELING_MISSIONS : MISSIONS;
+          const allFactions = isRefuelingTab
+            ? ["United Wayfarers Club"]
+            : ["Adagio Holdings", "Rough & Ready", "Tar Pits"];
 
           // Apply every active filter. Any falsy filter value is a
           // pass-through; the empty default state shows everything.
           const search = missionSearch.trim().toLowerCase();
-          const filtered = MISSIONS.filter((m) => {
+          const filtered = sourceMissions.filter((m) => {
             if (missionSystem && m.system !== missionSystem) return false;
             if (missionFaction && m.faction !== missionFaction) return false;
             if (missionLegality && m.legality !== missionLegality) return false;
@@ -20637,6 +21149,42 @@ export default function StarCitizenSalvageGuideWebsite() {
 
           return (
             <div className="space-y-6">
+              {/* --- Missions sub-tabs ---
+                  Salvage Missions ships in the live 4.7.2 catalog
+                  (59 entries from scmdb.net). Refueling Missions
+                  is 4.8 PTU only — 12 United Wayfarers Club
+                  contracts. Both share the filter row + table +
+                  detail popup; switching the tab swaps the source
+                  array and the faction option list.
+                  Hidden entirely on 4.7.2 — auto-appears once the
+                  live patch advances to 4.8. */}
+              {refuelingUnlocked && (
+                <nav className="flex gap-1 border-b border-cyan-500/25" role="tablist" aria-label="Missions sub-sections">
+                  {[
+                    { id: "salvage",   label: "Salvage Missions" },
+                    { id: "refueling", label: "Refueling Missions" },
+                  ].map((t) => {
+                    const active = missionsSubTab === t.id;
+                    return (
+                      <button
+                        key={t.id}
+                        type="button"
+                        role="tab"
+                        aria-selected={active}
+                        onClick={() => setMissionsSubTab(t.id)}
+                        className={`-mb-px inline-flex items-center gap-1.5 border-b-2 px-3 py-2 text-xs font-semibold uppercase tracking-wider transition sm:px-4 sm:text-sm sm:tracking-[0.18em] ${
+                          active
+                            ? "border-cyan-400 text-cyan-200"
+                            : "border-transparent text-slate-400 hover:border-cyan-500/40 hover:text-slate-200"
+                        }`}
+                      >
+                        {t.label}
+                      </button>
+                    );
+                  })}
+                </nav>
+              )}
+
               {/* Active Contracts panel — list of every accepted
                   mission. Sits ABOVE the table so it's the first
                   thing the user sees on the Missions tab. Each row
@@ -20713,13 +21261,17 @@ export default function StarCitizenSalvageGuideWebsite() {
               <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                   <div>
-                    <h2 className="text-xl font-bold text-cyan-300">Salvage Missions</h2>
+                    <h2 className="text-xl font-bold text-cyan-300">
+                      {missionsSubTab === "refueling" ? "Refueling Missions" : "Salvage Missions"}
+                    </h2>
                     <p className="mt-1 text-sm text-slate-400">
-                      Browse known salvage contracts. Filter by system, faction, or minimum payout — and search by name, giver, or notes.
+                      {missionsSubTab === "refueling"
+                        ? "Browse United Wayfarers Club refueling contracts. Filter by system, faction, or minimum payout — and search by name, giver, or notes."
+                        : "Browse known salvage contracts. Filter by system, faction, or minimum payout — and search by name, giver, or notes."}
                     </p>
                   </div>
                   <span className="shrink-0 rounded-lg border border-cyan-500/25 bg-cyan-500/10 px-3 py-1.5 text-xs font-semibold text-cyan-200">
-                    {filtered.length} / {MISSIONS.length} shown
+                    {filtered.length} / {sourceMissions.length} shown
                   </span>
                 </div>
 
@@ -21142,7 +21694,12 @@ export default function StarCitizenSalvageGuideWebsite() {
                         { title: "Unlocks", rows: missionDetail.unlocks || [] },
                       ].filter((s) => s.rows.length > 0);
                       if (sections.length === 0) return null;
-                      const known = new Map(MISSIONS.map((m) => [m.id, m]));
+                      // Chain ref links can point at either salvage or
+                      // refueling contracts — keep both arrays in scope
+                      // so the popup can navigate across mission-types.
+                      const known = new Map(
+                        [...MISSIONS, ...REFUELING_MISSIONS].map((m) => [m.id, m])
+                      );
                       return (
                         <div className="mt-5 space-y-3">
                           {sections.map((s) => (
@@ -24258,6 +24815,123 @@ export default function StarCitizenSalvageGuideWebsite() {
 
               {!adminUserDetailLoading && !adminUserDetailError && Array.isArray(adminUserDetail.refineryJobs) && (
                 <>
+                  {/* Contracts panel — current = prefs.activeContracts;
+                      completed/abandoned = sell-order entries with
+                      `material` of "Mission Reward" / "Mission Buy-In".
+                      A row's status is "Abandoned" when the location
+                      string carries the "(abandoned)" suffix that
+                      abandonMissionContract() stamps on the synthetic
+                      sell order. */}
+                  {(() => {
+                    const active = Array.isArray(adminUserDetail.activeContracts)
+                      ? adminUserDetail.activeContracts
+                      : [];
+                    const missionEntries = (adminUserDetail.sellOrders || []).filter(
+                      (o) =>
+                        o &&
+                        (o.material === "Mission Reward" || o.material === "Mission Buy-In")
+                    );
+                    const fmtAUec = (n) =>
+                      `${Number(n) >= 0 ? "" : "-"}${Math.abs(Number(n) || 0).toLocaleString()} aUEC`;
+                    const fmtTime = (ms) => {
+                      if (!Number.isFinite(ms)) return "—";
+                      const d = new Date(ms);
+                      return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`;
+                    };
+                    return (
+                      <section className="mt-5">
+                        <h4 className="text-cyan-300 text-sm font-semibold">
+                          Contracts ({active.length + missionEntries.length})
+                        </h4>
+                        {active.length === 0 && missionEntries.length === 0 ? (
+                          <div className="mt-2 rounded-2xl border border-dashed border-slate-700 p-4 text-xs text-slate-500">
+                            No active or completed contracts in the last {adminUserDetail.windowDays || 30} days.
+                          </div>
+                        ) : (
+                          <div className="mt-3 space-y-3">
+                            {/* Current */}
+                            <div>
+                              <div className="text-[10px] uppercase tracking-wider text-slate-500">
+                                Current ({active.length})
+                              </div>
+                              {active.length === 0 ? (
+                                <div className="mt-1 rounded-xl border border-dashed border-slate-800 px-3 py-2 text-[11px] text-slate-500">
+                                  No active contracts.
+                                </div>
+                              ) : (
+                                <ul className="mt-1 max-h-52 space-y-1.5 overflow-y-auto pr-1 [scrollbar-width:thin] [scrollbar-color:rgb(6_182_212_/_0.7)_rgb(2_6_23)] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-slate-950 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-500/70 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-cyan-400">
+                                  {active.map((c) => (
+                                    <li
+                                      key={c.missionId}
+                                      className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-emerald-500/25 bg-emerald-500/5 px-3 py-2 text-xs"
+                                    >
+                                      <span className="font-semibold text-white">{c.name}</span>
+                                      <span className="flex flex-wrap items-center gap-3 text-[11px]">
+                                        <span className="text-emerald-200">{fmtAUec(c.reward)}</span>
+                                        {Number(c.buyIn) > 0 && (
+                                          <span className="text-rose-200">−{fmtAUec(c.buyIn).replace("-", "")}</span>
+                                        )}
+                                        <span className="text-slate-500">accepted {fmtTime(c.acceptedAt)}</span>
+                                      </span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
+                            {/* Completed / Abandoned */}
+                            <div>
+                              <div className="text-[10px] uppercase tracking-wider text-slate-500">
+                                Completed ({missionEntries.length})
+                              </div>
+                              {missionEntries.length === 0 ? (
+                                <div className="mt-1 rounded-xl border border-dashed border-slate-800 px-3 py-2 text-[11px] text-slate-500">
+                                  No completed contracts in the last {adminUserDetail.windowDays || 30} days.
+                                </div>
+                              ) : (
+                                <ul className="mt-1 max-h-52 space-y-1.5 overflow-y-auto pr-1 [scrollbar-width:thin] [scrollbar-color:rgb(6_182_212_/_0.7)_rgb(2_6_23)] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-slate-950 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-500/70 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-cyan-400">
+                                  {missionEntries.map((o) => {
+                                    const abandoned = /\(abandoned\)\s*$/i.test(String(o.location || ""));
+                                    const missionName = String(o.location || "")
+                                      .replace(/^Mission:\s*/i, "")
+                                      .replace(/\s*\(abandoned\)\s*$/i, "");
+                                    const statusLabel = abandoned
+                                      ? "Abandoned"
+                                      : o.material === "Mission Reward"
+                                      ? "Reward"
+                                      : "Buy-In";
+                                    const statusClass = abandoned
+                                      ? "border-rose-500/30 bg-rose-500/5"
+                                      : o.material === "Mission Reward"
+                                      ? "border-cyan-500/25 bg-cyan-500/5"
+                                      : "border-rose-500/25 bg-rose-500/5";
+                                    return (
+                                      <li
+                                        key={o.id}
+                                        className={`flex flex-wrap items-center justify-between gap-2 rounded-xl border px-3 py-2 text-xs ${statusClass}`}
+                                      >
+                                        <span className="flex items-center gap-2">
+                                          <span className="rounded-md border border-slate-700/60 bg-slate-950/40 px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-slate-300">
+                                            {statusLabel}
+                                          </span>
+                                          <span className="font-semibold text-white">{missionName || "—"}</span>
+                                        </span>
+                                        <span className="flex flex-wrap items-center gap-3 text-[11px]">
+                                          <span className={Number(o.aUEC) >= 0 ? "text-emerald-200" : "text-rose-200"}>
+                                            {fmtAUec(o.aUEC)}
+                                          </span>
+                                          <span className="text-slate-500">{fmtTime(o.submittedAt)}</span>
+                                        </span>
+                                      </li>
+                                    );
+                                  })}
+                                </ul>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </section>
+                    );
+                  })()}
                   <section className="mt-5">
                     <h4 className="text-cyan-300 text-sm font-semibold">
                       Refinery jobs ({adminUserDetail.refineryJobs.length})
@@ -24267,7 +24941,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                         No refinery jobs in the last 30 days.
                       </div>
                     ) : (
-                      <div className="mt-3 overflow-x-auto rounded-2xl border border-slate-700 [scrollbar-width:thin] [scrollbar-color:rgb(6_182_212_/_0.7)_rgb(2_6_23)] [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-slate-950 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-500/70 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-cyan-400">
+                      <div className="mt-3 max-h-[15rem] overflow-x-auto overflow-y-auto rounded-2xl border border-slate-700 [scrollbar-width:thin] [scrollbar-color:rgb(6_182_212_/_0.7)_rgb(2_6_23)] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-slate-950 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-500/70 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-cyan-400">
                         <table className="w-full min-w-[760px] text-left text-xs md:min-w-0">
                           <thead className="bg-slate-950 text-slate-300">
                             <tr>
@@ -24356,7 +25030,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                         No sell orders in the last 30 days.
                       </div>
                     ) : (
-                      <div className="mt-3 overflow-x-auto rounded-2xl border border-slate-700 [scrollbar-width:thin] [scrollbar-color:rgb(6_182_212_/_0.7)_rgb(2_6_23)] [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-slate-950 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-500/70 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-cyan-400">
+                      <div className="mt-3 max-h-[15rem] overflow-x-auto overflow-y-auto rounded-2xl border border-slate-700 [scrollbar-width:thin] [scrollbar-color:rgb(6_182_212_/_0.7)_rgb(2_6_23)] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-slate-950 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-500/70 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-cyan-400">
                         <table className="w-full min-w-[720px] text-left text-xs md:min-w-0">
                           <thead className="bg-slate-950 text-slate-300">
                             <tr>
@@ -25722,6 +26396,10 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <li>Ships Salvaged picker now sources exclusively from the <strong>SPViewer.eu</strong> vehicle dataset (upstream: api.uexcorp.uk/2.0/vehicles) — 217 player-pilotable ships across 18 manufacturers. Concept ships, NPC-only Vanduul Clans hulls, Retaliator Cargo / Torpedo modules, and the Retaliator Bomber loadout variant are filtered out. Manufacturer dropdown drives off the same dataset.</li>
                     <li>Six <strong>patch 4.8</strong> ships pre-staged in the picker, gated on the live patch version: Drake Ironclad, Drake Ironclad Assault, Drake Pitbull, MISC Starlite, Aegis Tiburon, Kruger Intergalactic Stingray. Auto-appear once 4.8 goes live.</li>
                     <li>Home → Scraper Module Performance: each module's detail card now ships with a <strong>Quality Level</strong> slider (500 → 1000) that lights up on the patch 4.8 drop. 33% width with a paired numeric input, comparison-table Speed / Radius / Efficiency columns update live (linear 0–20% boost). Gated on the live patch version.</li>
+                    <li>Missions tab now ships with sub-tabs: <strong>Salvage Missions</strong> (live 4.7.2 catalog) and <strong>Refueling Missions</strong> (12 United Wayfarers Club contracts pulled from the scmdb.net 4.8 PTU dump). Same filter row + table + detail popup; sub-tab swap flips the source array and the faction option list. Refueling sub-tab is gated on the live patch — hidden on 4.7.2.</li>
+                    <li>New <strong>United Wayfarers Club</strong> faction option in the Missions filter dropdown — appears only on the Refueling sub-tab.</li>
+                    <li>Daily 6:03 AM scmdb.net diff watcher: pulls game-versions.json, fetches the latest LIVE + PTU dumps, diffs Salvage + Refueling contracts against yesterday's snapshot, and surfaces added / removed / modified rows.</li>
+                    <li>Header <strong>Patch Verified</strong> pill and footer "Data verified for patch …" string both drive off the live patch status, so they auto-flip 4.7.2 → 4.8 the moment the server-side patch advance lands.</li>
                   </ul>
                   <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Changes</p>
                   <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">

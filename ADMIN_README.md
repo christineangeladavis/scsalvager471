@@ -24,6 +24,17 @@ Modals:
 
 ---
 
+## 2026-04-29 — Contracts panel + 5-row scroll caps in the user-detail modal
+
+- New **Contracts** section between the modal header and the Refinery jobs table. Two sub-lists:
+  - **Current**: pulled from `prefs.activeContracts` via `GET /api/admin/user-history` (the endpoint now reads the user's prefs hash and includes `activeContracts: [{ missionId, name, reward, buyIn, acceptedAt }, …]` in the response). Empty array on prefs read failure — never fails the whole request.
+  - **Completed**: derived client-side by filtering `sellOrders` for `material in {"Mission Reward", "Mission Buy-In"}`. Status pill is set per row: `Reward` (cyan) when material is "Mission Reward", `Buy-In` (rose) when material is "Mission Buy-In", `Abandoned` (rose) when the location string ends in `(abandoned)` (the suffix `abandonMissionContract()` stamps on the synthetic sell order).
+- Both Contracts sub-lists cap at `max-h-52` with vertical scroll using the site-standard pill scrollbar utility (`[scrollbar-width:thin] [scrollbar-color:rgb(6_182_212_/_0.7)_rgb(2_6_23)] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-slate-950 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-500/70 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-cyan-400`). ~5 rows visible before scroll; older rows still reachable.
+- Refinery jobs + Sell orders tables also gain `max-h-[15rem]` with the same vertical scrollbar utility added alongside the existing horizontal scroll on the table wrapper. Header pinned via the natural `<thead>` flow inside the scrolling div.
+- Dev-mock fixture (`buildDevMock` in `openAdminUserDetail`) seeds 1 active contract + 1 completed reward + 1 abandoned buy-in for any dev user. The Chrissyy account specifically gets a richer 2 active + 2 completed fixture so the Contracts panel exercises both lists in vite-dev.
+
+---
+
 ## 2026-04-28 — Per-row edit + delete in the user-detail modal
 
 - Each row in the user-detail modal's Refinery jobs and Sell orders tables now has an **Edit (✏)** and **Delete (✕)** button.

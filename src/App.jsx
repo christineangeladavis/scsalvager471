@@ -15304,14 +15304,25 @@ const SCRAPER_LOCATIONS = {
   ],
 };
 
+// Scraper module spec table. Values sourced from the public
+// CStone Universal Item Finder spec sheet.
+//   speedMultiplier — extraction speed multiplier
+//   radius          — beam radius (no unit on the source sheet)
+//   efficiency      — extraction efficiency multiplier (0–1)
+//   mass            — module mass in kg-equivalent units
+//   kMicroScu       — K μSCU constant (same across every module)
+//   price           — sticker / lowest in-game price (used as
+//                     fallback when SCRAPER_LOCATIONS hasn't been
+//                     populated for this head yet)
 const salvageHeads = [
   {
     head: "Abrade",
     manufacturer: "Greycat Industrial",
-    speedMultiplier: 3.5,
-    efficiency: 340,
-    radius: 0.9,
-    powerDraw: 0.15,
+    speedMultiplier: 0.15,
+    radius: 3.5,
+    efficiency: 0.9,
+    mass: 0.1,
+    kMicroScu: 0.51,
     price: 21250,
     bestFor: "Balanced speed & coverage",
     description: "Delivers a sizable area of effect and respectable extraction rate — reliable for scraping hulls quickly and efficiently.",
@@ -15319,10 +15330,11 @@ const salvageHeads = [
   {
     head: "Trawler",
     manufacturer: "Greycat Industrial",
-    speedMultiplier: 6.0,
-    efficiency: 340,
-    radius: 0.6,
-    powerDraw: 0.05,
+    speedMultiplier: 0.05,
+    radius: 6,
+    efficiency: 0.6,
+    mass: 0.1,
+    kMicroScu: 0.51,
     price: 31150,
     bestFor: "Fastest stripping speed",
     description: "Largest area of effect but generates intense heat, causing more burn-off. Ideal when speed matters more than efficiency.",
@@ -15330,10 +15342,11 @@ const salvageHeads = [
   {
     head: "Cinch",
     manufacturer: "Greycat Industrial",
-    speedMultiplier: 1.5,
-    efficiency: 340,
-    radius: 1.0,
-    powerDraw: 0.60,
+    speedMultiplier: 0.6,
+    radius: 1.5,
+    efficiency: 1,
+    mass: 0.1,
+    kMicroScu: 0.51,
     price: 11150,
     bestFor: "Maximum RMC extraction",
     description: "Small, focused beam with the largest radius. Slower but extracts from every nook and cranny — best efficiency per pass.",
@@ -20879,7 +20892,8 @@ export default function StarCitizenSalvageGuideWebsite() {
                   <th className="px-3 py-3 text-center">Speed ×</th>
                   <th className="px-3 py-3 text-center">Radius</th>
                   <th className="px-3 py-3 text-center">Efficiency</th>
-                  <th className="px-3 py-3 text-center">Power</th>
+                  <th className="px-3 py-3 text-center">Mass</th>
+                  <th className="px-3 py-3 text-center">K μSCU</th>
                   <th className="px-3 py-3 text-right">Lowest Price</th>
                 </tr>
               </thead>
@@ -20893,10 +20907,11 @@ export default function StarCitizenSalvageGuideWebsite() {
                   return (
                   <tr key={row.head} className="border-t border-slate-800 bg-slate-900/40">
                     <td className="px-3 py-3 font-bold text-white">{row.head}</td>
-                    <td className="px-3 py-3 text-center text-amber-300 font-bold">{speed.toFixed(1)}×</td>
-                    <td className="px-3 py-3 text-center text-cyan-300">{radius.toFixed(2)} m</td>
-                    <td className="px-3 py-3 text-center text-slate-300">{Math.round(efficiency)}</td>
-                    <td className="px-3 py-3 text-center text-slate-300">{row.powerDraw.toFixed(2)}</td>
+                    <td className="px-3 py-3 text-center text-amber-300 font-bold">{speed.toFixed(2)}×</td>
+                    <td className="px-3 py-3 text-center text-cyan-300">{radius.toFixed(2)}</td>
+                    <td className="px-3 py-3 text-center text-slate-300">{efficiency.toFixed(2)}</td>
+                    <td className="px-3 py-3 text-center text-slate-300">{row.mass.toFixed(2)}</td>
+                    <td className="px-3 py-3 text-center text-slate-300">{row.kMicroScu.toFixed(2)}</td>
                     <td className="px-3 py-3 text-right text-emerald-300 font-bold">
                       {(() => {
                         // Surface the lowest in-game price across every
@@ -26406,6 +26421,10 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <li>Top Salvagers leaderboard now ranks strictly by <strong>Total SCU Refined</strong>. Profit-only activity no longer qualifies a user for the top 5.</li>
                     <li>Patch History panel description updated to "Mission history, collected refinery jobs, and sell orders…" so the new contract entries are front-and-center.</li>
                     <li>Recent Sales feed excludes mission contract settlements — they're tracked on the Active Contracts panel pre-settlement and in Patch History after.</li>
+                  </ul>
+                  <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Fixes</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li>Home → Scraper Module Performance comparison table values corrected. Speed × and Radius were swapped, Efficiency now reads as the 0–1 multiplier (Abrade 0.90, Trawler 0.60, Cinch 1.00) instead of the 340 figure that was shipping. Power column dropped; new <strong>Mass</strong> + <strong>K μSCU</strong> columns added so the table matches the in-game CStone Universal Item Finder spec sheet.</li>
                   </ul>
                 </section>
 

@@ -33,6 +33,7 @@ import { getRedis } from "../_lib/redis.js";
 import { getSession } from "../_lib/session.js";
 import { isAdminSession } from "../_lib/admin.js";
 import { listUserIds, getUserMeta } from "../_lib/userIndex.js";
+import { getPrefs } from "../_lib/prefs.js";
 import { ledgerKey } from "../ledger.js";
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
@@ -115,7 +116,29 @@ export default async function handler(req, res) {
         submittedAt: o.submittedAt,
       }));
 
-    if (jobs.length === 0 && sales.length === 0) continue;
+    // Active mission contracts come from prefs, not the ledger.
+    // Pull them so the admin's 7-day view can surface in-flight
+    // contracts even when the user hasn't logged any refinery /
+    // sales activity in the same window.
+    let activeContracts = [];
+    try {
+      const prefs = await getPrefs(redis, userId);
+      activeContracts = Array.isArray(prefs?.activeContracts)
+        ? prefs.activeContracts
+            .filter((c) => c && c.missionId)
+            .map((c) => ({
+              missionId: c.missionId,
+              name: c.name,
+              reward: c.reward,
+              buyIn: c.buyIn,
+              acceptedAt: c.acceptedAt,
+            }))
+        : [];
+    } catch (e) {
+      activeContracts = [];
+    }
+
+    if (jobs.length === 0 && sales.length === 0 && activeContracts.length === 0) continue;
 
     const meta = await getUserMeta(redis, userId);
     users.push({
@@ -123,14 +146,21 @@ export default async function handler(req, res) {
       username: (meta && meta.username) || "Unknown",
       jobs,
       sales,
+      activeContracts,
     });
   }
 
   // Sort users by their most recent event so the freshest activity bubbles
-  // to the top of the table.
+  // to the top of the table. Active-contract acceptedAt timestamps count
+  // toward "most recent event" so users with only an in-flight contract
+  // still rank by when they accepted it.
   users.sort((a, b) => {
     const latest = (u) => {
-      const all = [...u.jobs, ...u.sales].map((e) => e.submittedAt);
+      const all = [
+        ...u.jobs,
+        ...u.sales,
+        ...(u.activeContracts || []).map((c) => ({ submittedAt: c.acceptedAt })),
+      ].map((e) => e.submittedAt);
       return all.length ? Math.max(...all) : 0;
     };
     return latest(b) - latest(a);

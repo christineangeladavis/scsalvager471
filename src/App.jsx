@@ -16081,6 +16081,12 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [adminUsers, setAdminUsers] = useState(null);
   const [adminUsersLoading, setAdminUsersLoading] = useState(false);
   const [adminUsersError, setAdminUsersError] = useState("");
+  // Sort state for the All Users table. `key` is one of
+  // "username" | "isOnline" | "dmsEnabled"; `dir` is "asc" | "desc".
+  // null means "no sort applied — render in API order" (online
+  // first, then by lastLoginAt desc, the default the server
+  // already ships). Clicking a header cycles asc → desc → off.
+  const [adminUsersSort, setAdminUsersSort] = useState(null);
   const [adminGuests, setAdminGuests] = useState(null);
   const [adminGuestsLoading, setAdminGuestsLoading] = useState(false);
   const [adminGuestsError, setAdminGuestsError] = useState("");
@@ -16980,53 +16986,134 @@ export default function StarCitizenSalvageGuideWebsite() {
       return {
         fetchedAt: now,
         users: [
-          {
-            userId: "dev-1",
-            username: "Chrissyy",
-            jobs: [
-              {
-                id: "mock_a1",
-                material: "Construction Salvage",
-                materialScu: 240,
-                location: "Levski",
-                method: "Cormack Method",
-                submittedAt: now - 35 * min,
-                completesAt: now + 25 * min,
-                pickedUpAt: null,
-              },
-              {
-                id: "mock_a2",
-                material: "Construction Pieces",
-                materialScu: 90,
-                location: "Levski",
-                method: "Dinyx Solventation",
-                submittedAt: now - 2 * hour,
-                completesAt: now - 5 * min,
-                pickedUpAt: null,
-              },
-              {
-                id: "mock_a3",
-                material: "Construction Salvage",
-                materialScu: 180,
-                location: "Levski",
-                method: "Kazen Winnowing",
-                submittedAt: now - 3 * day,
-                completesAt: now - 3 * day + 90 * min,
-                pickedUpAt: now - 3 * day + 100 * min,
-              },
-            ],
-            sales: [
-              {
-                id: "mock_s1",
-                material: "Construction Materials",
-                scu: 36,
-                aUEC: 540000,
-                location: "ARC-L4",
+          (() => {
+            // Chrissyy fixture — bulk seeded so the 7-day admin
+            // view exercises all three sections at scale: 10
+            // refinery jobs, 20 sales (real sell orders only), and
+            // 20 mission settlement events spread across Reward /
+            // Buy-In / Abandoned. activeContracts seeds 4 in-flight
+            // entries on top so the Contracts section shows both
+            // Active and Completed rows.
+            const refMaterials = ["Construction Salvage", "Construction Pieces", "Construction Rubble"];
+            const refLocations = ["Levski", "Magnus", "ARC-L1", "HUR-L1", "CRU-L1", "Pyro Ruin Station"];
+            const refMethods = ["Cormack Method", "Dinyx Solventation", "Kazen Winnowing", "Gaskin Process"];
+            const sellMaterials = ["Construction Materials", "Recycled Material Composite", "Construction Pieces"];
+            const sellLocations = ["Area18", "New Babbage", "Lorville", "Orison", "GrimHEX", "Ruin Station", "Megumi", "Bloom"];
+            const missionTitles = [
+              "Wrecked Ships for Sale (Checkmate)",
+              "Wrecked Ships for Sale (Pinecone)",
+              "Adagio Rescue Run",
+              "Salvage Wreckage @ Pyro Outpost",
+              "Tar Pits Stripping Detail",
+              "Investigate Derelict at HUR-L4",
+              "Salvage Operation: Lyria",
+              "Component Hunt: ARC-L3",
+              "Stripped Hauler Recovery",
+              "Vulture Cleanup Run",
+            ];
+            const jobs = Array.from({ length: 10 }).map((_, i) => {
+              const submittedAt = now - (i * 12 + 30) * min - i * hour;
+              const minutes = 60 + ((i * 37) % 240);
+              const picked = i % 3 === 0;
+              return {
+                id: `mock_chrissy_j${i + 1}`,
+                material: refMaterials[i % refMaterials.length],
+                materialScu: 60 + ((i * 47) % 320),
+                location: refLocations[i % refLocations.length],
+                method: refMethods[i % refMethods.length],
+                submittedAt,
+                completesAt: submittedAt + minutes * min,
+                pickedUpAt: picked ? submittedAt + (minutes + 8) * min : null,
+              };
+            });
+            const sales = Array.from({ length: 20 }).map((_, i) => {
+              const submittedAt = now - (i * 8 + 1) * hour;
+              const scu = 20 + ((i * 23) % 220);
+              return {
+                id: `mock_chrissy_s${i + 1}`,
+                material: sellMaterials[i % sellMaterials.length],
+                scu,
+                aUEC: scu * (2400 + ((i * 41) % 1500)),
+                location: sellLocations[i % sellLocations.length],
                 playerName: "",
-                submittedAt: now - 3 * day + 110 * min,
+                submittedAt,
+              };
+            });
+            const missionEvents = Array.from({ length: 20 }).map((_, i) => {
+              const submittedAt = now - (i * 7 + 2) * hour;
+              const title = missionTitles[i % missionTitles.length];
+              // Rotate three states: Reward (60%) / Buy-In (20%) / Abandoned (20%).
+              const stateBucket = i % 5;
+              if (stateBucket >= 2) {
+                return {
+                  id: `mock_chrissy_mr${i + 1}`,
+                  material: "Mission Reward",
+                  scu: 0,
+                  aUEC: 18000 + ((i * 1700) % 35000),
+                  location: `Mission: ${title}`,
+                  playerName: "",
+                  submittedAt,
+                };
+              }
+              if (stateBucket === 1) {
+                return {
+                  id: `mock_chrissy_mb${i + 1}`,
+                  material: "Mission Buy-In",
+                  scu: 0,
+                  aUEC: -(2000 + ((i * 700) % 6000)),
+                  location: `Mission: ${title}`,
+                  playerName: "",
+                  submittedAt,
+                };
+              }
+              return {
+                id: `mock_chrissy_ma${i + 1}`,
+                material: "Mission Buy-In",
+                scu: 0,
+                aUEC: -(3000 + ((i * 500) % 4000)),
+                location: `Mission: ${title} (abandoned)`,
+                playerName: "",
+                submittedAt,
+              };
+            });
+            const activeContracts = [
+              {
+                missionId: "mock-active-chrissyy-1",
+                name: "Salvage Wreckage @ Pyro Outpost",
+                reward: 32000,
+                buyIn: 0,
+                acceptedAt: now - 6 * hour,
               },
-            ],
-          },
+              {
+                missionId: "mock-active-chrissyy-2",
+                name: "Wrecked Ships for Sale (Pinecone)",
+                reward: 27500,
+                buyIn: 5000,
+                acceptedAt: now - 22 * hour,
+              },
+              {
+                missionId: "mock-active-chrissyy-3",
+                name: "Tar Pits Stripping Detail",
+                reward: 41200,
+                buyIn: 0,
+                acceptedAt: now - 3 * hour,
+              },
+              {
+                missionId: "mock-active-chrissyy-4",
+                name: "Adagio Rescue Run",
+                reward: 18500,
+                buyIn: 1000,
+                acceptedAt: now - 45 * min,
+              },
+            ];
+            return {
+              userId: "dev-1",
+              username: "Chrissyy",
+              jobs,
+              sales: [...sales, ...missionEvents],
+              activeContracts,
+            };
+          })(),
           {
             userId: "dev-2",
             username: "Denavago",
@@ -17052,6 +17139,40 @@ export default function StarCitizenSalvageGuideWebsite() {
                 playerName: "Chrissyy",
                 submittedAt: now - 5 * day,
               },
+              {
+                id: "mock_s3",
+                material: "Mission Reward",
+                scu: 0,
+                aUEC: 28500,
+                location: "Mission: Wrecked Ships for Sale (Checkmate)",
+                playerName: "",
+                submittedAt: now - 2 * day,
+              },
+              {
+                id: "mock_s4",
+                material: "Mission Buy-In",
+                scu: 0,
+                aUEC: -5000,
+                location: "Mission: Adagio Rescue Run (abandoned)",
+                playerName: "",
+                submittedAt: now - 4 * day,
+              },
+            ],
+            activeContracts: [
+              {
+                missionId: "mock-active-1",
+                name: "Salvage Wreckage @ Pyro Outpost",
+                reward: 32000,
+                buyIn: 0,
+                acceptedAt: now - 6 * hour,
+              },
+              {
+                missionId: "mock-active-2",
+                name: "Wrecked Ships for Sale (Pinecone)",
+                reward: 27500,
+                buyIn: 5000,
+                acceptedAt: now - 22 * hour,
+              },
             ],
           },
           {
@@ -17070,6 +17191,7 @@ export default function StarCitizenSalvageGuideWebsite() {
               },
             ],
             sales: [],
+            activeContracts: [],
           },
         ],
       };
@@ -24127,11 +24249,29 @@ export default function StarCitizenSalvageGuideWebsite() {
                 const allJobs = adminRefineries.users.flatMap((u) =>
                   (u.jobs || []).map((j) => ({ ...j, _username: u.username, _userId: u.userId }))
                 );
+                // Sales table only shows real sell orders. Mission
+                // settlement entries (Mission Reward / Mission Buy-In)
+                // moved to the Contracts section below.
                 const allSales = adminRefineries.users.flatMap((u) =>
-                  (u.sales || []).map((o) => ({ ...o, _username: u.username, _userId: u.userId }))
+                  (u.sales || [])
+                    .filter((o) => o && o.material !== "Mission Reward" && o.material !== "Mission Buy-In")
+                    .map((o) => ({ ...o, _username: u.username, _userId: u.userId }))
+                );
+                // Contracts: in-flight (current) from prefs.activeContracts
+                // + completed/abandoned (derived from the mission
+                // settlement entries the sales table just dropped).
+                const allCurrentContracts = adminRefineries.users.flatMap((u) =>
+                  (u.activeContracts || []).map((c) => ({ ...c, _username: u.username, _userId: u.userId }))
+                );
+                const allCompletedContracts = adminRefineries.users.flatMap((u) =>
+                  (u.sales || [])
+                    .filter((o) => o && (o.material === "Mission Reward" || o.material === "Mission Buy-In"))
+                    .map((o) => ({ ...o, _username: u.username, _userId: u.userId }))
                 );
                 allJobs.sort((a, b) => b.submittedAt - a.submittedAt);
                 allSales.sort((a, b) => b.submittedAt - a.submittedAt);
+                allCurrentContracts.sort((a, b) => (b.acceptedAt || 0) - (a.acceptedAt || 0));
+                allCompletedContracts.sort((a, b) => b.submittedAt - a.submittedAt);
                 return (
                   <div className="mt-5 space-y-6">
                     {/* Refinery jobs */}
@@ -24144,9 +24284,9 @@ export default function StarCitizenSalvageGuideWebsite() {
                           No refinery jobs in the last 7 days.
                         </div>
                       ) : (
-                        <div className="overflow-x-auto rounded-2xl border border-slate-700">
+                        <div className="max-h-[22rem] overflow-x-auto overflow-y-auto rounded-2xl border border-slate-700 [scrollbar-width:thin] [scrollbar-color:rgb(6_182_212_/_0.7)_rgb(2_6_23)] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-slate-950 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-500/70 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-cyan-400">
                           <table className="w-full min-w-[760px] text-left text-sm md:min-w-0">
-                            <thead className="bg-slate-950 text-slate-300">
+                            <thead className="bg-slate-950 text-slate-300 sticky top-0 z-10">
                               <tr>
                                 <th className="px-4 py-3">User</th>
                                 <th className="px-4 py-3">Material</th>
@@ -24213,9 +24353,9 @@ export default function StarCitizenSalvageGuideWebsite() {
                           No sales in the last 7 days.
                         </div>
                       ) : (
-                        <div className="overflow-x-auto rounded-2xl border border-slate-700">
+                        <div className="max-h-[22rem] overflow-x-auto overflow-y-auto rounded-2xl border border-slate-700 [scrollbar-width:thin] [scrollbar-color:rgb(6_182_212_/_0.7)_rgb(2_6_23)] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-slate-950 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-500/70 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-cyan-400">
                           <table className="w-full min-w-[720px] text-left text-sm md:min-w-0">
-                            <thead className="bg-slate-950 text-slate-300">
+                            <thead className="bg-slate-950 text-slate-300 sticky top-0 z-10">
                               <tr>
                                 <th className="px-4 py-3">User</th>
                                 <th className="px-4 py-3">Material</th>
@@ -24253,6 +24393,100 @@ export default function StarCitizenSalvageGuideWebsite() {
                         </div>
                       )}
                     </div>
+
+                    {/* Contracts — current (in-flight, from each
+                        user's prefs.activeContracts) + completed
+                        (Mission Reward / Mission Buy-In sell-order
+                        rows the Sales table now drops). Sticky
+                        header, max-h-[22rem] caps at ~6 rows + a
+                        scrollbar matching the rest of the site. */}
+                    <div>
+                      <div className="mb-2 text-xs uppercase tracking-[0.25em] text-cyan-300/80">
+                        Contracts · {allCurrentContracts.length + allCompletedContracts.length}
+                      </div>
+                      {allCurrentContracts.length === 0 && allCompletedContracts.length === 0 ? (
+                        <div className="rounded-2xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">
+                          No active or completed contracts in the last 7 days.
+                        </div>
+                      ) : (
+                        <div className="max-h-[22rem] overflow-x-auto overflow-y-auto rounded-2xl border border-slate-700 [scrollbar-width:thin] [scrollbar-color:rgb(6_182_212_/_0.7)_rgb(2_6_23)] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-slate-950 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-500/70 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-cyan-400">
+                          <table className="w-full min-w-[720px] text-left text-sm md:min-w-0">
+                            <thead className="bg-slate-950 text-slate-300 sticky top-0 z-10">
+                              <tr>
+                                <th className="px-4 py-3">User</th>
+                                <th className="px-4 py-3">Status</th>
+                                <th className="px-4 py-3">Mission</th>
+                                <th className="px-4 py-3 text-right">aUEC</th>
+                                <th className="px-4 py-3">When</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {allCurrentContracts.map((c) => (
+                                <tr key={`cur-${c._userId}-${c.missionId}`} className="border-t border-slate-800 bg-slate-900/40">
+                                  <td className="px-4 py-3 font-semibold text-white">{c._username}</td>
+                                  <td className="px-4 py-3 whitespace-nowrap">
+                                    <span className="rounded-lg bg-emerald-500/15 px-2 py-1 text-xs font-semibold text-emerald-200">
+                                      Active
+                                    </span>
+                                  </td>
+                                  <td className="px-4 py-3 text-slate-200">{c.name || "—"}</td>
+                                  <td className="px-4 py-3 text-right font-bold text-emerald-300 whitespace-nowrap">
+                                    {Number.isFinite(c.reward) && c.reward !== 0
+                                      ? `${c.reward.toLocaleString()} aUEC`
+                                      : "—"}
+                                    {Number(c.buyIn) > 0 && (
+                                      <div className="text-xs font-semibold text-rose-300">
+                                        −{Number(c.buyIn).toLocaleString()} aUEC
+                                      </div>
+                                    )}
+                                  </td>
+                                  <td className="px-4 py-3 text-slate-400 whitespace-nowrap">
+                                    accepted {formatTimeAgo(c.acceptedAt) || "just now"}
+                                  </td>
+                                </tr>
+                              ))}
+                              {allCompletedContracts.map((o) => {
+                                const abandoned = /\(abandoned\)\s*$/i.test(String(o.location || ""));
+                                const missionName = String(o.location || "")
+                                  .replace(/^Mission:\s*/i, "")
+                                  .replace(/\s*\(abandoned\)\s*$/i, "");
+                                const statusLabel = abandoned
+                                  ? "Abandoned"
+                                  : o.material === "Mission Reward"
+                                  ? "Reward"
+                                  : "Buy-In";
+                                const statusClass = abandoned
+                                  ? "bg-rose-500/15 text-rose-300"
+                                  : o.material === "Mission Reward"
+                                  ? "bg-cyan-500/15 text-cyan-200"
+                                  : "bg-rose-500/15 text-rose-300";
+                                return (
+                                  <tr key={`comp-${o._userId}-${o.id}`} className="border-t border-slate-800 bg-slate-900/40">
+                                    <td className="px-4 py-3 font-semibold text-white">{o._username}</td>
+                                    <td className="px-4 py-3 whitespace-nowrap">
+                                      <span className={`rounded-lg px-2 py-1 text-xs font-semibold ${statusClass}`}>
+                                        {statusLabel}
+                                      </span>
+                                    </td>
+                                    <td className="px-4 py-3 text-slate-200">{missionName || "—"}</td>
+                                    <td className={`px-4 py-3 text-right font-bold whitespace-nowrap ${
+                                      Number(o.aUEC) >= 0 ? "text-emerald-300" : "text-rose-300"
+                                    }`}>
+                                      {Number.isFinite(o.aUEC)
+                                        ? `${Number(o.aUEC) >= 0 ? "" : "-"}${Math.abs(Number(o.aUEC)).toLocaleString()} aUEC`
+                                        : "—"}
+                                    </td>
+                                    <td className="px-4 py-3 text-slate-400 whitespace-nowrap">
+                                      {formatTimeAgo(o.submittedAt) || "just now"}
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 );
               })()}
@@ -24269,6 +24503,16 @@ export default function StarCitizenSalvageGuideWebsite() {
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
+                  {/* Online / total counter — reads off the raw
+                      adminUsers payload before any client-side
+                      sort filters it, so the totals reflect the
+                      whole roster regardless of which header the
+                      admin is sorting by. */}
+                  {adminUsers && Array.isArray(adminUsers.users) && (
+                    <span className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-200">
+                      {adminUsers.users.filter((u) => u.isOnline).length} / {adminUsers.users.length} online
+                    </span>
+                  )}
                   <div className="text-xs text-slate-500">
                     {adminUsers?.fetchedAt
                       ? `Updated ${formatTimeAgo(adminUsers.fetchedAt) || "just now"}`
@@ -24316,7 +24560,54 @@ export default function StarCitizenSalvageGuideWebsite() {
                 </div>
               )}
 
-              {!adminUsersLoading && !adminUsersError && adminUsers && adminUsers.users.length > 0 && (
+              {!adminUsersLoading && !adminUsersError && adminUsers && adminUsers.users.length > 0 && (() => {
+                // Click-to-sort the All Users table on the three
+                // sortable columns: Discord User, Status, DM
+                // Notifications. Cycle: idle → asc → desc → idle.
+                // When idle the rows render in the server-supplied
+                // order (online first, then by lastLoginAt desc).
+                const cycleSort = (key) => {
+                  setAdminUsersSort((s) => {
+                    if (!s || s.key !== key) return { key, dir: "asc" };
+                    if (s.dir === "asc") return { key, dir: "desc" };
+                    return null; // off
+                  });
+                };
+                const sortGlyph = (key) => {
+                  if (!adminUsersSort || adminUsersSort.key !== key) return "";
+                  return adminUsersSort.dir === "asc" ? " ▲" : " ▼";
+                };
+                const sortedUsers = (() => {
+                  if (!adminUsersSort) return adminUsers.users;
+                  const { key, dir } = adminUsersSort;
+                  const arr = [...adminUsers.users];
+                  arr.sort((a, b) => {
+                    let cmp;
+                    if (key === "username") {
+                      cmp = String(a.username || "").toLowerCase()
+                        .localeCompare(String(b.username || "").toLowerCase());
+                    } else if (key === "rsiHandle") {
+                      // Empty handles sort last on asc, first on desc
+                      // — flip via the sign on the dir multiplier so
+                      // the natural locale compare stays clean.
+                      const aH = String(a.rsiHandle || "").toLowerCase();
+                      const bH = String(b.rsiHandle || "").toLowerCase();
+                      const aEmpty = aH === "";
+                      const bEmpty = bH === "";
+                      if (aEmpty && !bEmpty) cmp = 1;
+                      else if (!aEmpty && bEmpty) cmp = -1;
+                      else cmp = aH.localeCompare(bH);
+                    } else if (key === "isOnline" || key === "dmsEnabled") {
+                      // Boolean columns: true sorts before false on asc.
+                      cmp = (b[key] ? 1 : 0) - (a[key] ? 1 : 0);
+                    } else {
+                      cmp = 0;
+                    }
+                    return dir === "asc" ? cmp : -cmp;
+                  });
+                  return arr;
+                })();
+                return (
                 // Cap visible rows at ~10; the remaining users scroll
                 // inside the panel with the same cyan-thumb / slate-950
                 // track scrollbar style as the 30-Day History table.
@@ -24326,16 +24617,40 @@ export default function StarCitizenSalvageGuideWebsite() {
                   <table className="w-full min-w-[720px] text-left text-sm md:min-w-0">
                     <thead className="bg-slate-950 text-slate-300 sticky top-0 z-10">
                       <tr>
-                        <th className="px-4 py-3">Discord User</th>
-                        <th className="px-4 py-3">RSI Handle</th>
-                        <th className="px-4 py-3">Status</th>
-                        <th className="px-4 py-3">DM Notifications</th>
+                        <th
+                          className="px-4 py-3 cursor-pointer select-none hover:text-cyan-200"
+                          onClick={() => cycleSort("username")}
+                          title="Click to sort by Discord user"
+                        >
+                          Discord User{sortGlyph("username")}
+                        </th>
+                        <th
+                          className="px-4 py-3 cursor-pointer select-none hover:text-cyan-200"
+                          onClick={() => cycleSort("rsiHandle")}
+                          title="Click to sort by RSI handle"
+                        >
+                          RSI Handle{sortGlyph("rsiHandle")}
+                        </th>
+                        <th
+                          className="px-4 py-3 cursor-pointer select-none hover:text-cyan-200"
+                          onClick={() => cycleSort("isOnline")}
+                          title="Click to sort by online status"
+                        >
+                          Status{sortGlyph("isOnline")}
+                        </th>
+                        <th
+                          className="px-4 py-3 cursor-pointer select-none hover:text-cyan-200"
+                          onClick={() => cycleSort("dmsEnabled")}
+                          title="Click to sort by DM notifications"
+                        >
+                          DM Notifications{sortGlyph("dmsEnabled")}
+                        </th>
                         <th className="px-4 py-3">Last Login</th>
                         <th className="px-4 py-3 text-right">When</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {adminUsers.users.map((u) => (
+                      {sortedUsers.map((u) => (
                         <tr
                           key={u.userId}
                           className="border-t border-slate-800 bg-slate-900/40 cursor-pointer hover:bg-cyan-500/10"
@@ -24398,7 +24713,8 @@ export default function StarCitizenSalvageGuideWebsite() {
                     </tbody>
                   </table>
                 </div>
-              )}
+                );
+              })()}
             </div>
             )}
 

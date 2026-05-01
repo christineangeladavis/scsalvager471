@@ -24,6 +24,27 @@ Modals:
 
 ---
 
+## 2026-05-01 — All Users sortable headers + online counter; 7-Day History Contracts section
+
+**All Users:**
+- Sortable column headers on **Discord User**, **RSI Handle**, **Status**, **DM Notifications**. Click cycles asc → desc → off; off restores the API-supplied default order (online first, then by lastLoginAt desc). Active column shows a `▲` / `▼` glyph in the header. Sort state lives in `adminUsersSort = { key, dir } | null` and applies via a memo-style `sortedUsers` derivation that iterates `adminUsers.users` without mutating the source.
+- Empty RSI handles always sort to the bottom on asc and to the top on desc — handled with an explicit `aEmpty / bEmpty` short-circuit before the locale compare.
+- New emerald **online counter pill** in the panel header right-rail: `${online} / ${total} online`. Reads off raw `adminUsers.users` so totals don't shift with the active sort.
+
+**7-Day History:**
+- New **Contracts** section after Sales. Two row sources merged into one table:
+  - **Current** (status pill `Active`): from each user's `prefs.activeContracts` via `GET /api/admin/active-refineries`. Endpoint now imports `getPrefs` and returns `activeContracts: [{ missionId, name, reward, buyIn, acceptedAt }, …]` per user. Inclusion criterion expanded so a user with only an in-flight contract still surfaces (was previously gated on `jobs.length || sales.length`).
+  - **Completed** (status pills `Reward` / `Buy-In` / `Abandoned`): derived client-side by filtering each user's `sales` for `material in {"Mission Reward", "Mission Buy-In"}`. Abandoned detection still keys off the `(abandoned)` suffix on the location string.
+- Sales table now drops mission settlement entries (`Mission Reward` / `Mission Buy-In`) — they only render in Contracts now. Filter applied at the flatMap that builds `allSales`, so the count pill matches.
+- All three sections (Refinery jobs / Sales / Contracts) wrapped with `max-h-[22rem]` + `overflow-y-auto` + sticky `<thead>` + the site-standard cyan pill scrollbar utility. ~6 rows visible before scroll.
+- User-sort secondary effect: server-side user ordering also factors in `activeContracts.acceptedAt` so a user whose only event is an accepted contract still sorts correctly to the top of the roster.
+
+**Dev mock:**
+- `devMock()` Chrissyy fixture extended to exercise the bulked-up surface: 10 refinery jobs, 20 real sell orders, and 20 mission settlement events (rotating Reward / Buy-In / Abandoned), plus 4 in-flight contracts on `activeContracts`. Other dev users (Denavago, TestPilot42) keep their minimal seed but gained an empty `activeContracts: []` field for shape consistency.
+- User-detail modal dev mock keeps the previous 1+1+1 seed for non-Chrissyy users; Chrissyy gets 2 active + 2 completed.
+
+---
+
 ## 2026-04-29 — Contracts panel + 5-row scroll caps in the user-detail modal
 
 - New **Contracts** section between the modal header and the Refinery jobs table. Two sub-lists:

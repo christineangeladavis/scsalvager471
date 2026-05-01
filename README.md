@@ -38,6 +38,7 @@ Changes:
 - Top Salvagers leaderboard now ranks strictly by **Total SCU Refined**. Profit-only activity (e.g. mission settlements without any refinery work) no longer qualifies a user for the top 5.
 - Patch History panel description updated to "Mission history, collected refinery jobs, and sell orders…" so the new contract entries are surfaced front-and-center.
 - Recent Sales feed excludes mission contract settlements — those are tracked on the Active Contracts panel pre-settlement and in Patch History after, so they don't clutter the sales feed.
+- "Site update available" surfaces as a centered modal instead of the page-top amber banner. Update now reloads with the cache busted; Later (or clicking the backdrop) dismisses for the session — the notification bell still carries the entry until you actually reload.
 
 Fixes:
 - Home → Scraper Module Performance comparison table values corrected. Speed × and Radius were swapped (e.g. Abrade was rendered as 3.5× / 0.90 m when the source spec is 0.15× / 3.5). Efficiency now reads as the 0–1 multiplier (Abrade 0.90, Trawler 0.60, Cinch 1.00) instead of the 340 figure that was shipping. Power column dropped; new **Mass** + **K μSCU** columns added so the table matches the in-game CStone Universal Item Finder spec sheet column-for-column.

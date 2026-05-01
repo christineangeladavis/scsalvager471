@@ -16072,6 +16072,12 @@ export default function StarCitizenSalvageGuideWebsite() {
   // /version.json; if the served value drifts from what this bundle was
   // built with, a banner asks the user to hard-refresh.
   const [updateAvailable, setUpdateAvailable] = useState(false);
+  // Lets the user dismiss the update modal for the rest of the
+  // current session without auto-reloading. The dismiss state is
+  // local-only — a fresh tab gets a fresh nag if a new build is
+  // still pending. The notification bell still surfaces "Site
+  // update available" until the user actually reloads.
+  const [updateModalDismissed, setUpdateModalDismissed] = useState(false);
 
   // --- Admin Panel data ---
   const [adminSection, setAdminSection] = useState("users"); // "users" | "guests" | "refineries" | "exports"
@@ -20119,47 +20125,78 @@ export default function StarCitizenSalvageGuideWebsite() {
 
       {/* Scrollable UI content */}
       <div className="relative mx-auto max-w-7xl px-4 py-8 md:px-8" style={{ zIndex: 10, flex: 1, display: "flex", flexDirection: "column", width: "100%" }}>
-        {updateAvailable && (
-          // One-click update banner. The button bypasses the HTTP cache
-          // by appending a fresh query string and calling reload(true)
-          // — equivalent to the user manually hitting Ctrl+Shift+R.
-          <button
-            type="button"
-            role="status"
-            aria-live="polite"
-            onClick={() => {
-              try {
-                // Best-effort: blow away any caches that the browser
-                // would otherwise honor across a reload. Wrapped in
-                // try/catch because Cache API isn't available on every
-                // browser/permission context.
-                if (typeof caches !== "undefined" && caches.keys) {
-                  caches.keys().then((names) => {
-                    names.forEach((n) => caches.delete(n));
-                  });
-                }
-              } catch {}
-              // Append a cache-buster + force a server roundtrip.
-              const url = new URL(window.location.href);
-              url.searchParams.set("_v", Date.now().toString());
-              window.location.replace(url.toString());
-            }}
-            className="mb-4 w-full rounded-2xl border border-amber-400/60 bg-amber-500/15 px-4 py-3 text-left text-sm shadow-lg shadow-amber-950/30 transition hover:border-amber-300 hover:bg-amber-500/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
-          >
-            <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-              <span className="text-amber-100">
-                <span className="font-bold">An update is available,</span>{" "}
-                <span className="text-amber-100/90">click here to update.</span>
-              </span>
-              <span
-                aria-hidden="true"
-                className="shrink-0 rounded-md border border-amber-300/60 bg-amber-500/25 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-amber-100"
+        {updateAvailable && !updateModalDismissed && (() => {
+          // Centered update-available modal. Replaces the page-top
+          // amber banner — the modal forces the user to look at it
+          // (backdrop dims the page) but keeps "Later" as an out
+          // so the user can finish whatever they were doing. The
+          // notification bell still surfaces the update entry
+          // until the user actually reloads.
+          const triggerReload = () => {
+            try {
+              // Best-effort: blow away any caches the browser
+              // would honor across a reload. Wrapped in try/catch
+              // because the Cache API isn't available on every
+              // browser/permission context.
+              if (typeof caches !== "undefined" && caches.keys) {
+                caches.keys().then((names) => {
+                  names.forEach((n) => caches.delete(n));
+                });
+              }
+            } catch {}
+            const url = new URL(window.location.href);
+            url.searchParams.set("_v", Date.now().toString());
+            window.location.replace(url.toString());
+          };
+          return (
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="update-modal-title"
+              onClick={() => setUpdateModalDismissed(true)}
+            >
+              <div
+                className="w-full max-w-md rounded-3xl border border-amber-400/60 bg-slate-900 p-6 shadow-2xl shadow-amber-950/40"
+                onClick={(e) => e.stopPropagation()}
               >
-                Update now
-              </span>
+                <div className="flex items-start gap-3">
+                  <span
+                    aria-hidden="true"
+                    className="mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-amber-300/60 bg-amber-500/25 text-lg font-bold text-amber-100"
+                  >
+                    ↻
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <h2 id="update-modal-title" className="text-lg font-bold text-amber-100">
+                      Site update available
+                    </h2>
+                    <p className="mt-1 text-sm text-slate-300">
+                      A new version of SCSalvager.net has been deployed. Reload to pick up the latest changes.
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setUpdateModalDismissed(true)}
+                    className="rounded-lg border border-slate-700 bg-slate-800/60 px-4 py-2 text-sm font-semibold text-slate-300 hover:border-slate-500 hover:text-slate-100"
+                  >
+                    Later
+                  </button>
+                  <button
+                    type="button"
+                    onClick={triggerReload}
+                    autoFocus
+                    className="rounded-lg border border-amber-300/60 bg-amber-500/25 px-4 py-2 text-sm font-bold uppercase tracking-wider text-amber-100 hover:border-amber-200 hover:bg-amber-500/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300"
+                  >
+                    Update now
+                  </button>
+                </div>
+              </div>
             </div>
-          </button>
-        )}
+          );
+        })()}
         <header className="mb-8 overflow-hidden rounded-3xl border border-cyan-500/30 shadow-2xl shadow-cyan-950/40">
           {/* Banner displayed at ~75% of its natural height (h-80 →
               320px). object-cover preserves the artwork's center
@@ -26737,6 +26774,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <li>Top Salvagers leaderboard now ranks strictly by <strong>Total SCU Refined</strong>. Profit-only activity no longer qualifies a user for the top 5.</li>
                     <li>Patch History panel description updated to "Mission history, collected refinery jobs, and sell orders…" so the new contract entries are front-and-center.</li>
                     <li>Recent Sales feed excludes mission contract settlements — they're tracked on the Active Contracts panel pre-settlement and in Patch History after.</li>
+                    <li>"Site update available" now surfaces as a centered modal instead of the page-top amber banner. <strong>Update now</strong> reloads with the cache busted; <strong>Later</strong> (or clicking the backdrop) dismisses for the session.</li>
                   </ul>
                   <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Fixes</p>
                   <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">

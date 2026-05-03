@@ -5,6 +5,22 @@ Made by Chrissyy · Referral: STAR-CH2W-R73F
 
 ## What's in this build
 
+UPDATE 5/2/2026 v2.7.1
+
+Added:
+- Ship Details right-rail spec block now lists each platform's **Insurance Claim / Expedite times** (white › amber arrow) and **Expedite Cost** (emerald aUEC pill) for all 5 supported salvage / mining ships. Sourced from spviewer.eu.
+- Mission detail popup gains a **Ships to salvage** chip section sourced from scmdb.net's mission-detail Combat tab. Each contract lists the ship pool that can spawn as the salvage target plus the per-encounter ship-count range (e.g. "1 per encounter").
+- Mission detail popup: **[LOCATIONS]** button replaces the always-visible Pickup + Destinations chip stacks. Hover or focus the button to expand a popover with the full chip list — keeps the modal compact while still surfacing every resolved system / planet / moon.
+
+Changes:
+- Salvage Missions table: **Reward column sort** now ranks by net (reward − buy-in) instead of gross reward, matching the column's two-line display. "Lowest reward" now correctly surfaces the worst-net contracts (high buy-in, no reward, etc.) first.
+
+Fixes:
+- Mission detail popup: **Prerequisite location chips removed**. scmdb's `prerequisites.location[]` array is a contract-availability scope, not a true prerequisite — surfacing it under "Prerequisite" was misleading. Real prereqs (chainStartsWith / requires / unlocks) still render in the Chain section.
+- Mission detail popup: scmdb's untransformed `@generic_locations_blank` placeholder no longer surfaces as a phantom location chip when a contract has no real entry.
+- scmdb.net daily diff watcher now also probes the SPViewer changelog index for new 4.8 PTU builds (6:07 AM local) and writes a snapshot for tomorrow's diff.
+- Refresh from latest scmdb 4.8 PTU build (`4.8.0-ptu.11768487`): refueling missions, salvage blueprint rewards, and scraper-module fabricator recipes regenerated.
+
 UPDATE 4/29/2026 v2.7.0
 
 Added:

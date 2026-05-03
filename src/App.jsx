@@ -19,6 +19,12 @@ const ships = [
     baseYield: 15,
     bestFor: "Large-scale construction salvage runs",
     crewSize: 5,
+    // Insurance claim window (seconds), expedited window, and the
+    // expedite fee in aUEC. Sourced from spviewer.eu's per-ship spec.
+    // Render helper formats `MMmSSs` from the second values.
+    claimSeconds: 30 * 60 + 41,
+    expediteSeconds: 10 * 60 + 13,
+    expediteCost: 12555,
     usdPrice: 400,
     // aUEC purchase locations sourced from finder.cstone.space.
     // "Teach's Special" entries are a separate higher-priced SKU sold
@@ -54,6 +60,9 @@ const ships = [
     baseYield: 20,
     bestFor: "Mid-size structural salvage",
     crewSize: 4,
+    claimSeconds: 12 * 60 + 30,
+    expediteSeconds: 3 * 60 + 7,
+    expediteCost: 9470,
     usdPrice: 315,
     // Per finder.cstone.space: not currently sold for aUEC at any
     // in-game location. Pledge-only.
@@ -85,6 +94,9 @@ const ships = [
     baseYield: 30,
     bestFor: "Light construction rubble farming",
     crewSize: 1,
+    claimSeconds: 9 * 60,
+    expediteSeconds: 3 * 60,
+    expediteCost: 3040,
     usdPrice: 175,
     aUECPrices: [
       { location: "Lorville · Teasa Spaceport · New Deal (Stanton)", price: 2513700 },
@@ -120,6 +132,9 @@ const ships = [
     baseYield: 30,
     bestFor: "Compact rubble collection",
     crewSize: 1,
+    claimSeconds: 5 * 60 + 10,
+    expediteSeconds: 1 * 60 + 18,
+    expediteCost: 3900,
     usdPrice: 175,
     aUECPrices: [
       { location: "Lorville · Teasa Spaceport · New Deal (Stanton)", price: 1795500 },
@@ -155,6 +170,9 @@ const ships = [
     baseYield: 30,
     bestFor: "Light snub salvage",
     crewSize: 1,
+    claimSeconds: 6 * 60,
+    expediteSeconds: 1 * 60 + 30,
+    expediteCost: 5620,
     usdPrice: 60,
     // Pledge-only — not sold for aUEC at any in-game location.
     aUECPrices: [],
@@ -234,6 +252,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":10,"max":10},{"name":"Construction Materials","unit":"SCU","min":41,"max":41},{"name":"Power Plant, Military Grade (S2)","unit":"count","min":2,"max":2},{"name":"Cooler, Military Grade (S2)","unit":"count","min":2,"max":2},{"name":"Shield Generator, Military Grade (S2)","unit":"count","min":2,"max":2},{"name":"Ship Weapon (S3 or S4)","unit":"count","min":8,"max":8}],
+    salvageShips: [],
+    salvageShipCount: {"min":null,"max":null},
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
   },
   {
     id: "993fbe39-f45a-456a-a94a-a65714c1db49",
@@ -268,6 +289,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [{"name":"Power Plant, Competition Grade (S2)","unit":"count","min":2,"max":2},{"name":"Cooler, Competition Grade (S2)","unit":"count","min":2,"max":2},{"name":"Shield Generator, Competition Grade (S2)","unit":"count","min":2,"max":2}],
+    salvageShips: [],
+    salvageShipCount: {"min":null,"max":null},
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
   },
   {
     id: "c2bf4edf-eb40-4abb-a81d-03bac07badd8",
@@ -302,6 +326,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":15,"max":15},{"name":"Construction Materials","unit":"SCU","min":15,"max":15},{"name":"Power Plant, Civilian Grade (S2)","unit":"count","min":2,"max":2},{"name":"Cooler, Civilian Grade (S2)","unit":"count","min":2,"max":2},{"name":"Shield Generator, Civilian Grade (S2)","unit":"count","min":4,"max":4}],
+    salvageShips: [],
+    salvageShipCount: {"min":null,"max":null},
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
   },
   {
     id: "09f5d6ae-c1a2-4dba-ba0d-886c33ea1af6",
@@ -336,6 +363,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":15,"max":15},{"name":"Quantum Drive, Industrial (S2)","unit":"count","min":2,"max":2},{"name":"Power Plant, Industrial Grade (S2)","unit":"count","min":2,"max":2},{"name":"Ship Mining Laser","unit":"count","min":4,"max":4},{"name":"Ship Salvage Head","unit":"count","min":4,"max":4}],
+    salvageShips: [],
+    salvageShipCount: {"min":null,"max":null},
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
   },
   {
     id: "acf17ba4-4007-466c-9081-72aee28232b3",
@@ -370,6 +400,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":10,"max":10},{"name":"Construction Materials","unit":"SCU","min":41,"max":41},{"name":"Power Plant, Industrial Grade (S2)","unit":"count","min":3,"max":3},{"name":"Cooler, Industrial Grade (S2)","unit":"count","min":3,"max":3},{"name":"Shield Generator, Industrial Grade (S2)","unit":"count","min":3,"max":3},{"name":"Quantum Drive, Industrial (S2)","unit":"count","min":2,"max":2},{"name":"Ship Mining Laser","unit":"count","min":2,"max":2}],
+    salvageShips: [],
+    salvageShipCount: {"min":null,"max":null},
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
   },
   {
     id: "1331671c-4bbd-47bc-b71e-c19def138faa",
@@ -404,6 +437,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":10,"max":10},{"name":"Construction Materials","unit":"SCU","min":41,"max":41},{"name":"Power Plant, Civilian Grade (S2)","unit":"count","min":3,"max":3},{"name":"Cooler, Civilian Grade (S2)","unit":"count","min":3,"max":3},{"name":"Shield Generator, Civilian Grade (S2)","unit":"count","min":3,"max":3},{"name":"Ship Weapon (S3 or S4)","unit":"count","min":6,"max":6}],
+    salvageShips: [],
+    salvageShipCount: {"min":null,"max":null},
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
   },
   {
     id: "28e535c8-740f-47cc-adcb-6238a0b5b724",
@@ -438,6 +474,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":10,"max":10},{"name":"Construction Materials","unit":"SCU","min":6,"max":6},{"name":"Ship Weapon (S3 or S4)","unit":"count","min":2,"max":2},{"name":"Ship Missile","unit":"count","min":4,"max":4},{"name":"Ship Bomb","unit":"count","min":2,"max":2}],
+    salvageShips: [],
+    salvageShipCount: {"min":null,"max":null},
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
   },
   {
     id: "fe5b519c-1149-454c-a680-8d2788c3f487",
@@ -472,6 +511,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":10,"max":10},{"name":"Construction Materials","unit":"SCU","min":5,"max":5},{"name":"Quantum Drive (S1)","unit":"count","min":2,"max":2},{"name":"Ship Mining Laser","unit":"count","min":3,"max":3},{"name":"Ship Salvage Head","unit":"count","min":3,"max":3}],
+    salvageShips: [],
+    salvageShipCount: {"min":null,"max":null},
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
   },
   {
     id: "44b632f2-e2e2-42e3-b0d5-a19889263c15",
@@ -506,6 +548,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":14,"max":14},{"name":"Construction Materials","unit":"SCU","min":5,"max":5},{"name":"Shield Generator (S1)","unit":"count","min":8,"max":8},{"name":"Ship Weapon (S3 or S4)","unit":"count","min":8,"max":8},{"name":"Construction Rubble","unit":"SCU","min":4,"max":4}],
+    salvageShips: [],
+    salvageShipCount: {"min":null,"max":null},
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
   },
   {
     id: "a2e30021-9bbd-4cbe-a014-3a851c86331c",
@@ -540,6 +585,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":9,"max":9},{"name":"Construction Materials","unit":"SCU","min":6,"max":6},{"name":"Power Plant (S1)","unit":"count","min":2,"max":2},{"name":"Ship Weapon (S1 or S2)","unit":"count","min":6,"max":6},{"name":"Cooler (S1)","unit":"count","min":2,"max":2},{"name":"Shield Generator (S1)","unit":"count","min":2,"max":2}],
+    salvageShips: [],
+    salvageShipCount: {"min":null,"max":null},
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
   },
   {
     id: "813ea00d-3766-46fd-802f-a9e5775de6b3",
@@ -574,6 +622,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":7,"max":7},{"name":"Construction Rubble","unit":"SCU","min":4,"max":4},{"name":"Power Plant (S1)","unit":"count","min":4,"max":4},{"name":"Shield Generator (S1)","unit":"count","min":2,"max":2},{"name":"Cooler (S1)","unit":"count","min":2,"max":2}],
+    salvageShips: [],
+    salvageShipCount: {"min":null,"max":null},
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
   },
   {
     id: "de9667b3-3142-46a3-80ae-f101c338ed4b",
@@ -608,6 +659,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":6,"max":6},{"name":"Construction Materials","unit":"SCU","min":6,"max":6},{"name":"Power Plant (S1)","unit":"count","min":4,"max":4},{"name":"Cooler (S1)","unit":"count","min":4,"max":4},{"name":"Shield Generator (S1)","unit":"count","min":4,"max":4}],
+    salvageShips: [],
+    salvageShipCount: {"min":null,"max":null},
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
   },
   {
     id: "5e97df76-fe6d-4a2e-91f6-95f9c7596f3f",
@@ -642,6 +696,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":10,"max":10}],
+    salvageShips: [],
+    salvageShipCount: {"min":null,"max":null},
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
   },
   {
     id: "e672b66a-a480-4ef2-b491-aaade45836c4",
@@ -676,6 +733,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":10,"max":10}],
+    salvageShips: [],
+    salvageShipCount: {"min":null,"max":null},
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
   },
   {
     id: "eab205c6-d19a-4f4c-af8c-0c823c34c40a",
@@ -710,6 +770,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":10,"max":10}],
+    salvageShips: [],
+    salvageShipCount: {"min":null,"max":null},
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
   },
   {
     id: "500a190f-14d5-4587-83f7-d33eb7a37577",
@@ -744,6 +807,9 @@ const MISSIONS = [
     requires: [{"id":"63550989-f035-4dc6-a8f6-c6f5c8482c33","name":"Adagio Holdings in Need of Salvagers"}],
     unlocks: [],
     turnIns: [{"name":"Quantum Drive (S1)","unit":"count","min":4,"max":4},{"name":"Power Plant (S1)","unit":"count","min":4,"max":4}],
+    salvageShips: [],
+    salvageShipCount: {"min":null,"max":null},
+    blueprintRewards: [],
   },
   {
     id: "d28dfeee-2ffa-4ec8-87d9-2a5db01bb5ec",
@@ -778,6 +844,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":5,"max":5},{"name":"Construction Materials","unit":"SCU","min":3,"max":3}],
+    salvageShips: [],
+    salvageShipCount: {"min":null,"max":null},
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
   },
   {
     id: "06212b32-00ce-43e6-8fd4-4c7e0d833bf1",
@@ -812,6 +881,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":5,"max":5},{"name":"Construction Rubble","unit":"SCU","min":3,"max":3}],
+    salvageShips: [],
+    salvageShipCount: {"min":null,"max":null},
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
   },
   {
     id: "7fb2faa7-b6d4-47e9-90ec-7e635cc2a9b0",
@@ -846,6 +918,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":5,"max":5},{"name":"Construction Materials","unit":"SCU","min":3,"max":3}],
+    salvageShips: [],
+    salvageShipCount: {"min":null,"max":null},
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
   },
   {
     id: "f8823d3b-df07-40fe-aa2f-ab2e52f30d86",
@@ -880,6 +955,9 @@ const MISSIONS = [
     requires: [{"id":"63550989-f035-4dc6-a8f6-c6f5c8482c33","name":"Adagio Holdings in Need of Salvagers"}],
     unlocks: [],
     turnIns: [{"name":"Ship Weapon (S1 or S2)","unit":"count","min":8,"max":8}],
+    salvageShips: [],
+    salvageShipCount: {"min":null,"max":null},
+    blueprintRewards: [],
   },
   {
     id: "e4853f9d-f027-4f83-bd82-1835cc2f6409",
@@ -914,6 +992,9 @@ const MISSIONS = [
     requires: [{"id":"63550989-f035-4dc6-a8f6-c6f5c8482c33","name":"Adagio Holdings in Need of Salvagers"}],
     unlocks: [],
     turnIns: [],
+    salvageShips: [],
+    salvageShipCount: {"min":null,"max":null},
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
   },
   {
     id: "787ac783-5a7f-49cf-b4b0-f3571f7ce6d6",
@@ -948,6 +1029,9 @@ const MISSIONS = [
     requires: [{"id":"63550989-f035-4dc6-a8f6-c6f5c8482c33","name":"Adagio Holdings in Need of Salvagers"}],
     unlocks: [],
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":5,"max":5}],
+    salvageShips: [],
+    salvageShipCount: {"min":null,"max":null},
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
   },
   {
     id: "67608eaf-63b0-4d4f-9103-7960eeeb9166",
@@ -982,6 +1066,9 @@ const MISSIONS = [
     requires: [{"id":"63550989-f035-4dc6-a8f6-c6f5c8482c33","name":"Adagio Holdings in Need of Salvagers"}],
     unlocks: [],
     turnIns: [],
+    salvageShips: [],
+    salvageShipCount: {"min":null,"max":null},
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
   },
   {
     id: "2a20ef29-7922-487f-b42c-70b48fe8031a",
@@ -1016,6 +1103,9 @@ const MISSIONS = [
     requires: [{"id":"63550989-f035-4dc6-a8f6-c6f5c8482c33","name":"Adagio Holdings in Need of Salvagers"}],
     unlocks: [],
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":5,"max":5}],
+    salvageShips: [],
+    salvageShipCount: {"min":null,"max":null},
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
   },
   {
     id: "9ff34277-7cba-441d-ac0f-1fcfc9d6e16c",
@@ -1050,6 +1140,9 @@ const MISSIONS = [
     requires: [{"id":"63550989-f035-4dc6-a8f6-c6f5c8482c33","name":"Adagio Holdings in Need of Salvagers"}],
     unlocks: [],
     turnIns: [],
+    salvageShips: [],
+    salvageShipCount: {"min":null,"max":null},
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
   },
   {
     id: "2501a070-bff6-4491-9c49-3456f1bfe128",
@@ -1084,6 +1177,9 @@ const MISSIONS = [
     requires: [{"id":"63550989-f035-4dc6-a8f6-c6f5c8482c33","name":"Adagio Holdings in Need of Salvagers"}],
     unlocks: [],
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":5,"max":5}],
+    salvageShips: [],
+    salvageShipCount: {"min":null,"max":null},
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
   },
   {
     id: "63550989-f035-4dc6-a8f6-c6f5c8482c33",
@@ -1118,6 +1214,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [{"id":"61201483-e22b-4170-ba24-705efb270635","name":"Salvager Needed (Small Special Order of RMC / Components)"},{"id":"f8823d3b-df07-40fe-aa2f-ab2e52f30d86","name":"Salvager Needed (Small Special Order of RMC / Components)"},{"id":"500a190f-14d5-4587-83f7-d33eb7a37577","name":"Salvager Needed (Small Special Order of RMC / Components)"},{"id":"5c455aa4-f18a-4f3e-8195-4d3d20f447a5","name":"Salvager Needed (Small Supply of RMC / Components)"},{"id":"fff5c566-eeae-4bae-9a03-26ae9b5e8d49","name":"Salvager Needed (Small Supply of RMC / Components)"},{"id":"4aa7b26e-701d-410e-a128-e9e2864568e0","name":"Salvager Needed (Small Supply of RMC / Components)"},{"id":"67608eaf-63b0-4d4f-9103-7960eeeb9166","name":"Salvager Needed (Small Supply of RMC / UCM)"},{"id":"e4853f9d-f027-4f83-bd82-1835cc2f6409","name":"Salvager Needed (Small Supply of RMC / UCM)"},{"id":"9ff34277-7cba-441d-ac0f-1fcfc9d6e16c","name":"Salvager Needed (Small Supply of RMC / UCM)"},{"id":"2a20ef29-7922-487f-b42c-70b48fe8031a","name":"Salvager Needed (Small Supply of RMC)"},{"id":"787ac783-5a7f-49cf-b4b0-f3571f7ce6d6","name":"Salvager Needed (Small Supply of RMC)"},{"id":"2501a070-bff6-4491-9c49-3456f1bfe128","name":"Salvager Needed (Small Supply of RMC)"}],
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":1,"max":1}],
+    salvageShips: ["Aegis Gladius"],
+    salvageShipCount: {"min":1,"max":1},
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
   },
   {
     id: "73cf6254-785a-41c1-b7a9-bdce2f6380e0",
@@ -1152,6 +1251,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [{"id":"61201483-e22b-4170-ba24-705efb270635","name":"Salvager Needed (Small Special Order of RMC / Components)"},{"id":"f8823d3b-df07-40fe-aa2f-ab2e52f30d86","name":"Salvager Needed (Small Special Order of RMC / Components)"},{"id":"500a190f-14d5-4587-83f7-d33eb7a37577","name":"Salvager Needed (Small Special Order of RMC / Components)"},{"id":"5c455aa4-f18a-4f3e-8195-4d3d20f447a5","name":"Salvager Needed (Small Supply of RMC / Components)"},{"id":"fff5c566-eeae-4bae-9a03-26ae9b5e8d49","name":"Salvager Needed (Small Supply of RMC / Components)"},{"id":"4aa7b26e-701d-410e-a128-e9e2864568e0","name":"Salvager Needed (Small Supply of RMC / Components)"},{"id":"67608eaf-63b0-4d4f-9103-7960eeeb9166","name":"Salvager Needed (Small Supply of RMC / UCM)"},{"id":"e4853f9d-f027-4f83-bd82-1835cc2f6409","name":"Salvager Needed (Small Supply of RMC / UCM)"},{"id":"9ff34277-7cba-441d-ac0f-1fcfc9d6e16c","name":"Salvager Needed (Small Supply of RMC / UCM)"},{"id":"2a20ef29-7922-487f-b42c-70b48fe8031a","name":"Salvager Needed (Small Supply of RMC)"},{"id":"787ac783-5a7f-49cf-b4b0-f3571f7ce6d6","name":"Salvager Needed (Small Supply of RMC)"},{"id":"2501a070-bff6-4491-9c49-3456f1bfe128","name":"Salvager Needed (Small Supply of RMC)"}],
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":1,"max":1}],
+    salvageShips: ["Aegis Gladius"],
+    salvageShipCount: {"min":1,"max":1},
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
   },
   {
     id: "76ed5ffe-32b6-473a-9605-19f82c5d879e",
@@ -1186,6 +1288,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [{"id":"61201483-e22b-4170-ba24-705efb270635","name":"Salvager Needed (Small Special Order of RMC / Components)"},{"id":"f8823d3b-df07-40fe-aa2f-ab2e52f30d86","name":"Salvager Needed (Small Special Order of RMC / Components)"},{"id":"500a190f-14d5-4587-83f7-d33eb7a37577","name":"Salvager Needed (Small Special Order of RMC / Components)"},{"id":"5c455aa4-f18a-4f3e-8195-4d3d20f447a5","name":"Salvager Needed (Small Supply of RMC / Components)"},{"id":"fff5c566-eeae-4bae-9a03-26ae9b5e8d49","name":"Salvager Needed (Small Supply of RMC / Components)"},{"id":"4aa7b26e-701d-410e-a128-e9e2864568e0","name":"Salvager Needed (Small Supply of RMC / Components)"},{"id":"67608eaf-63b0-4d4f-9103-7960eeeb9166","name":"Salvager Needed (Small Supply of RMC / UCM)"},{"id":"e4853f9d-f027-4f83-bd82-1835cc2f6409","name":"Salvager Needed (Small Supply of RMC / UCM)"},{"id":"9ff34277-7cba-441d-ac0f-1fcfc9d6e16c","name":"Salvager Needed (Small Supply of RMC / UCM)"},{"id":"2a20ef29-7922-487f-b42c-70b48fe8031a","name":"Salvager Needed (Small Supply of RMC)"},{"id":"787ac783-5a7f-49cf-b4b0-f3571f7ce6d6","name":"Salvager Needed (Small Supply of RMC)"},{"id":"2501a070-bff6-4491-9c49-3456f1bfe128","name":"Salvager Needed (Small Supply of RMC)"}],
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":1,"max":1}],
+    salvageShips: ["Aegis Gladius"],
+    salvageShipCount: {"min":1,"max":1},
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
   },
   {
     id: "5c455aa4-f18a-4f3e-8195-4d3d20f447a5",
@@ -1220,6 +1325,9 @@ const MISSIONS = [
     requires: [{"id":"63550989-f035-4dc6-a8f6-c6f5c8482c33","name":"Adagio Holdings in Need of Salvagers"}],
     unlocks: [],
     turnIns: [{"name":"Power Plant (S1)","unit":"count","min":2,"max":2},{"name":"Shield Generator (S1)","unit":"count","min":2,"max":2}],
+    salvageShips: [],
+    salvageShipCount: {"min":null,"max":null},
+    blueprintRewards: [],
   },
   {
     id: "fff5c566-eeae-4bae-9a03-26ae9b5e8d49",
@@ -1254,6 +1362,9 @@ const MISSIONS = [
     requires: [{"id":"63550989-f035-4dc6-a8f6-c6f5c8482c33","name":"Adagio Holdings in Need of Salvagers"}],
     unlocks: [],
     turnIns: [{"name":"Shield Generator (S1)","unit":"count","min":2,"max":2},{"name":"Cooler (S1)","unit":"count","min":2,"max":2},{"name":"Power Plant (S1)","unit":"count","min":2,"max":2}],
+    salvageShips: [],
+    salvageShipCount: {"min":null,"max":null},
+    blueprintRewards: [],
   },
   {
     id: "4aa7b26e-701d-410e-a128-e9e2864568e0",
@@ -1288,6 +1399,9 @@ const MISSIONS = [
     requires: [{"id":"63550989-f035-4dc6-a8f6-c6f5c8482c33","name":"Adagio Holdings in Need of Salvagers"}],
     unlocks: [],
     turnIns: [{"name":"Shield Generator (S1)","unit":"count","min":2,"max":2},{"name":"Power Plant (S1)","unit":"count","min":2,"max":2},{"name":"Cooler (S1)","unit":"count","min":4,"max":4}],
+    salvageShips: [],
+    salvageShipCount: {"min":null,"max":null},
+    blueprintRewards: [],
   },
   {
     id: "61201483-e22b-4170-ba24-705efb270635",
@@ -1322,6 +1436,9 @@ const MISSIONS = [
     requires: [{"id":"63550989-f035-4dc6-a8f6-c6f5c8482c33","name":"Adagio Holdings in Need of Salvagers"}],
     unlocks: [],
     turnIns: [{"name":"Ship Weapon (S1 or S2)","unit":"count","min":1,"max":1},{"name":"Ship Mining Laser","unit":"count","min":1,"max":1},{"name":"Ship Salvage Head","unit":"count","min":1,"max":1}],
+    salvageShips: [],
+    salvageShipCount: {"min":null,"max":null},
+    blueprintRewards: [],
   },
   {
     id: "41127c2d-7685-fb1d-9f08-57bde4310aa7",
@@ -1356,6 +1473,9 @@ const MISSIONS = [
     requires: [{"id":"d46436e6-56ea-40ed-a0fd-e7c0c7218fbb","name":"[SHIP] clean up"}],
     unlocks: [{"id":"3617c33e-0f3f-44e7-b468-7de2a2db1dc4","name":"[SHIP] clean up"},{"id":"40a00ef8-0b53-9270-bc2c-ef38cda62eb2","name":"Adagio Holdings: Salvage Mission (Medium)"},{"id":"c2871e21-9f59-448e-97c7-0e7bfe4bf8b6","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"},{"id":"f91fbab9-1e90-4fb8-871d-961053ad1f49","name":"Risky [SHIP] Salvage Job"}],
     turnIns: [],
+    salvageShips: ["Aegis Redeemer","Aegis Vanguard Harbinger","Aegis Vanguard Hoplite","Aegis Vanguard Sentinel","Aegis Vanguard Warden","Argo RAFT","C.O. Nomad","Crusader A1 Spirit","Crusader Ares Star Fighter Inferno","Crusader C1 Spirit","Drake Vulture","Esperia Prowler","RSI Scorpius","RSI Scorpius Antares","RSI Zeus Mk II ES"],
+    salvageShipCount: {"min":1,"max":1},
+    blueprintRewards: [],
   },
   {
     id: "46541e90-fa81-f9d4-7206-a88fdda5789f",
@@ -1390,6 +1510,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [{"id":"4eebc223-b15f-9cba-d1b9-070816b6caa9","name":"Adagio Holdings: Salvage Mission (Very Easy)"},{"id":"d56b6a21-6ccc-4620-8bcc-aa3538f220dd","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"}],
     turnIns: [],
+    salvageShips: ["Aegis Gladius"],
+    salvageShipCount: {"min":1,"max":1},
+    blueprintRewards: [],
   },
   {
     id: "40a00ef8-0b53-9270-bc2c-ef38cda62eb2",
@@ -1424,6 +1547,9 @@ const MISSIONS = [
     requires: [{"id":"152bc6c1-70e0-44fb-a89a-5200456f132c","name":"[SHIP] clean up"}],
     unlocks: [{"id":"93113c47-1c37-4e7f-bda3-76911dfebd67","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"}],
     turnIns: [],
+    salvageShips: ["Aegis Hammerhead","Aegis Retaliator","Argo MOLE","Crusader Mercury Star Runner","Drake Corsair","Origin 400i","RSI Constellation Taurus"],
+    salvageShipCount: {"min":1,"max":1},
+    blueprintRewards: [],
   },
   {
     id: "4eebc223-b15f-9cba-d1b9-070816b6caa9",
@@ -1458,6 +1584,9 @@ const MISSIONS = [
     requires: [{"id":"46541e90-fa81-f9d4-7206-a88fdda5789f","name":"Adagio Holdings: Salvage Mission (Intro)"}],
     unlocks: [{"id":"152bc6c1-70e0-44fb-a89a-5200456f132c","name":"[SHIP] clean up"},{"id":"41127c2d-7685-fb1d-9f08-57bde4310aa7","name":"Adagio Holdings: Salvage Mission (Easy)"},{"id":"6aa230b9-0719-4ca6-8e8f-55358c88ab74","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"}],
     turnIns: [],
+    salvageShips: ["Aegis Sabre","Anvil Terrapin","Aopoa San'tok.yāi","Crusader Ares Star Fighter Ion","Crusader Intrepid","Drake Cutter","Drake Cutter Rambler","Drake Cutter Scout","Esperia Talon","Esperia Talon Shrike","Gatac Syulen","Origin 315p","Origin 325a","Origin 350r"],
+    salvageShipCount: {"min":1,"max":1},
+    blueprintRewards: [],
   },
   {
     id: "6aa230b9-0719-4ca6-8e8f-55358c88ab74",
@@ -1485,13 +1614,16 @@ const MISSIONS = [
     crimeStatMax: 2,
     notes: "Attention: Rights to a new Salvage Claim are available for purchase.",
     description: "Attention:\n\nRights to a new Salvage Claim are available for purchase. Exclusive access to the ship’s verified coordinates in monitored space will be provided upon confirmed credit transfer. The coordinates will remain accessible as long as the accepted contract is active. When you are satisfied with the amount of material you've salvaged, you may abandon the contract early with no penalty to clear the coordinates from your Starmap.\n\nClaim #[CLAIM]:\n• SHIP: [SHIP]\n• CAUSE OF ACCIDENT: [SHIPSTORY]\n• LOCATION: [LOCATION]\n\nAdagio Rights Division",
-    locations: [{"name":"Nyx","type":"Star","system":null,"planet":null,"moon":null},{"name":"@generic_locations_blank","type":"Default","system":null,"planet":null,"moon":null},{"name":"Nyx I","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx II","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx III","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx System","type":"Default","system":null,"planet":null,"moon":null},{"name":"Pyro","type":"Star","system":null,"planet":null,"moon":null},{"name":"PYR1 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYAM-EXHANG-0-1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-WHISKEY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-CHARLIE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-YORK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-GULF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Asteroid Mining Base","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LEST","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JONG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KNAP","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OXID","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PALL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HELM","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BASK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BUCK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LUNE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-GRAY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MAGE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-GADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-WARB","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HORN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KIFF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MUGG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PEKE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TACK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-AXIL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DARI","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-YEAD","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster BGR-560","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster CAJ-445","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster JWY-925","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR5 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR5 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-DELTA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-LAMDA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-OVER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ECHO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-POINT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-SIERRA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-HELIO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-VICTORY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ZETA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-XENO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-QUAGMIRE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-JAK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NARY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JUTE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TYRO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SPAW","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MURK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OLLA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KYUS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DORY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RODE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-VERD","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-FLAG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RINE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-ALME","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OAKS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NONG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LANX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SIJO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-ARID","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BORS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LYES","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster FSN-704","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster GRP-839","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster KKE-717","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster RSC-340","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster WDH-387","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster YKA-011","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Pyro V","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Pyro IV","type":"Planet","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Ignis","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Vatra","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Adir","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Fairo","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Fuego","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Vuur","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"PYR6 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR6 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-LYNX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-COOK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-UMUS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MEFF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SOWL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PIZE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-QINS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RAWN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LOWN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-CRUE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MARA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-CHAM","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RAIK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KELT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MOSK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NENE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DIRK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PLEX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TIGS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HARK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SEER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SAIC","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster DLO-486","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster EMM-567","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster HJS-232","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster LHB-976","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster MNK-833","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Terminus","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Pyro I","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Monox","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Patch City","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Patch City Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ALPHA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-TUNG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-KILO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-NOVEMBER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-IGNITION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-BRAVO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ROTH","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-FOXTROT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster NBD-102","type":"Default","system":"Pyro","planet":null,"moon":null}],
+    locations: [{"name":"Nyx","type":"Star","system":null,"planet":null,"moon":null},{"name":"Nyx I","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx II","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx III","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx System","type":"Default","system":null,"planet":null,"moon":null},{"name":"Pyro","type":"Star","system":null,"planet":null,"moon":null},{"name":"PYR1 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYAM-EXHANG-0-1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-WHISKEY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-CHARLIE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-YORK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-GULF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Asteroid Mining Base","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LEST","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JONG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KNAP","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OXID","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PALL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HELM","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BASK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BUCK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LUNE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-GRAY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MAGE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-GADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-WARB","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HORN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KIFF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MUGG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PEKE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TACK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-AXIL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DARI","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-YEAD","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster BGR-560","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster CAJ-445","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster JWY-925","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR5 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR5 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-DELTA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-LAMDA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-OVER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ECHO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-POINT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-SIERRA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-HELIO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-VICTORY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ZETA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-XENO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-QUAGMIRE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-JAK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NARY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JUTE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TYRO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SPAW","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MURK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OLLA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KYUS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DORY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RODE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-VERD","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-FLAG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RINE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-ALME","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OAKS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NONG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LANX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SIJO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-ARID","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BORS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LYES","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster FSN-704","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster GRP-839","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster KKE-717","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster RSC-340","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster WDH-387","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster YKA-011","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Pyro V","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Pyro IV","type":"Planet","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Ignis","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Vatra","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Adir","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Fairo","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Fuego","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Vuur","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"PYR6 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR6 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-LYNX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-COOK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-UMUS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MEFF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SOWL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PIZE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-QINS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RAWN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LOWN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-CRUE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MARA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-CHAM","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RAIK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KELT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MOSK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NENE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DIRK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PLEX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TIGS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HARK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SEER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SAIC","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster DLO-486","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster EMM-567","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster HJS-232","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster LHB-976","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster MNK-833","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Terminus","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Pyro I","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Monox","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Patch City","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Patch City Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ALPHA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-TUNG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-KILO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-NOVEMBER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-IGNITION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-BRAVO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ROTH","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-FOXTROT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster NBD-102","type":"Default","system":"Pyro","planet":null,"moon":null}],
     destinations: [],
     prereqLocations: [{"name":"Nyx","type":"Star","system":"","planet":null,"moon":null}],
     chainStartsWith: [{"id":"6198b19b-187d-4342-8883-350387408a03","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"}],
     requires: [{"id":"d46436e6-56ea-40ed-a0fd-e7c0c7218fbb","name":"[SHIP] clean up"}],
     unlocks: [{"id":"3617c33e-0f3f-44e7-b468-7de2a2db1dc4","name":"[SHIP] clean up"},{"id":"40a00ef8-0b53-9270-bc2c-ef38cda62eb2","name":"Adagio Holdings: Salvage Mission (Medium)"},{"id":"c2871e21-9f59-448e-97c7-0e7bfe4bf8b6","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"},{"id":"f91fbab9-1e90-4fb8-871d-961053ad1f49","name":"Risky [SHIP] Salvage Job"}],
     turnIns: [],
+    salvageShips: ["Aegis Redeemer","Aegis Vanguard Harbinger","Aegis Vanguard Hoplite","Aegis Vanguard Sentinel","Aegis Vanguard Warden","Argo RAFT","C.O. Nomad","Crusader A1 Spirit","Crusader Ares Star Fighter Inferno","Crusader C1 Spirit","Drake Vulture","Esperia Prowler","RSI Scorpius","RSI Scorpius Antares","RSI Zeus Mk II ES"],
+    salvageShipCount: {"min":1,"max":1},
+    blueprintRewards: [],
   },
   {
     id: "93113c47-1c37-4e7f-bda3-76911dfebd67",
@@ -1519,13 +1651,16 @@ const MISSIONS = [
     crimeStatMax: 2,
     notes: "Be aware that due to the size of the Claim, a Large Salvage Ship is recommended.",
     description: "Be aware that due to the size of the Claim, a Large Salvage Ship is recommended.",
-    locations: [{"name":"Nyx","type":"Star","system":null,"planet":null,"moon":null},{"name":"@generic_locations_blank","type":"Default","system":null,"planet":null,"moon":null},{"name":"Nyx I","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx II","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx III","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx System","type":"Default","system":null,"planet":null,"moon":null},{"name":"Pyro","type":"Star","system":null,"planet":null,"moon":null},{"name":"PYR1 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYAM-EXHANG-0-1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-WHISKEY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-CHARLIE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-YORK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-GULF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Asteroid Mining Base","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LEST","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JONG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KNAP","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OXID","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PALL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HELM","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BASK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BUCK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LUNE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-GRAY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MAGE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-GADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-WARB","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HORN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KIFF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MUGG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PEKE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TACK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-AXIL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DARI","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-YEAD","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster BGR-560","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster CAJ-445","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster JWY-925","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR5 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR5 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-DELTA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-LAMDA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-OVER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ECHO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-POINT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-SIERRA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-HELIO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-VICTORY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ZETA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-XENO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-QUAGMIRE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-JAK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NARY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JUTE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TYRO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SPAW","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MURK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OLLA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KYUS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DORY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RODE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-VERD","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-FLAG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RINE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-ALME","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OAKS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NONG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LANX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SIJO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-ARID","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BORS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LYES","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster FSN-704","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster GRP-839","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster KKE-717","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster RSC-340","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster WDH-387","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster YKA-011","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Pyro V","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Pyro IV","type":"Planet","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Ignis","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Vatra","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Adir","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Fairo","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Fuego","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Vuur","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"PYR6 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR6 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-LYNX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-COOK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-UMUS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MEFF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SOWL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PIZE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-QINS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RAWN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LOWN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-CRUE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MARA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-CHAM","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RAIK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KELT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MOSK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NENE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DIRK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PLEX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TIGS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HARK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SEER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SAIC","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster DLO-486","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster EMM-567","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster HJS-232","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster LHB-976","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster MNK-833","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Terminus","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Pyro I","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Monox","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Patch City","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Patch City Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ALPHA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-TUNG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-KILO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-NOVEMBER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-IGNITION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-BRAVO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ROTH","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-FOXTROT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster NBD-102","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Hurston","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"Crusader","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"ArcCorp","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"microTech","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"HUR L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Arial","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Aberdeen","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Magda","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Ita","type":"Moon","system":"Stanton","planet":"Hurston","moon":null}],
+    locations: [{"name":"Nyx","type":"Star","system":null,"planet":null,"moon":null},{"name":"Nyx I","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx II","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx III","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx System","type":"Default","system":null,"planet":null,"moon":null},{"name":"Pyro","type":"Star","system":null,"planet":null,"moon":null},{"name":"PYR1 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYAM-EXHANG-0-1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-WHISKEY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-CHARLIE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-YORK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-GULF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Asteroid Mining Base","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LEST","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JONG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KNAP","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OXID","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PALL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HELM","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BASK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BUCK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LUNE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-GRAY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MAGE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-GADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-WARB","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HORN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KIFF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MUGG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PEKE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TACK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-AXIL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DARI","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-YEAD","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster BGR-560","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster CAJ-445","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster JWY-925","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR5 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR5 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-DELTA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-LAMDA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-OVER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ECHO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-POINT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-SIERRA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-HELIO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-VICTORY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ZETA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-XENO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-QUAGMIRE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-JAK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NARY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JUTE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TYRO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SPAW","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MURK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OLLA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KYUS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DORY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RODE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-VERD","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-FLAG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RINE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-ALME","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OAKS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NONG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LANX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SIJO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-ARID","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BORS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LYES","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster FSN-704","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster GRP-839","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster KKE-717","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster RSC-340","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster WDH-387","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster YKA-011","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Pyro V","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Pyro IV","type":"Planet","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Ignis","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Vatra","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Adir","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Fairo","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Fuego","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Vuur","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"PYR6 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR6 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-LYNX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-COOK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-UMUS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MEFF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SOWL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PIZE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-QINS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RAWN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LOWN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-CRUE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MARA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-CHAM","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RAIK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KELT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MOSK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NENE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DIRK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PLEX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TIGS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HARK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SEER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SAIC","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster DLO-486","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster EMM-567","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster HJS-232","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster LHB-976","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster MNK-833","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Terminus","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Pyro I","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Monox","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Patch City","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Patch City Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ALPHA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-TUNG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-KILO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-NOVEMBER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-IGNITION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-BRAVO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ROTH","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-FOXTROT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster NBD-102","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Hurston","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"Crusader","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"ArcCorp","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"microTech","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"HUR L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Arial","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Aberdeen","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Magda","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Ita","type":"Moon","system":"Stanton","planet":"Hurston","moon":null}],
     destinations: [],
     prereqLocations: [{"name":"Nyx","type":"Star","system":"","planet":null,"moon":null}],
     chainStartsWith: [{"id":"6198b19b-187d-4342-8883-350387408a03","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"}],
     requires: [{"id":"3617c33e-0f3f-44e7-b468-7de2a2db1dc4","name":"[SHIP] clean up"}],
     unlocks: [],
     turnIns: [],
+    salvageShips: ["Crusader A2 Hercules Starlifter","Crusader C2 Hercules Starlifter","Crusader M2 Hercules Starlifter","Origin 890 Jump"],
+    salvageShipCount: {"min":1,"max":1},
+    blueprintRewards: [],
   },
   {
     id: "6198b19b-187d-4342-8883-350387408a03",
@@ -1553,13 +1688,16 @@ const MISSIONS = [
     crimeStatMax: 2,
     notes: "Attention: Rights to a new Salvage Claim are available for purchase.",
     description: "Attention:\n\nRights to a new Salvage Claim are available for purchase. Exclusive access to the ship’s verified coordinates in monitored space will be provided upon confirmed credit transfer. The coordinates will remain accessible as long as the accepted contract is active. When you are satisfied with the amount of material you've salvaged, you may abandon the contract early with no penalty to clear the coordinates from your Starmap.\n\nClaim #[CLAIM]:\n• SHIP: [SHIP]\n• CAUSE OF ACCIDENT: [SHIPSTORY]\n• LOCATION: [LOCATION]\n\nAdagio Rights Division",
-    locations: [{"name":"Nyx","type":"Star","system":null,"planet":null,"moon":null},{"name":"@generic_locations_blank","type":"Default","system":null,"planet":null,"moon":null},{"name":"Nyx I","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx II","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx III","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx System","type":"Default","system":null,"planet":null,"moon":null},{"name":"Pyro","type":"Star","system":null,"planet":null,"moon":null},{"name":"PYR1 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYAM-EXHANG-0-1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-WHISKEY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-CHARLIE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-YORK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-GULF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Asteroid Mining Base","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LEST","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JONG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KNAP","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OXID","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PALL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HELM","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BASK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BUCK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LUNE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-GRAY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MAGE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-GADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-WARB","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HORN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KIFF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MUGG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PEKE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TACK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-AXIL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DARI","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-YEAD","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster BGR-560","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster CAJ-445","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster JWY-925","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR5 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR5 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-DELTA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-LAMDA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-OVER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ECHO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-POINT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-SIERRA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-HELIO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-VICTORY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ZETA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-XENO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-QUAGMIRE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-JAK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NARY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JUTE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TYRO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SPAW","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MURK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OLLA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KYUS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DORY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RODE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-VERD","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-FLAG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RINE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-ALME","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OAKS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NONG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LANX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SIJO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-ARID","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BORS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LYES","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster FSN-704","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster GRP-839","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster KKE-717","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster RSC-340","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster WDH-387","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster YKA-011","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Pyro V","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Pyro IV","type":"Planet","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Ignis","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Vatra","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Adir","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Fairo","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Fuego","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Vuur","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"PYR6 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR6 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-LYNX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-COOK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-UMUS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MEFF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SOWL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PIZE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-QINS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RAWN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LOWN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-CRUE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MARA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-CHAM","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RAIK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KELT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MOSK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NENE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DIRK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PLEX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TIGS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HARK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SEER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SAIC","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster DLO-486","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster EMM-567","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster HJS-232","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster LHB-976","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster MNK-833","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Terminus","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Pyro I","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Monox","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Patch City","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Patch City Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ALPHA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-TUNG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-KILO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-NOVEMBER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-IGNITION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-BRAVO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ROTH","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-FOXTROT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster NBD-102","type":"Default","system":"Pyro","planet":null,"moon":null}],
+    locations: [{"name":"Nyx","type":"Star","system":null,"planet":null,"moon":null},{"name":"Nyx I","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx II","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx III","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx System","type":"Default","system":null,"planet":null,"moon":null},{"name":"Pyro","type":"Star","system":null,"planet":null,"moon":null},{"name":"PYR1 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYAM-EXHANG-0-1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-WHISKEY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-CHARLIE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-YORK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-GULF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Asteroid Mining Base","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LEST","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JONG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KNAP","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OXID","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PALL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HELM","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BASK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BUCK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LUNE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-GRAY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MAGE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-GADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-WARB","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HORN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KIFF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MUGG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PEKE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TACK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-AXIL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DARI","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-YEAD","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster BGR-560","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster CAJ-445","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster JWY-925","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR5 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR5 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-DELTA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-LAMDA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-OVER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ECHO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-POINT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-SIERRA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-HELIO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-VICTORY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ZETA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-XENO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-QUAGMIRE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-JAK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NARY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JUTE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TYRO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SPAW","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MURK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OLLA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KYUS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DORY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RODE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-VERD","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-FLAG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RINE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-ALME","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OAKS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NONG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LANX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SIJO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-ARID","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BORS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LYES","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster FSN-704","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster GRP-839","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster KKE-717","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster RSC-340","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster WDH-387","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster YKA-011","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Pyro V","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Pyro IV","type":"Planet","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Ignis","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Vatra","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Adir","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Fairo","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Fuego","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Vuur","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"PYR6 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR6 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-LYNX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-COOK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-UMUS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MEFF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SOWL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PIZE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-QINS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RAWN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LOWN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-CRUE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MARA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-CHAM","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RAIK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KELT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MOSK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NENE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DIRK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PLEX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TIGS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HARK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SEER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SAIC","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster DLO-486","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster EMM-567","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster HJS-232","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster LHB-976","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster MNK-833","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Terminus","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Pyro I","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Monox","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Patch City","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Patch City Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ALPHA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-TUNG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-KILO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-NOVEMBER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-IGNITION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-BRAVO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ROTH","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-FOXTROT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster NBD-102","type":"Default","system":"Pyro","planet":null,"moon":null}],
     destinations: [],
     prereqLocations: [{"name":"Nyx","type":"Star","system":"","planet":null,"moon":null}],
     chainStartsWith: [],
     requires: [],
     unlocks: [{"id":"4eebc223-b15f-9cba-d1b9-070816b6caa9","name":"Adagio Holdings: Salvage Mission (Very Easy)"},{"id":"d56b6a21-6ccc-4620-8bcc-aa3538f220dd","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"}],
     turnIns: [],
+    salvageShips: ["Aegis Gladius"],
+    salvageShipCount: {"min":1,"max":1},
+    blueprintRewards: [],
   },
   {
     id: "c2871e21-9f59-448e-97c7-0e7bfe4bf8b6",
@@ -1587,13 +1725,16 @@ const MISSIONS = [
     crimeStatMax: 2,
     notes: "Attention: Rights to a new Salvage Claim are available for purchase.",
     description: "Attention:\n\nRights to a new Salvage Claim are available for purchase. Exclusive access to the ship’s verified coordinates in monitored space will be provided upon confirmed credit transfer. The coordinates will remain accessible as long as the accepted contract is active. When you are satisfied with the amount of material you've salvaged, you may abandon the contract early with no penalty to clear the coordinates from your Starmap.\n\nClaim #[CLAIM]:\n• SHIP: [SHIP]\n• CAUSE OF ACCIDENT: [SHIPSTORY]\n• LOCATION: [LOCATION]\n\nAdagio Rights Division",
-    locations: [{"name":"Nyx","type":"Star","system":null,"planet":null,"moon":null},{"name":"@generic_locations_blank","type":"Default","system":null,"planet":null,"moon":null},{"name":"Nyx I","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx II","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx III","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx System","type":"Default","system":null,"planet":null,"moon":null},{"name":"Pyro","type":"Star","system":null,"planet":null,"moon":null},{"name":"PYR1 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYAM-EXHANG-0-1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-WHISKEY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-CHARLIE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-YORK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-GULF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Asteroid Mining Base","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LEST","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JONG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KNAP","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OXID","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PALL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HELM","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BASK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BUCK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LUNE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-GRAY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MAGE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-GADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-WARB","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HORN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KIFF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MUGG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PEKE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TACK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-AXIL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DARI","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-YEAD","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster BGR-560","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster CAJ-445","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster JWY-925","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR5 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR5 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-DELTA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-LAMDA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-OVER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ECHO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-POINT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-SIERRA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-HELIO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-VICTORY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ZETA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-XENO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-QUAGMIRE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-JAK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NARY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JUTE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TYRO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SPAW","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MURK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OLLA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KYUS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DORY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RODE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-VERD","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-FLAG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RINE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-ALME","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OAKS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NONG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LANX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SIJO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-ARID","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BORS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LYES","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster FSN-704","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster GRP-839","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster KKE-717","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster RSC-340","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster WDH-387","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster YKA-011","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Pyro V","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Pyro IV","type":"Planet","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Ignis","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Vatra","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Adir","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Fairo","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Fuego","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Vuur","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"PYR6 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR6 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-LYNX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-COOK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-UMUS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MEFF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SOWL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PIZE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-QINS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RAWN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LOWN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-CRUE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MARA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-CHAM","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RAIK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KELT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MOSK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NENE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DIRK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PLEX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TIGS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HARK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SEER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SAIC","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster DLO-486","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster EMM-567","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster HJS-232","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster LHB-976","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster MNK-833","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Terminus","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Pyro I","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Monox","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Patch City","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Patch City Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ALPHA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-TUNG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-KILO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-NOVEMBER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-IGNITION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-BRAVO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ROTH","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-FOXTROT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster NBD-102","type":"Default","system":"Pyro","planet":null,"moon":null}],
+    locations: [{"name":"Nyx","type":"Star","system":null,"planet":null,"moon":null},{"name":"Nyx I","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx II","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx III","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx System","type":"Default","system":null,"planet":null,"moon":null},{"name":"Pyro","type":"Star","system":null,"planet":null,"moon":null},{"name":"PYR1 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYAM-EXHANG-0-1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-WHISKEY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-CHARLIE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-YORK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-GULF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Asteroid Mining Base","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LEST","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JONG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KNAP","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OXID","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PALL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HELM","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BASK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BUCK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LUNE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-GRAY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MAGE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-GADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-WARB","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HORN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KIFF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MUGG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PEKE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TACK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-AXIL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DARI","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-YEAD","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster BGR-560","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster CAJ-445","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster JWY-925","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR5 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR5 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-DELTA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-LAMDA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-OVER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ECHO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-POINT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-SIERRA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-HELIO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-VICTORY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ZETA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-XENO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-QUAGMIRE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-JAK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NARY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JUTE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TYRO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SPAW","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MURK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OLLA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KYUS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DORY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RODE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-VERD","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-FLAG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RINE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-ALME","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OAKS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NONG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LANX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SIJO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-ARID","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BORS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LYES","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster FSN-704","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster GRP-839","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster KKE-717","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster RSC-340","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster WDH-387","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster YKA-011","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Pyro V","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Pyro IV","type":"Planet","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Ignis","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Vatra","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Adir","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Fairo","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Fuego","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Vuur","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"PYR6 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR6 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-LYNX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-COOK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-UMUS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MEFF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SOWL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PIZE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-QINS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RAWN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LOWN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-CRUE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MARA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-CHAM","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RAIK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KELT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MOSK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NENE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DIRK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PLEX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TIGS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HARK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SEER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SAIC","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster DLO-486","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster EMM-567","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster HJS-232","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster LHB-976","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster MNK-833","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Terminus","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Pyro I","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Monox","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Patch City","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Patch City Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ALPHA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-TUNG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-KILO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-NOVEMBER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-IGNITION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-BRAVO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ROTH","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-FOXTROT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster NBD-102","type":"Default","system":"Pyro","planet":null,"moon":null}],
     destinations: [],
     prereqLocations: [{"name":"Nyx","type":"Star","system":"","planet":null,"moon":null}],
     chainStartsWith: [{"id":"6198b19b-187d-4342-8883-350387408a03","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"}],
     requires: [{"id":"152bc6c1-70e0-44fb-a89a-5200456f132c","name":"[SHIP] clean up"}],
     unlocks: [{"id":"93113c47-1c37-4e7f-bda3-76911dfebd67","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"}],
     turnIns: [],
+    salvageShips: ["Aegis Hammerhead","Aegis Retaliator","Argo MOLE","Crusader Mercury Star Runner","Drake Corsair","Origin 400i","RSI Constellation Taurus"],
+    salvageShipCount: {"min":1,"max":1},
+    blueprintRewards: [],
   },
   {
     id: "d56b6a21-6ccc-4620-8bcc-aa3538f220dd",
@@ -1621,13 +1762,16 @@ const MISSIONS = [
     crimeStatMax: 2,
     notes: "Attention: Rights to a new Salvage Claim are available for purchase.",
     description: "Attention:\n\nRights to a new Salvage Claim are available for purchase. Exclusive access to the ship’s verified coordinates in monitored space will be provided upon confirmed credit transfer. The coordinates will remain accessible as long as the accepted contract is active. When you are satisfied with the amount of material you've salvaged, you may abandon the contract early with no penalty to clear the coordinates from your Starmap.\n\nClaim #[CLAIM]:\n• SHIP: [SHIP]\n• CAUSE OF ACCIDENT: [SHIPSTORY]\n• LOCATION: [LOCATION]\n\nAdagio Rights Division",
-    locations: [{"name":"Nyx","type":"Star","system":null,"planet":null,"moon":null},{"name":"@generic_locations_blank","type":"Default","system":null,"planet":null,"moon":null},{"name":"Nyx I","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx II","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx III","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx System","type":"Default","system":null,"planet":null,"moon":null},{"name":"Pyro","type":"Star","system":null,"planet":null,"moon":null},{"name":"PYR1 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYAM-EXHANG-0-1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-WHISKEY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-CHARLIE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-YORK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-GULF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Asteroid Mining Base","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LEST","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JONG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KNAP","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OXID","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PALL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HELM","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BASK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BUCK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LUNE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-GRAY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MAGE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-GADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-WARB","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HORN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KIFF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MUGG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PEKE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TACK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-AXIL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DARI","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-YEAD","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster BGR-560","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster CAJ-445","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster JWY-925","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR5 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR5 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-DELTA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-LAMDA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-OVER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ECHO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-POINT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-SIERRA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-HELIO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-VICTORY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ZETA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-XENO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-QUAGMIRE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-JAK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NARY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JUTE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TYRO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SPAW","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MURK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OLLA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KYUS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DORY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RODE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-VERD","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-FLAG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RINE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-ALME","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OAKS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NONG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LANX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SIJO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-ARID","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BORS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LYES","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster FSN-704","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster GRP-839","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster KKE-717","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster RSC-340","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster WDH-387","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster YKA-011","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Pyro V","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Pyro IV","type":"Planet","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Ignis","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Vatra","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Adir","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Fairo","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Fuego","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Vuur","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"PYR6 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR6 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-LYNX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-COOK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-UMUS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MEFF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SOWL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PIZE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-QINS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RAWN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LOWN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-CRUE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MARA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-CHAM","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RAIK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KELT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MOSK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NENE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DIRK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PLEX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TIGS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HARK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SEER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SAIC","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster DLO-486","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster EMM-567","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster HJS-232","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster LHB-976","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster MNK-833","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Terminus","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Pyro I","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Monox","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Patch City","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Patch City Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ALPHA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-TUNG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-KILO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-NOVEMBER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-IGNITION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-BRAVO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ROTH","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-FOXTROT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster NBD-102","type":"Default","system":"Pyro","planet":null,"moon":null}],
+    locations: [{"name":"Nyx","type":"Star","system":null,"planet":null,"moon":null},{"name":"Nyx I","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx II","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx III","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx System","type":"Default","system":null,"planet":null,"moon":null},{"name":"Pyro","type":"Star","system":null,"planet":null,"moon":null},{"name":"PYR1 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYAM-EXHANG-0-1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-WHISKEY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-CHARLIE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-YORK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-GULF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Asteroid Mining Base","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LEST","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JONG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KNAP","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OXID","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PALL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HELM","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BASK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BUCK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LUNE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-GRAY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MAGE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-GADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-WARB","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HORN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KIFF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MUGG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PEKE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TACK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-AXIL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DARI","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-YEAD","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster BGR-560","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster CAJ-445","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster JWY-925","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR5 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR5 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-DELTA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-LAMDA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-OVER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ECHO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-POINT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-SIERRA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-HELIO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-VICTORY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ZETA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-XENO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-QUAGMIRE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-JAK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NARY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JUTE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TYRO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SPAW","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MURK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OLLA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KYUS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DORY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RODE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-VERD","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-FLAG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RINE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-ALME","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OAKS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NONG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LANX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SIJO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-ARID","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BORS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LYES","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster FSN-704","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster GRP-839","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster KKE-717","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster RSC-340","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster WDH-387","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster YKA-011","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Pyro V","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Pyro IV","type":"Planet","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Ignis","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Vatra","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Adir","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Fairo","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Fuego","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Vuur","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"PYR6 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR6 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-LYNX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-COOK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-UMUS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MEFF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SOWL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PIZE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-QINS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RAWN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LOWN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-CRUE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MARA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-CHAM","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RAIK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KELT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MOSK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NENE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DIRK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PLEX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TIGS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HARK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SEER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SAIC","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster DLO-486","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster EMM-567","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster HJS-232","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster LHB-976","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster MNK-833","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Terminus","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Pyro I","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Monox","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Patch City","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Patch City Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ALPHA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-TUNG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-KILO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-NOVEMBER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-IGNITION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-BRAVO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ROTH","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-FOXTROT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster NBD-102","type":"Default","system":"Pyro","planet":null,"moon":null}],
     destinations: [],
     prereqLocations: [{"name":"Nyx","type":"Star","system":"","planet":null,"moon":null}],
     chainStartsWith: [{"id":"6198b19b-187d-4342-8883-350387408a03","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"}],
     requires: [{"id":"46541e90-fa81-f9d4-7206-a88fdda5789f","name":"Adagio Holdings: Salvage Mission (Intro)"}],
     unlocks: [{"id":"152bc6c1-70e0-44fb-a89a-5200456f132c","name":"[SHIP] clean up"},{"id":"41127c2d-7685-fb1d-9f08-57bde4310aa7","name":"Adagio Holdings: Salvage Mission (Easy)"},{"id":"6aa230b9-0719-4ca6-8e8f-55358c88ab74","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"}],
     turnIns: [],
+    salvageShips: ["Aegis Sabre","Anvil Terrapin","Aopoa San'tok.yāi","Crusader Ares Star Fighter Ion","Crusader Intrepid","Drake Cutter","Drake Cutter Rambler","Drake Cutter Scout","Esperia Talon","Esperia Talon Shrike","Gatac Syulen","Origin 315p","Origin 325a","Origin 350r"],
+    salvageShipCount: {"min":1,"max":1},
+    blueprintRewards: [],
   },
   {
     id: "fd8e44db-6c4d-4aac-8cd7-6f570254c591",
@@ -1662,6 +1806,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [],
+    salvageShips: ["Aegis Gladius","Aegis Gladius Valiant","Aegis Redeemer","Aegis Vanguard Harbinger","Aegis Vanguard Hoplite","Aegis Vanguard Sentinel","Aegis Vanguard Warden","Anvil Arrow","Anvil F7C Hornet Mk II","Anvil F7C-M Super Hornet Mk I","Anvil Gladiator","Anvil Hurricane","Anvil Valkyrie","Argo RAFT","C.O. Nomad","Crusader A1 Spirit","Crusader Ares Star Fighter Inferno","Crusader C1 Spirit","Crusader Mercury Star Runner","Drake Buccaneer","Drake Caterpillar","Drake Cutlass Black","Drake Cutlass Steel","Drake Vulture","Esperia Prowler","Esperia Talon Shrike","MISC Freelancer","MISC Freelancer DUR","MISC Freelancer MAX","MISC Freelancer MIS","MISC Reliant Kore","MISC Reliant Tana","Origin 400i","RSI Scorpius","RSI Scorpius Antares","RSI Zeus Mk II ES"],
+    salvageShipCount: {"min":9,"max":9},
+    blueprintRewards: [],
   },
   {
     id: "e054f8ec-0dd0-453e-9bb6-0524e991a5d8",
@@ -1696,6 +1843,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [],
+    salvageShips: ["Aegis Gladius","Aegis Gladius Valiant","Aegis Redeemer","Aegis Vanguard Harbinger","Aegis Vanguard Hoplite","Aegis Vanguard Sentinel","Aegis Vanguard Warden","Anvil Arrow","Anvil F7C Hornet Mk II","Anvil F7C-M Super Hornet Mk I","Anvil Gladiator","Anvil Hurricane","Anvil Valkyrie","Argo RAFT","C.O. Nomad","Crusader A1 Spirit","Crusader Ares Star Fighter Inferno","Crusader C1 Spirit","Crusader Mercury Star Runner","Drake Buccaneer","Drake Caterpillar","Drake Cutlass Black","Drake Cutlass Steel","Drake Vulture","Esperia Prowler","Esperia Talon Shrike","MISC Freelancer","MISC Freelancer DUR","MISC Freelancer MAX","MISC Freelancer MIS","MISC Reliant Kore","MISC Reliant Tana","Origin 400i","RSI Scorpius","RSI Scorpius Antares","RSI Zeus Mk II ES"],
+    salvageShipCount: {"min":9,"max":9},
+    blueprintRewards: [],
   },
   {
     id: "c0367fb3-fe9a-4d96-a52e-37379fb84c48",
@@ -1730,6 +1880,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [],
+    salvageShips: ["Aegis Gladius"],
+    salvageShipCount: {"min":1,"max":1},
+    blueprintRewards: [],
   },
   {
     id: "fb7cdad3-3adf-47db-a9dc-fbc9b8c48f11",
@@ -1764,6 +1917,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [],
+    salvageShips: ["Aegis Gladius"],
+    salvageShipCount: {"min":1,"max":1},
+    blueprintRewards: [],
   },
   {
     id: "e4d58696-cb09-4a99-9455-c38c8cea760d",
@@ -1798,6 +1954,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [],
+    salvageShips: ["Aegis Gladius"],
+    salvageShipCount: {"min":1,"max":1},
+    blueprintRewards: [],
   },
   {
     id: "16f1f278-25d4-42ae-9720-78de4832963b",
@@ -1832,6 +1991,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [],
+    salvageShips: ["Aegis Gladius"],
+    salvageShipCount: {"min":1,"max":1},
+    blueprintRewards: [],
   },
   {
     id: "ae20c909-cc86-46aa-aee3-f2ea70faeff1",
@@ -1866,6 +2028,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [],
+    salvageShips: ["Aegis Gladius"],
+    salvageShipCount: {"min":1,"max":1},
+    blueprintRewards: [],
   },
   {
     id: "adada33c-0309-44b1-b0db-1d4421756b49",
@@ -1900,6 +2065,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [],
+    salvageShips: ["Aegis Gladius"],
+    salvageShipCount: {"min":1,"max":1},
+    blueprintRewards: [],
   },
   {
     id: "f9d84f75-b48c-4f4b-8f6e-ee59434efee4",
@@ -1934,6 +2102,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [],
+    salvageShips: ["Aegis Gladius"],
+    salvageShipCount: {"min":1,"max":1},
+    blueprintRewards: [],
   },
   {
     id: "3fb8de52-6791-4ea9-bf1c-737bf4f7fa78",
@@ -1968,6 +2139,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [],
+    salvageShips: ["Aegis Gladius"],
+    salvageShipCount: {"min":1,"max":1},
+    blueprintRewards: [],
   },
   {
     id: "ce3723ef-cc33-41ab-9d36-f8ab0510455b",
@@ -2002,6 +2176,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [],
+    salvageShips: ["Aegis Gladius"],
+    salvageShipCount: {"min":1,"max":1},
+    blueprintRewards: [],
   },
   {
     id: "bbb1603f-640a-4061-b75c-7c6c6b4e7d55",
@@ -2036,6 +2213,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [],
+    salvageShips: ["Aegis Gladius"],
+    salvageShipCount: {"min":1,"max":1},
+    blueprintRewards: [],
   },
   {
     id: "3617c33e-0f3f-44e7-b468-7de2a2db1dc4",
@@ -2070,6 +2250,9 @@ const MISSIONS = [
     requires: [{"id":"152bc6c1-70e0-44fb-a89a-5200456f132c","name":"[SHIP] clean up"}],
     unlocks: [{"id":"93113c47-1c37-4e7f-bda3-76911dfebd67","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"}],
     turnIns: [],
+    salvageShips: ["Aegis Avenger Stalker","Aegis Hammerhead","Drake Caterpillar","MISC Starfarer","RSI Mantis"],
+    salvageShipCount: {"min":4,"max":4},
+    blueprintRewards: [],
   },
   {
     id: "152bc6c1-70e0-44fb-a89a-5200456f132c",
@@ -2104,6 +2287,9 @@ const MISSIONS = [
     requires: [{"id":"d46436e6-56ea-40ed-a0fd-e7c0c7218fbb","name":"[SHIP] clean up"}],
     unlocks: [{"id":"3617c33e-0f3f-44e7-b468-7de2a2db1dc4","name":"[SHIP] clean up"},{"id":"40a00ef8-0b53-9270-bc2c-ef38cda62eb2","name":"Adagio Holdings: Salvage Mission (Medium)"},{"id":"c2871e21-9f59-448e-97c7-0e7bfe4bf8b6","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"},{"id":"f91fbab9-1e90-4fb8-871d-961053ad1f49","name":"Risky [SHIP] Salvage Job"}],
     turnIns: [],
+    salvageShips: ["Aegis Avenger Stalker","Anvil Valkyrie","Drake Cutlass Black","RSI Constellation Andromeda","RSI Mantis"],
+    salvageShipCount: {"min":4,"max":4},
+    blueprintRewards: [],
   },
   {
     id: "d46436e6-56ea-40ed-a0fd-e7c0c7218fbb",
@@ -2138,6 +2324,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [{"id":"152bc6c1-70e0-44fb-a89a-5200456f132c","name":"[SHIP] clean up"},{"id":"41127c2d-7685-fb1d-9f08-57bde4310aa7","name":"Adagio Holdings: Salvage Mission (Easy)"},{"id":"6aa230b9-0719-4ca6-8e8f-55358c88ab74","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"}],
     turnIns: [],
+    salvageShips: ["Aegis Avenger Stalker","MISC Prospector","RSI Mantis"],
+    salvageShipCount: {"min":4,"max":4},
+    blueprintRewards: [],
   },
   {
     id: "f34ee69a-3836-4853-9765-2ced2596bc6e",
@@ -2172,6 +2361,9 @@ const MISSIONS = [
     requires: [],
     unlocks: [{"id":"3617c33e-0f3f-44e7-b468-7de2a2db1dc4","name":"[SHIP] clean up"},{"id":"40a00ef8-0b53-9270-bc2c-ef38cda62eb2","name":"Adagio Holdings: Salvage Mission (Medium)"},{"id":"c2871e21-9f59-448e-97c7-0e7bfe4bf8b6","name":"Claim #[CLAIM]: [SHIP] Salvage Rights"},{"id":"f91fbab9-1e90-4fb8-871d-961053ad1f49","name":"Risky [SHIP] Salvage Job"}],
     turnIns: [],
+    salvageShips: ["Aegis Avenger Stalker","Aegis Avenger Titan Renegade","Aegis Avenger Warlock","Aegis Eclipse","Aegis Gladius","Aegis Gladius Valiant","Aegis Hammerhead","Aegis Idris-M","Aegis Idris-P","Aegis Reclaimer","Aegis Redeemer","Aegis Retaliator","Aegis Sabre","Aegis Sabre Comet","Aegis Sabre Firebird","Aegis Sabre Raven","Aegis Vanguard Harbinger","Aegis Vanguard Hoplite","Aegis Vanguard Sentinel","Aegis Vanguard Warden","Anvil Arrow","Anvil C8 Pisces","Anvil C8R Pisces Rescue","Anvil C8X Pisces Expedition","Anvil Carrack","Anvil F7C Hornet Mk I","Anvil F7C-M Super Hornet Mk I","Anvil F7C-R Hornet Tracker Mk I","Anvil F7C-S Hornet Ghost Mk I","Anvil Gladiator","Anvil Hawk","Anvil Hurricane","Anvil Terrapin","Anvil Terrapin Medic","Anvil Valkyrie","Aopoa Khartu-al","Argo MOLE","Argo RAFT","Broad & Rabiee Overseer Orbital Sentry","C.O. Mustang Alpha","C.O. Mustang Beta","C.O. Mustang Delta","C.O. Mustang Gamma","C.O. Nomad","Crusader A1 Spirit","Crusader A2 Hercules Starlifter","Crusader Ares Star Fighter Inferno","Crusader Ares Star Fighter Ion","Crusader C1 Spirit","Crusader C2 Hercules Starlifter","Crusader M2 Hercules Starlifter","Crusader Mercury Star Runner","Drake Buccaneer","Drake Caterpillar","Drake Corsair","Drake Cutlass Black","Drake Cutlass Steel","Drake Cutter","Drake Cutter Rambler","Drake Cutter Scout","Drake Herald","Drake Vulture","Esperia Prowler","Esperia Talon","Esperia Talon Shrike","MISC Freelancer","MISC Freelancer DUR","MISC Freelancer MAX","MISC Freelancer MIS","MISC Hull A","MISC Prospector","MISC Reliant Kore","MISC Reliant Mako","MISC Reliant Sen","MISC Reliant Tana","MISC Starfarer","MISC Starfarer Gemini","Mirai Razor","Mirai Razor EX","Mirai Razor LX","Origin 100i","Origin 125a","Origin 135c","Origin 300i","Origin 315p","Origin 325a","Origin 350r","Origin 400i","Origin 600i","Origin 85X Limited","Origin 890 Jump","Origin M50 Interceptor","RSI Aurora Mk I  LX","RSI Aurora Mk I CL","RSI Aurora Mk I ES","RSI Aurora Mk I LN","RSI Aurora Mk I MR","RSI Constellation Andromeda","RSI Constellation Aquila","RSI Constellation Phoenix","RSI Constellation Taurus","RSI Mantis","RSI Polaris","RSI Scorpius","RSI Scorpius Antares","RSI Zeus Mk II ES"],
+    salvageShipCount: {"min":10,"max":10},
+    blueprintRewards: [],
   },
   {
     id: "f91fbab9-1e90-4fb8-871d-961053ad1f49",
@@ -2206,6 +2398,9 @@ const MISSIONS = [
     requires: [{"id":"152bc6c1-70e0-44fb-a89a-5200456f132c","name":"[SHIP] clean up"}],
     unlocks: [],
     turnIns: [],
+    salvageShips: ["Aegis Avenger Stalker","Aegis Avenger Titan Renegade","Aegis Avenger Warlock","Aegis Eclipse","Aegis Gladius","Aegis Gladius Valiant","Aegis Hammerhead","Aegis Idris-M","Aegis Idris-P","Aegis Reclaimer","Aegis Redeemer","Aegis Retaliator","Aegis Sabre","Aegis Sabre Comet","Aegis Sabre Firebird","Aegis Sabre Raven","Aegis Vanguard Harbinger","Aegis Vanguard Hoplite","Aegis Vanguard Sentinel","Aegis Vanguard Warden","Anvil Arrow","Anvil C8 Pisces","Anvil C8R Pisces Rescue","Anvil C8X Pisces Expedition","Anvil Carrack","Anvil F7C Hornet Mk I","Anvil F7C-M Super Hornet Mk I","Anvil F7C-R Hornet Tracker Mk I","Anvil F7C-S Hornet Ghost Mk I","Anvil Gladiator","Anvil Hawk","Anvil Hurricane","Anvil Terrapin","Anvil Terrapin Medic","Anvil Valkyrie","Aopoa Khartu-al","Argo MOLE","Argo RAFT","Broad & Rabiee Overseer Orbital Sentry","C.O. Mustang Alpha","C.O. Mustang Beta","C.O. Mustang Delta","C.O. Mustang Gamma","C.O. Nomad","Crusader A1 Spirit","Crusader A2 Hercules Starlifter","Crusader Ares Star Fighter Inferno","Crusader Ares Star Fighter Ion","Crusader C2 Hercules Starlifter","Crusader M2 Hercules Starlifter","Crusader Mercury Star Runner","Drake Buccaneer","Drake Caterpillar","Drake Corsair","Drake Cutlass Black","Drake Cutlass Steel","Drake Cutter","Drake Cutter Rambler","Drake Cutter Scout","Drake Herald","Drake Vulture","Esperia Prowler","Esperia Talon","Esperia Talon Shrike","MISC Freelancer","MISC Freelancer DUR","MISC Freelancer MAX","MISC Freelancer MIS","MISC Hull A","MISC Hull C","MISC Prospector","MISC Reliant Kore","MISC Reliant Mako","MISC Reliant Sen","MISC Reliant Tana","MISC Starfarer","MISC Starfarer Gemini","Mirai Razor","Mirai Razor EX","Mirai Razor LX","Origin 100i","Origin 125a","Origin 135c","Origin 300i","Origin 315p","Origin 325a","Origin 350r","Origin 400i","Origin 600i","Origin 85X Limited","Origin 890 Jump","Origin M50 Interceptor","RSI Aurora Mk I  LX","RSI Aurora Mk I CL","RSI Aurora Mk I ES","RSI Aurora Mk I LN","RSI Aurora Mk I MR","RSI Constellation Andromeda","RSI Constellation Aquila","RSI Constellation Phoenix","RSI Constellation Taurus","RSI Mantis","RSI Polaris","RSI Scorpius","RSI Scorpius Antares"],
+    salvageShipCount: {"min":10,"max":10},
+    blueprintRewards: [],
   },
 ];
 
@@ -2214,20 +2409,160 @@ const MISSIONS = [
 // .claude/build-refueling-missions.cjs after refreshing the JSON.
 const REFUELING_MISSIONS = [
   {
+    id: "1080d9fc-d511-4bda-a567-161797dac491",
+    name: "CRITICAL REFUEL REQUEST: [SHIP]",
+    faction: "United Wayfarers Club",
+    giver: "United Wayfarers Club",
+    system: "Multi",
+    reward: 85500,
+    buyIn: 0,
+    baseXP: 200,
+    legality: "Legal",
+    minRank: "Sr. Contractor",
+    minRankXP: 5800,
+    maxRank: "Elite Contractor",
+    maxRankXP: 95250,
+    timeToComplete: 23.4,
+    canBeShared: true,
+    onceOnly: false,
+    canReacceptAfterAbandoning: false,
+    canReacceptAfterFailing: false,
+    hasPersonalCooldown: false,
+    personalCooldownTime: 1,
+    abandonedCooldownTime: 1,
+    crimeStatMin: null,
+    crimeStatMax: null,
+    notes: "Hi, Another day another beacon.",
+    description: "Hi,\n\nAnother day another beacon. There's a [SHIP] with an empty tank at [LOCATION].  The client vessel will pay you at the rate of [FUELRATE] aUEC per SCU of Hydrogen and  [QTFUELRATE] aUEC per SCU of Quantum , and as a United Wayfarers Club contractor, you will also qualify for the UWC service fee listed above upon completion.\n\nI can't lie: it's a nasty place to get stuck and a worse place to get caught by surprise. We've lost good people out there - even the ones who got lucky made it home with pieces missing.\n\nIf you decide to take the job, do me a favour and keep everything peeled. If you've got a buddy with time to spare, maybe reach out for a little back-up.\n\nMaybe I'm being paranoid, but that doesn't mean they're not out to get you, as Momma Deloit used to say. \nActually she never said that - but I'm pretty sure she would if she did this for a living.\n\nJust do the job and get home safe, okay?\n\nDina Deloit\nDispatch Hub\nUnited Wayfarers Club\n\"We’ve got your back\"",
+    locations: [{"name":"Nyx","type":"Star","system":null,"planet":null,"moon":null},{"name":"Nyx I","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx II","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx III","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx System","type":"Default","system":null,"planet":null,"moon":null},{"name":"Pyro I","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Monox","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Patch City","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Patch City Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ALPHA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-TUNG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-KILO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-NOVEMBER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-IGNITION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-BRAVO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ROTH","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-FOXTROT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster NBD-102","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Crusader","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"CRU L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"CRU L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"CRU L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Cellin","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"Daymar","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"Yela","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"ArcCorp","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"ARC L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Lyria","type":"Moon","system":"Stanton","planet":"ArcCorp","moon":null},{"name":"Wala","type":"Moon","system":"Stanton","planet":"ArcCorp","moon":null},{"name":"microTech","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"MIC L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Calliope","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Clio","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Euterpe","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Hurston","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"HUR L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Arial","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Aberdeen","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Magda","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Ita","type":"Moon","system":"Stanton","planet":"Hurston","moon":null}],
+    destinations: [],
+    prereqLocations: [],
+    chainStartsWith: [],
+    requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
+    unlocks: [],
+    turnIns: [],
+    blueprintRewards: [],
+  },
+  {
+    id: "b95ac811-ec6b-4027-9294-3e1f8d9107f5",
+    name: "URGENT FLEET REFUEL",
+    faction: "United Wayfarers Club",
+    giver: "United Wayfarers Club",
+    system: "Multi",
+    reward: 68250,
+    buyIn: 0,
+    baseXP: 50,
+    legality: "Legal",
+    minRank: "Sr. Contractor",
+    minRankXP: 5800,
+    maxRank: "Elite Contractor",
+    maxRankXP: 95250,
+    timeToComplete: 19.9,
+    canBeShared: true,
+    onceOnly: false,
+    canReacceptAfterAbandoning: false,
+    canReacceptAfterFailing: false,
+    hasPersonalCooldown: false,
+    personalCooldownTime: 1,
+    abandonedCooldownTime: 1,
+    crimeStatMin: null,
+    crimeStatMax: null,
+    notes: "Hey again, I've got a beacon at [LOCATION] and this one's a big one.",
+    description: "Hey again,\n\nI've got a beacon at [LOCATION] and this one's a big one. An entire little fleet of ships all burned out of fuel at the same time. Impressive coordination and lack of planning at the same time. \n\nThe client vessel will pay you at the rate of [FUELRATE] aUEC per SCU of Hydrogen and  [QTFUELRATE] aUEC per SCU of Quantum , and as a United Wayfarers Club contractor, you will also qualify for the UWC service fee listed above upon completion.\n\nHopefully since the area they're in is pretty safe, there shouldn't be too much trouble lurking, but these days you never know. Wouldn't hurt to get them back flying again as quick as you're able.\n\nHappy trails,\n\nDina Deloit\nDispatch Hub\nUnited Wayfarers Club\n\"We’ve got your back\"",
+    locations: [{"name":"Pyro I","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Monox","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Patch City","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Patch City Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ALPHA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-TUNG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-KILO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-NOVEMBER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-IGNITION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-BRAVO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ROTH","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-FOXTROT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster NBD-102","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Crusader","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"CRU L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"CRU L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"CRU L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Cellin","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"Daymar","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"Yela","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"ArcCorp","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"ARC L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Lyria","type":"Moon","system":"Stanton","planet":"ArcCorp","moon":null},{"name":"Wala","type":"Moon","system":"Stanton","planet":"ArcCorp","moon":null},{"name":"microTech","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"MIC L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Calliope","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Clio","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Euterpe","type":"Moon","system":"Stanton","planet":"microTech","moon":null}],
+    destinations: [],
+    prereqLocations: [],
+    chainStartsWith: [],
+    requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
+    unlocks: [],
+    turnIns: [],
+    blueprintRewards: [],
+  },
+  {
+    id: "82e38ec9-3066-4aac-9363-608a4d67383c",
+    name: "URGENT FLEET REFUEL",
+    faction: "United Wayfarers Club",
+    giver: "United Wayfarers Club",
+    system: "Nyx",
+    reward: 43500,
+    buyIn: 0,
+    baseXP: 50,
+    legality: "Legal",
+    minRank: "Sr. Contractor",
+    minRankXP: 5800,
+    maxRank: "Elite Contractor",
+    maxRankXP: 95250,
+    timeToComplete: 12.7,
+    canBeShared: true,
+    onceOnly: false,
+    canReacceptAfterAbandoning: false,
+    canReacceptAfterFailing: false,
+    hasPersonalCooldown: false,
+    personalCooldownTime: 1,
+    abandonedCooldownTime: 1,
+    crimeStatMin: null,
+    crimeStatMax: null,
+    notes: "Hey again, I've got a beacon at [LOCATION] and this one's a big one.",
+    description: "Hey again,\n\nI've got a beacon at [LOCATION] and this one's a big one. An entire little fleet of ships all burned out of fuel at the same time. Impressive coordination and lack of planning at the same time. \n\nThe client vessel will pay you at the rate of [FUELRATE] aUEC per SCU of Hydrogen and  [QTFUELRATE] aUEC per SCU of Quantum , and as a United Wayfarers Club contractor, you will also qualify for the UWC service fee listed above upon completion.\n\nHopefully since the area they're in is pretty safe, there shouldn't be too much trouble lurking, but these days you never know. Wouldn't hurt to get them back flying again as quick as you're able.\n\nHappy trails,\n\nDina Deloit\nDispatch Hub\nUnited Wayfarers Club\n\"We’ve got your back\"",
+    locations: [{"name":"Nyx","type":"Star","system":null,"planet":null,"moon":null},{"name":"Nyx I","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx II","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx III","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx System","type":"Default","system":null,"planet":null,"moon":null}],
+    destinations: [],
+    prereqLocations: [],
+    chainStartsWith: [],
+    requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
+    unlocks: [],
+    turnIns: [],
+    blueprintRewards: [],
+  },
+  {
+    id: "14910f0b-9b69-41ae-bd78-d072725b074a",
+    name: "URGENT FLEET REFUEL",
+    faction: "United Wayfarers Club",
+    giver: "United Wayfarers Club",
+    system: "Stanton",
+    reward: 43500,
+    buyIn: 0,
+    baseXP: 50,
+    legality: "Legal",
+    minRank: "Sr. Contractor",
+    minRankXP: 5800,
+    maxRank: "Elite Contractor",
+    maxRankXP: 95250,
+    timeToComplete: 12.7,
+    canBeShared: true,
+    onceOnly: false,
+    canReacceptAfterAbandoning: false,
+    canReacceptAfterFailing: false,
+    hasPersonalCooldown: false,
+    personalCooldownTime: 1,
+    abandonedCooldownTime: 1,
+    crimeStatMin: null,
+    crimeStatMax: null,
+    notes: "Hey again, I've got a beacon at [LOCATION] and this one's a big one.",
+    description: "Hey again,\n\nI've got a beacon at [LOCATION] and this one's a big one. An entire little fleet of ships all burned out of fuel at the same time. Impressive coordination and lack of planning at the same time. \n\nThe client vessel will pay you at the rate of [FUELRATE] aUEC per SCU of Hydrogen and  [QTFUELRATE] aUEC per SCU of Quantum , and as a United Wayfarers Club contractor, you will also qualify for the UWC service fee listed above upon completion.\n\nHopefully since the area they're in is pretty safe, there shouldn't be too much trouble lurking, but these days you never know. Wouldn't hurt to get them back flying again as quick as you're able.\n\nHappy trails,\n\nDina Deloit\nDispatch Hub\nUnited Wayfarers Club\n\"We’ve got your back\"",
+    locations: [{"name":"Hurston","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"HUR L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Arial","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Aberdeen","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Magda","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Ita","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Crusader","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"CRU L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"CRU L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"CRU L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Cellin","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"Daymar","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"Yela","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"ArcCorp","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"ARC L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Lyria","type":"Moon","system":"Stanton","planet":"ArcCorp","moon":null},{"name":"Wala","type":"Moon","system":"Stanton","planet":"ArcCorp","moon":null},{"name":"microTech","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"MIC L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Calliope","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Clio","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Euterpe","type":"Moon","system":"Stanton","planet":"microTech","moon":null}],
+    destinations: [],
+    prereqLocations: [],
+    chainStartsWith: [],
+    requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
+    unlocks: [],
+    turnIns: [],
+    blueprintRewards: [],
+  },
+  {
     id: "33944d03-1b31-4457-8717-75b36a6f0ad6",
     name: "URGENT FLEET REFUEL",
     faction: "United Wayfarers Club",
     giver: "United Wayfarers Club",
     system: "Stanton",
-    reward: 49250,
+    reward: 43500,
     buyIn: 0,
-    baseXP: 300,
+    baseXP: 50,
     legality: "Legal",
     minRank: "Head Contractor",
     minRankXP: 38000,
     maxRank: "Elite Contractor",
     maxRankXP: 95250,
-    timeToComplete: 20,
+    timeToComplete: 12.7,
     canBeShared: true,
     onceOnly: false,
     canReacceptAfterAbandoning: false,
@@ -2246,56 +2581,23 @@ const REFUELING_MISSIONS = [
     requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
     unlocks: [],
     turnIns: [],
+    blueprintRewards: [],
   },
   {
-    id: "1080d9fc-d511-4bda-a567-161797dac491",
-    name: "CRITICAL REFUEL REQUEST: [SHIP]",
+    id: "0d66c038-2136-4c36-8e77-e449eba8e493",
+    name: "URGENT FLEET REFUEL",
     faction: "United Wayfarers Club",
     giver: "United Wayfarers Club",
     system: "Multi",
-    reward: 40750,
+    reward: 28500,
     buyIn: 0,
-    baseXP: 200,
+    baseXP: 150,
     legality: "Legal",
-    minRank: "Sr. Contractor",
-    minRankXP: 5800,
+    minRank: "Contractor",
+    minRankXP: 2200,
     maxRank: "Elite Contractor",
     maxRankXP: 95250,
-    timeToComplete: 14,
-    canBeShared: true,
-    onceOnly: false,
-    canReacceptAfterAbandoning: false,
-    canReacceptAfterFailing: false,
-    hasPersonalCooldown: false,
-    personalCooldownTime: 1,
-    abandonedCooldownTime: 1,
-    crimeStatMin: null,
-    crimeStatMax: null,
-    notes: "Hi, Another day another beacon.",
-    description: "Hi,\n\nAnother day another beacon. There's a [SHIP] with an empty tank at [LOCATION].  The client vessel will pay you at the rate of [FUELRATE] aUEC per SCU of Hydrogen and  [QTFUELRATE] aUEC per SCU of Quantum , and as a United Wayfarers Club contractor, you will also qualify for the UWC service fee listed above upon completion.\n\nI can't lie: it's a nasty place to get stuck and a worse place to get caught by surprise. We've lost good people out there - even the ones who got lucky made it home with pieces missing.\n\nIf you decide to take the job, do me a favour and keep everything peeled. If you've got a buddy with time to spare, maybe reach out for a little back-up.\n\nMaybe I'm being paranoid, but that doesn't mean they're not out to get you, as Momma Deloit used to say. \nActually she never said that - but I'm pretty sure she would if she did this for a living.\n\nJust do the job and get home safe, okay?\n\nDina Deloit\nDispatch Hub\nUnited Wayfarers Club\n\"We’ve got your back\"",
-    locations: [{"name":"Nyx","type":"Star","system":null,"planet":null,"moon":null},{"name":"@generic_locations_blank","type":"Default","system":null,"planet":null,"moon":null},{"name":"Nyx I","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx II","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx III","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx System","type":"Default","system":null,"planet":null,"moon":null},{"name":"Hurston","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"HUR L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Arial","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Aberdeen","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Magda","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Ita","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Crusader","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"CRU L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"CRU L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"CRU L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Cellin","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"Daymar","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"Yela","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"ArcCorp","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"ARC L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Lyria","type":"Moon","system":"Stanton","planet":"ArcCorp","moon":null},{"name":"Wala","type":"Moon","system":"Stanton","planet":"ArcCorp","moon":null},{"name":"microTech","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"MIC L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Calliope","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Clio","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Euterpe","type":"Moon","system":"Stanton","planet":"microTech","moon":null}],
-    destinations: [],
-    prereqLocations: [],
-    chainStartsWith: [],
-    requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
-    unlocks: [],
-    turnIns: [],
-  },
-  {
-    id: "82e38ec9-3066-4aac-9363-608a4d67383c",
-    name: "URGENT FLEET REFUEL",
-    faction: "United Wayfarers Club",
-    giver: "United Wayfarers Club",
-    system: "Nyx",
-    reward: 36750,
-    buyIn: 0,
-    baseXP: 50,
-    legality: "Legal",
-    minRank: "Sr. Contractor",
-    minRankXP: 5800,
-    maxRank: "Elite Contractor",
-    maxRankXP: 95250,
-    timeToComplete: 15,
+    timeToComplete: 8.3,
     canBeShared: true,
     onceOnly: false,
     canReacceptAfterAbandoning: false,
@@ -2307,81 +2609,14 @@ const REFUELING_MISSIONS = [
     crimeStatMax: null,
     notes: "Hey again, I've got a beacon at [LOCATION] and this one's a big one.",
     description: "Hey again,\n\nI've got a beacon at [LOCATION] and this one's a big one. An entire little fleet of ships all burned out of fuel at the same time. Impressive coordination and lack of planning at the same time. \n\nThe client vessel will pay you at the rate of [FUELRATE] aUEC per SCU of Hydrogen and  [QTFUELRATE] aUEC per SCU of Quantum , and as a United Wayfarers Club contractor, you will also qualify for the UWC service fee listed above upon completion.\n\nHopefully since the area they're in is pretty safe, there shouldn't be too much trouble lurking, but these days you never know. Wouldn't hurt to get them back flying again as quick as you're able.\n\nHappy trails,\n\nDina Deloit\nDispatch Hub\nUnited Wayfarers Club\n\"We’ve got your back\"",
-    locations: [{"name":"Nyx","type":"Star","system":null,"planet":null,"moon":null},{"name":"@generic_locations_blank","type":"Default","system":null,"planet":null,"moon":null},{"name":"Nyx I","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx II","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx III","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx System","type":"Default","system":null,"planet":null,"moon":null}],
+    locations: [{"name":"Pyro I","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Monox","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Patch City","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Patch City Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ALPHA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-TUNG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-KILO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-NOVEMBER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-IGNITION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-BRAVO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ROTH","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-FOXTROT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster NBD-102","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Crusader","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"CRU L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"CRU L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"CRU L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Cellin","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"Daymar","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"Yela","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"ArcCorp","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"ARC L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Lyria","type":"Moon","system":"Stanton","planet":"ArcCorp","moon":null},{"name":"Wala","type":"Moon","system":"Stanton","planet":"ArcCorp","moon":null},{"name":"microTech","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"MIC L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Calliope","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Clio","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Euterpe","type":"Moon","system":"Stanton","planet":"microTech","moon":null}],
     destinations: [],
     prereqLocations: [],
     chainStartsWith: [],
     requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
     unlocks: [],
     turnIns: [],
-  },
-  {
-    id: "b95ac811-ec6b-4027-9294-3e1f8d9107f5",
-    name: "URGENT FLEET REFUEL",
-    faction: "United Wayfarers Club",
-    giver: "United Wayfarers Club",
-    system: "Pyro",
-    reward: 36750,
-    buyIn: 0,
-    baseXP: 50,
-    legality: "Legal",
-    minRank: "Sr. Contractor",
-    minRankXP: 5800,
-    maxRank: "Elite Contractor",
-    maxRankXP: 95250,
-    timeToComplete: 15,
-    canBeShared: true,
-    onceOnly: false,
-    canReacceptAfterAbandoning: false,
-    canReacceptAfterFailing: false,
-    hasPersonalCooldown: false,
-    personalCooldownTime: 1,
-    abandonedCooldownTime: 1,
-    crimeStatMin: null,
-    crimeStatMax: null,
-    notes: "Hey again, I've got a beacon at [LOCATION] and this one's a big one.",
-    description: "Hey again,\n\nI've got a beacon at [LOCATION] and this one's a big one. An entire little fleet of ships all burned out of fuel at the same time. Impressive coordination and lack of planning at the same time. \n\nThe client vessel will pay you at the rate of [FUELRATE] aUEC per SCU of Hydrogen and  [QTFUELRATE] aUEC per SCU of Quantum , and as a United Wayfarers Club contractor, you will also qualify for the UWC service fee listed above upon completion.\n\nHopefully since the area they're in is pretty safe, there shouldn't be too much trouble lurking, but these days you never know. Wouldn't hurt to get them back flying again as quick as you're able.\n\nHappy trails,\n\nDina Deloit\nDispatch Hub\nUnited Wayfarers Club\n\"We’ve got your back\"",
-    locations: [{"name":"PYAM-EXHANG-0-1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-WHISKEY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-CHARLIE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-YORK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-GULF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Asteroid Mining Base","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LEST","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JONG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KNAP","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OXID","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PALL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HELM","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BASK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BUCK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LUNE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-GRAY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MAGE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-GADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-WARB","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HORN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KIFF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MUGG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PEKE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TACK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-AXIL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DARI","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-YEAD","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster BGR-560","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster CAJ-445","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster JWY-925","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-DELTA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-LAMDA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-OVER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ECHO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-POINT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-SIERRA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-HELIO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-VICTORY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ZETA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-XENO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-QUAGMIRE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-JAK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NARY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JUTE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TYRO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SPAW","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MURK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OLLA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KYUS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DORY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RODE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-VERD","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-FLAG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RINE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-ALME","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-OAKS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NONG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LANX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SIJO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-ARID","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-BORS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LYES","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster FSN-704","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster GRP-839","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster KKE-717","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster RSC-340","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster WDH-387","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster YKA-011","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"RAB-ION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-LYNX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-COOK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-UMUS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MEFF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SOWL","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PIZE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-QINS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RAWN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-LOWN","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-CRUE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MARA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-CHAM","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-RAIK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-KELT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-MOSK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-JADE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-NENE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-DIRK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-PLEX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-TIGS","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-HARK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SEER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RMB-SAIC","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster DLO-486","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster EMM-567","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster HJS-232","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster LHB-976","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster MNK-833","type":"Default","system":"Pyro","planet":null,"moon":null}],
-    destinations: [],
-    prereqLocations: [],
-    chainStartsWith: [],
-    requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
-    unlocks: [],
-    turnIns: [],
-  },
-  {
-    id: "14910f0b-9b69-41ae-bd78-d072725b074a",
-    name: "URGENT FLEET REFUEL",
-    faction: "United Wayfarers Club",
-    giver: "United Wayfarers Club",
-    system: "Stanton",
-    reward: 36750,
-    buyIn: 0,
-    baseXP: 50,
-    legality: "Legal",
-    minRank: "Sr. Contractor",
-    minRankXP: 5800,
-    maxRank: "Elite Contractor",
-    maxRankXP: 95250,
-    timeToComplete: 15,
-    canBeShared: true,
-    onceOnly: false,
-    canReacceptAfterAbandoning: false,
-    canReacceptAfterFailing: false,
-    hasPersonalCooldown: false,
-    personalCooldownTime: 1,
-    abandonedCooldownTime: 1,
-    crimeStatMin: null,
-    crimeStatMax: null,
-    notes: "Hey again, I've got a beacon at [LOCATION] and this one's a big one.",
-    description: "Hey again,\n\nI've got a beacon at [LOCATION] and this one's a big one. An entire little fleet of ships all burned out of fuel at the same time. Impressive coordination and lack of planning at the same time. \n\nThe client vessel will pay you at the rate of [FUELRATE] aUEC per SCU of Hydrogen and  [QTFUELRATE] aUEC per SCU of Quantum , and as a United Wayfarers Club contractor, you will also qualify for the UWC service fee listed above upon completion.\n\nHopefully since the area they're in is pretty safe, there shouldn't be too much trouble lurking, but these days you never know. Wouldn't hurt to get them back flying again as quick as you're able.\n\nHappy trails,\n\nDina Deloit\nDispatch Hub\nUnited Wayfarers Club\n\"We’ve got your back\"",
-    locations: [{"name":"Hurston","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"HUR L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Arial","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Aberdeen","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Magda","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Ita","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Crusader","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"CRU L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"CRU L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"CRU L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Cellin","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"Daymar","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"Yela","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"ArcCorp","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"ARC L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Lyria","type":"Moon","system":"Stanton","planet":"ArcCorp","moon":null},{"name":"Wala","type":"Moon","system":"Stanton","planet":"ArcCorp","moon":null},{"name":"microTech","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"MIC L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Calliope","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Clio","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Euterpe","type":"Moon","system":"Stanton","planet":"microTech","moon":null}],
-    destinations: [],
-    prereqLocations: [],
-    chainStartsWith: [],
-    requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
-    unlocks: [],
-    turnIns: [],
+    blueprintRewards: [],
   },
   {
     id: "bed4ea01-87f4-444a-a50a-cb9f60c55bcf",
@@ -2389,7 +2624,7 @@ const REFUELING_MISSIONS = [
     faction: "United Wayfarers Club",
     giver: "United Wayfarers Club",
     system: "Nyx",
-    reward: 29500,
+    reward: 23000,
     buyIn: 0,
     baseXP: 150,
     legality: "Legal",
@@ -2397,7 +2632,7 @@ const REFUELING_MISSIONS = [
     minRankXP: 2200,
     maxRank: "Elite Contractor",
     maxRankXP: 95250,
-    timeToComplete: 12,
+    timeToComplete: 6.7,
     canBeShared: true,
     onceOnly: false,
     canReacceptAfterAbandoning: false,
@@ -2409,21 +2644,22 @@ const REFUELING_MISSIONS = [
     crimeStatMax: null,
     notes: "Hey again, I've got a beacon at [LOCATION] and this one's a big one.",
     description: "Hey again,\n\nI've got a beacon at [LOCATION] and this one's a big one. An entire little fleet of ships all burned out of fuel at the same time. Impressive coordination and lack of planning at the same time. \n\nThe client vessel will pay you at the rate of [FUELRATE] aUEC per SCU of Hydrogen and  [QTFUELRATE] aUEC per SCU of Quantum , and as a United Wayfarers Club contractor, you will also qualify for the UWC service fee listed above upon completion.\n\nHopefully since the area they're in is pretty safe, there shouldn't be too much trouble lurking, but these days you never know. Wouldn't hurt to get them back flying again as quick as you're able.\n\nHappy trails,\n\nDina Deloit\nDispatch Hub\nUnited Wayfarers Club\n\"We’ve got your back\"",
-    locations: [{"name":"Nyx","type":"Star","system":null,"planet":null,"moon":null},{"name":"@generic_locations_blank","type":"Default","system":null,"planet":null,"moon":null},{"name":"Nyx I","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx II","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx III","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx System","type":"Default","system":null,"planet":null,"moon":null}],
+    locations: [{"name":"Nyx","type":"Star","system":null,"planet":null,"moon":null},{"name":"Nyx I","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx II","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx III","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx System","type":"Default","system":null,"planet":null,"moon":null}],
     destinations: [],
     prereqLocations: [],
     chainStartsWith: [],
     requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
     unlocks: [],
     turnIns: [],
+    blueprintRewards: [],
   },
   {
-    id: "0d66c038-2136-4c36-8e77-e449eba8e493",
+    id: "85d17b53-5f6c-4c8b-876b-5032d998642c",
     name: "URGENT FLEET REFUEL",
     faction: "United Wayfarers Club",
     giver: "United Wayfarers Club",
     system: "Stanton",
-    reward: 29500,
+    reward: 23000,
     buyIn: 0,
     baseXP: 150,
     legality: "Legal",
@@ -2431,7 +2667,7 @@ const REFUELING_MISSIONS = [
     minRankXP: 2200,
     maxRank: "Elite Contractor",
     maxRankXP: 95250,
-    timeToComplete: 12,
+    timeToComplete: 6.7,
     canBeShared: true,
     onceOnly: false,
     canReacceptAfterAbandoning: false,
@@ -2450,6 +2686,7 @@ const REFUELING_MISSIONS = [
     requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
     unlocks: [],
     turnIns: [],
+    blueprintRewards: [],
   },
   {
     id: "145a74cc-fda4-4bb9-b274-c6938b32fa71",
@@ -2457,7 +2694,7 @@ const REFUELING_MISSIONS = [
     faction: "United Wayfarers Club",
     giver: "United Wayfarers Club",
     system: "Multi",
-    reward: 19750,
+    reward: 20250,
     buyIn: 0,
     baseXP: 150,
     legality: "Legal",
@@ -2465,7 +2702,7 @@ const REFUELING_MISSIONS = [
     minRankXP: 800,
     maxRank: "Elite Contractor",
     maxRankXP: 95250,
-    timeToComplete: 8,
+    timeToComplete: 5.9,
     canBeShared: true,
     onceOnly: false,
     canReacceptAfterAbandoning: false,
@@ -2477,13 +2714,14 @@ const REFUELING_MISSIONS = [
     crimeStatMax: null,
     notes: "Hey, you! I've got a beacon at [LOCATION].",
     description: "Hey, you!\n\nI've got a beacon at [LOCATION]. They say their tanks are dry and they're calling for a full refuel. If you're interested, I get the feeling they'll be really pleased to see you.\n\nThe client vessel will pay you at the rate of [FUELRATE] aUEC per SCU of Hydrogen and  [QTFUELRATE] aUEC per SCU of Quantum , and as a United Wayfarers Club contractor, you will also qualify for the UWC service fee listed above upon completion.\n\nThey're stuck out in an area with a bad reputation, though things have been a bit more quiet recently. Still worth staying alert I'd say, just in case there's still trouble lurking out there. \n\nEither way, the sooner everyone's able to get flying again - and that includes you - the better.\n\nHappy trails,\n\nDina Deloit\nDispatch Hub\nUnited Wayfarers Club\n\"We’ve got your back\"",
-    locations: [{"name":"Nyx","type":"Star","system":null,"planet":null,"moon":null},{"name":"@generic_locations_blank","type":"Default","system":null,"planet":null,"moon":null},{"name":"Nyx I","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx II","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx III","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx System","type":"Default","system":null,"planet":null,"moon":null},{"name":"Hurston","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"HUR L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Arial","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Aberdeen","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Magda","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Ita","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Crusader","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"CRU L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"CRU L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"CRU L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Cellin","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"Daymar","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"Yela","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"ArcCorp","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"ARC L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Lyria","type":"Moon","system":"Stanton","planet":"ArcCorp","moon":null},{"name":"Wala","type":"Moon","system":"Stanton","planet":"ArcCorp","moon":null},{"name":"microTech","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"MIC L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Calliope","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Clio","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Euterpe","type":"Moon","system":"Stanton","planet":"microTech","moon":null}],
+    locations: [{"name":"Nyx","type":"Star","system":null,"planet":null,"moon":null},{"name":"Nyx I","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx II","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx III","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx System","type":"Default","system":null,"planet":null,"moon":null},{"name":"Pyro I","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Monox","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Patch City","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Patch City Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ALPHA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-TUNG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-KILO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-NOVEMBER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-IGNITION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-BRAVO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ROTH","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-FOXTROT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster NBD-102","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Crusader","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"CRU L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"CRU L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"CRU L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Cellin","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"Daymar","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"Yela","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"ArcCorp","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"ARC L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Lyria","type":"Moon","system":"Stanton","planet":"ArcCorp","moon":null},{"name":"Wala","type":"Moon","system":"Stanton","planet":"ArcCorp","moon":null},{"name":"microTech","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"MIC L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Calliope","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Clio","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Euterpe","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Hurston","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"HUR L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Arial","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Aberdeen","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Magda","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Ita","type":"Moon","system":"Stanton","planet":"Hurston","moon":null}],
     destinations: [],
     prereqLocations: [],
     chainStartsWith: [],
     requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
     unlocks: [],
     turnIns: [],
+    blueprintRewards: [],
   },
   {
     id: "02f841ac-ebed-47b6-89e6-8973b37398be",
@@ -2491,7 +2729,7 @@ const REFUELING_MISSIONS = [
     faction: "United Wayfarers Club",
     giver: "United Wayfarers Club",
     system: "Multi",
-    reward: 10000,
+    reward: 7750,
     buyIn: 0,
     baseXP: 100,
     legality: "Legal",
@@ -2499,7 +2737,7 @@ const REFUELING_MISSIONS = [
     minRankXP: 0,
     maxRank: "Elite Contractor",
     maxRankXP: 95250,
-    timeToComplete: 5,
+    timeToComplete: 2.6,
     canBeShared: true,
     onceOnly: false,
     canReacceptAfterAbandoning: false,
@@ -2511,13 +2749,14 @@ const REFUELING_MISSIONS = [
     crimeStatMax: null,
     notes: "Hey there, If you're fitted for refueling, you might like this one.",
     description: "Hey there,\n\nIf you're fitted for refueling, you might like this one. \n\nA beacon has just gone live at [LOCATION], from a client whose [SHIP] is running on empty, so make sure your fuel pods are topped off.\n\nThe client vessel will pay you at the rate of [FUELRATE] aUEC per SCU of Hydrogen and  [QTFUELRATE] aUEC per SCU of Quantum , and as a United Wayfarers Club contractor, you will also qualify for the UWC service fee listed above upon completion.\n\nLooks like a zero-drama one and done, but it never hurts to keep your scanners live.\nLet me know if you're interested and let's get these good people on their way.\n\nWaiting to hear from you,\n\nDina Deloit\nDispatch Hub\nUnited Wayfarers Club\n\"We’ve got your back\"",
-    locations: [{"name":"Nyx","type":"Star","system":null,"planet":null,"moon":null},{"name":"@generic_locations_blank","type":"Default","system":null,"planet":null,"moon":null},{"name":"Nyx I","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx II","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx III","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx System","type":"Default","system":null,"planet":null,"moon":null},{"name":"Stanton","type":"Star","system":null,"planet":null,"moon":null},{"name":"Stanton System","type":"Default","system":null,"planet":null,"moon":null},{"name":"Hurston","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"Crusader","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"ArcCorp","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"microTech","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"CRU L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"CRU L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"CRU L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Cellin","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"Daymar","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"Yela","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"ARC L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Lyria","type":"Moon","system":"Stanton","planet":"ArcCorp","moon":null},{"name":"Wala","type":"Moon","system":"Stanton","planet":"ArcCorp","moon":null},{"name":"MIC L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Calliope","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Clio","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Euterpe","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"HUR L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Arial","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Aberdeen","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Magda","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Ita","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Pyro I","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Monox","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Patch City","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Patch City Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ALPHA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-TUNG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-KILO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-NOVEMBER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-IGNITION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-BRAVO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ROTH","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-FOXTROT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster NBD-102","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Bloom","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Orbituary","type":"Station","system":"Pyro","planet":"Bloom","moon":null},{"name":"Orbituary Clinic","type":"Default","system":"Pyro","planet":"Bloom","moon":null},{"name":"Starlight Service Station","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Starlight Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR5 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Rat's Nest","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Rat's Nest Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-WHISKEY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-CHARLIE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-YORK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-GULF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-MAT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ULTRA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster BGR-560","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster CAJ-445","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster JWY-925","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Pyro IV","type":"Planet","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Pyro V","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Ignis","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Vatra","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Adir","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Fairo","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Fuego","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Vuur","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"PYR5 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR5 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Gaslight","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Gaslight Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-DELTA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-LAMDA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-OVER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ECHO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-POINT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-SIERRA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-HELIO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-VICTORY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ZETA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-XENO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-QUAGMIRE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster FSN-704","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster GRP-839","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster KKE-717","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster RSC-340","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster WDH-387","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster YKA-011","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Terminus","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"PYR6 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR6 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Ruin Station","type":"Station","system":"Pyro","planet":"Terminus","moon":null},{"name":"Ruin Clinic","type":"Default","system":"Pyro","planet":"Terminus","moon":null},{"name":"RAB-ION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-LYNX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-COOK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster DLO-486","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster EMM-567","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster HJS-232","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster LHB-976","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster MNK-833","type":"Default","system":"Pyro","planet":null,"moon":null}],
+    locations: [{"name":"Nyx","type":"Star","system":null,"planet":null,"moon":null},{"name":"Nyx I","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx II","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx III","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx System","type":"Default","system":null,"planet":null,"moon":null},{"name":"Pyro I","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR1 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Monox","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR2 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L3","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L4","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Checkmate Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Patch City","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Patch City Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ALPHA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-TUNG","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-KILO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-NOVEMBER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-IGNITION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-BRAVO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ROTH","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-FOXTROT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster NBD-102","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Crusader","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"CRU L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"CRU L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"CRU L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Cellin","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"Daymar","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"Yela","type":"Moon","system":"Stanton","planet":"Crusader","moon":null},{"name":"ArcCorp","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"ARC L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"ARC L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Lyria","type":"Moon","system":"Stanton","planet":"ArcCorp","moon":null},{"name":"Wala","type":"Moon","system":"Stanton","planet":"ArcCorp","moon":null},{"name":"microTech","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"MIC L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"MIC L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Calliope","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Clio","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Euterpe","type":"Moon","system":"Stanton","planet":"microTech","moon":null},{"name":"Hurston","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"HUR L1","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L2","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L3","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L4","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"HUR L5","type":"Default","system":"Stanton","planet":null,"moon":null},{"name":"Arial","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Aberdeen","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Magda","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Ita","type":"Moon","system":"Stanton","planet":"Hurston","moon":null},{"name":"Bloom","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR3 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Orbituary","type":"Station","system":"Pyro","planet":"Bloom","moon":null},{"name":"Orbituary Clinic","type":"Default","system":"Pyro","planet":"Bloom","moon":null},{"name":"Starlight Service Station","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Starlight Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR5 L5","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Rat's Nest","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Rat's Nest Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-WHISKEY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-CHARLIE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-YORK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-GULF","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-MAT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ULTRA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster BGR-560","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster CAJ-445","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster JWY-925","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Pyro IV","type":"Planet","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Pyro V","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"Ignis","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Vatra","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Adir","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Fairo","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Fuego","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Vuur","type":"Moon","system":"Pyro","planet":"Pyro V","moon":null},{"name":"PYR5 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR5 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Gaslight","type":"Station","system":"Pyro","planet":null,"moon":null},{"name":"Gaslight Clinic","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-DELTA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-LAMDA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-OVER","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ECHO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-POINT","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-SIERRA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-HELIO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-VICTORY","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-ZETA","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-XENO","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-QUAGMIRE","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster FSN-704","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster GRP-839","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster KKE-717","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster RSC-340","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster WDH-387","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Cluster YKA-011","type":"Default","system":"Pyro","planet":"Pyro V","moon":null},{"name":"Terminus","type":"Planet","system":"Pyro","planet":null,"moon":null},{"name":"PYR6 L1","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"PYR6 L2","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Ruin Station","type":"Station","system":"Pyro","planet":"Terminus","moon":null},{"name":"Ruin Clinic","type":"Default","system":"Pyro","planet":"Terminus","moon":null},{"name":"RAB-ION","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-LYNX","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"RAB-COOK","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster DLO-486","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster EMM-567","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster HJS-232","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster LHB-976","type":"Default","system":"Pyro","planet":null,"moon":null},{"name":"Cluster MNK-833","type":"Default","system":"Pyro","planet":null,"moon":null}],
     destinations: [],
     prereqLocations: [],
     chainStartsWith: [],
     requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
     unlocks: [],
     turnIns: [],
+    blueprintRewards: [],
   },
   {
     id: "0ada3f08-3f76-46ec-96e2-fc0f856b8eeb",
@@ -2525,15 +2764,15 @@ const REFUELING_MISSIONS = [
     faction: "United Wayfarers Club",
     giver: "United Wayfarers Club",
     system: "Nyx",
-    reward: 6000,
+    reward: 7750,
     buyIn: 0,
     baseXP: 200,
     legality: "Legal",
     minRank: "Neutral",
     minRankXP: 0,
-    maxRank: "Jr. Contractor",
-    maxRankXP: 800,
-    timeToComplete: 3,
+    maxRank: "Elite Contractor",
+    maxRankXP: 95250,
+    timeToComplete: 2.6,
     canBeShared: true,
     onceOnly: false,
     canReacceptAfterAbandoning: false,
@@ -2545,13 +2784,14 @@ const REFUELING_MISSIONS = [
     crimeStatMax: null,
     notes: "Hey! DD from the United Wayfarers Club here.",
     description: "Hey!\n\nDD from the United Wayfarers Club here.\n\nThe UWC offers repair, rearming and refuelling services across the UEE. It just so happens that we're on the look-out for new affiliates whose ships are fitted for refuelling. If you've got the fuel pods and like it when people are pleased to see you, the UWC might be the club for you.\n\nAnd if you think it might be, I've got a live beacon you might like.\n\nIf you do happen to like it, a word to the wise: make sure your fuel pods are full before you head out.\n\nA Club member has run out of fuel at [LOCATION]. I'm not sure on the details, like how they ended up out there with no Go Juice, but the UWC doesn't like to leave folk hanging.\n\nThe client vessel will pay you at the rate of [FUELRATE] aUEC per SCU of Hydrogen and  [QTFUELRATE] aUEC per SCU of Quantum . As a United Wayfarers Club contractor, you will also qualify for the UWC service fee listed above upon completion.\n\nIt's a straightforward run. Perfect if you want to get a feel for this kind of job. Get out there, fill up the tanks of their [SHIP] and get them on their way. Do enough runs like this, and the process becomes muscle memory. Until then, there's a journal entry on your mobiGlas called \"\"Refueling Protocols\"\" that covers the basics.\n\nThere have been no reports of outlaw activity in that sector, but stay alert. I always recommend you aim for a fast turnaround. The sooner you're done, the sooner I can fix you up with another contract. UWC's always looking for new affiliates. \n\nLooking forward to working with you.\n\nDina Deloit\nDispatch Hub\nUnited Wayfarers Club\n\"We’ve got your back\"",
-    locations: [{"name":"Nyx","type":"Star","system":null,"planet":null,"moon":null},{"name":"@generic_locations_blank","type":"Default","system":null,"planet":null,"moon":null},{"name":"Nyx I","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx II","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx III","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx System","type":"Default","system":null,"planet":null,"moon":null}],
+    locations: [{"name":"Nyx","type":"Star","system":null,"planet":null,"moon":null},{"name":"Nyx I","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx II","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx III","type":"Planet","system":"Nyx","planet":null,"moon":null},{"name":"Nyx System","type":"Default","system":null,"planet":null,"moon":null}],
     destinations: [],
     prereqLocations: [],
     chainStartsWith: [],
     requires: [],
-    unlocks: [{"id":"1080d9fc-d511-4bda-a567-161797dac491","name":"CRITICAL REFUEL REQUEST: [SHIP]"},{"id":"02f841ac-ebed-47b6-89e6-8973b37398be","name":"REFUEL REQUEST: [SHIP]"},{"id":"82e38ec9-3066-4aac-9363-608a4d67383c","name":"URGENT FLEET REFUEL"},{"id":"bed4ea01-87f4-444a-a50a-cb9f60c55bcf","name":"URGENT FLEET REFUEL"},{"id":"b95ac811-ec6b-4027-9294-3e1f8d9107f5","name":"URGENT FLEET REFUEL"},{"id":"0d66c038-2136-4c36-8e77-e449eba8e493","name":"URGENT FLEET REFUEL"},{"id":"14910f0b-9b69-41ae-bd78-d072725b074a","name":"URGENT FLEET REFUEL"},{"id":"33944d03-1b31-4457-8717-75b36a6f0ad6","name":"URGENT FLEET REFUEL"},{"id":"145a74cc-fda4-4bb9-b274-c6938b32fa71","name":"URGENT REFUEL REQUEST: [SHIP]"}],
+    unlocks: [{"id":"1080d9fc-d511-4bda-a567-161797dac491","name":"CRITICAL REFUEL REQUEST: [SHIP]"},{"id":"02f841ac-ebed-47b6-89e6-8973b37398be","name":"REFUEL REQUEST: [SHIP]"},{"id":"82e38ec9-3066-4aac-9363-608a4d67383c","name":"URGENT FLEET REFUEL"},{"id":"bed4ea01-87f4-444a-a50a-cb9f60c55bcf","name":"URGENT FLEET REFUEL"},{"id":"b95ac811-ec6b-4027-9294-3e1f8d9107f5","name":"URGENT FLEET REFUEL"},{"id":"0d66c038-2136-4c36-8e77-e449eba8e493","name":"URGENT FLEET REFUEL"},{"id":"14910f0b-9b69-41ae-bd78-d072725b074a","name":"URGENT FLEET REFUEL"},{"id":"85d17b53-5f6c-4c8b-876b-5032d998642c","name":"URGENT FLEET REFUEL"},{"id":"33944d03-1b31-4457-8717-75b36a6f0ad6","name":"URGENT FLEET REFUEL"},{"id":"145a74cc-fda4-4bb9-b274-c6938b32fa71","name":"URGENT REFUEL REQUEST: [SHIP]"}],
     turnIns: [],
+    blueprintRewards: [],
   },
   {
     id: "68667545-1978-4dbf-95e7-8fcdc03d017e",
@@ -2559,15 +2799,15 @@ const REFUELING_MISSIONS = [
     faction: "United Wayfarers Club",
     giver: "United Wayfarers Club",
     system: "Pyro",
-    reward: 6000,
+    reward: 7750,
     buyIn: 0,
     baseXP: 200,
     legality: "Legal",
     minRank: "Neutral",
     minRankXP: 0,
-    maxRank: "Jr. Contractor",
-    maxRankXP: 800,
-    timeToComplete: 3,
+    maxRank: "Elite Contractor",
+    maxRankXP: 95250,
+    timeToComplete: 2.6,
     canBeShared: true,
     onceOnly: false,
     canReacceptAfterAbandoning: false,
@@ -2584,8 +2824,9 @@ const REFUELING_MISSIONS = [
     prereqLocations: [],
     chainStartsWith: [],
     requires: [],
-    unlocks: [{"id":"1080d9fc-d511-4bda-a567-161797dac491","name":"CRITICAL REFUEL REQUEST: [SHIP]"},{"id":"02f841ac-ebed-47b6-89e6-8973b37398be","name":"REFUEL REQUEST: [SHIP]"},{"id":"82e38ec9-3066-4aac-9363-608a4d67383c","name":"URGENT FLEET REFUEL"},{"id":"bed4ea01-87f4-444a-a50a-cb9f60c55bcf","name":"URGENT FLEET REFUEL"},{"id":"b95ac811-ec6b-4027-9294-3e1f8d9107f5","name":"URGENT FLEET REFUEL"},{"id":"0d66c038-2136-4c36-8e77-e449eba8e493","name":"URGENT FLEET REFUEL"},{"id":"14910f0b-9b69-41ae-bd78-d072725b074a","name":"URGENT FLEET REFUEL"},{"id":"33944d03-1b31-4457-8717-75b36a6f0ad6","name":"URGENT FLEET REFUEL"},{"id":"145a74cc-fda4-4bb9-b274-c6938b32fa71","name":"URGENT REFUEL REQUEST: [SHIP]"}],
+    unlocks: [{"id":"1080d9fc-d511-4bda-a567-161797dac491","name":"CRITICAL REFUEL REQUEST: [SHIP]"},{"id":"02f841ac-ebed-47b6-89e6-8973b37398be","name":"REFUEL REQUEST: [SHIP]"},{"id":"82e38ec9-3066-4aac-9363-608a4d67383c","name":"URGENT FLEET REFUEL"},{"id":"bed4ea01-87f4-444a-a50a-cb9f60c55bcf","name":"URGENT FLEET REFUEL"},{"id":"b95ac811-ec6b-4027-9294-3e1f8d9107f5","name":"URGENT FLEET REFUEL"},{"id":"0d66c038-2136-4c36-8e77-e449eba8e493","name":"URGENT FLEET REFUEL"},{"id":"14910f0b-9b69-41ae-bd78-d072725b074a","name":"URGENT FLEET REFUEL"},{"id":"85d17b53-5f6c-4c8b-876b-5032d998642c","name":"URGENT FLEET REFUEL"},{"id":"33944d03-1b31-4457-8717-75b36a6f0ad6","name":"URGENT FLEET REFUEL"},{"id":"145a74cc-fda4-4bb9-b274-c6938b32fa71","name":"URGENT REFUEL REQUEST: [SHIP]"}],
     turnIns: [],
+    blueprintRewards: [],
   },
   {
     id: "66f31bca-1961-47f7-a4af-f7392271b15c",
@@ -2593,15 +2834,15 @@ const REFUELING_MISSIONS = [
     faction: "United Wayfarers Club",
     giver: "United Wayfarers Club",
     system: "Stanton",
-    reward: 6000,
+    reward: 7750,
     buyIn: 0,
     baseXP: 200,
     legality: "Legal",
     minRank: "Neutral",
     minRankXP: 0,
-    maxRank: "Jr. Contractor",
-    maxRankXP: 800,
-    timeToComplete: 3,
+    maxRank: "Elite Contractor",
+    maxRankXP: 95250,
+    timeToComplete: 2.6,
     canBeShared: true,
     onceOnly: false,
     canReacceptAfterAbandoning: false,
@@ -2618,8 +2859,9 @@ const REFUELING_MISSIONS = [
     prereqLocations: [],
     chainStartsWith: [],
     requires: [],
-    unlocks: [{"id":"1080d9fc-d511-4bda-a567-161797dac491","name":"CRITICAL REFUEL REQUEST: [SHIP]"},{"id":"02f841ac-ebed-47b6-89e6-8973b37398be","name":"REFUEL REQUEST: [SHIP]"},{"id":"82e38ec9-3066-4aac-9363-608a4d67383c","name":"URGENT FLEET REFUEL"},{"id":"bed4ea01-87f4-444a-a50a-cb9f60c55bcf","name":"URGENT FLEET REFUEL"},{"id":"b95ac811-ec6b-4027-9294-3e1f8d9107f5","name":"URGENT FLEET REFUEL"},{"id":"0d66c038-2136-4c36-8e77-e449eba8e493","name":"URGENT FLEET REFUEL"},{"id":"14910f0b-9b69-41ae-bd78-d072725b074a","name":"URGENT FLEET REFUEL"},{"id":"33944d03-1b31-4457-8717-75b36a6f0ad6","name":"URGENT FLEET REFUEL"},{"id":"145a74cc-fda4-4bb9-b274-c6938b32fa71","name":"URGENT REFUEL REQUEST: [SHIP]"}],
+    unlocks: [{"id":"1080d9fc-d511-4bda-a567-161797dac491","name":"CRITICAL REFUEL REQUEST: [SHIP]"},{"id":"02f841ac-ebed-47b6-89e6-8973b37398be","name":"REFUEL REQUEST: [SHIP]"},{"id":"82e38ec9-3066-4aac-9363-608a4d67383c","name":"URGENT FLEET REFUEL"},{"id":"bed4ea01-87f4-444a-a50a-cb9f60c55bcf","name":"URGENT FLEET REFUEL"},{"id":"b95ac811-ec6b-4027-9294-3e1f8d9107f5","name":"URGENT FLEET REFUEL"},{"id":"0d66c038-2136-4c36-8e77-e449eba8e493","name":"URGENT FLEET REFUEL"},{"id":"14910f0b-9b69-41ae-bd78-d072725b074a","name":"URGENT FLEET REFUEL"},{"id":"85d17b53-5f6c-4c8b-876b-5032d998642c","name":"URGENT FLEET REFUEL"},{"id":"33944d03-1b31-4457-8717-75b36a6f0ad6","name":"URGENT FLEET REFUEL"},{"id":"145a74cc-fda4-4bb9-b274-c6938b32fa71","name":"URGENT REFUEL REQUEST: [SHIP]"}],
     turnIns: [],
+    blueprintRewards: [],
   },
 ];
 
@@ -2630,7 +2872,7 @@ const PLAYER_SELL_POINT = "Sold to Player";
 // notification bell surfaces a "new site update available" entry until
 // the user opens the What's New modal (or marks it read). Per-browser
 // pointer is stored at localStorage["scs_whatsnew_seen_version"].
-const LATEST_WHATSNEW_VERSION = "v2.7.0";
+const LATEST_WHATSNEW_VERSION = "v2.7.1";
 
 // localStorage key for explicitly dismissed notification ids. Lets
 // users hide the red badge without changing their underlying setup
@@ -15314,6 +15556,270 @@ const SCRAPER_LOCATIONS = {
 //   price           — sticker / lowest in-game price (used as
 //                     fallback when SCRAPER_LOCATIONS hasn't been
 //                     populated for this head yet)
+const SCRAPER_BLUEPRINTS = {
+  "Abrade": {
+    "craftTimeSeconds": 90,
+    "slots": [
+      {
+        "name": "Case",
+        "material": {
+          "type": "resource",
+          "name": "Iron",
+          "quantity": 0.04,
+          "minQuality": 0
+        },
+        "modifiers": [
+          {
+            "property": "Efficiency",
+            "startQuality": 0,
+            "endQuality": 1000,
+            "modifierAtStart": 0.8,
+            "modifierAtEnd": 1.2
+          },
+          {
+            "property": "Radius",
+            "startQuality": 0,
+            "endQuality": 1000,
+            "modifierAtStart": 0.95,
+            "modifierAtEnd": 1.05
+          },
+          {
+            "property": "Speed",
+            "startQuality": 0,
+            "endQuality": 1000,
+            "modifierAtStart": 0.95,
+            "modifierAtEnd": 1.05
+          }
+        ]
+      },
+      {
+        "name": "Wiring",
+        "material": {
+          "type": "resource",
+          "name": "Copper",
+          "quantity": 0.04,
+          "minQuality": 0
+        },
+        "modifiers": [
+          {
+            "property": "Radius",
+            "startQuality": 0,
+            "endQuality": 1000,
+            "modifierAtStart": 0.95,
+            "modifierAtEnd": 1.05
+          },
+          {
+            "property": "Speed",
+            "startQuality": 0,
+            "endQuality": 1000,
+            "modifierAtStart": 0.9,
+            "modifierAtEnd": 1.1
+          }
+        ]
+      },
+      {
+        "name": "Ocular Enhancer",
+        "material": {
+          "type": "item",
+          "name": "Sadaryx",
+          "quantity": 4,
+          "minQuality": 0
+        },
+        "modifiers": [
+          {
+            "property": "Radius",
+            "startQuality": 0,
+            "endQuality": 1000,
+            "modifierAtStart": 0.9,
+            "modifierAtEnd": 1.1
+          },
+          {
+            "property": "Speed",
+            "startQuality": 0,
+            "endQuality": 1000,
+            "modifierAtStart": 0.95,
+            "modifierAtEnd": 1.05
+          }
+        ]
+      }
+    ]
+  },
+  "Trawler": {
+    "craftTimeSeconds": 90,
+    "slots": [
+      {
+        "name": "Case",
+        "material": {
+          "type": "resource",
+          "name": "Iron",
+          "quantity": 0.06,
+          "minQuality": 0
+        },
+        "modifiers": [
+          {
+            "property": "Efficiency",
+            "startQuality": 0,
+            "endQuality": 1000,
+            "modifierAtStart": 0.8,
+            "modifierAtEnd": 1.2
+          },
+          {
+            "property": "Radius",
+            "startQuality": 0,
+            "endQuality": 1000,
+            "modifierAtStart": 0.95,
+            "modifierAtEnd": 1.05
+          },
+          {
+            "property": "Speed",
+            "startQuality": 0,
+            "endQuality": 1000,
+            "modifierAtStart": 0.95,
+            "modifierAtEnd": 1.05
+          }
+        ]
+      },
+      {
+        "name": "Wiring",
+        "material": {
+          "type": "resource",
+          "name": "Copper",
+          "quantity": 0.06,
+          "minQuality": 0
+        },
+        "modifiers": [
+          {
+            "property": "Radius",
+            "startQuality": 0,
+            "endQuality": 1000,
+            "modifierAtStart": 0.95,
+            "modifierAtEnd": 1.05
+          },
+          {
+            "property": "Speed",
+            "startQuality": 0,
+            "endQuality": 1000,
+            "modifierAtStart": 0.9,
+            "modifierAtEnd": 1.1
+          }
+        ]
+      },
+      {
+        "name": "Ocular Enhancer",
+        "material": {
+          "type": "item",
+          "name": "Sadaryx",
+          "quantity": 6,
+          "minQuality": 0
+        },
+        "modifiers": [
+          {
+            "property": "Radius",
+            "startQuality": 0,
+            "endQuality": 1000,
+            "modifierAtStart": 0.9,
+            "modifierAtEnd": 1.1
+          },
+          {
+            "property": "Speed",
+            "startQuality": 0,
+            "endQuality": 1000,
+            "modifierAtStart": 0.95,
+            "modifierAtEnd": 1.05
+          }
+        ]
+      }
+    ]
+  },
+  "Cinch": {
+    "craftTimeSeconds": 90,
+    "slots": [
+      {
+        "name": "Case",
+        "material": {
+          "type": "resource",
+          "name": "Iron",
+          "quantity": 0.04,
+          "minQuality": 0
+        },
+        "modifiers": [
+          {
+            "property": "Efficiency",
+            "startQuality": 0,
+            "endQuality": 1000,
+            "modifierAtStart": 0.8,
+            "modifierAtEnd": 1.2
+          },
+          {
+            "property": "Radius",
+            "startQuality": 0,
+            "endQuality": 1000,
+            "modifierAtStart": 0.95,
+            "modifierAtEnd": 1.05
+          },
+          {
+            "property": "Speed",
+            "startQuality": 0,
+            "endQuality": 1000,
+            "modifierAtStart": 0.95,
+            "modifierAtEnd": 1.05
+          }
+        ]
+      },
+      {
+        "name": "Wiring",
+        "material": {
+          "type": "resource",
+          "name": "Copper",
+          "quantity": 0.04,
+          "minQuality": 0
+        },
+        "modifiers": [
+          {
+            "property": "Radius",
+            "startQuality": 0,
+            "endQuality": 1000,
+            "modifierAtStart": 0.95,
+            "modifierAtEnd": 1.05
+          },
+          {
+            "property": "Speed",
+            "startQuality": 0,
+            "endQuality": 1000,
+            "modifierAtStart": 0.9,
+            "modifierAtEnd": 1.1
+          }
+        ]
+      },
+      {
+        "name": "Ocular Enhancer",
+        "material": {
+          "type": "item",
+          "name": "Sadaryx",
+          "quantity": 4,
+          "minQuality": 0
+        },
+        "modifiers": [
+          {
+            "property": "Radius",
+            "startQuality": 0,
+            "endQuality": 1000,
+            "modifierAtStart": 0.9,
+            "modifierAtEnd": 1.1
+          },
+          {
+            "property": "Speed",
+            "startQuality": 0,
+            "endQuality": 1000,
+            "modifierAtStart": 0.95,
+            "modifierAtEnd": 1.05
+          }
+        ]
+      }
+    ]
+  }
+};
+
 const salvageHeads = [
   {
     head: "Abrade",
@@ -15614,19 +16120,53 @@ export default function StarCitizenSalvageGuideWebsite() {
   // Empty string means "Any system" — show every location.
   const [scraperSystemFilter, setScraperSystemFilter] = useState({});
   // Per-scraper-module power level slider (4.8+). Range 500–1000:
-  //   500  → +0% modifier
-  //   1000 → +20% modifier on Speed / Radius / Efficiency
-  // Default 500 = baseline behavior. Hidden until the live patch is
-  // 4.8 or newer (gated downstream by isPatchAtLeast).
+  //   Per-slot quality 0–1000 (one slider per scraper-module
+  //   blueprint slot — Case / Wiring / Ocular Enhancer for the
+  //   three scraper modules). Defaults to 500 for each slot.
+  // The aggregate Speed / Radius / Efficiency multipliers used by
+  // the comparison table are the product of every slot's modifier
+  // contribution at the current quality, computed via
+  // scraperPropertyMultiplier(head, property). Hidden until the
+  // live patch is 4.8 or newer (gated downstream by isPatchAtLeast).
   const [scraperBoosts, setScraperBoosts] = useState({});
-  const setScraperBoost = (head, val) =>
-    setScraperBoosts((s) => ({ ...s, [head]: Number(val) || 500 }));
-  const scraperBoostFor = (head) => {
-    const v = Number(scraperBoosts[head]);
-    return Number.isFinite(v) ? Math.max(500, Math.min(1000, v)) : 500;
+  // Open scraper-module blueprint detail modal. Stores the
+  // module head ("Abrade" / "Trawler" / "Cinch"); null = closed.
+  // Click a module's title in the Scraper Module Performance
+  // section → modal lists every salvage / refueling mission that
+  // can award this blueprint, plus the fabricator material list.
+  const [scraperBlueprintModal, setScraperBlueprintModal] = useState(null);
+  const setScraperBoost = (head, slotName, val) =>
+    setScraperBoosts((s) => ({
+      ...s,
+      [head]: { ...(s[head] || {}), [slotName]: Math.max(0, Math.min(1000, Number(val) || 0)) },
+    }));
+  const scraperBoostFor = (head, slotName) => {
+    const v = Number(scraperBoosts[head]?.[slotName]);
+    return Number.isFinite(v) ? Math.max(0, Math.min(1000, v)) : 500;
   };
-  // Modifier = 0..0.2 linear from 500..1000.
-  const scraperBoostMultiplier = (head) => (scraperBoostFor(head) - 500) / 500 * 0.20;
+  // Linear-interp the modifier value at quality `q` between
+  // `[startQuality, endQuality]` and `[modifierAtStart, modifierAtEnd]`.
+  const interpModifier = (q, m) => {
+    const span = m.endQuality - m.startQuality;
+    if (!Number.isFinite(span) || span <= 0) return m.modifierAtEnd;
+    const clamped = Math.max(m.startQuality, Math.min(m.endQuality, q));
+    const t = (clamped - m.startQuality) / span;
+    return m.modifierAtStart + (m.modifierAtEnd - m.modifierAtStart) * t;
+  };
+  // Aggregate multiplier for a property (Speed / Radius / Efficiency)
+  // is the product of every slot's contribution at its current
+  // quality. Slots without a modifier on this property contribute 1.0.
+  const scraperPropertyMultiplier = (head, property) => {
+    const bp = SCRAPER_BLUEPRINTS[head];
+    if (!bp) return 1;
+    let mult = 1;
+    for (const slot of bp.slots) {
+      const m = (slot.modifiers || []).find((x) => x.property === property);
+      if (!m) continue;
+      mult *= interpModifier(scraperBoostFor(head, slot.name), m);
+    }
+    return mult;
+  };
   const [selectedSellMaterial, setSelectedSellMaterial] = useState("");
   const [estimatePlayerName, setEstimatePlayerName] = useState("");
   const [selectedSellPointName, setSelectedSellPointName] = useState("");
@@ -15898,6 +16438,11 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [missionFaction, setMissionFaction] = useState("");
   const [missionLegality, setMissionLegality] = useState("");
   const [missionMinReward, setMissionMinReward] = useState(0);
+  // Blueprint filter for the Missions table. "" = all; "yes" =
+  // only missions whose blueprintRewards is non-empty; "no" =
+  // only missions without any blueprint pool. Applies to both
+  // Salvage and Refueling sub-tabs.
+  const [missionBlueprint, setMissionBlueprint] = useState("");
   const MISSION_REWARD_MAX = 550000;
   const MISSION_REWARD_STEP = 5000;
   // Mission detail modal target. null when closed; full mission row
@@ -20667,6 +21212,42 @@ export default function StarCitizenSalvageGuideWebsite() {
                   <span className="text-slate-400">Crew Size</span>
                   <span className="font-bold text-cyan-300">{selectedShip.crewSize}</span>
                 </div>
+                {/* Insurance claim window — sourced from spviewer.eu.
+                    Shows the standard claim duration, the expedited
+                    claim duration, and the aUEC fee to expedite.
+                    Format helper renders MMmSSs from raw seconds; an
+                    em-dash falls through if any field is missing. */}
+                {(() => {
+                  if (
+                    !Number.isFinite(selectedShip.claimSeconds) ||
+                    !Number.isFinite(selectedShip.expediteSeconds) ||
+                    !Number.isFinite(selectedShip.expediteCost)
+                  ) {
+                    return null;
+                  }
+                  const fmt = (s) => {
+                    const m = Math.floor(s / 60);
+                    const sec = s % 60;
+                    return `${String(m).padStart(2, "0")}m${String(sec).padStart(2, "0")}s`;
+                  };
+                  return (
+                    <>
+                      <div className="flex items-center justify-between rounded-xl bg-slate-900 px-4 py-3">
+                        <span className="text-slate-400">Claim / Expedite</span>
+                        <span className="font-bold text-cyan-300">
+                          {fmt(selectedShip.claimSeconds)} <span className="text-slate-500">›</span>{" "}
+                          <span className="text-amber-300">{fmt(selectedShip.expediteSeconds)}</span>
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between rounded-xl bg-slate-900 px-4 py-3">
+                        <span className="text-slate-400">Expedite Cost</span>
+                        <span className="font-bold text-emerald-300">
+                          {selectedShip.expediteCost.toLocaleString()} aUEC
+                        </span>
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
 
               {/* Pledge price (USD) — single value from RSI store. */}
@@ -21059,10 +21640,15 @@ export default function StarCitizenSalvageGuideWebsite() {
               <tbody>
                 {salvageHeads.map((row) => {
                   const boostActive = isPatchAtLeast(patchStatus?.version, "4.8");
-                  const mult = boostActive ? 1 + scraperBoostMultiplier(row.head) : 1;
-                  const speed = row.speedMultiplier * mult;
-                  const radius = row.radius * mult;
-                  const efficiency = row.efficiency * mult;
+                  // 4.8 quality system multiplies the base spec by
+                  // each property's aggregate slot modifier. On
+                  // 4.7.2 the multipliers all collapse to 1.0.
+                  const speedMult = boostActive ? scraperPropertyMultiplier(row.head, "Speed") : 1;
+                  const radiusMult = boostActive ? scraperPropertyMultiplier(row.head, "Radius") : 1;
+                  const efficiencyMult = boostActive ? scraperPropertyMultiplier(row.head, "Efficiency") : 1;
+                  const speed = row.speedMultiplier * speedMult;
+                  const radius = row.radius * radiusMult;
+                  const efficiency = row.efficiency * efficiencyMult;
                   return (
                   <tr key={row.head} className="border-t border-slate-800 bg-slate-900/40">
                     <td className="px-3 py-3 font-bold text-white">{row.head}</td>
@@ -21120,58 +21706,121 @@ export default function StarCitizenSalvageGuideWebsite() {
               return (
                 <div key={row.head} className="rounded-2xl border border-slate-700 bg-slate-950/60 p-4">
                   <div className="flex items-start justify-between gap-3">
-                    <div>
+                    <div className="flex items-center gap-2 flex-wrap">
                       <div className="font-bold text-white">{row.head} Scraper Module</div>
-                      <div className="text-xs text-slate-400 mt-0.5">{row.manufacturer}</div>
+                      {/* [BP Missions] button — sourced from the
+                          4.8 PTU dump, gated on the live patch
+                          version. Hidden on 4.7.2; auto-appears
+                          once the live patch advances to 4.8. */}
+                      {isPatchAtLeast(patchStatus?.version, "4.8") && (
+                        <button
+                          type="button"
+                          onClick={() => setScraperBlueprintModal(row.head)}
+                          className="rounded-md border border-violet-400/50 bg-violet-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-violet-200 hover:border-violet-300 hover:bg-violet-500/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-300"
+                          title="View blueprint missions + fabricator materials"
+                        >
+                          [BP Missions]
+                        </button>
+                      )}
                     </div>
                     <span className="rounded-lg border border-cyan-500/25 bg-cyan-500/10 px-2.5 py-1 text-xs font-semibold text-cyan-300 shrink-0">{row.bestFor}</span>
                   </div>
+                  <div className="text-xs text-slate-400 mt-0.5">{row.manufacturer}</div>
                   <p className="mt-2 text-xs text-slate-400 leading-relaxed">{row.description}</p>
 
-                  {/* Quality-level slider — 4.8+ only. 500 → +0%,
-                      1000 → +20% on Speed / Radius / Efficiency.
-                      Reflects in the comparison table above as the
-                      slider moves. */}
-                  {isPatchAtLeast(patchStatus?.version, "4.8") && (() => {
-                    const slider = scraperBoostFor(row.head);
-                    const pct = ((slider - 500) / 500 * 20).toFixed(1);
+                  {/* Per-slot quality sliders — 4.8+ only.
+                      Mirrors the scmdb.net fabricator detail modal:
+                      one slider per blueprint slot (Case / Wiring /
+                      Ocular Enhancer for the scraper modules), with
+                      its material name + required quantity / min
+                      quality, plus the per-property modifier
+                      breakdown (Speed / Radius / Efficiency). The
+                      comparison table above multiplies the base
+                      spec by the aggregate of every slot's modifier
+                      contribution at its current quality. Sourced
+                      from scmdb.net's PTU crafting_blueprints dump. */}
+                  {isPatchAtLeast(patchStatus?.version, "4.8") && SCRAPER_BLUEPRINTS[row.head] && (() => {
+                    const bp = SCRAPER_BLUEPRINTS[row.head];
                     return (
-                      <div className="mt-3 rounded-xl border border-cyan-500/25 bg-cyan-500/5 p-3">
-                        <div className="flex items-center justify-between text-[10px] uppercase tracking-wider">
-                          <span className="text-cyan-300/80">Quality Level</span>
-                          <span className="font-mono text-cyan-200">
-                            {slider} · +{pct}% Speed / Radius / Efficiency
-                          </span>
-                        </div>
-                        <div className="mt-1.5 flex items-center gap-2">
-                          <input
-                            type="range"
-                            min={500}
-                            max={1000}
-                            step={10}
-                            value={slider}
-                            onChange={(e) => setScraperBoost(row.head, e.target.value)}
-                            className="w-1/3 accent-cyan-400"
-                            aria-label={`${row.head} quality level`}
-                          />
-                          <input
-                            type="number"
-                            min={500}
-                            max={1000}
-                            step={10}
-                            value={slider}
-                            onChange={(e) => {
-                              const n = Number(e.target.value);
-                              if (!Number.isFinite(n)) return;
-                              setScraperBoost(row.head, Math.max(500, Math.min(1000, n)));
-                            }}
-                            className="w-20 rounded-md border border-slate-700 bg-slate-900/70 px-2 py-1 text-xs font-mono text-cyan-200 focus:border-cyan-500/60 focus:outline-none"
-                            aria-label={`${row.head} quality level numeric`}
-                          />
-                        </div>
-                        <div className="mt-0.5 flex w-1/3 justify-between text-[10px] text-slate-500">
-                          <span>500 · base</span>
-                          <span>1000 · +20%</span>
+                      <div className="mt-2 space-y-1.5">
+                        {bp.slots.map((slot) => {
+                          const q = scraperBoostFor(row.head, slot.name);
+                          const mat = slot.material;
+                          const qtyLabel = mat
+                            ? mat.type === "item"
+                              ? `×${mat.quantity}`
+                              : `${mat.quantity} SCU`
+                            : "";
+                          return (
+                            <div
+                              key={slot.name}
+                              className="rounded-lg border border-cyan-500/25 bg-cyan-500/5 px-2.5 py-1.5"
+                            >
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-300">
+                                  {slot.name}
+                                </span>
+                                {mat && (
+                                  <span className="text-[10px] font-mono text-slate-400">
+                                    <span aria-hidden="true" className="mr-0.5 text-amber-300">
+                                      {mat.type === "item" ? "◆" : "↯"}
+                                    </span>
+                                    <span className="text-slate-200">{mat.name}</span>
+                                    <span className="ml-1.5 text-slate-300">{qtyLabel}</span>
+                                    <span className="ml-1 text-slate-500">(min {mat.minQuality})</span>
+                                  </span>
+                                )}
+                              </div>
+                              <div className="mt-1 flex items-center gap-1.5">
+                                <input
+                                  type="range"
+                                  min={0}
+                                  max={1000}
+                                  step={10}
+                                  value={q}
+                                  onChange={(e) => setScraperBoost(row.head, slot.name, e.target.value)}
+                                  className="h-1 w-full accent-cyan-400"
+                                  aria-label={`${row.head} ${slot.name} quality`}
+                                />
+                                <input
+                                  type="number"
+                                  min={0}
+                                  max={1000}
+                                  step={10}
+                                  value={q}
+                                  onChange={(e) => setScraperBoost(row.head, slot.name, e.target.value)}
+                                  className="w-14 rounded border border-slate-700 bg-slate-900/70 px-1 py-0.5 text-[10px] font-mono text-cyan-200 focus:border-cyan-500/60 focus:outline-none"
+                                  aria-label={`${row.head} ${slot.name} quality numeric`}
+                                />
+                              </div>
+                              {(slot.modifiers || []).length > 0 && (
+                                <div className="mt-1 space-y-0.5">
+                                  {slot.modifiers.map((m) => {
+                                    const v = interpModifier(q, m);
+                                    const pct = ((v - 1) * 100);
+                                    const sign = pct >= 0 ? "+" : "";
+                                    const pctClass = pct > 0 ? "text-emerald-300" : pct < 0 ? "text-rose-300" : "text-slate-400";
+                                    return (
+                                      <div key={m.property} className="flex items-center justify-between text-[10px]">
+                                        <span className="text-slate-400">{m.property}</span>
+                                        <span className="font-mono">
+                                          <span className="text-slate-500">×{m.modifierAtStart}-{m.modifierAtEnd}</span>
+                                          <span className="ml-1.5 text-slate-300">×{v.toFixed(3)}</span>
+                                          <span className={`ml-1.5 font-bold ${pctClass}`}>
+                                            {sign}{pct.toFixed(2)}%
+                                          </span>
+                                        </span>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                        <div className="flex items-center justify-between rounded-lg border border-slate-700 bg-slate-900/40 px-2.5 py-1 text-[10px] text-slate-400">
+                          <span className="uppercase tracking-wider">Craft Time</span>
+                          <span className="font-mono text-cyan-200">⏱ {bp.craftTimeSeconds}s</span>
                         </div>
                       </div>
                     );
@@ -21259,7 +21908,24 @@ export default function StarCitizenSalvageGuideWebsite() {
           // the Refueling source is unreachable.
           const refuelingUnlocked = isPatchAtLeast(patchStatus?.version, "4.8");
           const isRefuelingTab = refuelingUnlocked && missionsSubTab === "refueling";
-          const sourceMissions = isRefuelingTab ? REFUELING_MISSIONS : MISSIONS;
+          // Five Tar Pits salvage contracts ("[SHIP] clean up" + "Risky
+          // [SHIP] Salvage Job") were dropped from the 4.8 PTU dump.
+          // Filter them out of the Salvage list once the live patch
+          // advances to 4.8 so the table matches what's actually
+          // available in-game. The IDs are pinned here rather than
+          // rebuilding MISSIONS from the PTU JSON because the LIVE
+          // dump is still authoritative for everything else.
+          const SALVAGE_REMOVED_IN_4_8 = new Set([
+            "152bc6c1-70e0-44fb-a89a-5200456f132c",
+            "3617c33e-0f3f-44e7-b468-7de2a2db1dc4",
+            "d46436e6-56ea-40ed-a0fd-e7c0c7218fbb",
+            "f34ee69a-3836-4853-9765-2ced2596bc6e",
+            "f91fbab9-1e90-4fb8-871d-961053ad1f49",
+          ]);
+          const salvageSource = refuelingUnlocked
+            ? MISSIONS.filter((m) => !SALVAGE_REMOVED_IN_4_8.has(m.id))
+            : MISSIONS;
+          const sourceMissions = isRefuelingTab ? REFUELING_MISSIONS : salvageSource;
           const allFactions = isRefuelingTab
             ? ["United Wayfarers Club"]
             : ["Adagio Holdings", "Rough & Ready", "Tar Pits"];
@@ -21271,6 +21937,11 @@ export default function StarCitizenSalvageGuideWebsite() {
             if (missionSystem && m.system !== missionSystem) return false;
             if (missionFaction && m.faction !== missionFaction) return false;
             if (missionLegality && m.legality !== missionLegality) return false;
+            if (missionBlueprint && isPatchAtLeast(patchStatus?.version, "4.8")) {
+              const hasBp = Array.isArray(m.blueprintRewards) && m.blueprintRewards.length > 0;
+              if (missionBlueprint === "yes" && !hasBp) return false;
+              if (missionBlueprint === "no" && hasBp) return false;
+            }
             if (missionMinReward > 0 && (m.reward || 0) < missionMinReward) {
               return false;
             }
@@ -21287,15 +21958,25 @@ export default function StarCitizenSalvageGuideWebsite() {
           // string columns use locale-aware compare on a lowercased
           // value so "—" / empty entries collapse cleanly.
           const numericKeys = new Set(["reward", "baseXP"]);
+          // Reward column displays gross reward minus buy-in fee
+          // (rendered as a green line + a red `-buyIn` line). Sort
+          // by the net value (reward − buyIn) so the column-order
+          // matches what the user sees. baseXP uses the raw number.
+          const sortValue = (m, key) => {
+            if (key === "reward") {
+              const r = Number(m.reward) || 0;
+              const b = Number.isFinite(m.buyIn) ? Math.max(0, Number(m.buyIn) || 0) : 0;
+              return r - b;
+            }
+            return Number(m[key]) || 0;
+          };
           const compareByKey = (a, b, key, dir) => {
-            const aV = a[key];
-            const bV = b[key];
             let cmp;
             if (numericKeys.has(key)) {
-              cmp = (Number(aV) || 0) - (Number(bV) || 0);
+              cmp = sortValue(a, key) - sortValue(b, key);
             } else {
-              const aS = String(aV ?? "").toLowerCase();
-              const bS = String(bV ?? "").toLowerCase();
+              const aS = String(a[key] ?? "").toLowerCase();
+              const bS = String(b[key] ?? "").toLowerCase();
               cmp = aS.localeCompare(bS);
             }
             return dir === "asc" ? cmp : -cmp;
@@ -21319,7 +22000,7 @@ export default function StarCitizenSalvageGuideWebsite() {
           };
 
           const filtersActive =
-            missionSearch || missionSystem || missionFaction || missionLegality || missionMinReward > 0;
+            missionSearch || missionSystem || missionFaction || missionLegality || missionBlueprint || missionMinReward > 0;
 
           return (
             <div className="space-y-6">
@@ -21499,6 +22180,24 @@ export default function StarCitizenSalvageGuideWebsite() {
                       <option value="Illegal">Illegal</option>
                     </select>
                   </div>
+                  {/* Blueprint filter — sourced from the 4.8 PTU
+                      dump, gated on the live patch version. Hidden
+                      on 4.7.2 since blueprint rewards don't surface
+                      anywhere on the live cycle. */}
+                  {isPatchAtLeast(patchStatus?.version, "4.8") && (
+                    <div>
+                      <label className="mb-1 block text-xs uppercase tracking-wider text-slate-400">Blueprint</label>
+                      <select
+                        value={missionBlueprint}
+                        onChange={(e) => setMissionBlueprint(e.target.value)}
+                        className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-100 focus:border-cyan-400/60 focus:outline-none focus:ring-1 focus:ring-cyan-400/40"
+                      >
+                        <option value="">Any</option>
+                        <option value="yes">Awards a blueprint</option>
+                        <option value="no">No blueprint</option>
+                      </select>
+                    </div>
+                  )}
                   <div>
                     <div className="mb-1 flex items-center justify-between">
                       <label className="block text-xs uppercase tracking-wider text-slate-400">
@@ -21533,6 +22232,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                         setMissionSystem("");
                         setMissionFaction("");
                         setMissionLegality("");
+                        setMissionBlueprint("");
                         setMissionMinReward(0);
                       }}
                       className="rounded-md border border-slate-700 bg-slate-800/60 px-3 py-1.5 text-xs text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
@@ -21604,6 +22304,21 @@ export default function StarCitizenSalvageGuideWebsite() {
                             <td className="px-4 py-3">
                               <div className="font-semibold text-white">
                                 {m.name}
+                                {/* [BP] tag — green inline marker that
+                                    flags missions whose blueprintRewards
+                                    array is non-empty. Sourced from the
+                                    4.8 PTU dump, so the tag is gated on
+                                    the live patch version — invisible
+                                    on 4.7.2, auto-appears once 4.8
+                                    hits production. */}
+                                {refuelingUnlocked && Array.isArray(m.blueprintRewards) && m.blueprintRewards.length > 0 && (
+                                  <span
+                                    className="ml-1.5 align-middle text-[11px] font-bold text-emerald-400"
+                                    title="This mission awards a blueprint on completion"
+                                  >
+                                    [BP]
+                                  </span>
+                                )}
                                 {/* "Wrecked Ships for Sale" missions
                                     use the title as a generic header;
                                     the actual destination station is
@@ -21811,15 +22526,25 @@ export default function StarCitizenSalvageGuideWebsite() {
                       )}
                     </div>
 
-                    {/* Resolved location chips — pickup, destinations,
-                        prerequisites. Each chip: name + " · system /
-                        planet / moon" subtext when known. Sections
-                        with no resolvable rows are hidden. */}
+                    {/* Resolved location chips — pickup + destinations.
+                        Prereq-location chips removed: scmdb's
+                        `prerequisites.location[]` is a location-scope
+                        restriction (where the contract is offered),
+                        not a true mission prerequisite. Real prereqs
+                        — completed-contract requirements + chain
+                        starters — render in the Chain section
+                        (chainStartsWith / requires / unlocks). */}
+                    {/* Condensed [LOCATIONS] trigger — hover or
+                        focus expands an inline popover listing
+                        Pickup + Destinations chips. Replaces the
+                        always-visible chip stacks so the modal
+                        stays compact. The popover sits absolute-
+                        positioned under the trigger, dismisses on
+                        mouseleave / blur. */}
                     {(() => {
                       const sections = [
                         { title: "Pickup", rows: missionDetail.locations || [] },
                         { title: "Destinations", rows: missionDetail.destinations || [] },
-                        { title: "Prerequisite", rows: missionDetail.prereqLocations || [] },
                       ].filter((s) => s.rows.length > 0);
                       if (sections.length === 0) return null;
                       const dedupe = (rows) => {
@@ -21831,26 +22556,44 @@ export default function StarCitizenSalvageGuideWebsite() {
                         });
                       };
                       return (
-                        <div className="mt-5 space-y-3">
-                          {sections.map((s) => (
-                            <div key={s.title}>
-                              <div className="text-[10px] uppercase tracking-wider text-slate-500">{s.title}</div>
-                              <div className="mt-1 flex flex-wrap gap-2">
-                                {dedupe(s.rows).map((loc) => {
-                                  const sub = [loc.system, loc.planet, loc.moon].filter(Boolean).join(" · ");
-                                  return (
-                                    <span
-                                      key={loc.name}
-                                      className="rounded-md border border-slate-700 bg-slate-950/60 px-2 py-1 text-xs"
-                                    >
-                                      <span className="font-semibold text-slate-200">{loc.name}</span>
-                                      {sub && <span className="ml-1 text-slate-500">· {sub}</span>}
-                                    </span>
-                                  );
-                                })}
-                              </div>
+                        <div className="relative mt-5 group">
+                          <button
+                            type="button"
+                            className="inline-flex items-center gap-1.5 rounded-md border border-cyan-500/40 bg-cyan-500/10 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-cyan-200 hover:border-cyan-300 hover:bg-cyan-500/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300"
+                            aria-label="Show mission locations"
+                          >
+                            [Locations]
+                            <span className="text-[10px] text-cyan-300/70">
+                              {sections.reduce((acc, s) => acc + dedupe(s.rows).length, 0)}
+                            </span>
+                          </button>
+                          <div
+                            role="dialog"
+                            aria-label="Mission locations"
+                            className="invisible absolute left-0 top-full z-30 mt-2 w-full max-w-md scale-95 rounded-2xl border border-cyan-500/30 bg-slate-900 p-4 opacity-0 shadow-2xl shadow-cyan-950/40 transition-all group-hover:visible group-hover:scale-100 group-hover:opacity-100 group-focus-within:visible group-focus-within:scale-100 group-focus-within:opacity-100"
+                          >
+                            <div className="space-y-3">
+                              {sections.map((s) => (
+                                <div key={s.title}>
+                                  <div className="text-[10px] uppercase tracking-wider text-slate-500">{s.title}</div>
+                                  <div className="mt-1 flex flex-wrap gap-2">
+                                    {dedupe(s.rows).map((loc) => {
+                                      const sub = [loc.system, loc.planet, loc.moon].filter(Boolean).join(" · ");
+                                      return (
+                                        <span
+                                          key={loc.name}
+                                          className="rounded-md border border-slate-700 bg-slate-950/60 px-2 py-1 text-xs"
+                                        >
+                                          <span className="font-semibold text-slate-200">{loc.name}</span>
+                                          {sub && <span className="ml-1 text-slate-500">· {sub}</span>}
+                                        </span>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              ))}
                             </div>
-                          ))}
+                          </div>
                         </div>
                       );
                     })()}
@@ -21999,6 +22742,117 @@ export default function StarCitizenSalvageGuideWebsite() {
                                     </div>
                                   </div>
                                 )}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Ships to salvage — scmdb's "Combat" tab
+                        equivalent. shipEncounters.poolId resolves
+                        to the array of ship-name strings the
+                        contract can spawn as salvage targets, plus
+                        the min/max ship count per encounter from
+                        spawnConfig. Hidden when no ships resolve. */}
+                    {Array.isArray(missionDetail.salvageShips) && missionDetail.salvageShips.length > 0 && (
+                      <div className="mt-5">
+                        <div className="text-[10px] uppercase tracking-wider text-slate-500">
+                          Ships to salvage
+                          {(() => {
+                            const c = missionDetail.salvageShipCount || {};
+                            const min = Number.isFinite(c.min) ? c.min : null;
+                            const max = Number.isFinite(c.max) ? c.max : null;
+                            if (!min && !max) return null;
+                            const label = min === max ? `${min}` : `${min ?? 0}–${max ?? "?"}`;
+                            return (
+                              <span className="ml-2 normal-case tracking-normal text-slate-400">
+                                ({label} per encounter)
+                              </span>
+                            );
+                          })()}
+                        </div>
+                        <div className="mt-1 flex flex-wrap gap-1.5">
+                          {missionDetail.salvageShips.map((ship) => (
+                            <span
+                              key={ship}
+                              className="rounded-md border border-amber-500/30 bg-amber-500/5 px-2 py-1 text-xs text-amber-100"
+                            >
+                              {ship}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Blueprint rewards — sourced from the scmdb.net
+                        4.8 PTU dump's blueprintPools. Each pool lists
+                        the manufacturing blueprints the contract can
+                        award on completion plus per-blueprint weights
+                        (the in-game roll table). Gated on the live
+                        patch version — invisible on 4.7.2, surfaces
+                        once 4.8 hits production. */}
+                    {isPatchAtLeast(patchStatus?.version, "4.8") && Array.isArray(missionDetail.blueprintRewards) && missionDetail.blueprintRewards.length > 0 && (
+                      <div className="mt-5">
+                        <div className="text-[10px] uppercase tracking-wider text-slate-500">
+                          Blueprint rewards
+                        </div>
+                        <ul className="mt-1 space-y-2">
+                          {missionDetail.blueprintRewards.map((pool, i) => {
+                            const totalWeight = pool.blueprints.reduce(
+                              (acc, bp) => acc + (Number(bp.weight) || 0),
+                              0
+                            );
+                            // De-dupe blueprints that appear multiple
+                            // times in the same pool (those repeats
+                            // are how scmdb encodes higher-weight
+                            // entries) and show the combined weight.
+                            const merged = [];
+                            const idx = new Map();
+                            for (const bp of pool.blueprints) {
+                              const key = bp.name;
+                              if (idx.has(key)) {
+                                merged[idx.get(key)].weight += Number(bp.weight) || 0;
+                              } else {
+                                idx.set(key, merged.length);
+                                merged.push({ name: key, weight: Number(bp.weight) || 0 });
+                              }
+                            }
+                            return (
+                              <li
+                                key={`${pool.poolName || "pool"}-${i}`}
+                                className="rounded-md border border-violet-500/30 bg-violet-500/5 px-3 py-2 text-xs"
+                              >
+                                <div className="flex flex-wrap items-center justify-between gap-2">
+                                  <span className="font-semibold text-violet-100">
+                                    {pool.poolName
+                                      ? pool.poolName.replace(/^BP_REWARDS_/, "")
+                                      : "Blueprint pool"}
+                                  </span>
+                                  <span className="font-mono text-violet-200">
+                                    {Number.isFinite(pool.chance) && pool.chance < 1
+                                      ? `${Math.round(pool.chance * 100)}% chance · `
+                                      : ""}
+                                    {merged.length} blueprint{merged.length === 1 ? "" : "s"}
+                                  </span>
+                                </div>
+                                <div className="mt-1.5 flex flex-wrap gap-1.5">
+                                  {merged.map((bp) => {
+                                    const pct = totalWeight > 0
+                                      ? Math.round((bp.weight / totalWeight) * 100)
+                                      : null;
+                                    return (
+                                      <span
+                                        key={bp.name}
+                                        className="rounded border border-violet-500/30 bg-slate-900 px-2 py-0.5 text-[11px] text-violet-100"
+                                        title={pct != null ? `${pct}% of pool` : undefined}
+                                      >
+                                        {bp.name}
+                                        {pct != null && <span className="ml-1 text-violet-300/70">{pct}%</span>}
+                                      </span>
+                                    );
+                                  })}
+                                </div>
                               </li>
                             );
                           })}
@@ -25137,6 +25991,168 @@ export default function StarCitizenSalvageGuideWebsite() {
             after a 2-step confirmation; `adminClearLedgerStep` drives
             the inline state machine (0 = button, 1 = first confirm,
             2 = last-chance, then result re-loads to step 0). */}
+        {/* Scraper-module blueprint detail modal — opens when a
+            user clicks a module title in the Scraper Module
+            Performance section. Lists every salvage / refueling
+            mission whose blueprintRewards include this module's
+            blueprint (with pool name + chance) and the fabricator
+            material list (slot name → material name + quantity +
+            min quality), sourced from scmdb.net's PTU dump. */}
+        {scraperBlueprintModal && isPatchAtLeast(patchStatus?.version, "4.8") && (() => {
+          const head = scraperBlueprintModal;
+          const fullName = `${head} Scraper Module`;
+          const bp = SCRAPER_BLUEPRINTS[head];
+          const allMissions = [...MISSIONS, ...REFUELING_MISSIONS];
+          // Reverse-map: collect missions whose blueprintRewards
+          // include this module. Keep one row per (mission, pool)
+          // pair so a mission that has the same blueprint in two
+          // different pools renders both entries (rare but
+          // possible per scmdb's pool encoding).
+          const sources = [];
+          for (const m of allMissions) {
+            if (!Array.isArray(m.blueprintRewards)) continue;
+            for (const pool of m.blueprintRewards) {
+              if (!Array.isArray(pool.blueprints)) continue;
+              if (pool.blueprints.some((b) => b.name === fullName)) {
+                sources.push({ mission: m, pool });
+              }
+            }
+          }
+          return (
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="scraper-bp-modal-title"
+              onClick={() => setScraperBlueprintModal(null)}
+            >
+              <div
+                className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl border border-cyan-500/30 bg-slate-900 p-6 shadow-2xl shadow-cyan-950/40 [scrollbar-width:thin] [scrollbar-color:rgb(6_182_212_/_0.7)_rgb(2_6_23)] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-slate-950 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-500/70 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-cyan-400"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h3 id="scraper-bp-modal-title" className="text-lg font-bold text-cyan-300">
+                      {fullName}
+                    </h3>
+                    <p className="mt-0.5 text-xs text-slate-400">
+                      Greycat Industrial · Blueprint sources + fabricator materials (scmdb.net PTU)
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setScraperBlueprintModal(null)}
+                    aria-label="Close blueprint detail"
+                    className="rounded-md border border-slate-700 bg-slate-800/60 px-2 py-1 text-xs text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                {/* Mission sources */}
+                <section className="mt-5">
+                  <h4 className="text-cyan-300 text-sm font-semibold">
+                    Missions that award this blueprint ({sources.length})
+                  </h4>
+                  {sources.length === 0 ? (
+                    <div className="mt-2 rounded-2xl border border-dashed border-slate-700 p-4 text-xs text-slate-500">
+                      No salvage or refueling missions in the catalog list this blueprint as a reward.
+                    </div>
+                  ) : (
+                    <ul className="mt-2 space-y-1.5">
+                      {sources.map((s, i) => {
+                        const isRefueling = REFUELING_MISSIONS.some((rm) => rm.id === s.mission.id);
+                        const handleClick = () => {
+                          // Navigate the user to the Missions tab,
+                          // flip to the right sub-tab (Salvage vs
+                          // Refueling) so the surrounding table
+                          // matches the contract type, then open
+                          // the mission detail modal directly.
+                          setScraperBlueprintModal(null);
+                          setActiveTab("missions");
+                          setMissionsSubTab(isRefueling ? "refueling" : "salvage");
+                          setMissionDetail(s.mission);
+                        };
+                        return (
+                          <li key={`${s.mission.id}-${i}`}>
+                            <button
+                              type="button"
+                              onClick={handleClick}
+                              className="w-full rounded-md border border-violet-500/30 bg-violet-500/5 px-3 py-2 text-left text-xs hover:border-violet-400/60 hover:bg-violet-500/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-300"
+                              title="Open mission detail"
+                            >
+                              <div className="flex flex-wrap items-center justify-between gap-2">
+                                <span className="font-semibold text-white">{s.mission.name || "—"}</span>
+                                <span className="font-mono text-violet-200">
+                                  {Number.isFinite(s.pool.chance) && s.pool.chance < 1
+                                    ? `${Math.round(s.pool.chance * 100)}% pool · `
+                                    : ""}
+                                  {s.mission.faction}
+                                </span>
+                              </div>
+                              {s.pool.poolName && (
+                                <div className="mt-0.5 text-[10px] text-slate-500">
+                                  {s.pool.poolName.replace(/^BP_REWARDS_/, "")}
+                                </div>
+                              )}
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </section>
+
+                {/* Fabricator materials */}
+                <section className="mt-5">
+                  <h4 className="text-cyan-300 text-sm font-semibold">
+                    Fabricator materials
+                    {bp ? ` · ${bp.craftTimeSeconds}s craft time` : ""}
+                  </h4>
+                  {!bp ? (
+                    <div className="mt-2 rounded-2xl border border-dashed border-slate-700 p-4 text-xs text-slate-500">
+                      No fabricator recipe found for this module in the PTU dump.
+                    </div>
+                  ) : (
+                    <ul className="mt-2 space-y-1.5">
+                      {bp.slots.map((slot) => {
+                        const mat = slot.material;
+                        const qtyLabel = mat
+                          ? mat.type === "item"
+                            ? `×${mat.quantity}`
+                            : `${mat.quantity} SCU`
+                          : "";
+                        return (
+                          <li
+                            key={slot.name}
+                            className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-cyan-500/25 bg-cyan-500/5 px-3 py-2 text-xs"
+                          >
+                            <span className="font-semibold text-cyan-200">
+                              {slot.name}
+                            </span>
+                            {mat && (
+                              <span className="font-mono text-slate-300">
+                                <span aria-hidden="true" className="mr-1 text-amber-300">
+                                  {mat.type === "item" ? "◆" : "↯"}
+                                </span>
+                                <span className="text-white">{mat.name}</span>
+                                <span className="ml-2 text-slate-300">{qtyLabel}</span>
+                                <span className="ml-1.5 text-[10px] text-slate-500">
+                                  (min Q{mat.minQuality})
+                                </span>
+                              </span>
+                            )}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </section>
+              </div>
+            </div>
+          );
+        })()}
+
         {adminUserDetail && (
           <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
@@ -26737,6 +27753,27 @@ export default function StarCitizenSalvageGuideWebsite() {
               </div>
 
               <div className="mt-5 space-y-7 text-sm text-slate-300 leading-relaxed">
+
+                <section>
+                  <h4 className="text-cyan-300 text-base font-bold">v2.7.1 — May 2, 2026</h4>
+                  <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li>Ship Details right-rail spec block now lists each platform's <strong>Insurance Claim / Expedite times</strong> + <strong>Expedite Cost</strong> for all 5 supported ships. Sourced from spviewer.eu.</li>
+                    <li>Mission detail popup gains a <strong>Ships to salvage</strong> chip section sourced from scmdb.net's mission-detail Combat tab — lists the ship pool that can spawn as salvage targets, plus per-encounter ship-count range.</li>
+                    <li>Mission detail popup: <strong>[LOCATIONS]</strong> button replaces the always-visible Pickup + Destinations chip stacks. Hover the button to expand a popover with the full chip list — keeps the modal compact.</li>
+                  </ul>
+                  <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Changes</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li>Salvage Missions table: <strong>Reward column sort</strong> now ranks by net (reward − buy-in) instead of gross reward, matching the column's two-line display.</li>
+                  </ul>
+                  <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Fixes</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li>Mission detail popup: Prerequisite location chips removed — scmdb's <code className="rounded bg-slate-800 px-1 text-cyan-200">prerequisites.location[]</code> is a contract-availability scope, not a true prerequisite. Real prereqs still render in the Chain section.</li>
+                    <li>Mission detail popup: scmdb's untransformed <code className="rounded bg-slate-800 px-1 text-cyan-200">@generic_locations_blank</code> placeholder no longer surfaces as a phantom location chip.</li>
+                    <li>Daily 6:07 AM SPViewer changelog watcher added alongside the existing 6:03 AM scmdb mission diff. Tracks new 4.8 PTU build IDs and reports them next morning.</li>
+                    <li>Refresh from latest scmdb 4.8 PTU build (<code className="rounded bg-slate-800 px-1 text-cyan-200">4.8.0-ptu.11768487</code>): refueling missions, salvage blueprint rewards, and scraper-module fabricator recipes regenerated.</li>
+                  </ul>
+                </section>
 
                 <section>
                   <h4 className="text-cyan-300 text-base font-bold">v2.7.0 — April 29, 2026</h4>

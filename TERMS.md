@@ -13,7 +13,7 @@ SCSalvager.net ("the site", "we", "us") is a free community tool for Star Citize
 ## What you can do here
 
 - Track your refinery jobs and sell orders in your personal Ledger.
-- Submit anonymous community price reports that go into the site's median pricing.
+- Submit anonymous community price reports. The most recent report for each (material, location) becomes the displayed price site-wide on a latest-wins basis — your submission overwrites the prior value.
 - Upload screenshots (or a crop you select) of refinery and sell-order screens; the image is sent once to a vision AI service for parsing and immediately discarded.
 - Set an optional custom display name to appear on the Statistics leaderboard until you verify an RSI handle.
 - Upload an optional custom avatar that replaces your Discord avatar across the site. We resize and center-crop client-side to 312×312 before storage.
@@ -39,7 +39,7 @@ We may suspend or permanently ban any account that violates these rules. Severe 
 ## Your content
 
 - **Ledger entries** (refinery jobs, sell orders) belong to you. We don't share them with anyone except as described in the Privacy Policy. Deleting your account wipes them.
-- **Community price reports** are stored anonymously, with no link to your user ID. By submitting a report, you grant SCSalvager.net a perpetual, non-exclusive license to display and aggregate that report as part of the community price data. Because the report carries no identifier, deleting your account does not retract reports you previously submitted — they are already irreversibly anonymous and continue to inform the community median.
+- **Community price reports** are stored anonymously, with no link to your user ID. The site uses a **latest-wins** model: every new submission overwrites the prior price for that (material, location) pair, so only the most recent report is retained per pair. By submitting a report, you grant SCSalvager.net a perpetual, non-exclusive license to display that report as the public price until the next user replaces it. Because reports carry no identifier and any prior report is already overwritten, deleting your account cannot retract submissions you have already made.
 - **Screenshot uploads** (and any crop you select before submitting) are processed once by the vision AI parser and discarded. They are never written to disk, stored in Redis, or logged. Don't upload screenshots that contain content you don't have the right to share with the parser.
 - **Custom display names** must not impersonate another player or the site itself. We may reset a custom display name that violates these rules without notice.
 - **Custom avatars** must not infringe on third-party copyright, contain pornographic / hateful imagery, or be designed to impersonate another player. We may remove an avatar that violates these rules without notice.

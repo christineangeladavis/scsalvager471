@@ -14,13 +14,12 @@ Added:
 
 Changes:
 - Salvage Missions table: **Reward column sort** now ranks by net (reward − buy-in) instead of gross reward, matching the column's two-line display. "Lowest reward" now correctly surfaces the worst-net contracts (high buy-in, no reward, etc.) first.
-- **Report Price** (Home page Sell Estimate + Ledger sell-order form) now replaces the displayed price with the exact value you just submitted instead of swapping it for the community median. Other users still see the server-side median computed across every report; only the reporter sees their own number reflected.
+- **Report Price** (Home page Sell Estimate + Ledger sell-order form) now uses a **latest-wins** model: every submission overwrites the stored price for that (material, location) pair. The displayed value site-wide is the most recent report — no community median, no rolling window, no anti-spike dilution. Privacy Policy + Terms of Service refreshed to reflect the new storage model.
+- **Page reloads restore your last-viewed tab.** Top-level tab + Ledger sub-tab + Missions sub-tab are now persisted to localStorage on every change, so refreshing the page lands you exactly where you left off instead of bouncing back to Home.
 
 Fixes:
 - Mission detail popup: **Prerequisite location chips removed**. scmdb's `prerequisites.location[]` array is a contract-availability scope, not a true prerequisite — surfacing it under "Prerequisite" was misleading. Real prereqs (chainStartsWith / requires / unlocks) still render in the Chain section.
 - Mission detail popup: scmdb's untransformed `@generic_locations_blank` placeholder no longer surfaces as a phantom location chip when a contract has no real entry.
-- scmdb.net daily diff watcher now also probes the SPViewer changelog index for new 4.8 PTU builds (6:07 AM local) and writes a snapshot for tomorrow's diff.
-- Refresh from latest scmdb 4.8 PTU build (`4.8.0-ptu.11768487`): refueling missions, salvage blueprint rewards, and scraper-module fabricator recipes regenerated.
 
 UPDATE 4/29/2026 v2.7.0
 

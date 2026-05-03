@@ -16187,18 +16187,49 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [isLoadingCommunityPrices, setIsLoadingCommunityPrices] = useState(true);
 
   // --- Ledger state ---
-  const [activeTab, setActiveTab] = useState("home"); // "home" | "ledger"
+  // Persist active tab + sub-tabs across reloads via localStorage
+  // so a refresh lands on the page the user was last viewing.
+  // Reads happen lazily (function form of useState) to dodge SSR
+  // window references, and writes go through useEffect listeners
+  // below.
+  const readTabPref = (key, fallback) => {
+    try {
+      if (typeof window === "undefined") return fallback;
+      const v = window.localStorage?.getItem(key);
+      return v || fallback;
+    } catch {
+      return fallback;
+    }
+  };
+  const [activeTab, setActiveTab] = useState(() =>
+    readTabPref("scs_active_tab", "home")
+  ); // "home" | "ships" | "missions" | "ledger" | "statistics" | "admin"
   // Sub-tabs inside the Ledger surface. Three slots:
   //   "orders"  — refinery jobs + sell orders forms + Recent Sales
   //   "history" — Patch History panel (per-patch entries + clear)
   //   "crew"    — Crew Salvage roster (multi-user salvage runs)
   // Default: orders.
-  const [ledgerSubTab, setLedgerSubTab] = useState("orders");
+  const [ledgerSubTab, setLedgerSubTab] = useState(() =>
+    readTabPref("scs_ledger_subtab", "orders")
+  );
   // Missions sub-tab: "salvage" (default — live 4.7.2 catalog) or
   // "refueling" (4.8 PTU only — UWC contracts). Both share the
   // same filter / table / modal surface; the sub-tab swaps the
   // underlying mission array and faction option list.
-  const [missionsSubTab, setMissionsSubTab] = useState("salvage");
+  const [missionsSubTab, setMissionsSubTab] = useState(() =>
+    readTabPref("scs_missions_subtab", "salvage")
+  );
+  // Persist tab choices on every change so a reload restores the
+  // user's last-viewed page + sub-tab.
+  useEffect(() => {
+    try { window.localStorage?.setItem("scs_active_tab", activeTab); } catch {}
+  }, [activeTab]);
+  useEffect(() => {
+    try { window.localStorage?.setItem("scs_ledger_subtab", ledgerSubTab); } catch {}
+  }, [ledgerSubTab]);
+  useEffect(() => {
+    try { window.localStorage?.setItem("scs_missions_subtab", missionsSubTab); } catch {}
+  }, [missionsSubTab]);
   // Crew Salvage state — local-only for now (persistence +
   // server-side run-splitting comes when this feature graduates out
   // of preview). Layout:
@@ -17143,23 +17174,50 @@ export default function StarCitizenSalvageGuideWebsite() {
     };
   }, []);
 
-  // Core: POST a price report. Server still aggregates a community
-  // median, but the local view replaces the displayed price with
-  // exactly what THIS user just entered (`parsedPrice`) so they
-  // see their own number reflected immediately. Other users keep
-  // seeing the server-side median per their own reports.
+  // Core: POST a price report. Server is now latest-wins — every
+  // submission overwrites the stored entry for that
+  // (material, location), so `info.medianPrice` returned by the
+  // endpoint is always the value the user just submitted. Mirror
+  // that into local state so the displayed price flips to the
+  // submitted number for THIS user AND every subsequent visitor.
+  // In `vite dev` the /api/* routes aren't served (returns 404
+  // HTML); fall back to a local-only update so the preview
+  // exercises the UI without a backend.
   const submitPriceReport = async (material, location, parsedPrice) => {
     const reportKey = `${material}::${location}`;
-    const res = await fetch("/api/prices", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ material, location, price: parsedPrice }),
-    });
+    const updateLocal = (priceVal) => {
+      setReportedPrices((prev) => ({ ...prev, [reportKey]: priceVal }));
+      setReportedMeta((prev) => ({
+        ...prev,
+        [reportKey]: { reportCount: 1, lastReportedAt: Date.now() },
+      }));
+    };
+    let res;
+    try {
+      res = await fetch("/api/prices", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ material, location, price: parsedPrice }),
+      });
+    } catch (e) {
+      if (import.meta.env.DEV) {
+        updateLocal(parsedPrice);
+        return { devMock: true, medianPrice: parsedPrice, reportCount: 1 };
+      }
+      throw e;
+    }
     const info = await res.json().catch(() => ({}));
     if (!res.ok) {
+      // Vite dev returns 404 HTML for /api/* — soak up that error
+      // locally so the preview still flows. Production keeps the
+      // hard error so users see the real failure.
+      if (import.meta.env.DEV) {
+        updateLocal(parsedPrice);
+        return { devMock: true, medianPrice: parsedPrice, reportCount: 1 };
+      }
       throw new Error(info.error || `Could not submit report (HTTP ${res.status}).`);
     }
-    setReportedPrices((prev) => ({ ...prev, [reportKey]: parsedPrice }));
+    updateLocal(info.medianPrice);
     setReportedMeta((prev) => ({
       ...prev,
       [reportKey]: {
@@ -27483,7 +27541,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                   <h4 className="text-cyan-300 text-xs font-semibold uppercase tracking-wider">What you can do here</h4>
                   <ul className="mt-2 list-disc pl-5 space-y-1 text-slate-400">
                     <li>Track your refinery jobs and sell orders in your personal Ledger.</li>
-                    <li>Submit anonymous community price reports that go into the site's median pricing.</li>
+                    <li>Submit anonymous community price reports. The most recent report for each (material, location) becomes the displayed price site-wide on a latest-wins basis — your submission overwrites the prior value.</li>
                     <li>Upload screenshots (or a crop you select) of refinery and sell-order screens; the image is sent once to a vision AI service for parsing and immediately discarded.</li>
                     <li>Set an optional custom display name to appear on the Statistics leaderboard until you verify an RSI handle.</li>
                     <li>Upload an optional <strong>custom avatar</strong> that replaces your Discord avatar across the site. Resized and center-cropped client-side to 312×312 before storage.</li>
@@ -27515,7 +27573,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                   <h4 className="text-cyan-300 text-xs font-semibold uppercase tracking-wider">Your content</h4>
                   <ul className="mt-2 list-disc pl-5 space-y-2 text-slate-400">
                     <li><strong className="text-slate-200">Ledger entries</strong> (refinery jobs, sell orders) belong to you. We don't share them with anyone except as described in the Privacy Policy. Deleting your account wipes them.</li>
-                    <li><strong className="text-slate-200">Community price reports</strong> are stored anonymously, with no link to your user ID. By submitting a report, you grant SCSalvager.net a perpetual, non-exclusive license to display and aggregate that report as part of the community price data. Because the report carries no identifier, deleting your account does not retract reports you previously submitted — they are already irreversibly anonymous and continue to inform the community median.</li>
+                    <li><strong className="text-slate-200">Community price reports</strong> are stored anonymously, with no link to your user ID. The site uses a <strong>latest-wins</strong> model: every new submission overwrites the prior price for that (material, location) pair, so only the most recent report is retained per pair. By submitting a report, you grant SCSalvager.net a perpetual, non-exclusive license to display that report as the public price until the next user replaces it. Because reports carry no identifier and any prior report is already overwritten, deleting your account cannot retract submissions you have already made.</li>
                     <li><strong className="text-slate-200">Screenshot uploads</strong> (and any crop you select before submitting) are processed once by the vision AI parser and discarded. They are never written to disk, stored in Redis, or logged. Don't upload screenshots that contain content you don't have the right to share with the parser.</li>
                     <li><strong className="text-slate-200">Custom display names</strong> must not impersonate another player or the site itself. We may reset a custom display name that violates these rules without notice.</li>
                     <li><strong className="text-slate-200">Custom avatars</strong> must not infringe on third-party copyright, contain pornographic / hateful imagery, or be designed to impersonate another player. We may remove an avatar that violates these rules without notice.</li>
@@ -27767,14 +27825,13 @@ export default function StarCitizenSalvageGuideWebsite() {
                   <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Changes</p>
                   <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
                     <li>Salvage Missions table: <strong>Reward column sort</strong> now ranks by net (reward − buy-in) instead of gross reward, matching the column's two-line display.</li>
-                    <li><strong>Report Price</strong> (Home Sell Estimate + Ledger sell-order form) now replaces the displayed price with the exact value you submitted instead of swapping it for the community median. Other users still see the server-side median; only the reporter sees their own number reflected.</li>
+                    <li><strong>Report Price</strong> (Home Sell Estimate + Ledger sell-order form) now uses a <strong>latest-wins</strong> model: every submission overwrites the stored price for that (material, location). The displayed value site-wide is the most recent report — no community median, no rolling window. Privacy Policy + Terms of Service refreshed.</li>
+                    <li>Page reloads now restore your <strong>last-viewed tab</strong> + Ledger sub-tab + Missions sub-tab via localStorage. Refresh = stay where you were instead of bouncing back to Home.</li>
                   </ul>
                   <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Fixes</p>
                   <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
                     <li>Mission detail popup: Prerequisite location chips removed — scmdb's <code className="rounded bg-slate-800 px-1 text-cyan-200">prerequisites.location[]</code> is a contract-availability scope, not a true prerequisite. Real prereqs still render in the Chain section.</li>
                     <li>Mission detail popup: scmdb's untransformed <code className="rounded bg-slate-800 px-1 text-cyan-200">@generic_locations_blank</code> placeholder no longer surfaces as a phantom location chip.</li>
-                    <li>Daily 6:07 AM SPViewer changelog watcher added alongside the existing 6:03 AM scmdb mission diff. Tracks new 4.8 PTU build IDs and reports them next morning.</li>
-                    <li>Refresh from latest scmdb 4.8 PTU build (<code className="rounded bg-slate-800 px-1 text-cyan-200">4.8.0-ptu.11768487</code>): refueling missions, salvage blueprint rewards, and scraper-module fabricator recipes regenerated.</li>
                   </ul>
                 </section>
 

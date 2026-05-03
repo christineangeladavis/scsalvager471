@@ -3,20 +3,26 @@
 //   GET  -> { [material::locationName]: { medianPrice, reportCount, lastReportedAt } }
 //   POST { material, location, price } -> { ok, medianPrice, reportCount, lastReportedAt }
 //
+// Latest-wins model: every POST overwrites the stored entry for that
+// (material, location) so the most recent report becomes the single
+// authoritative price. The response field is still `medianPrice` for
+// client backward-compat, but with a single stored report it always
+// equals the submitted value. GET continues to compute over the
+// stored reports array, so old multi-report entries (from before the
+// switch to latest-wins) still resolve correctly until they get
+// replaced by a fresh report.
+//
 // Backward compatibility: legacy entries (stored with plain location keys, no
 // "::" separator) are treated as Construction Material on read. New writes
 // always go to prefixed keys. This means old CMAT reports remain visible
-// forever; any new CMAT report on the same location is stored at the prefixed
-// key and accumulates fresh reports. The legacy entry is left in place
-// untouched (lazy migration — could be cleaned up by a one-shot script later).
+// until someone reports a fresh price on the same location, at which
+// point the prefixed key takes over with the new latest-wins single entry.
 //
 // Environment variables (auto-injected by the Vercel Marketplace Upstash Redis
 // integration): UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN (and/or the
 // KV_REST_API_URL / KV_REST_API_TOKEN aliases).
 //
-// Anti-troll design:
-//   - Reports stored as a rolling window of the last MAX_REPORTS per (material,location)
-//   - medianPrice is the median of stored reports — one spike is diluted out
+// Validation:
 //   - Price must be within [MIN_PRICE, MAX_PRICE]
 //   - Location and material names capped at 100 chars
 
@@ -174,38 +180,25 @@ export default async function handler(req, res) {
 
     try {
       const data = (await redis.get(MASTER_KEY)) || {};
-      // Backward compat: if writing CMAT and a legacy plain-keyed entry exists
-      // for this location, seed the prefixed entry with its reports so the new
-      // report extends history rather than restarting it.
-      let existing = data[storageKey];
-      if (!existing && canonical === DEFAULT_MATERIAL && data[location]) {
-        existing = data[location];
-      }
-      // Backward compat: if this material was renamed, also try the old key
-      // so the new entry inherits prior reports rather than starting empty.
-      if (!existing) {
-        for (const [oldName, newName] of Object.entries(MATERIAL_RENAMES)) {
-          if (newName !== canonical) continue;
-          const oldKey = `${oldName}${KEY_SEP}${location}`;
-          if (data[oldKey]) { existing = data[oldKey]; break; }
-        }
-      }
-      existing = existing || { material: canonical, location, reports: [] };
-
-      const nextReports = [
-        ...(Array.isArray(existing.reports) ? existing.reports : []),
-        { price: Math.round(priceNum), ts: Date.now() },
-      ].slice(-MAX_REPORTS_PER_LOCATION);
+      // Latest-wins: discard any prior reports for this
+      // (material, location) and store only the new submission.
+      // Subsequent GET calls see this single price as both the
+      // medianPrice (single value → median is itself) and the
+      // sole report. Legacy plain-keyed entries are NOT migrated
+      // because the new prefixed write is now authoritative
+      // for the public view.
+      const ts = Date.now();
+      const price = Math.round(priceNum);
+      const nextReports = [{ price, ts }];
 
       data[storageKey] = { material: canonical, location, reports: nextReports };
       await redis.set(MASTER_KEY, data);
 
-      const prices = nextReports.map((r) => r.price);
       return res.status(200).json({
         ok: true,
-        medianPrice: Math.round(median(prices)),
-        reportCount: prices.length,
-        lastReportedAt: nextReports[nextReports.length - 1].ts,
+        medianPrice: price,
+        reportCount: 1,
+        lastReportedAt: ts,
       });
     } catch (e) {
       console.error("POST /api/prices failed:", e && e.message ? e.message : e);

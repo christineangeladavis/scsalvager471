@@ -85,10 +85,12 @@ export function median(nums) {
 }
 
 export function buildPublicView(dataMap) {
-  // Two storage keys can canonicalize to the same public key (e.g. an old
-  // "Recycle Material Composite::HUR-L1" entry and a new "Recycled Material
-  // Composite::HUR-L1" entry roll up to the same view). Merge their reports
-  // first, then compute the median once.
+  // Latest-wins: surface the single most-recent report per
+  // (material, location). Two storage keys can canonicalize to
+  // the same public key (legacy "Recycle Material Composite" →
+  // "Recycled Material Composite", legacy non-prefixed keys →
+  // "Construction Materials::<loc>"); merge candidates per
+  // public key, sort by timestamp descending, take the freshest.
   const merged = {};
   for (const [rawKey, entry] of Object.entries(dataMap || {})) {
     if (!entry || !Array.isArray(entry.reports) || !entry.reports.length) continue;
@@ -99,15 +101,17 @@ export function buildPublicView(dataMap) {
   }
   const result = {};
   for (const [publicKey, reports] of Object.entries(merged)) {
-    const prices = reports
-      .map((r) => (r && typeof r.price === "number" ? r.price : null))
-      .filter((p) => p !== null);
-    if (!prices.length) continue;
-    const timestamps = reports.map((r) => (r && r.ts) || 0);
+    const valid = reports
+      .filter((r) => r && typeof r.price === "number")
+      .sort((a, b) => (b.ts || 0) - (a.ts || 0));
+    if (!valid.length) continue;
+    const newest = valid[0];
+    // medianPrice field name kept for backward-compat with older
+    // clients still in cache; the value is now the latest report.
     result[publicKey] = {
-      medianPrice: Math.round(median(prices)),
-      reportCount: prices.length,
-      lastReportedAt: Math.max(...timestamps),
+      medianPrice: Math.round(newest.price),
+      reportCount: 1,
+      lastReportedAt: newest.ts || 0,
     };
   }
   return result;

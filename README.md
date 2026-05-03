@@ -14,6 +14,7 @@ Added:
 
 Changes:
 - Salvage Missions table: **Reward column sort** now ranks by net (reward − buy-in) instead of gross reward, matching the column's two-line display. "Lowest reward" now correctly surfaces the worst-net contracts (high buy-in, no reward, etc.) first.
+- **Report Price** (Home page Sell Estimate + Ledger sell-order form) now replaces the displayed price with the exact value you just submitted instead of swapping it for the community median. Other users still see the server-side median computed across every report; only the reporter sees their own number reflected.
 
 Fixes:
 - Mission detail popup: **Prerequisite location chips removed**. scmdb's `prerequisites.location[]` array is a contract-availability scope, not a true prerequisite — surfacing it under "Prerequisite" was misleading. Real prereqs (chainStartsWith / requires / unlocks) still render in the Chain section.

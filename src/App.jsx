@@ -17143,9 +17143,11 @@ export default function StarCitizenSalvageGuideWebsite() {
     };
   }, []);
 
-  // Core: POST a price report and merge the response into the shared
-  // reportedPrices / reportedMeta state. Throws on failure so the
-  // per-widget wrappers can surface error messages.
+  // Core: POST a price report. Server still aggregates a community
+  // median, but the local view replaces the displayed price with
+  // exactly what THIS user just entered (`parsedPrice`) so they
+  // see their own number reflected immediately. Other users keep
+  // seeing the server-side median per their own reports.
   const submitPriceReport = async (material, location, parsedPrice) => {
     const reportKey = `${material}::${location}`;
     const res = await fetch("/api/prices", {
@@ -17157,7 +17159,7 @@ export default function StarCitizenSalvageGuideWebsite() {
     if (!res.ok) {
       throw new Error(info.error || `Could not submit report (HTTP ${res.status}).`);
     }
-    setReportedPrices((prev) => ({ ...prev, [reportKey]: info.medianPrice }));
+    setReportedPrices((prev) => ({ ...prev, [reportKey]: parsedPrice }));
     setReportedMeta((prev) => ({
       ...prev,
       [reportKey]: {
@@ -27765,6 +27767,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                   <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Changes</p>
                   <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
                     <li>Salvage Missions table: <strong>Reward column sort</strong> now ranks by net (reward − buy-in) instead of gross reward, matching the column's two-line display.</li>
+                    <li><strong>Report Price</strong> (Home Sell Estimate + Ledger sell-order form) now replaces the displayed price with the exact value you submitted instead of swapping it for the community median. Other users still see the server-side median; only the reporter sees their own number reflected.</li>
                   </ul>
                   <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Fixes</p>
                   <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">

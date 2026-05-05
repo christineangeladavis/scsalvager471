@@ -5,6 +5,17 @@ Made by Chrissyy · Referral: STAR-CH2W-R73F
 
 ## What's in this build
 
+UPDATE 5/5/2026 v2.7.2
+
+Added:
+- Crew Salvage Refinery + Sales Calculator now ships with two **sell-location dropdowns**: **CMAT Sell Location** and **RMC Sell Location**. Pick a specific sell point per material to pin the calculator to that point's per-SCU price; leave blank to fall through to the highest-priced location across the catalog (the previous default).
+
+Changes:
+- Crew Salvage table cleanup: dropped the **Sells As** and **Best aUEC/SCU** columns. The remaining columns (Salvaged / Input SCU / Refined SCU / Sale aUEC) are tighter and easier to scan.
+- Crew Salvage **Construction Salvage** row now follows the **CMAT Sell Location** dropdown (was implicitly priced as RMC). **Recycled Material Composite** row continues to follow the RMC Sell Location dropdown.
+- Crew Salvage **Recycled Material Composite** row blanks the Refined SCU column (RMC sells 1:1 with no refinery step, so the cell was tautologically Input SCU; em-dash makes the no-refinery story obvious).
+- Crew Salvage labels turned **yellow** for visual hierarchy: Refinery Location / Refinery Method / CMAT Sell Location / RMC Sell Location, the three SCU input labels (Construction Salvage / Construction Pieces / Recycled Material Composite), Total aUEC + Crew Count in the Split Calculator, and every role label (Pilot / Claw Operator / Salvage Operator 1-3 / Cargo Operator).
+
 UPDATE 5/2/2026 v2.7.1
 
 Added:

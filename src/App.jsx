@@ -2872,7 +2872,7 @@ const PLAYER_SELL_POINT = "Sold to Player";
 // notification bell surfaces a "new site update available" entry until
 // the user opens the What's New modal (or marks it read). Per-browser
 // pointer is stored at localStorage["scs_whatsnew_seen_version"].
-const LATEST_WHATSNEW_VERSION = "v2.7.1";
+const LATEST_WHATSNEW_VERSION = "v2.7.2";
 
 // localStorage key for explicitly dismissed notification ids. Lets
 // users hide the red badge without changing their underlying setup
@@ -16252,6 +16252,11 @@ export default function StarCitizenSalvageGuideWebsite() {
     scuRMC: "",
     refMethod: "",
     refLocation: "",
+    // Per-material sell-location pickers. Empty string falls
+    // through to the site-wide best-price scan; setting a value
+    // pins the calculator to that specific sell point's price.
+    cmatSellLocation: "",
+    rmcSellLocation: "",
     splitCrewCount: "",
     splitAuec: "",
   });
@@ -16702,12 +16707,13 @@ export default function StarCitizenSalvageGuideWebsite() {
   // Vercel redeploy) these ships start appearing automatically —
   // no separate code push required.
   const PENDING_SHIPS = useMemo(() => ([
-    { name: "Drake Ironclad",                manufacturer: "Drake Interplanetary",  sinceVersion: "4.8" },
-    { name: "Drake Ironclad Assault",        manufacturer: "Drake Interplanetary",  sinceVersion: "4.8" },
-    { name: "Drake Pitbull",                 manufacturer: "Drake Interplanetary",  sinceVersion: "4.8" },
-    { name: "MISC Starlite",                 manufacturer: "Musashi Industrial & Starflight Concern", sinceVersion: "4.8" },
-    { name: "Aegis Tiburon",                 manufacturer: "Aegis Dynamics",         sinceVersion: "4.8" },
-    { name: "Kruger Intergalactic Stingray", manufacturer: "Kruger Intergalactic",   sinceVersion: "4.8" },
+    { name: "Ironclad",                      manufacturer: "Drake Interplanetary",  sinceVersion: "4.8" },
+    { name: "Ironclad Assault",              manufacturer: "Drake Interplanetary",  sinceVersion: "4.8" },
+    { name: "Pitbull",                       manufacturer: "Drake Interplanetary",  sinceVersion: "4.8" },
+    { name: "Starlite",                      manufacturer: "Musashi Industrial and Starflight Concern", sinceVersion: "4.8" },
+    { name: "Tiburon",                       manufacturer: "Aegis Dynamics",         sinceVersion: "4.8" },
+    { name: "Stingray",                      manufacturer: "Kruger Intergalactic",   sinceVersion: "4.8" },
+    { name: "M80",                           manufacturer: "Origin Jumpworks",       sinceVersion: "4.8" },
   ]), []);
   // Numeric-segment compare: "4.7.2" < "4.8" < "4.10". Empty /
   // missing versions sort to "below threshold" so pending ships
@@ -23921,17 +23927,40 @@ export default function StarCitizenSalvageGuideWebsite() {
                 }
                 return best;
               };
-              const rmcPrice = bestSellPriceFor("Recycled Material Composite");
-              const cmPrice = bestSellPriceFor("Construction Materials");
+              // Per-material sell-location resolver. When the user
+              // pins a specific sell point via the new dropdowns
+              // (cmatSellLocation / rmcSellLocation), use that
+              // point's per-SCU price; otherwise fall through to
+              // the global best price for the material.
+              const priceAtLocation = (mat, locName) => {
+                if (!locName) return bestSellPriceFor(mat);
+                const hit = sellPoints.find(
+                  (p) => p.material === mat && p.name === locName
+                );
+                return hit && Number.isFinite(hit.pricePerScu)
+                  ? hit.pricePerScu
+                  : bestSellPriceFor(mat);
+              };
+              const rmcPrice = priceAtLocation("Recycled Material Composite", crewDraft.rmcSellLocation);
+              const cmPrice = priceAtLocation("Construction Materials", crewDraft.cmatSellLocation);
+              // Sell-point lists per material for the dropdowns.
+              const cmatSellOptions = sellPoints
+                .filter((p) => p.material === "Construction Materials")
+                .map((p) => p.name)
+                .filter((n, i, arr) => arr.indexOf(n) === i);
+              const rmcSellOptions = sellPoints
+                .filter((p) => p.material === "Recycled Material Composite")
+                .map((p) => p.name)
+                .filter((n, i, arr) => arr.indexOf(n) === i);
               const sessionSaleRows = [
                 ...(crewDraft.ship === "Reclaimer"
                   ? [{
                       label: "Construction Salvage",
                       inputScu: csInScu,
                       refinedScu: csRefResult.totalYield,
-                      sellAs: "RMC",
-                      bestPrice: rmcPrice,
-                      saleAuec: csRefResult.totalYield * rmcPrice,
+                      sellAs: "Construction Materials",
+                      bestPrice: cmPrice,
+                      saleAuec: csRefResult.totalYield * cmPrice,
                       refCost: csRefResult.cost,
                     }]
                   : []),
@@ -24232,7 +24261,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                       <div className="mt-2 grid gap-3 md:grid-cols-2">
                         {roleSet.map((role) => (
                           <div key={role} className="rounded-2xl border border-slate-700 bg-slate-950/60 p-3">
-                            <label className="block text-[10px] uppercase tracking-wider text-cyan-300/80">
+                            <label className="block text-[10px] uppercase tracking-wider text-amber-300">
                               {role}
                             </label>
                             <input
@@ -24401,7 +24430,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <div className="mt-3 grid gap-3 md:grid-cols-2">
                       {crewDraft.ship === "Reclaimer" && (
                         <div className="rounded-2xl border border-slate-700 bg-slate-950/60 p-3">
-                          <label className="block text-[10px] uppercase tracking-wider text-white">
+                          <label className="block text-[10px] uppercase tracking-wider text-amber-300">
                             Construction Salvage SCU <span className="text-slate-500">(Reclaimer)</span>
                           </label>
                           <input
@@ -24417,7 +24446,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                       )}
                       {crewDraft.ship === "Moth" && (
                         <div className="rounded-2xl border border-slate-700 bg-slate-950/60 p-3">
-                          <label className="block text-[10px] uppercase tracking-wider text-white">
+                          <label className="block text-[10px] uppercase tracking-wider text-amber-300">
                             Construction Pieces SCU <span className="text-slate-500">(Moth)</span>
                           </label>
                           <input
@@ -24432,7 +24461,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                         </div>
                       )}
                       <div className="rounded-2xl border border-slate-700 bg-slate-950/60 p-3">
-                        <label className="block text-[10px] uppercase tracking-wider text-white">
+                        <label className="block text-[10px] uppercase tracking-wider text-amber-300">
                           Recycled Material Composite SCU
                         </label>
                         <input
@@ -24460,7 +24489,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                       </div>
                       <div className="mt-3 grid gap-3 md:grid-cols-2">
                         <div>
-                          <label className="block text-[10px] uppercase tracking-wider text-slate-500">Refinery Location</label>
+                          <label className="block text-[10px] uppercase tracking-wider text-amber-300">Refinery Location</label>
                           <select
                             value={crewDraft.refLocation}
                             onChange={(e) => setCrewDraftField("refLocation", e.target.value)}
@@ -24485,7 +24514,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                           </select>
                         </div>
                         <div>
-                          <label className="block text-[10px] uppercase tracking-wider text-slate-500">Refinery Method</label>
+                          <label className="block text-[10px] uppercase tracking-wider text-amber-300">Refinery Method</label>
                           <select
                             value={crewDraft.refMethod}
                             onChange={(e) => setCrewDraftField("refMethod", e.target.value)}
@@ -24494,6 +24523,37 @@ export default function StarCitizenSalvageGuideWebsite() {
                             <option value="">(Select a Method)</option>
                             {refineryMethods.map((m) => (
                               <option key={m.name} value={m.name}>{m.name} — {m.speed}/{m.cost}/{m.yieldRating}</option>
+                            ))}
+                          </select>
+                        </div>
+                        {/* Per-material sell-location pickers. Empty
+                            value = use the global best price across
+                            every known sell point for that material;
+                            otherwise pin to the chosen point's
+                            per-SCU price. */}
+                        <div>
+                          <label className="block text-[10px] uppercase tracking-wider text-amber-300">CMAT Sell Location</label>
+                          <select
+                            value={crewDraft.cmatSellLocation}
+                            onChange={(e) => setCrewDraftField("cmatSellLocation", e.target.value)}
+                            className="mt-1 w-full rounded-md border border-cyan-500/25 bg-slate-900 px-3 py-1.5 text-sm outline-none focus:border-cyan-400"
+                          >
+                            <option value="">(Best across all locations)</option>
+                            {cmatSellOptions.map((n) => (
+                              <option key={n} value={n}>{n}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[10px] uppercase tracking-wider text-amber-300">RMC Sell Location</label>
+                          <select
+                            value={crewDraft.rmcSellLocation}
+                            onChange={(e) => setCrewDraftField("rmcSellLocation", e.target.value)}
+                            className="mt-1 w-full rounded-md border border-cyan-500/25 bg-slate-900 px-3 py-1.5 text-sm outline-none focus:border-cyan-400"
+                          >
+                            <option value="">(Best across all locations)</option>
+                            {rmcSellOptions.map((n) => (
+                              <option key={n} value={n}>{n}</option>
                             ))}
                           </select>
                         </div>
@@ -24506,24 +24566,30 @@ export default function StarCitizenSalvageGuideWebsite() {
                               <th className="px-3 py-2 text-left">Salvaged</th>
                               <th className="px-3 py-2 text-right">Input SCU</th>
                               <th className="px-3 py-2 text-right">Refined SCU</th>
-                              <th className="px-3 py-2 text-right">Sells As</th>
-                              <th className="px-3 py-2 text-right">Best aUEC/SCU</th>
                               <th className="px-3 py-2 text-right">Sale aUEC</th>
                             </tr>
                           </thead>
                           <tbody>
-                            {sessionSaleRows.map((r) => (
-                              <tr key={r.label} className="border-t border-slate-800">
-                                <td className="px-3 py-2 text-slate-200">{r.label}</td>
-                                <td className="px-3 py-2 text-right text-amber-300">{r.inputScu.toLocaleString(undefined, { maximumFractionDigits: 1 })}</td>
-                                <td className="px-3 py-2 text-right text-amber-200">{r.refinedScu.toLocaleString(undefined, { maximumFractionDigits: 1 })}</td>
-                                <td className="px-3 py-2 text-right text-slate-300">{r.sellAs}</td>
-                                <td className="px-3 py-2 text-right text-cyan-300">{r.bestPrice ? r.bestPrice.toLocaleString() : "—"}</td>
-                                <td className="px-3 py-2 text-right font-bold text-emerald-300">{Math.round(r.saleAuec).toLocaleString()}</td>
-                              </tr>
-                            ))}
+                            {sessionSaleRows.map((r) => {
+                              // RMC sells 1:1 with no refinery step,
+                              // so the Refined SCU column is
+                              // tautologically the same as Input SCU
+                              // for that row — blank it out instead
+                              // of repeating the number.
+                              const isRmc = r.label === "Recycled Material Composite";
+                              return (
+                                <tr key={r.label} className="border-t border-slate-800">
+                                  <td className="px-3 py-2 text-slate-200">{r.label}</td>
+                                  <td className="px-3 py-2 text-right text-amber-300">{r.inputScu.toLocaleString(undefined, { maximumFractionDigits: 1 })}</td>
+                                  <td className="px-3 py-2 text-right text-amber-200">
+                                    {isRmc ? <span className="text-slate-600">—</span> : r.refinedScu.toLocaleString(undefined, { maximumFractionDigits: 1 })}
+                                  </td>
+                                  <td className="px-3 py-2 text-right font-bold text-emerald-300">{Math.round(r.saleAuec).toLocaleString()}</td>
+                                </tr>
+                              );
+                            })}
                             <tr className="border-t border-cyan-500/30 bg-slate-950/80">
-                              <td colSpan={5} className="px-3 py-2 text-right text-[10px] uppercase tracking-wider text-cyan-300/80">
+                              <td colSpan={3} className="px-3 py-2 text-right text-[10px] uppercase tracking-wider text-cyan-300/80">
                                 Total Refinery Cost
                               </td>
                               <td className="px-3 py-2 text-right font-bold text-rose-300">
@@ -24531,7 +24597,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                               </td>
                             </tr>
                             <tr className="bg-slate-950/80">
-                              <td colSpan={5} className="px-3 py-2 text-right text-[10px] uppercase tracking-wider text-emerald-300/80">
+                              <td colSpan={3} className="px-3 py-2 text-right text-[10px] uppercase tracking-wider text-emerald-300/80">
                                 Net Projected Sale
                               </td>
                               <td className="px-3 py-2 text-right font-black text-emerald-300">
@@ -24552,7 +24618,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                       <p className="mt-1 text-xs text-slate-400">Divide total aUEC across the crew. Defaults crew count to the number of assigned roles.</p>
                       <div className="mt-3 grid gap-3 md:grid-cols-3">
                         <div>
-                          <label className="block text-[10px] uppercase tracking-wider text-slate-500">Total aUEC</label>
+                          <label className="block text-[10px] uppercase tracking-wider text-amber-300">Total aUEC</label>
                           <input
                             type="number"
                             min="0"
@@ -24564,7 +24630,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                           />
                         </div>
                         <div>
-                          <label className="block text-[10px] uppercase tracking-wider text-slate-500">Crew Count</label>
+                          <label className="block text-[10px] uppercase tracking-wider text-amber-300">Crew Count</label>
                           <input
                             type="number"
                             min="1"
@@ -25728,7 +25794,24 @@ export default function StarCitizenSalvageGuideWebsite() {
                             {formatTimestamp(g.ts)}
                           </td>
                           <td className="px-4 py-3 text-slate-300 whitespace-nowrap">
-                            {g.country || <span className="text-slate-600">—</span>}
+                            {/* Country payload from CDN is a
+                                two-letter ISO-3166-1 alpha-2 code
+                                (e.g. "US"). Resolve to the full
+                                English country name via
+                                Intl.DisplayNames so admins read
+                                "United States" instead of "US".
+                                Falls back to the raw code if the
+                                runtime can't resolve it. */}
+                            {(() => {
+                              const code = g.country;
+                              if (!code) return <span className="text-slate-600">—</span>;
+                              try {
+                                const dn = new Intl.DisplayNames(["en"], { type: "region" });
+                                return dn.of(String(code).toUpperCase()) || code;
+                              } catch {
+                                return code;
+                              }
+                            })()}
                           </td>
                           <td className="px-4 py-3 text-slate-400 text-xs max-w-[28rem] truncate" title={g.ua}>
                             {g.ua || <span className="text-slate-600">—</span>}
@@ -27813,6 +27896,21 @@ export default function StarCitizenSalvageGuideWebsite() {
               </div>
 
               <div className="mt-5 space-y-7 text-sm text-slate-300 leading-relaxed">
+
+                <section>
+                  <h4 className="text-cyan-300 text-base font-bold">v2.7.2 — May 5, 2026</h4>
+                  <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li>Crew Salvage Refinery + Sales Calculator gains two sell-location dropdowns: <strong>CMAT Sell Location</strong> + <strong>RMC Sell Location</strong>. Pick a specific sell point per material; leave blank to keep the previous "best across all locations" default.</li>
+                  </ul>
+                  <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Changes</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li>Crew Salvage table dropped the <strong>Sells As</strong> and <strong>Best aUEC/SCU</strong> columns. Salvaged / Input SCU / Refined SCU / Sale aUEC remain.</li>
+                    <li>Crew Salvage <strong>Construction Salvage</strong> row now follows the CMAT Sell Location dropdown (was implicitly priced as RMC).</li>
+                    <li>Crew Salvage Recycled Material Composite row blanks the Refined SCU cell — RMC sells 1:1 with no refinery step.</li>
+                    <li>Crew Salvage labels (Refinery dropdowns, Sell Location dropdowns, the three SCU inputs, Total aUEC + Crew Count, every role station) turned <strong>yellow</strong> for visual hierarchy.</li>
+                  </ul>
+                </section>
 
                 <section>
                   <h4 className="text-cyan-300 text-base font-bold">v2.7.1 — May 2, 2026</h4>

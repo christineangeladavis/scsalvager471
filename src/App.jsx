@@ -16046,6 +16046,35 @@ function getSafeScuValue(value) {
 // User enters refinery time as separate hours/minutes/seconds string fields;
 // this collapses them into a single non-negative second count, treating any
 // blank or non-numeric field as zero.
+// Format a numeric string with thousands separators while keeping
+// the optional leading minus and a single decimal point intact.
+// State everywhere stores the raw digits string (no commas), so
+// downstream `Number()` parsing keeps working — only the rendered
+// `value` flows through this formatter.
+function formatNumberWithCommas(raw) {
+  const str = String(raw ?? "");
+  if (!str) return "";
+  const negative = str.startsWith("-");
+  const body = negative ? str.slice(1) : str;
+  const [intPart = "", decPart] = body.split(".");
+  const formatted = intPart === "" ? "" : intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return (negative ? "-" : "") + formatted + (decPart !== undefined ? "." + decPart : "");
+}
+// Sanitize keystrokes coming back from the input — strip commas,
+// keep one leading minus, keep at most one decimal point, drop any
+// other non-digit char. Returns the canonical raw digit string.
+function stripCommaInput(value) {
+  let v = String(value ?? "").replace(/,/g, "");
+  v = v.replace(/[^\d.\-]/g, "");
+  if (v.startsWith("-")) v = "-" + v.slice(1).replace(/-/g, "");
+  else v = v.replace(/-/g, "");
+  const firstDot = v.indexOf(".");
+  if (firstDot !== -1) {
+    v = v.slice(0, firstDot + 1) + v.slice(firstDot + 1).replace(/\./g, "");
+  }
+  return v;
+}
+
 function hmsToSeconds(form) {
   const h = Math.max(0, Number(form.hours) || 0);
   const m = Math.max(0, Number(form.minutes) || 0);
@@ -16873,6 +16902,14 @@ export default function StarCitizenSalvageGuideWebsite() {
     const v = patchStatus?.version;
     return PENDING_SHIPS.filter((s) => isPatchAtLeast(v, s.sinceVersion));
   }, [PENDING_SHIPS, patchStatus]);
+  // 4.8-gated label tone. Form labels turn amber-300 once
+  // patchStatus.version >= "4.8"; on 4.7.2 they keep the
+  // baseline slate-400 tone the site shipped with. Used as a
+  // tail token in label className strings:
+  //   className={`mb-1 block text-xs ${labelTone}`}
+  const labelTone = isPatchAtLeast(patchStatus?.version, "4.8")
+    ? "text-amber-300"
+    : "text-slate-400";
   // Manufacturer-by-name map sourced exclusively from SPVIEWER_SHIPS
   // (upstream: api.uexcorp.uk/2.0/vehicles), plus any pending ships
   // that have gone live for the current patch.
@@ -21599,7 +21636,7 @@ export default function StarCitizenSalvageGuideWebsite() {
 
               <div className="mt-5 grid gap-4 md:grid-cols-2">
                 <div className="rounded-2xl border border-slate-700 bg-slate-950/70 p-4">
-                  <label className="mb-2 block text-sm text-slate-400">Refinery Location</label>
+                  <label className={`mb-2 block text-sm ${labelTone}`}>Refinery Location</label>
                   <select
                     value={selectedRefineryLocation}
                     onChange={(e) => setSelectedRefineryLocation(e.target.value)}
@@ -21635,7 +21672,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     </optgroup>
                   </select>
 
-                  <label className="mb-2 mt-4 block text-sm text-slate-400">Material</label>
+                  <label className={`mb-2 mt-4 block text-sm ${labelTone}`}>Material</label>
                   <select
                     value={selectedMaterial}
                     onChange={(e) => setSelectedMaterial(e.target.value)}
@@ -21649,7 +21686,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     ))}
                   </select>
 
-                  <label className="mb-2 mt-4 block text-sm text-slate-400">Refinery Method</label>
+                  <label className={`mb-2 mt-4 block text-sm ${labelTone}`}>Refinery Method</label>
                   <select
                     value={selectedRefineryMethod}
                     onChange={(e) => setSelectedRefineryMethod(e.target.value)}
@@ -21664,13 +21701,13 @@ export default function StarCitizenSalvageGuideWebsite() {
                   </select>
                   <p className="mt-1 text-xs text-slate-500">Speed / Cost / Yield · H=High, M=Moderate, L=Low, V=Very Low</p>
 
-                  <label className="mb-2 mt-4 block text-sm text-slate-400">SCU Amount</label>
+                  <label className={`mb-2 mt-4 block text-sm ${labelTone}`}>SCU Amount</label>
                   <input
-                    type="number"
+                    type="text" inputMode="decimal"
                     min="0"
                     step="1"
-                    value={scuInput}
-                    onChange={(e) => setScuInput(e.target.value)}
+                    value={formatNumberWithCommas(scuInput)}
+                    onChange={(e) => setScuInput(stripCommaInput(e.target.value))}
                     className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 outline-none focus:border-cyan-400"
                   />
                 </div>
@@ -21714,7 +21751,7 @@ export default function StarCitizenSalvageGuideWebsite() {
               <p className="mt-1 text-sm text-slate-400">Enter your yield amount and select a sell location to calculate your total aUEC value.</p>
               <div className="mt-4 space-y-4">
                 <div className="rounded-2xl border border-slate-700 bg-slate-950/70 p-4">
-                  <label className="mb-2 block text-sm text-slate-400">Material</label>
+                  <label className={`mb-2 block text-sm ${labelTone}`}>Material</label>
                   <select
                     value={selectedSellMaterial}
                     onChange={(e) => {
@@ -21735,20 +21772,20 @@ export default function StarCitizenSalvageGuideWebsite() {
                 </div>
 
                 <div className="rounded-2xl border border-slate-700 bg-slate-950/70 p-4">
-                  <label className="mb-2 block text-sm text-slate-400">SCU Amount</label>
+                  <label className={`mb-2 block text-sm ${labelTone}`}>SCU Amount</label>
                   <input
-                    type="number"
+                    type="text" inputMode="decimal"
                     min="0"
                     step="1"
-                    value={sellYieldInput}
-                    onChange={(e) => setSellYieldInput(e.target.value)}
+                    value={formatNumberWithCommas(sellYieldInput)}
+                    onChange={(e) => setSellYieldInput(stripCommaInput(e.target.value))}
                     className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 outline-none focus:border-cyan-400"
                   />
                 </div>
 
                 {selectedSellMaterial && (
                   <div className="rounded-2xl border border-slate-700 bg-slate-950/70 p-4">
-                    <label className="mb-2 block text-sm text-slate-400">Sell Location</label>
+                    <label className={`mb-2 block text-sm ${labelTone}`}>Sell Location</label>
                     <select
                       value={selectedSellPointName}
                       onChange={(e) => setSelectedSellPointName(e.target.value)}
@@ -21829,12 +21866,12 @@ export default function StarCitizenSalvageGuideWebsite() {
                   </p>
                   <div className="mt-3 flex items-stretch gap-2">
                     <input
-                      type="number"
+                      type="text" inputMode="decimal"
                       min="0"
                       step="1"
                       placeholder="Reported aUEC/SCU"
-                      value={reportPriceInput}
-                      onChange={(e) => { setReportPriceInput(e.target.value); if (reportError) setReportError(""); }}
+                      value={formatNumberWithCommas(reportPriceInput)}
+                      onChange={(e) => { setReportPriceInput(stripCommaInput(e.target.value)); if (reportError) setReportError(""); }}
                       onKeyDown={(e) => { if (e.key === "Enter" && !isSubmittingReport) handleReportPrice(); }}
                       disabled={isSubmittingReport}
                       className="min-w-0 flex-1 rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 outline-none focus:border-cyan-400 disabled:opacity-60"
@@ -22046,12 +22083,12 @@ export default function StarCitizenSalvageGuideWebsite() {
                                   aria-label={`${row.head} ${slot.name} quality`}
                                 />
                                 <input
-                                  type="number"
+                                  type="text" inputMode="decimal"
                                   min={0}
                                   max={1000}
                                   step={10}
-                                  value={q}
-                                  onChange={(e) => setScraperBoost(row.head, slot.name, e.target.value)}
+                                  value={formatNumberWithCommas(q)}
+                                  onChange={(e) => setScraperBoost(row.head, slot.name, stripCommaInput(e.target.value))}
                                   className="w-14 rounded border border-slate-700 bg-slate-900/70 px-1 py-0.5 text-[10px] font-mono text-cyan-200 focus:border-cyan-500/60 focus:outline-none"
                                   aria-label={`${row.head} ${slot.name} quality numeric`}
                                 />
@@ -22396,7 +22433,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                 {/* Filter row */}
                 <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
                   <div>
-                    <label className="mb-1 block text-xs uppercase tracking-wider text-slate-400">Search</label>
+                    <label className={`mb-1 block text-xs uppercase tracking-wider ${labelTone}`}>Search</label>
                     <input
                       type="text"
                       value={missionSearch}
@@ -22406,7 +22443,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs uppercase tracking-wider text-slate-400">System</label>
+                    <label className={`mb-1 block text-xs uppercase tracking-wider ${labelTone}`}>System</label>
                     <select
                       value={missionSystem}
                       onChange={(e) => setMissionSystem(e.target.value)}
@@ -22419,7 +22456,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     </select>
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs uppercase tracking-wider text-slate-400">Faction</label>
+                    <label className={`mb-1 block text-xs uppercase tracking-wider ${labelTone}`}>Faction</label>
                     <select
                       value={missionFaction}
                       onChange={(e) => setMissionFaction(e.target.value)}
@@ -22432,7 +22469,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     </select>
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs uppercase tracking-wider text-slate-400">Legality</label>
+                    <label className={`mb-1 block text-xs uppercase tracking-wider ${labelTone}`}>Legality</label>
                     <select
                       value={missionLegality}
                       onChange={(e) => setMissionLegality(e.target.value)}
@@ -22449,7 +22486,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                       anywhere on the live cycle. */}
                   {isPatchAtLeast(patchStatus?.version, "4.8") && (
                     <div>
-                      <label className="mb-1 block text-xs uppercase tracking-wider text-slate-400">Blueprint</label>
+                      <label className={`mb-1 block text-xs uppercase tracking-wider ${labelTone}`}>Blueprint</label>
                       <select
                         value={missionBlueprint}
                         onChange={(e) => setMissionBlueprint(e.target.value)}
@@ -22463,7 +22500,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                   )}
                   <div>
                     <div className="mb-1 flex items-center justify-between">
-                      <label className="block text-xs uppercase tracking-wider text-slate-400">
+                      <label className={`block text-xs uppercase tracking-wider ${labelTone}`}>
                         Min reward
                       </label>
                       <span className="text-xs font-semibold text-cyan-300">
@@ -22798,8 +22835,10 @@ export default function StarCitizenSalvageGuideWebsite() {
                         starters — render in the Chain section
                         (chainStartsWith / requires / unlocks). */}
                     {/* Resolved location chips — pickup +
-                        destinations. Each chip: name + " · system /
-                        planet / moon" subtext when known. */}
+                        destinations. 4.8-gated threshold: under 4
+                        total dedup'd entries OR on 4.7.2, render
+                        inline chip stacks per section. On 4.8 with
+                        4+ entries, collapse to a hover popover. */}
                     {(() => {
                       const sections = [
                         { title: "Pickup", rows: missionDetail.locations || [] },
@@ -22814,27 +22853,62 @@ export default function StarCitizenSalvageGuideWebsite() {
                           return true;
                         });
                       };
-                      return (
-                        <div className="mt-5 space-y-3">
-                          {sections.map((s) => (
-                            <div key={s.title}>
-                              <div className="text-[10px] uppercase tracking-wider text-slate-500">{s.title}</div>
-                              <div className="mt-1 flex flex-wrap gap-2">
-                                {dedupe(s.rows).map((loc) => {
-                                  const sub = [loc.system, loc.planet, loc.moon].filter(Boolean).join(" · ");
-                                  return (
-                                    <span
-                                      key={loc.name}
-                                      className="rounded-md border border-slate-700 bg-slate-950/60 px-2 py-1 text-xs"
-                                    >
-                                      <span className="font-semibold text-slate-200">{loc.name}</span>
-                                      {sub && <span className="ml-1 text-slate-500">· {sub}</span>}
-                                    </span>
-                                  );
-                                })}
+                      const renderChip = (loc) => {
+                        const sub = [loc.system, loc.planet, loc.moon].filter(Boolean).join(" · ");
+                        return (
+                          <span
+                            key={loc.name}
+                            className="rounded-md border border-slate-700 bg-slate-950/60 px-2 py-1 text-xs"
+                          >
+                            <span className="font-semibold text-slate-200">{loc.name}</span>
+                            {sub && <span className="ml-1 text-slate-500">· {sub}</span>}
+                          </span>
+                        );
+                      };
+                      const totalLocs = sections.reduce((acc, s) => acc + dedupe(s.rows).length, 0);
+                      const COLLAPSE_THRESHOLD = 4;
+                      const collapse = isPatchAtLeast(patchStatus?.version, "4.8") &&
+                                       totalLocs >= COLLAPSE_THRESHOLD;
+                      if (!collapse) {
+                        return (
+                          <div className="mt-5 space-y-3">
+                            {sections.map((s) => (
+                              <div key={s.title}>
+                                <div className="text-[10px] uppercase tracking-wider text-slate-500">{s.title}</div>
+                                <div className="mt-1 flex flex-wrap gap-2">
+                                  {dedupe(s.rows).map(renderChip)}
+                                </div>
                               </div>
+                            ))}
+                          </div>
+                        );
+                      }
+                      return (
+                        <div className="relative mt-5 group">
+                          <button
+                            type="button"
+                            className="inline-flex items-center gap-1.5 rounded-md border border-cyan-500/40 bg-cyan-500/10 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-cyan-200 hover:border-cyan-300 hover:bg-cyan-500/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300"
+                            aria-label="Show mission locations"
+                          >
+                            [Locations]
+                            <span className="text-[10px] text-cyan-300/70">{totalLocs}</span>
+                          </button>
+                          <div
+                            role="dialog"
+                            aria-label="Mission locations"
+                            className="invisible absolute left-0 top-full z-30 mt-2 w-full max-w-md scale-95 rounded-2xl border border-cyan-500/30 bg-slate-900 p-4 opacity-0 shadow-2xl shadow-cyan-950/40 transition-all group-hover:visible group-hover:scale-100 group-hover:opacity-100 group-focus-within:visible group-focus-within:scale-100 group-focus-within:opacity-100"
+                          >
+                            <div className="space-y-3">
+                              {sections.map((s) => (
+                                <div key={s.title}>
+                                  <div className="text-[10px] uppercase tracking-wider text-slate-500">{s.title}</div>
+                                  <div className="mt-1 flex flex-wrap gap-2">
+                                    {dedupe(s.rows).map(renderChip)}
+                                  </div>
+                                </div>
+                              ))}
                             </div>
-                          ))}
+                          </div>
                         </div>
                       );
                     })()}
@@ -23169,18 +23243,58 @@ export default function StarCitizenSalvageGuideWebsite() {
                         }
                         const list = m[1] === "DESTINATION" ? destinationsList : locationsList;
                         if (list.length > 0) {
-                          // Emit one chip per entry, comma-separated.
-                          list.forEach((name, i) => {
-                            if (i > 0) parts.push(", ");
+                          // 4.8-gated: when the resolved list has
+                          // 4+ entries (refueling missions can drop
+                          // 100+ pickup chips into a single token),
+                          // collapse to a hover popover so the
+                          // briefing stays readable. On 4.7.2 keep
+                          // the original comma-separated chip flow.
+                          const COLLAPSE_THRESHOLD = 4;
+                          const collapse = isPatchAtLeast(patchStatus?.version, "4.8") &&
+                                            list.length >= COLLAPSE_THRESHOLD;
+                          if (collapse) {
+                            const labelText = m[1] === "DESTINATION" ? "DESTINATIONS" : "LOCATIONS";
                             parts.push(
-                              <span
-                                key={`sub-${key++}`}
-                                className="rounded border border-cyan-500/30 bg-cyan-500/10 px-1.5 py-0.5 text-cyan-200 font-semibold"
-                              >
-                                {name}
+                              <span key={`sub-${key++}`} className="relative inline-block group align-baseline">
+                                <span
+                                  tabIndex={0}
+                                  className="cursor-help rounded border border-cyan-500/40 bg-cyan-500/15 px-1.5 py-0.5 font-bold uppercase tracking-wider text-cyan-200 hover:border-cyan-300 hover:bg-cyan-500/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300"
+                                  aria-label={`Show ${list.length} resolved ${labelText.toLowerCase()}`}
+                                >
+                                  [{labelText}]<span className="ml-1 text-[10px] text-cyan-300/70">{list.length}</span>
+                                </span>
+                                <span
+                                  role="dialog"
+                                  className="invisible absolute left-0 top-full z-30 mt-1 w-max max-w-md scale-95 rounded-2xl border border-cyan-500/30 bg-slate-900 p-3 opacity-0 shadow-2xl shadow-cyan-950/40 transition-all group-hover:visible group-hover:scale-100 group-hover:opacity-100 group-focus-within:visible group-focus-within:scale-100 group-focus-within:opacity-100"
+                                >
+                                  <span className="block text-[10px] uppercase tracking-wider text-slate-500">{labelText} ({list.length})</span>
+                                  <span className="mt-1.5 flex flex-wrap gap-1.5">
+                                    {list.map((name) => (
+                                      <span
+                                        key={name}
+                                        className="rounded border border-cyan-500/30 bg-cyan-500/10 px-1.5 py-0.5 text-cyan-200 text-xs font-semibold"
+                                      >
+                                        {name}
+                                      </span>
+                                    ))}
+                                  </span>
+                                </span>
                               </span>
                             );
-                          });
+                          } else {
+                            // Emit one chip per entry, comma-separated.
+                            list.forEach((name, i) => {
+                              if (i > 0) parts.push(", ");
+                              parts.push(
+                                <span
+                                  key={`sub-${key++}`}
+                                  className="rounded border border-cyan-500/30 bg-cyan-500/10 px-1.5 py-0.5 text-cyan-200 font-semibold"
+                                >
+                                  {name}
+                                </span>
+                              );
+                            });
+                          }
                         } else {
                           // No resolved location — fall back to the
                           // literal placeholder so the copy still makes
@@ -23343,7 +23457,7 @@ export default function StarCitizenSalvageGuideWebsite() {
 
                 <div className="mt-4 grid gap-3 rounded-2xl border border-slate-700 bg-slate-950/70 p-4">
                   <div>
-                    <label className="mb-1 block text-xs text-slate-400">Material</label>
+                    <label className={`mb-1 block text-xs ${labelTone}`}>Material</label>
                     <select
                       value={jobForm.material}
                       onChange={(e) => setJobForm({ ...jobForm, material: e.target.value })}
@@ -23357,20 +23471,20 @@ export default function StarCitizenSalvageGuideWebsite() {
                     </select>
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs text-slate-400">Material (SCU)</label>
+                    <label className={`mb-1 block text-xs ${labelTone}`}>Material (SCU)</label>
                     <input
-                      type="number"
+                      type="text" inputMode="decimal"
                       min="0"
                       step="0.01"
                       placeholder="0"
-                      value={jobForm.materialScu}
-                      onChange={(e) => setJobForm({ ...jobForm, materialScu: e.target.value })}
+                      value={formatNumberWithCommas(jobForm.materialScu)}
+                      onChange={(e) => setJobForm({ ...jobForm, materialScu: stripCommaInput(e.target.value) })}
                       disabled={!user && !import.meta.env.DEV}
                       className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
                     />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs text-slate-400">Refinery Location</label>
+                    <label className={`mb-1 block text-xs ${labelTone}`}>Refinery Location</label>
                     <select
                       value={jobForm.location}
                       onChange={(e) => setJobForm({ ...jobForm, location: e.target.value })}
@@ -23396,7 +23510,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     </select>
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs text-slate-400">Refinery Method</label>
+                    <label className={`mb-1 block text-xs ${labelTone}`}>Refinery Method</label>
                     <select
                       value={jobForm.method}
                       onChange={(e) => setJobForm({ ...jobForm, method: e.target.value })}
@@ -23413,7 +23527,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <p className="mt-1 text-[11px] text-slate-500">Speed / Cost / Yield · H=High, M=Moderate, L=Low, V=Very Low</p>
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs text-slate-400">Refinery Time</label>
+                    <label className={`mb-1 block text-xs ${labelTone}`}>Refinery Time</label>
                     <div className="grid grid-cols-3 gap-2">
                       {[
                         { key: "hours", label: "Hours" },
@@ -23612,7 +23726,7 @@ export default function StarCitizenSalvageGuideWebsite() {
 
                 <div className="mt-4 grid gap-3 rounded-2xl border border-slate-700 bg-slate-950/70 p-4">
                   <div>
-                    <label className="mb-1 block text-xs text-slate-400">Material</label>
+                    <label className={`mb-1 block text-xs ${labelTone}`}>Material</label>
                     <select
                       value={orderForm.material}
                       onChange={(e) => {
@@ -23635,14 +23749,14 @@ export default function StarCitizenSalvageGuideWebsite() {
                     </select>
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs text-slate-400">SCU Amount</label>
+                    <label className={`mb-1 block text-xs ${labelTone}`}>SCU Amount</label>
                     <input
-                      type="number"
+                      type="text" inputMode="decimal"
                       min="0"
                       step="0.1"
                       placeholder="0"
-                      value={orderForm.scu}
-                      onChange={(e) => setOrderForm({ ...orderForm, scu: e.target.value })}
+                      value={formatNumberWithCommas(orderForm.scu)}
+                      onChange={(e) => setOrderForm({ ...orderForm, scu: stripCommaInput(e.target.value) })}
                       disabled={!user && !import.meta.env.DEV}
                       className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
                     />
@@ -23653,7 +23767,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                       but the field itself stays on screen so the user
                       can see and pick it whenever. */}
                   <div>
-                    <label className="mb-1 block text-xs text-slate-400">Sell Location</label>
+                    <label className={`mb-1 block text-xs ${labelTone}`}>Sell Location</label>
                     <select
                       value={orderForm.location}
                       onChange={(e) => setOrderForm({ ...orderForm, location: e.target.value, playerName: "" })}
@@ -23695,14 +23809,14 @@ export default function StarCitizenSalvageGuideWebsite() {
                     </div>
                   )}
                   <div>
-                    <label className="mb-1 block text-xs text-slate-400">aUEC Amount Received</label>
+                    <label className={`mb-1 block text-xs ${labelTone}`}>aUEC Amount Received</label>
                     <input
-                      type="number"
+                      type="text" inputMode="decimal"
                       min="0"
                       step="1"
                       placeholder="0"
-                      value={orderForm.aUEC}
-                      onChange={(e) => setOrderForm({ ...orderForm, aUEC: e.target.value })}
+                      value={formatNumberWithCommas(orderForm.aUEC)}
+                      onChange={(e) => setOrderForm({ ...orderForm, aUEC: stripCommaInput(e.target.value) })}
                       disabled={!user && !import.meta.env.DEV}
                       className="w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
                     />
@@ -23741,12 +23855,12 @@ export default function StarCitizenSalvageGuideWebsite() {
                     </p>
                     <div className="mt-3 flex items-stretch gap-2">
                       <input
-                        type="number"
+                        type="text" inputMode="decimal"
                         min="0"
                         step="1"
                         placeholder="Reported aUEC/SCU"
-                        value={reportPriceInputLedger}
-                        onChange={(e) => { setReportPriceInputLedger(e.target.value); if (reportErrorLedger) setReportErrorLedger(""); }}
+                        value={formatNumberWithCommas(reportPriceInputLedger)}
+                        onChange={(e) => { setReportPriceInputLedger(stripCommaInput(e.target.value)); if (reportErrorLedger) setReportErrorLedger(""); }}
                         onKeyDown={(e) => { if (e.key === "Enter" && !isSubmittingReportLedger) handleReportPriceLedger(); }}
                         disabled={isSubmittingReportLedger || (!user && !import.meta.env.DEV)}
                         className="min-w-0 flex-1 rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 outline-none focus:border-cyan-400 disabled:opacity-60"
@@ -24532,10 +24646,10 @@ export default function StarCitizenSalvageGuideWebsite() {
                                 className="rounded border border-cyan-300/50 bg-slate-900/60 px-1 leading-none text-cyan-100 hover:bg-slate-900 disabled:cursor-not-allowed disabled:opacity-40"
                               >−</button>
                               <input
-                                type="number"
+                                type="text" inputMode="decimal"
                                 min="1"
-                                value={entry.qty}
-                                onChange={(e) => setCrewDraftShipQty(entry.ship, e.target.value)}
+                                value={formatNumberWithCommas(entry.qty)}
+                                onChange={(e) => setCrewDraftShipQty(entry.ship, stripCommaInput(e.target.value))}
                                 className="w-10 rounded border border-cyan-300/40 bg-slate-900/80 px-1 py-0 text-center text-xs text-cyan-100 outline-none focus:border-cyan-300"
                               />
                               <button
@@ -24615,11 +24729,11 @@ export default function StarCitizenSalvageGuideWebsite() {
                             Construction Salvage SCU <span className="text-slate-500">(Reclaimer)</span>
                           </label>
                           <input
-                            type="number"
+                            type="text" inputMode="decimal"
                             min="0"
                             step="1"
-                            value={crewDraft.scuConstructionSalvage}
-                            onChange={(e) => setCrewDraftField("scuConstructionSalvage", e.target.value)}
+                            value={formatNumberWithCommas(crewDraft.scuConstructionSalvage)}
+                            onChange={(e) => setCrewDraftField("scuConstructionSalvage", stripCommaInput(e.target.value))}
                             placeholder="0"
                             className="mt-1.5 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-100 placeholder-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-1 focus:ring-cyan-400/40"
                           />
@@ -24631,11 +24745,11 @@ export default function StarCitizenSalvageGuideWebsite() {
                             Construction Pieces SCU <span className="text-slate-500">(Moth)</span>
                           </label>
                           <input
-                            type="number"
+                            type="text" inputMode="decimal"
                             min="0"
                             step="1"
-                            value={crewDraft.scuConstructionPieces}
-                            onChange={(e) => setCrewDraftField("scuConstructionPieces", e.target.value)}
+                            value={formatNumberWithCommas(crewDraft.scuConstructionPieces)}
+                            onChange={(e) => setCrewDraftField("scuConstructionPieces", stripCommaInput(e.target.value))}
                             placeholder="0"
                             className="mt-1.5 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-100 placeholder-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-1 focus:ring-cyan-400/40"
                           />
@@ -24646,11 +24760,11 @@ export default function StarCitizenSalvageGuideWebsite() {
                           Recycled Material Composite SCU
                         </label>
                         <input
-                          type="number"
+                          type="text" inputMode="decimal"
                           min="0"
                           step="1"
-                          value={crewDraft.scuRMC}
-                          onChange={(e) => setCrewDraftField("scuRMC", e.target.value)}
+                          value={formatNumberWithCommas(crewDraft.scuRMC)}
+                          onChange={(e) => setCrewDraftField("scuRMC", stripCommaInput(e.target.value))}
                           placeholder="0"
                           className="mt-1.5 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-100 placeholder-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-1 focus:ring-cyan-400/40"
                         />
@@ -24801,11 +24915,11 @@ export default function StarCitizenSalvageGuideWebsite() {
                         <div>
                           <label className="block text-[10px] uppercase tracking-wider text-amber-300">Total aUEC</label>
                           <input
-                            type="number"
+                            type="text" inputMode="decimal"
                             min="0"
                             step="1"
-                            value={crewDraft.splitAuec}
-                            onChange={(e) => setCrewDraftField("splitAuec", e.target.value)}
+                            value={formatNumberWithCommas(crewDraft.splitAuec)}
+                            onChange={(e) => setCrewDraftField("splitAuec", stripCommaInput(e.target.value))}
                             placeholder="0"
                             className="mt-1 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-100 placeholder-slate-500 focus:border-emerald-400/60 focus:outline-none focus:ring-1 focus:ring-emerald-400/40"
                           />
@@ -24813,11 +24927,11 @@ export default function StarCitizenSalvageGuideWebsite() {
                         <div>
                           <label className="block text-[10px] uppercase tracking-wider text-amber-300">Crew Count</label>
                           <input
-                            type="number"
+                            type="text" inputMode="decimal"
                             min="1"
                             step="1"
-                            value={crewDraft.splitCrewCount}
-                            onChange={(e) => setCrewDraftField("splitCrewCount", e.target.value)}
+                            value={formatNumberWithCommas(crewDraft.splitCrewCount)}
+                            onChange={(e) => setCrewDraftField("splitCrewCount", stripCommaInput(e.target.value))}
                             placeholder={String(crewedCount || 1)}
                             className="mt-1 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-100 placeholder-slate-500 focus:border-emerald-400/60 focus:outline-none focus:ring-1 focus:ring-emerald-400/40"
                           />
@@ -24875,7 +24989,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     {editingEntry.source === "refinery" ? (
                       <>
                         <div>
-                          <label className="mb-1 block text-xs text-slate-400">Refinery Location</label>
+                          <label className={`mb-1 block text-xs ${labelTone}`}>Refinery Location</label>
                           <select
                             value={editForm.location || ""}
                             onChange={(e) => setEditForm({ ...editForm, location: e.target.value })}
@@ -24900,7 +25014,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                           </select>
                         </div>
                         <div>
-                          <label className="mb-1 block text-xs text-slate-400">Material</label>
+                          <label className={`mb-1 block text-xs ${labelTone}`}>Material</label>
                           <select
                             value={editForm.material || ""}
                             onChange={(e) => setEditForm({ ...editForm, material: e.target.value })}
@@ -24913,7 +25027,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                           </select>
                         </div>
                         <div>
-                          <label className="mb-1 block text-xs text-slate-400">Refinery Method</label>
+                          <label className={`mb-1 block text-xs ${labelTone}`}>Refinery Method</label>
                           <select
                             value={editForm.method || ""}
                             onChange={(e) => setEditForm({ ...editForm, method: e.target.value })}
@@ -24928,18 +25042,18 @@ export default function StarCitizenSalvageGuideWebsite() {
                           </select>
                         </div>
                         <div>
-                          <label className="mb-1 block text-xs text-slate-400">Material (SCU)</label>
+                          <label className={`mb-1 block text-xs ${labelTone}`}>Material (SCU)</label>
                           <input
-                            type="number"
+                            type="text" inputMode="decimal"
                             min="0"
                             step="0.01"
-                            value={editForm.materialScu || ""}
-                            onChange={(e) => setEditForm({ ...editForm, materialScu: e.target.value })}
+                            value={formatNumberWithCommas(editForm.materialScu || "")}
+                            onChange={(e) => setEditForm({ ...editForm, materialScu: stripCommaInput(e.target.value) })}
                             className="w-full rounded-xl border border-cyan-500/25 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-cyan-400"
                           />
                         </div>
                         <div>
-                          <label className="mb-1 block text-xs text-slate-400">Refinery Time</label>
+                          <label className={`mb-1 block text-xs ${labelTone}`}>Refinery Time</label>
                           <div className="grid grid-cols-3 gap-2">
                             {[
                               { key: "hours", label: "Hours" },
@@ -24976,7 +25090,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     ) : (
                       <>
                         <div>
-                          <label className="mb-1 block text-xs text-slate-400">Material</label>
+                          <label className={`mb-1 block text-xs ${labelTone}`}>Material</label>
                           <select
                             value={editForm.material || ""}
                             onChange={(e) => {
@@ -24998,18 +25112,18 @@ export default function StarCitizenSalvageGuideWebsite() {
                           </select>
                         </div>
                         <div>
-                          <label className="mb-1 block text-xs text-slate-400">SCU Amount</label>
+                          <label className={`mb-1 block text-xs ${labelTone}`}>SCU Amount</label>
                           <input
-                            type="number"
+                            type="text" inputMode="decimal"
                             min="0"
                             step="0.1"
-                            value={editForm.scu || ""}
-                            onChange={(e) => setEditForm({ ...editForm, scu: e.target.value })}
+                            value={formatNumberWithCommas(editForm.scu || "")}
+                            onChange={(e) => setEditForm({ ...editForm, scu: stripCommaInput(e.target.value) })}
                             className="w-full rounded-xl border border-cyan-500/25 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-cyan-400"
                           />
                         </div>
                         <div>
-                          <label className="mb-1 block text-xs text-slate-400">Sell Location</label>
+                          <label className={`mb-1 block text-xs ${labelTone}`}>Sell Location</label>
                           <select
                             value={editForm.location || ""}
                             onChange={(e) => setEditForm({ ...editForm, location: e.target.value, playerName: "" })}
@@ -25042,13 +25156,13 @@ export default function StarCitizenSalvageGuideWebsite() {
                           </div>
                         )}
                         <div>
-                          <label className="mb-1 block text-xs text-slate-400">aUEC Amount Received</label>
+                          <label className={`mb-1 block text-xs ${labelTone}`}>aUEC Amount Received</label>
                           <input
-                            type="number"
+                            type="text" inputMode="decimal"
                             min="0"
                             step="1"
-                            value={editForm.aUEC || ""}
-                            onChange={(e) => setEditForm({ ...editForm, aUEC: e.target.value })}
+                            value={formatNumberWithCommas(editForm.aUEC || "")}
+                            onChange={(e) => setEditForm({ ...editForm, aUEC: stripCommaInput(e.target.value) })}
                             className="w-full rounded-xl border border-cyan-500/25 bg-slate-950 px-3 py-2 text-sm outline-none focus:border-cyan-400"
                           />
                         </div>
@@ -25274,12 +25388,12 @@ export default function StarCitizenSalvageGuideWebsite() {
                       <div>
                         <label className="block text-[10px] uppercase tracking-wider text-amber-300">SCU</label>
                         <input
-                          type="number"
+                          type="text" inputMode="decimal"
                           min="0"
                           step="1"
                           placeholder="0"
-                          value={inventoryForm.scu}
-                          onChange={(e) => setInventoryForm({ ...inventoryForm, scu: e.target.value })}
+                          value={formatNumberWithCommas(inventoryForm.scu)}
+                          onChange={(e) => setInventoryForm({ ...inventoryForm, scu: stripCommaInput(e.target.value) })}
                           className="mt-1 w-full rounded-md border border-cyan-500/25 bg-slate-900 px-3 py-1.5 text-sm text-slate-100 placeholder-slate-500 outline-none focus:border-cyan-400"
                         />
                       </div>
@@ -25479,12 +25593,12 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <div>
                       <label className="block text-[10px] uppercase tracking-wider text-amber-300">SCU</label>
                       <input
-                        type="number"
+                        type="text" inputMode="decimal"
                         min="0"
                         step="1"
                         placeholder="0"
-                        value={inventoryForm.scu}
-                        onChange={(e) => setInventoryForm({ ...inventoryForm, scu: e.target.value })}
+                        value={formatNumberWithCommas(inventoryForm.scu)}
+                        onChange={(e) => setInventoryForm({ ...inventoryForm, scu: stripCommaInput(e.target.value) })}
                         autoFocus
                         className="mt-1 w-full rounded-md border border-cyan-500/25 bg-slate-900 px-3 py-1.5 text-sm text-slate-100 placeholder-slate-500 outline-none focus:border-cyan-400"
                       />
@@ -26994,10 +27108,10 @@ export default function StarCitizenSalvageGuideWebsite() {
                                 return (
                                   <tr key={j.id} className="border-t border-slate-800 bg-cyan-500/5">
                                     <td className="px-2 py-2"><input className="w-full rounded border border-cyan-500/40 bg-slate-900 px-2 py-1 text-xs text-slate-100 outline-none focus:border-cyan-400" value={d.material} onChange={(e) => updateAdminEditDraft("material", e.target.value)} /></td>
-                                    <td className="px-2 py-2"><input type="number" inputMode="decimal" className="w-20 rounded border border-cyan-500/40 bg-slate-900 px-2 py-1 text-right text-xs text-amber-200 outline-none focus:border-cyan-400" value={d.materialScu} onChange={(e) => updateAdminEditDraft("materialScu", e.target.value)} /></td>
+                                    <td className="px-2 py-2"><input type="text" inputMode="decimal" inputMode="decimal" className="w-20 rounded border border-cyan-500/40 bg-slate-900 px-2 py-1 text-right text-xs text-amber-200 outline-none focus:border-cyan-400" value={formatNumberWithCommas(d.materialScu)} onChange={(e) => updateAdminEditDraft("materialScu", stripCommaInput(e.target.value))} /></td>
                                     <td className="px-2 py-2"><input className="w-full rounded border border-cyan-500/40 bg-slate-900 px-2 py-1 text-xs text-slate-100 outline-none focus:border-cyan-400" value={d.location} onChange={(e) => updateAdminEditDraft("location", e.target.value)} /></td>
                                     <td className="px-2 py-2"><input className="w-full rounded border border-cyan-500/40 bg-slate-900 px-2 py-1 text-xs text-slate-100 outline-none focus:border-cyan-400" value={d.method} onChange={(e) => updateAdminEditDraft("method", e.target.value)} /></td>
-                                    <td className="px-2 py-2"><input type="number" inputMode="decimal" className="w-24 rounded border border-cyan-500/40 bg-slate-900 px-2 py-1 text-right text-xs text-rose-200 outline-none focus:border-cyan-400" value={d.cost} onChange={(e) => updateAdminEditDraft("cost", e.target.value)} /></td>
+                                    <td className="px-2 py-2"><input type="text" inputMode="decimal" inputMode="decimal" className="w-24 rounded border border-cyan-500/40 bg-slate-900 px-2 py-1 text-right text-xs text-rose-200 outline-none focus:border-cyan-400" value={formatNumberWithCommas(d.cost)} onChange={(e) => updateAdminEditDraft("cost", stripCommaInput(e.target.value))} /></td>
                                     <td className="px-2 py-2 text-slate-400 whitespace-nowrap">{formatTimestamp(j.submittedAt)}</td>
                                     <td className="px-2 py-2 whitespace-nowrap text-right">
                                       <button type="button" onClick={saveAdminEditEntry} disabled={adminEditEntry.saving} className="mr-1 rounded border border-emerald-500/50 bg-emerald-500/15 px-2 py-1 text-xs font-semibold text-emerald-100 hover:bg-emerald-500/25 disabled:opacity-50">{adminEditEntry.saving ? "Saving…" : "Save"}</button>
@@ -27082,8 +27196,8 @@ export default function StarCitizenSalvageGuideWebsite() {
                                 return (
                                   <tr key={o.id} className="border-t border-slate-800 bg-cyan-500/5">
                                     <td className="px-2 py-2"><input className="w-full rounded border border-cyan-500/40 bg-slate-900 px-2 py-1 text-xs text-slate-100 outline-none focus:border-cyan-400" value={d.material} onChange={(e) => updateAdminEditDraft("material", e.target.value)} /></td>
-                                    <td className="px-2 py-2"><input type="number" inputMode="decimal" className="w-20 rounded border border-cyan-500/40 bg-slate-900 px-2 py-1 text-right text-xs text-amber-200 outline-none focus:border-cyan-400" value={d.scu} onChange={(e) => updateAdminEditDraft("scu", e.target.value)} /></td>
-                                    <td className="px-2 py-2"><input type="number" inputMode="decimal" className="w-28 rounded border border-cyan-500/40 bg-slate-900 px-2 py-1 text-right text-xs text-emerald-200 outline-none focus:border-cyan-400" value={d.aUEC} onChange={(e) => updateAdminEditDraft("aUEC", e.target.value)} /></td>
+                                    <td className="px-2 py-2"><input type="text" inputMode="decimal" inputMode="decimal" className="w-20 rounded border border-cyan-500/40 bg-slate-900 px-2 py-1 text-right text-xs text-amber-200 outline-none focus:border-cyan-400" value={formatNumberWithCommas(d.scu)} onChange={(e) => updateAdminEditDraft("scu", stripCommaInput(e.target.value))} /></td>
+                                    <td className="px-2 py-2"><input type="text" inputMode="decimal" inputMode="decimal" className="w-28 rounded border border-cyan-500/40 bg-slate-900 px-2 py-1 text-right text-xs text-emerald-200 outline-none focus:border-cyan-400" value={formatNumberWithCommas(d.aUEC)} onChange={(e) => updateAdminEditDraft("aUEC", stripCommaInput(e.target.value))} /></td>
                                     <td className="px-2 py-2"><input className="w-full rounded border border-cyan-500/40 bg-slate-900 px-2 py-1 text-xs text-slate-100 outline-none focus:border-cyan-400" value={d.location} onChange={(e) => updateAdminEditDraft("location", e.target.value)} /></td>
                                     <td className="px-2 py-2 text-slate-400 whitespace-nowrap">{formatTimestamp(o.submittedAt)}</td>
                                     <td className="px-2 py-2 whitespace-nowrap text-right">
@@ -28407,6 +28521,8 @@ export default function StarCitizenSalvageGuideWebsite() {
                   <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
                   <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
                     <li>Crew Salvage Refinery + Sales Calculator gains two sell-location dropdowns: <strong>CMAT Sell Location</strong> + <strong>RMC Sell Location</strong>. Pick a specific sell point per material; leave blank to keep the previous "best across all locations" default.</li>
+                    <li>New <strong>Inventory</strong> sub-tab on the Ledger surface — card grid where each storage location renders a rounded square with side-by-side CMAT + RMC SCU pills. Click → modal with current totals + live <code className="rounded bg-slate-800 px-1 text-cyan-200">+ → / − →</code> projection as you type. Add / Remove buttons; Remove blocked below zero. Stanton / Pyro / Nyx system-grouped locations including Lagrange stations, jump gateways, and the 4 Levski People's Service Stations. Gated on the patch 4.8 live release.</li>
+                    <li><strong>Origin M80</strong> pre-staged in the Crew Salvage > Ships Salvaged picker (gated 4.8). Display names cleaned across all 7 pre-staged ships — manufacturer prefixes dropped (Ironclad / Ironclad Assault / Pitbull / Tiburon / Stingray / Starlite / M80).</li>
                   </ul>
                   <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Changes</p>
                   <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
@@ -28414,6 +28530,10 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <li>Crew Salvage <strong>Construction Salvage</strong> row now follows the CMAT Sell Location dropdown (was implicitly priced as RMC).</li>
                     <li>Crew Salvage Recycled Material Composite row blanks the Refined SCU cell — RMC sells 1:1 with no refinery step.</li>
                     <li>Crew Salvage labels (Refinery dropdowns, Sell Location dropdowns, the three SCU inputs, Total aUEC + Crew Count, every role station) turned <strong>yellow</strong> for visual hierarchy.</li>
+                    <li>All <strong>numerical text-entry fields</strong> site-wide now show thousands-separator commas as you type (e.g. <code className="rounded bg-slate-800 px-1 text-cyan-200">1,000,000</code>). Refinery Time HMS inputs are intentionally excluded. State still stores the raw digits so downstream math keeps working.</li>
+                    <li>On 4.8: form labels site-wide turn yellow (Missions filter, Refinery & Sell Orders, Refinery Bonus Yield Calculator, Sell Estimate). On 4.7.2 they stay slate.</li>
+                    <li>On 4.8: mission detail briefing collapses long resolved-location lists (4+ entries) into a hover popover so refueling missions with 100+ pickup chips don't blow out the modal. Short lists (1–3) stay inline. Pickup + Destinations chip stack uses the same threshold.</li>
+                    <li>Refresh from the latest scmdb 4.8 PTU dump (<code className="rounded bg-slate-800 px-1 text-cyan-200">4.8.0-ptu.11777743</code>): refueling missions 13 → 14 (new contract + 13 reward / time-to-complete bumps), salvage blueprint pools regenerated, scraper craft times updated (Abrade 90s → 240s, Trawler 90s → 300s). Visible only on 4.8.</li>
                   </ul>
                 </section>
 

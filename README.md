@@ -16,6 +16,10 @@ Changes:
 - Crew Salvage **Recycled Material Composite** row blanks the Refined SCU column (RMC sells 1:1 with no refinery step, so the cell was tautologically Input SCU; em-dash makes the no-refinery story obvious).
 - Crew Salvage labels turned **yellow** for visual hierarchy: Refinery Location / Refinery Method / CMAT Sell Location / RMC Sell Location, the three SCU input labels (Construction Salvage / Construction Pieces / Recycled Material Composite), Total aUEC + Crew Count in the Split Calculator, and every role label (Pilot / Claw Operator / Salvage Operator 1-3 / Cargo Operator).
 - All **numerical text-entry fields** site-wide now display **thousands-separator commas** as you type (e.g. `1,000,000` instead of `1000000`). State stores the raw digits so downstream math keeps working; only the rendered value flows through the formatter. Refinery Time HMS inputs are intentionally excluded.
+- Ledger **Refinery Job Orders** + **Edit Job** preview now surface the **Levski refinery bonus** as a small `incl. +X.X SCU · Levski +Y%` sub-line under Expected Yield whenever the selected location has a non-zero bonus (Levski only as of 4.7.2). Makes it visually obvious the bonus is being applied.
+
+Fixes:
+- **Refinery yield math:** the **Levski location bonus** (Construction Salvage 9%, Construction Rubble 8%) is now applied **multiplicatively** to the base yield instead of being added to the yield rate. Empirical fit against an in-game sample (1,024 SCU Construction Salvage / Pyrometric Chromalysis / Levski → game-observed **165 SCU**): the old additive math predicted **245.76 SCU** (49% high); the new multiplicative math predicts **167.42 SCU** (≈1.5% variance, matches in-game rounding). Affects the **Refinery Bonus Yield Calculator** (Home), **Refinery Job Orders + Edit Job** preview (Ledger), and **Crew Salvage** projections — all share the same `computeRefineryJob` engine.
 
 UPDATE 5/2/2026 v2.7.1
 

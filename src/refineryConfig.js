@@ -230,8 +230,13 @@ export function computeRefineryJob({ scu, materialName, methodName, locationName
   const safeScu = Number.isFinite(scu) && scu > 0 ? scu : 0;
   const scaleFactor = safeScu / METHOD_BASELINE_SCU;
 
+  // Levski location bonus is MULTIPLICATIVE on the base yield, not
+  // additive to the yield rate. Empirical fit (1,024 SCU Construction
+  // Salvage / Pyrometric Chromalysis / Levski → 165 SCU game-observed):
+  //   additive   pred: 1024 * (0.15 + 0.09)        = 245.76 SCU (49% high)
+  //   multiplic. pred: 1024 * 0.15 * 1.09          = 167.42 SCU (≈1.5% var)
   const baseYield = safeScu * baseYieldRate;
-  const refineryBonusYield = safeScu * locationBonusRate;
+  const refineryBonusYield = baseYield * locationBonusRate;
   const totalYield = baseYield + refineryBonusYield;
 
   return {

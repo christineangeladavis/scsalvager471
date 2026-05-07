@@ -23555,6 +23555,11 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <div>
                       <div className="text-[11px] uppercase tracking-wider text-slate-500">Expected Yield</div>
                       <div className="mt-0.5 text-sm font-bold text-emerald-300">{jobFormPreview.totalYield.toFixed(1)} SCU</div>
+                      {jobFormPreview.locationBonusRate > 0 && (
+                        <div className="mt-0.5 text-[10px] text-emerald-400/80">
+                          incl. +{jobFormPreview.refineryBonusYield.toFixed(1)} SCU · {jobFormPreview.location.name} +{(jobFormPreview.locationBonusRate * 100).toFixed(0)}%
+                        </div>
+                      )}
                     </div>
                     <div>
                       {/* Cost display — prefers the screenshot-extracted
@@ -25080,6 +25085,11 @@ export default function StarCitizenSalvageGuideWebsite() {
                           <div>
                             <div className="text-[11px] uppercase tracking-wider text-slate-500">Expected Yield</div>
                             <div className="mt-0.5 text-sm font-bold text-emerald-300">{editFormPreview.totalYield.toFixed(1)} SCU</div>
+                            {editFormPreview.locationBonusRate > 0 && (
+                              <div className="mt-0.5 text-[10px] text-emerald-400/80">
+                                incl. +{editFormPreview.refineryBonusYield.toFixed(1)} SCU · {editFormPreview.location.name} +{(editFormPreview.locationBonusRate * 100).toFixed(0)}%
+                              </div>
+                            )}
                           </div>
                           <div>
                             <div className="text-[11px] uppercase tracking-wider text-slate-500">Cost</div>
@@ -28529,6 +28539,11 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <li>Crew Salvage Recycled Material Composite row blanks the Refined SCU cell — RMC sells 1:1 with no refinery step.</li>
                     <li>Crew Salvage labels (Refinery dropdowns, Sell Location dropdowns, the three SCU inputs, Total aUEC + Crew Count, every role station) turned <strong>yellow</strong> for visual hierarchy.</li>
                     <li>All <strong>numerical text-entry fields</strong> site-wide now show thousands-separator commas as you type (e.g. <code className="rounded bg-slate-800 px-1 text-cyan-200">1,000,000</code>). Refinery Time HMS inputs are intentionally excluded. State still stores the raw digits so downstream math keeps working.</li>
+                    <li>Ledger Refinery Job Orders + Edit Job preview now surface the <strong>Levski refinery bonus</strong> as a small <code className="rounded bg-slate-800 px-1 text-cyan-200">incl. +X.X SCU · Levski +Y%</code> sub-line under Expected Yield whenever the selected location has a non-zero bonus.</li>
+                  </ul>
+                  <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Fixes</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li><strong>Refinery yield math:</strong> the <strong>Levski location bonus</strong> (Construction Salvage 9%, Construction Rubble 8%) is now applied <em>multiplicatively</em> to the base yield instead of being added to the yield rate. Empirical fit: 1,024 SCU Construction Salvage / Pyrometric Chromalysis / Levski → game-observed 165 SCU. Old additive math predicted 245.76 SCU (49% high); new multiplicative math predicts 167.42 SCU (≈1.5% variance). Affects the Refinery Bonus Yield Calculator (Home), Refinery Job Orders + Edit Job preview (Ledger), and Crew Salvage projections.</li>
                   </ul>
                 </section>
 

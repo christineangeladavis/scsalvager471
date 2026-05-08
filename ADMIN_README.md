@@ -5,7 +5,7 @@ Internal log of every change shipped to the Admin Panel since the tab launched. 
 ## Access model
 
 - Tab is gated by `user?.isAdmin || import.meta.env.DEV` everywhere it appears (tab list, sub-section dispatch, dev mock).
-- `isAdminSession()` (`api/_lib/admin.js`) admits the configured admin Discord IDs plus a hard-coded fallback (`125372743637008384`) so the owner can never be locked out by env-var failure.
+- `isAdminSession()` (`api/_lib/admin.js`) admits the configured admin Discord IDs plus a hard-coded fallback list (`125372743637008384` site owner, `237446168206901259` Junior2065) so admins can never be locked out by env-var failure.
 - Every admin API endpoint runs three guards in order: `getSession` → `isAdminSession` → handler.
 
 ## Sub-sections
@@ -23,6 +23,10 @@ Modals:
 - **All Users → row click** → user-detail modal showing 30-day history. Per-row edit + delete plus per-patch and all-data clear actions. Backed by `GET /api/admin/user-history`, `POST /api/admin/clear-user-ledger`, `POST /api/admin/delete-ledger-entry`, `POST /api/admin/edit-ledger-entry`.
 
 ---
+
+## 2026-05-08 — Junior2065 added to admin fallback list
+
+- `FALLBACK_ADMIN_IDS` in `api/_lib/admin.js` now contains two entries: site owner (`125372743637008384`) and **Junior2065** (`237446168206901259`). Both stay admin even if `ADMIN_DISCORD_ID` env var on Vercel gets cleared / misspelled. The env var still wins when set — the fallback list only resolves when env is empty.
 
 ## 2026-05-01 — All Users sortable headers + online counter; 7-Day History Contracts section
 

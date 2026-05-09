@@ -17069,6 +17069,13 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [adminMessageDraft, setAdminMessageDraft] = useState("");
   const [adminMessageStatus, setAdminMessageStatus] = useState(null); // { kind: "ok"|"err", text }
   const [adminMessageInFlight, setAdminMessageInFlight] = useState(false);
+  // Quick-send message dialog launched from the All Users → Actions
+  // column mailbox button. Independent from the user-detail modal so
+  // the admin can shoot a one-liner without opening 30-day history.
+  const [quickMessageTarget, setQuickMessageTarget] = useState(null); // { userId, username } | null
+  const [quickMessageDraft, setQuickMessageDraft] = useState("");
+  const [quickMessageStatus, setQuickMessageStatus] = useState(null);
+  const [quickMessageInFlight, setQuickMessageInFlight] = useState(false);
   // User-side inbox feed. Pulled from /api/notifications/inbox on
   // login + refreshed when the bell is opened. Each entry surfaces
   // in the bell as a "Message from SCSalvager Admin" notification.
@@ -17129,6 +17136,10 @@ export default function StarCitizenSalvageGuideWebsite() {
   // logged-in users have a one-click path to the Settings section
   // that fixes each one.
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  // Mailbox = dedicated dropdown for admin → user messages. Sits
+  // next to the notification bell. Separate from isNotificationsOpen
+  // so the two dropdowns don't fight for screen space.
+  const [isMailboxOpen, setIsMailboxOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   // Privacy Policy modal — opens from the footer link. Stays decoupled
   // from auth state so anonymous visitors can read it too.
@@ -17692,26 +17703,9 @@ export default function StarCitizenSalvageGuideWebsite() {
         body: "Your handle is set but unverified. Paste the one-time token into your RSI Short Bio so your verified name shows on the leaderboard.",
       });
     }
-    // Admin → user messages. Always rendered with the hardcoded
-    // "Message from SCSalvager Admin" title regardless of which
-    // operator sent the message — no admin identity surfaces to the
-    // recipient. Read state is server-driven (dismissedAt set on the
-    // entry); dismissing in the bell hits POST /api/notifications/inbox
-    // with action=dismiss.
-    for (const entry of adminInbox) {
-      if (!entry || !entry.id) continue;
-      out.push({
-        id: `admin-msg:${entry.id}`,
-        target: "admin-message",
-        title: "Message from SCSalvager Admin",
-        body: entry.body || "",
-        // Source data carried alongside so the bell can drive the
-        // dismiss network call without re-deriving the inbox id.
-        inboxId: entry.id,
-        createdAt: entry.createdAt || 0,
-        serverDismissedAt: entry.dismissedAt || null,
-      });
-    }
+    // Admin → user messages now have their own mailbox icon next
+    // to the bell — they no longer surface here. The bell stays
+    // focused on derived setup-nag items + What's New.
     // Tag (don't filter) so read items stay visible in the dropdown
     // but stop counting toward the red badge. The user explicitly
     // asked to keep them on screen after Mark-as-read.
@@ -17726,17 +17720,22 @@ export default function StarCitizenSalvageGuideWebsite() {
     //     state is irrelevant.
     const dismissed = new Set(dismissedNotifications);
     return out.map((n) => {
-      let isRead;
-      if (n.id === "whatsnew") {
-        isRead = whatsNewSeenVersion === LATEST_WHATSNEW_VERSION;
-      } else if (n.target === "admin-message") {
-        isRead = Boolean(n.serverDismissedAt);
-      } else {
-        isRead = dismissed.has(n.id);
-      }
+      const isRead =
+        n.id === "whatsnew"
+          ? whatsNewSeenVersion === LATEST_WHATSNEW_VERSION
+          : dismissed.has(n.id);
       return { ...n, isRead };
     });
-  }, [user, prefs, whatsNewSeenVersion, dismissedNotifications, adminInbox]);
+  }, [user, prefs, whatsNewSeenVersion, dismissedNotifications]);
+
+  // Mailbox derived state — admin → user messages, ranked newest first.
+  // Lives separate from the bell so admin corrections don't get
+  // visually mixed with setup-nag / What's New items.
+  const mailboxMessages = useMemo(() => {
+    if (!Array.isArray(adminInbox)) return [];
+    return [...adminInbox].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  }, [adminInbox]);
+  const unreadMailboxCount = mailboxMessages.filter((m) => !m.dismissedAt).length;
 
   // Unread count drives the red bell badge.
   const unreadNotificationCount = userNotifications.filter((n) => !n.isRead).length;
@@ -19410,6 +19409,60 @@ export default function StarCitizenSalvageGuideWebsite() {
     setAdminMessageInFlight(false);
   };
 
+  // Open / close the quick-send dialog from the All Users Actions
+  // column. Resets draft + status every open so the next target
+  // starts fresh.
+  const openQuickMessage = (u) => {
+    setQuickMessageTarget({ userId: u.userId, username: u.username });
+    setQuickMessageDraft("");
+    setQuickMessageStatus(null);
+    setQuickMessageInFlight(false);
+  };
+  const closeQuickMessage = () => {
+    setQuickMessageTarget(null);
+    setQuickMessageDraft("");
+    setQuickMessageStatus(null);
+    setQuickMessageInFlight(false);
+  };
+  const sendQuickMessage = async () => {
+    if (!quickMessageTarget) return;
+    const trimmed = quickMessageDraft.trim();
+    if (!trimmed) {
+      setQuickMessageStatus({ kind: "err", text: "Message body cannot be empty." });
+      return;
+    }
+    setQuickMessageInFlight(true);
+    setQuickMessageStatus(null);
+    try {
+      const res = await fetch("/api/admin/message-user", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ userId: quickMessageTarget.userId, body: trimmed }),
+      });
+      const info = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setQuickMessageStatus({
+          kind: "err",
+          text: info.error || `Send failed (HTTP ${res.status}).`,
+        });
+        return;
+      }
+      setQuickMessageStatus({
+        kind: "ok",
+        text: `Sent. ${info.count || 0} message${info.count === 1 ? "" : "s"} now in their inbox.`,
+      });
+      setQuickMessageDraft("");
+    } catch (e) {
+      setQuickMessageStatus({
+        kind: "err",
+        text: e && e.message ? e.message : "Network error.",
+      });
+    } finally {
+      setQuickMessageInFlight(false);
+    }
+  };
+
   // POST /api/admin/message-user — push a corrective message into
   // the target user's notification bell. Always rendered as
   // "SCSalvager Admin" on the recipient side; the acting admin's id
@@ -19889,6 +19942,20 @@ export default function StarCitizenSalvageGuideWebsite() {
   useEffect(() => {
     refreshAdminInbox();
   }, [user]);
+  // Poll the inbox every 60 s while logged in so admin-sent
+  // messages surface in the mailbox without a manual refresh.
+  // 60 s is a balance between latency and Redis load —
+  // moderation messages aren't urgent enough to warrant 10 s polls.
+  useEffect(() => {
+    if (!user) return;
+    const interval = setInterval(refreshAdminInbox, 60_000);
+    return () => clearInterval(interval);
+  }, [user]);
+  // Refresh when the mailbox is opened so the user always sees the
+  // freshest state at the moment they look.
+  useEffect(() => {
+    if (isMailboxOpen) refreshAdminInbox();
+  }, [isMailboxOpen]);
 
   // --- Ledger: explicit save function ---
   // Called directly by mutation handlers with the NEXT state values. There is
@@ -21344,10 +21411,141 @@ export default function StarCitizenSalvageGuideWebsite() {
                     </svg>
                     {Number(lifetimeAUEC || 0).toLocaleString()} aUEC
                   </div>
+                  {/* Mailbox — dedicated home for admin → user
+                      messages. Separate from the bell so corrective
+                      actions don't get mixed with setup-nag /
+                      What's New. Opens a dropdown listing every
+                      message; dismissed messages stay visible but
+                      stop counting toward the unread badge. */}
+                  {user && (
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsMailboxOpen((v) => !v);
+                          setIsNotificationsOpen(false);
+                        }}
+                        aria-haspopup="menu"
+                        aria-expanded={isMailboxOpen}
+                        aria-label={
+                          unreadMailboxCount > 0
+                            ? `Messages (${unreadMailboxCount} unread)`
+                            : "Messages"
+                        }
+                        title={
+                          unreadMailboxCount > 0
+                            ? `${unreadMailboxCount} unread message${unreadMailboxCount === 1 ? "" : "s"}`
+                            : "No unread messages"
+                        }
+                        className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-cyan-500/25 bg-slate-900/70 text-slate-300 hover:border-cyan-400/50 hover:text-cyan-200"
+                      >
+                        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="h-4 w-4">
+                          <path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4.236-7.445 4.962a1 1 0 0 1-1.11 0L4 8.236V6l8 5.333L20 6v2.236z" />
+                        </svg>
+                        {unreadMailboxCount > 0 && (
+                          <span
+                            aria-hidden="true"
+                            className="pointer-events-none absolute -right-1.5 -top-1.5 flex h-4 min-w-[1rem] items-center justify-center rounded-full border border-slate-900 bg-rose-500 px-1 text-[10px] font-bold text-white shadow-[0_0_0_1px_rgba(244,63,94,0.4)]"
+                          >
+                            {unreadMailboxCount > 9 ? "9+" : unreadMailboxCount}
+                          </span>
+                        )}
+                      </button>
+                      {isMailboxOpen && (
+                        <>
+                          <div
+                            className="fixed inset-0 z-40"
+                            onClick={() => setIsMailboxOpen(false)}
+                          />
+                          <div
+                            role="menu"
+                            className="absolute right-0 bottom-full z-50 mb-1 w-80 overflow-hidden rounded-lg border border-cyan-500/25 bg-slate-900 shadow-xl shadow-cyan-950/40"
+                          >
+                            <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950/60 px-3 py-2">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-300">
+                                Messages
+                              </span>
+                              {unreadMailboxCount > 0 && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const ids = mailboxMessages
+                                      .filter((m) => !m.dismissedAt)
+                                      .map((m) => `admin-msg:${m.id}`);
+                                    dismissAllNotifications(ids);
+                                  }}
+                                  className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                                >
+                                  Mark all as read
+                                </button>
+                              )}
+                            </div>
+                            {mailboxMessages.length === 0 ? (
+                              <div className="px-3 py-3 text-xs text-slate-400">
+                                No messages.
+                              </div>
+                            ) : (
+                              <div className="max-h-[60vh] overflow-y-auto">
+                                {mailboxMessages.map((m) => {
+                                  const isRead = Boolean(m.dismissedAt);
+                                  const ts = m.createdAt
+                                    ? new Date(m.createdAt).toLocaleString([], {
+                                        month: "short",
+                                        day: "numeric",
+                                        hour: "numeric",
+                                        minute: "2-digit",
+                                      })
+                                    : "";
+                                  return (
+                                    <div
+                                      key={m.id}
+                                      role="menuitem"
+                                      className={`flex items-start gap-2 border-b border-slate-800 px-3 py-2.5 last:border-b-0 hover:bg-slate-800/60 ${isRead ? "opacity-60" : ""}`}
+                                    >
+                                      <span
+                                        className={`mt-1 inline-block h-1.5 w-1.5 shrink-0 rounded-full ${
+                                          isRead
+                                            ? "bg-slate-600"
+                                            : "bg-rose-400 shadow-[0_0_4px_rgba(244,63,94,0.7)]"
+                                        }`}
+                                      />
+                                      <div className="min-w-0 flex-1">
+                                        <div className="text-xs font-bold text-cyan-200">
+                                          SCSalvager Admin
+                                        </div>
+                                        <div className="mt-0.5 whitespace-pre-wrap break-words text-xs text-slate-200">
+                                          {m.body}
+                                        </div>
+                                        <div className="mt-1 flex items-center justify-between">
+                                          <span className="text-[10px] text-slate-500">{ts}</span>
+                                          {!isRead && (
+                                            <button
+                                              type="button"
+                                              onClick={() => dismissNotification(`admin-msg:${m.id}`)}
+                                              className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                                            >
+                                              Mark read
+                                            </button>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  )}
                   <div className="relative">
                     <button
                       type="button"
-                      onClick={() => setIsNotificationsOpen((v) => !v)}
+                      onClick={() => {
+                        setIsNotificationsOpen((v) => !v);
+                        setIsMailboxOpen(false);
+                      }}
                       aria-haspopup="menu"
                       aria-expanded={isNotificationsOpen}
                       aria-label={
@@ -26580,6 +26778,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                         </th>
                         <th className="px-4 py-3">Last Login</th>
                         <th className="px-4 py-3 text-right">When</th>
+                        <th className="px-4 py-3 text-center">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -26640,6 +26839,27 @@ export default function StarCitizenSalvageGuideWebsite() {
                           </td>
                           <td className="px-4 py-3 text-right text-slate-400 whitespace-nowrap">
                             {formatTimeAgo(u.lastLoginAt) || "just now"}
+                          </td>
+                          <td className="px-4 py-3 text-center whitespace-nowrap">
+                            {/* Mailbox button — opens a dedicated
+                                quick-send dialog for this user.
+                                stopPropagation prevents the row
+                                click-to-open-detail handler from
+                                also firing. */}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openQuickMessage(u);
+                              }}
+                              aria-label={`Send message to ${u.username}`}
+                              title={`Send message to ${u.username}`}
+                              className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-cyan-500/25 bg-slate-950/50 text-slate-300 hover:border-cyan-400/60 hover:bg-cyan-500/15 hover:text-cyan-200"
+                            >
+                              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="h-3.5 w-3.5">
+                                <path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4.236-7.445 4.962a1 1 0 0 1-1.11 0L4 8.236V6l8 5.333L20 6v2.236z" />
+                              </svg>
+                            </button>
                           </td>
                         </tr>
                       ))}
@@ -27057,6 +27277,93 @@ export default function StarCitizenSalvageGuideWebsite() {
             blueprint (with pool name + chance) and the fabricator
             material list (slot name → material name + quantity +
             min quality), sourced from scmdb.net's PTU dump. */}
+
+        {/* Quick-send admin message dialog — launched from the All
+            Users → Actions column mailbox button. Posts to the same
+            /api/admin/message-user endpoint as the user-detail
+            modal's full Send-Admin-Message section, but skipped the
+            30-day-history load so admins can fire a one-liner at
+            anyone in the table without context. */}
+        {quickMessageTarget && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+            onClick={() => !quickMessageInFlight && closeQuickMessage()}
+          >
+            <div
+              className="w-full max-w-md rounded-3xl border border-cyan-500/30 bg-slate-900 p-6 shadow-2xl shadow-cyan-950/40"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="quick-message-title"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h3 id="quick-message-title" className="text-lg font-bold text-cyan-300">
+                    Send message to {quickMessageTarget.username}
+                  </h3>
+                  <p className="mt-1 text-xs text-slate-500">
+                    Lands in their notification mailbox as <strong>SCSalvager Admin</strong>. Max 1,000 characters.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={closeQuickMessage}
+                  disabled={quickMessageInFlight}
+                  aria-label="Close"
+                  className="rounded-md border border-slate-700 bg-slate-800/60 px-2 py-1 text-xs text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200 disabled:opacity-50"
+                >
+                  ✕
+                </button>
+              </div>
+              <textarea
+                value={quickMessageDraft}
+                onChange={(e) => setQuickMessageDraft(e.target.value.slice(0, 1000))}
+                disabled={quickMessageInFlight}
+                placeholder="Type your message…"
+                rows={4}
+                autoFocus
+                className="mt-4 w-full rounded-xl border border-cyan-500/25 bg-slate-950 px-3 py-2 text-sm text-slate-100 outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+              />
+              <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                <span className="text-[10px] text-slate-500">
+                  {quickMessageDraft.length} / 1,000
+                </span>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={closeQuickMessage}
+                    disabled={quickMessageInFlight}
+                    className="rounded-xl border border-slate-700 bg-slate-800/60 px-4 py-2 text-xs font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200 disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={sendQuickMessage}
+                    disabled={quickMessageInFlight || !quickMessageDraft.trim()}
+                    className={`rounded-xl border px-4 py-2 text-xs font-semibold transition ${
+                      quickMessageInFlight || !quickMessageDraft.trim()
+                        ? "cursor-not-allowed border-slate-700 bg-slate-800/50 text-slate-500"
+                        : "border-cyan-400 bg-cyan-500/20 text-cyan-100 hover:bg-cyan-500/30"
+                    }`}
+                  >
+                    {quickMessageInFlight ? "Sending…" : "Send"}
+                  </button>
+                </div>
+              </div>
+              {quickMessageStatus && (
+                <div
+                  className={`mt-2 text-xs ${
+                    quickMessageStatus.kind === "ok" ? "text-emerald-300" : "text-rose-300"
+                  }`}
+                >
+                  {quickMessageStatus.text}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {scraperBlueprintModal && isPatchAtLeast(patchStatus?.version, "4.8") && (() => {
           const head = scraperBlueprintModal;
           const fullName = `${head} Scraper Module`;
@@ -28887,7 +29194,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                   </ul>
                   <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Notes</p>
                   <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
-                    <li>Your notification bell can now receive messages from <strong>SCSalvager Admin</strong>. We'll only use this for corrective actions (e.g. flagged price reports rolled back) or critical follow-ups. Dismiss in the bell to mark read; dismissed state persists across devices.</li>
+                    <li>New <strong>Messages</strong> mailbox icon sits next to the notification bell in the header. Admin → user messages (corrective actions, critical follow-ups) land here, not in the bell. Always rendered as <strong>SCSalvager Admin</strong>; dismissed state persists across devices. The mailbox auto-refreshes every 60 seconds and on open — no page reload needed to see new messages.</li>
                   </ul>
                 </section>
 

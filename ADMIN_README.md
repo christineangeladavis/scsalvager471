@@ -30,8 +30,11 @@ Modals:
 - New endpoint `/api/notifications/inbox`:
   - `GET` — returns the caller's inbox entries (id / body / createdAt / dismissedAt). `fromAdminId` is stripped before serialization.
   - `POST { action: "dismiss", id }` — flips `dismissedAt` on one entry so the bell stops counting it toward the unread badge.
-- Admin Panel UI lives on the **All Users → row click → user-detail modal**. Section "Send admin message" carries a `<textarea maxLength=1000>` + character counter + Send button. Errors / success render inline below the button. Sending clears the draft and refreshes the inbox count.
-- Recipient surface: messages render in the existing notification bell as `Message from SCSalvager Admin` entries. Read state is server-driven (entry's `dismissedAt`), so dismiss survives reload + cross-device login. The bell's mark-all-read still works — it fans out one POST per admin-message id since there's no batch-dismiss endpoint.
+- Admin Panel UI has two entry points:
+  - **All Users table → Actions column** — mailbox icon on every row launches a quick-send modal scoped to that user (no 30-day history load). Modal has a `<textarea maxLength=1000>` + counter + Send/Cancel. The row's click-to-open-detail handler is suppressed via `stopPropagation` so the icon click stays focused on messaging.
+  - **All Users → row click → user-detail modal → "Send admin message" section** — same payload, embedded inside the existing detail modal so admins can review the user's history before composing.
+  - Both paths POST to `/api/admin/message-user`. Errors / success render inline; sending clears the draft and reports the new inbox count.
+- Recipient surface: a **dedicated Messages mailbox icon** sits next to the notification bell in the header (envelope glyph). Admin → user messages render in the mailbox dropdown only — the bell stays focused on setup-nag + What's New. Title bar reads "Messages"; sender label inside each entry reads "SCSalvager Admin". Read state is server-driven (entry's `dismissedAt`), so dismiss survives reload + cross-device login. The mailbox auto-refreshes every 60 seconds while the user is logged in AND on every open, so admin messages reach the recipient without requiring a page reload — within a minute of `POST /api/admin/message-user` returning. Mark-all-read fans out one POST per admin-message id since there's no batch-dismiss endpoint.
 
 ## 2026-05-08 — Junior2065 added to admin fallback list
 

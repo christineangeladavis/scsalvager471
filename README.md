@@ -17,7 +17,7 @@ Fixes:
 - **Crew Salvage saved sessions now persist server-side.** Saved sessions used to live in React state only — refreshing the page or logging in from another device wiped the list. `/api/ledger` now stores `crewSessions` alongside refinery jobs + sell orders (capped at 200 per user); saving / deleting / editing / completing a session writes through to Redis. Older clients that don't send the field on save have their stored sessions preserved (no accidental wipes). Sessions saved before this build are unrecoverable — they never made it past React state.
 
 Notes:
-- Your notification bell can now receive messages from **SCSalvager Admin**. We'll only use this for corrective actions (e.g. flagged price reports rolled back) or critical follow-ups. Dismiss in the bell to mark read; dismissed state persists across devices.
+- New **Messages** mailbox icon sits next to the notification bell in the header. Admin → user messages (corrective actions, critical follow-ups) land here, not in the bell. Always rendered as **SCSalvager Admin**; dismissed state persists across devices. The mailbox auto-refreshes every 60 seconds and on open — no page reload needed to see new messages.
 
 UPDATE 5/5/2026 v2.7.2
 

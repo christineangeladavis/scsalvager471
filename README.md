@@ -5,6 +5,12 @@ Made by Chrissyy · Referral: STAR-CH2W-R73F
 
 ## What's in this build
 
+UPDATE 5/8/2026 v2.7.3
+
+Added:
+- Crew Salvage **Reclaimer** roster picks up three turret stations: **Manned Turret**, **Remote Turret 1**, **Remote Turret 2**. Reclaimer now lists 8 stations total (was 5). Split Calculator + Roles header automatically pick up the new stations — `Roles · X / 8 stations crewed`.
+- Crew Salvage **Moth** roster gains a **Missile Operator** station, slotted directly after Pilot. Moth now lists 6 stations total (was 5).
+
 UPDATE 5/5/2026 v2.7.2
 
 Added:

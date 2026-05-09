@@ -2984,7 +2984,7 @@ const SC_STORAGE_LOCATIONS = {
 // notification bell surfaces a "new site update available" entry until
 // the user opens the What's New modal (or marks it read). Per-browser
 // pointer is stored at localStorage["scs_whatsnew_seen_version"].
-const LATEST_WHATSNEW_VERSION = "v2.7.2";
+const LATEST_WHATSNEW_VERSION = "v2.7.3";
 
 // localStorage key for explicitly dismissed notification ids. Lets
 // users hide the red badge without changing their underlying setup
@@ -24182,9 +24182,13 @@ export default function StarCitizenSalvageGuideWebsite() {
                       "Salvage Operator 1",
                       "Salvage Operator 2",
                       "Cargo Operator",
+                      "Manned Turret",
+                      "Remote Turret 1",
+                      "Remote Turret 2",
                     ]
                   : [
                       "Pilot",
+                      "Missile Operator",
                       "Salvage Operator 1",
                       "Salvage Operator 2",
                       "Salvage Operator 3",
@@ -28525,6 +28529,15 @@ export default function StarCitizenSalvageGuideWebsite() {
               </div>
 
               <div className="mt-5 space-y-7 text-sm text-slate-300 leading-relaxed">
+
+                <section>
+                  <h4 className="text-cyan-300 text-base font-bold">v2.7.3 — May 8, 2026</h4>
+                  <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li>Crew Salvage <strong>Reclaimer</strong> roster picks up three turret stations: <strong>Manned Turret</strong>, <strong>Remote Turret 1</strong>, <strong>Remote Turret 2</strong>. Reclaimer now lists 8 stations total (was 5). Header counter updates to <code className="rounded bg-slate-800 px-1 text-cyan-200">Roles · X / 8 stations crewed</code>.</li>
+                    <li>Crew Salvage <strong>Moth</strong> roster gains a <strong>Missile Operator</strong> station, slotted directly after Pilot. Moth now lists 6 stations total (was 5).</li>
+                  </ul>
+                </section>
 
                 <section>
                   <h4 className="text-cyan-300 text-base font-bold">v2.7.2 — May 5, 2026</h4>

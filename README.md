@@ -15,6 +15,7 @@ Added:
 Changes:
 - Messages mailbox poll cadence tightened from 60 seconds to **30 seconds**. New admin-sent messages reach you within ~30 s of the admin clicking Send — still no manual reload required.
 - The Home-tab yellow announcement banner is now driven by a dedicated **Post Announcement** action, separate from per-user broadcasts. Broadcasts still arrive in your Messages mailbox; announcements live on the Home banner only. The banner is purely time-gated — survives page refresh and re-login, hides automatically **24 hours** after the admin posts it.
+- Messages you send to SCSalvager Admin now surface directly in the admin's Messages mailbox (with your username + a preview), so admins can see and respond to incoming mail without having to dig per-user. Admins continue to see the full thread + history when they open your user record.
 
 UPDATE 5/8/2026 v2.7.3
 

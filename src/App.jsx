@@ -17107,6 +17107,12 @@ export default function StarCitizenSalvageGuideWebsite() {
   // banner on the Home tab. Survives refresh — banner only hides
   // when 24 h elapses since createdAt.
   const [siteAnnouncements, setSiteAnnouncements] = useState([]);
+  // Admin-only: aggregated user → admin messages across every
+  // indexed user. Source: GET /api/admin/inbox-overview. Drives
+  // the "User messages" section in the admin's Messages mailbox
+  // dropdown so they don't have to open per-user threads to see
+  // incoming mail. Empty array on non-admin sessions.
+  const [adminUserMailOverview, setAdminUserMailOverview] = useState([]);
   const [adminClearLedgerStep, setAdminClearLedgerStep] = useState(0); // 0=picker visible,1=first confirm,2=second confirm
   const [adminClearLedgerInFlight, setAdminClearLedgerInFlight] = useState(false);
   const [adminClearLedgerError, setAdminClearLedgerError] = useState("");
@@ -17774,9 +17780,18 @@ export default function StarCitizenSalvageGuideWebsite() {
   // Unread count drives the red badge. Only inbound (admin → user)
   // entries that aren't dismissed contribute — user-authored
   // outgoing messages are "self-read" the moment they're sent.
-  const unreadMailboxCount = mailboxMessages.filter(
-    (m) => !m.dismissedAt && (m.from || "admin") === "admin"
-  ).length;
+  // For admin sessions, also add the count of incoming user → admin
+  // messages from the aggregated overview so admins see the same
+  // unread badge for both their own inbox and the user-mail feed.
+  const unreadMailboxCount = useMemo(() => {
+    let n = mailboxMessages.filter(
+      (m) => !m.dismissedAt && (m.from || "admin") === "admin"
+    ).length;
+    if (user && user.isAdmin) {
+      n += adminUserMailOverview.length;
+    }
+    return n;
+  }, [mailboxMessages, user, adminUserMailOverview]);
 
   // Unread count drives the red bell badge.
   const unreadNotificationCount = userNotifications.filter((n) => !n.isRead).length;
@@ -20197,6 +20212,39 @@ export default function StarCitizenSalvageGuideWebsite() {
     refreshAdminInbox();
   }, [user]);
 
+  // Admin-only: pull the aggregated user → admin mailbox overview
+  // so the operator sees inbound user mail in their own Messages
+  // dropdown without having to click each user. No-op on
+  // non-admin sessions (the endpoint 403s; we just clear state).
+  const refreshAdminUserMailOverview = async () => {
+    if (!user || !user.isAdmin) {
+      setAdminUserMailOverview([]);
+      return;
+    }
+    try {
+      const res = await fetch("/api/admin/inbox-overview", { credentials: "same-origin" });
+      if (!res.ok) {
+        setAdminUserMailOverview([]);
+        return;
+      }
+      const data = await res.json();
+      setAdminUserMailOverview(Array.isArray(data.messages) ? data.messages : []);
+    } catch {
+      // silent — degrade to empty
+    }
+  };
+  useEffect(() => {
+    refreshAdminUserMailOverview();
+    if (!user || !user.isAdmin) return;
+    const interval = setInterval(refreshAdminUserMailOverview, 30_000);
+    return () => clearInterval(interval);
+  }, [user]);
+  // Refresh on mailbox open so admin always sees fresh state
+  // when they actually look at the dropdown.
+  useEffect(() => {
+    if (isMailboxOpen) refreshAdminUserMailOverview();
+  }, [isMailboxOpen]);
+
   // Site-wide announcements — separate from per-user inboxes. Open
   // to anyone, no auth needed. Drives the Home-tab yellow banner.
   const refreshSiteAnnouncements = async () => {
@@ -21820,11 +21868,61 @@ export default function StarCitizenSalvageGuideWebsite() {
                                 )}
                               </div>
                             )}
-                            {mailboxMessages.length === 0 ? (
+                            {/* Admin-only: incoming user → admin
+                                mailbox aggregate. Sits above the
+                                regular Messages list so operators
+                                see fresh user mail first. Clicking
+                                an entry pops the user-detail modal
+                                for that user with the thread
+                                pre-loaded. */}
+                            {user?.isAdmin && adminUserMailOverview.length > 0 && (
+                              <div className="border-b border-amber-500/30 bg-amber-500/5">
+                                <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-amber-300">
+                                  User mail · {adminUserMailOverview.length}
+                                </div>
+                                <div className="max-h-[40vh] overflow-y-auto">
+                                  {adminUserMailOverview.map((m) => {
+                                    const ts = m.createdAt
+                                      ? new Date(m.createdAt).toLocaleString([], {
+                                          month: "short",
+                                          day: "numeric",
+                                          hour: "numeric",
+                                          minute: "2-digit",
+                                        })
+                                      : "";
+                                    return (
+                                      <button
+                                        key={`u-${m.id}`}
+                                        type="button"
+                                        onClick={() => {
+                                          setIsMailboxOpen(false);
+                                          openAdminUserDetail({
+                                            userId: m.userId,
+                                            username: m.username,
+                                          });
+                                        }}
+                                        className="block w-full border-b border-amber-500/20 px-3 py-2.5 text-left last:border-b-0 hover:bg-amber-500/10"
+                                      >
+                                        <div className="flex items-center justify-between gap-2">
+                                          <span className="text-xs font-bold text-amber-200">
+                                            {m.username}
+                                          </span>
+                                          <span className="text-[10px] text-slate-500">{ts}</span>
+                                        </div>
+                                        <div className="mt-0.5 line-clamp-2 break-words text-xs text-slate-200">
+                                          {m.body}
+                                        </div>
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
+                            {mailboxMessages.length === 0 && !(user?.isAdmin && adminUserMailOverview.length > 0) ? (
                               <div className="px-3 py-3 text-xs text-slate-400">
                                 No messages.
                               </div>
-                            ) : (
+                            ) : mailboxMessages.length === 0 ? null : (
                               <div className="max-h-[60vh] overflow-y-auto">
                                 {mailboxMessages.map((m) => {
                                   const direction = m.from === "user" ? "user" : "admin";

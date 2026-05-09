@@ -35,6 +35,12 @@ Modals:
   - **All Users → row click → user-detail modal → "Send admin message" section** — same payload, embedded inside the existing detail modal so admins can review the user's history before composing.
   - Both paths POST to `/api/admin/message-user`. Errors / success render inline; sending clears the draft and reports the new inbox count.
 - Recipient surface: a **dedicated Messages mailbox icon** sits next to the notification bell in the header (envelope glyph). Admin → user messages render in the mailbox dropdown only — the bell stays focused on setup-nag + What's New. Title bar reads "Messages"; sender label inside each entry reads "SCSalvager Admin" or "You" depending on direction. Mailbox auto-refreshes every **30 seconds** + on every open, so admin messages reach the recipient within ~30 s of `POST /api/admin/message-user` returning. Mark-all-read fans out one POST per admin-message id (no batch-dismiss endpoint).
+- **Aggregated incoming user mail** (added 2026-05-09):
+  - New endpoint `GET /api/admin/inbox-overview` (admin-only). Iterates `listUserIds()`, reads each `inbox:<userId>`, returns every entry where `from === "user"` and `deletedAt` is unset, flattened with `userId` + `username` attached. Cap **200** newest. Sorted desc by `createdAt`.
+  - Recipient surface: admin's Messages mailbox dropdown gains a top **User mail · N** section (amber-tinted) above the regular Messages list. Each entry shows username + body preview + timestamp; clicking jumps to that user's user-detail modal with the full thread pre-loaded.
+  - Polling: client refreshes every **30 s** + on every mailbox open. Independent from the per-user inbox poll.
+  - The unread badge on the envelope icon now sums the admin's own mailbox unread count + the User mail count, so the badge fires on incoming user replies even if the admin hasn't been clicking through user-detail modals.
+
 - **Two-way messaging** (added 2026-05-09):
   - Users can **Reply** to any admin message via the per-entry Reply button in the dropdown, or start a **New** thread with admin via the New button at the top.
   - Routes through `POST /api/notifications/inbox { action: "send" | "reply", body, replyToId? }`. Server appends a `from: "user"` entry to the same `inbox:<userId>` array (cap **50** total entries).

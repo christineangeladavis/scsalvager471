@@ -254,7 +254,7 @@ const MISSIONS = [
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":10,"max":10},{"name":"Construction Materials","unit":"SCU","min":41,"max":41},{"name":"Power Plant, Military Grade (S2)","unit":"count","min":2,"max":2},{"name":"Cooler, Military Grade (S2)","unit":"count","min":2,"max":2},{"name":"Shield Generator, Military Grade (S2)","unit":"count","min":2,"max":2},{"name":"Ship Weapon (S3 or S4)","unit":"count","min":8,"max":8}],
     salvageShips: [],
     salvageShipCount: {"min":null,"max":null},
-    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1,"unresolved":false},{"name":"Abrade Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false}]}],
   },
   {
     id: "993fbe39-f45a-456a-a94a-a65714c1db49",
@@ -291,7 +291,7 @@ const MISSIONS = [
     turnIns: [{"name":"Power Plant, Competition Grade (S2)","unit":"count","min":2,"max":2},{"name":"Cooler, Competition Grade (S2)","unit":"count","min":2,"max":2},{"name":"Shield Generator, Competition Grade (S2)","unit":"count","min":2,"max":2}],
     salvageShips: [],
     salvageShipCount: {"min":null,"max":null},
-    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1,"unresolved":false},{"name":"Abrade Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false}]}],
   },
   {
     id: "c2bf4edf-eb40-4abb-a81d-03bac07badd8",
@@ -328,7 +328,7 @@ const MISSIONS = [
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":15,"max":15},{"name":"Construction Materials","unit":"SCU","min":15,"max":15},{"name":"Power Plant, Civilian Grade (S2)","unit":"count","min":2,"max":2},{"name":"Cooler, Civilian Grade (S2)","unit":"count","min":2,"max":2},{"name":"Shield Generator, Civilian Grade (S2)","unit":"count","min":4,"max":4}],
     salvageShips: [],
     salvageShipCount: {"min":null,"max":null},
-    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1,"unresolved":false},{"name":"Abrade Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false}]}],
   },
   {
     id: "09f5d6ae-c1a2-4dba-ba0d-886c33ea1af6",
@@ -365,7 +365,7 @@ const MISSIONS = [
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":15,"max":15},{"name":"Quantum Drive, Industrial (S2)","unit":"count","min":2,"max":2},{"name":"Power Plant, Industrial Grade (S2)","unit":"count","min":2,"max":2},{"name":"Ship Mining Laser","unit":"count","min":4,"max":4},{"name":"Ship Salvage Head","unit":"count","min":4,"max":4}],
     salvageShips: [],
     salvageShipCount: {"min":null,"max":null},
-    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1,"unresolved":false},{"name":"Abrade Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false}]}],
   },
   {
     id: "acf17ba4-4007-466c-9081-72aee28232b3",
@@ -402,7 +402,7 @@ const MISSIONS = [
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":10,"max":10},{"name":"Construction Materials","unit":"SCU","min":41,"max":41},{"name":"Power Plant, Industrial Grade (S2)","unit":"count","min":3,"max":3},{"name":"Cooler, Industrial Grade (S2)","unit":"count","min":3,"max":3},{"name":"Shield Generator, Industrial Grade (S2)","unit":"count","min":3,"max":3},{"name":"Quantum Drive, Industrial (S2)","unit":"count","min":2,"max":2},{"name":"Ship Mining Laser","unit":"count","min":2,"max":2}],
     salvageShips: [],
     salvageShipCount: {"min":null,"max":null},
-    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1,"unresolved":false},{"name":"Abrade Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false}]}],
   },
   {
     id: "1331671c-4bbd-47bc-b71e-c19def138faa",
@@ -439,7 +439,7 @@ const MISSIONS = [
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":10,"max":10},{"name":"Construction Materials","unit":"SCU","min":41,"max":41},{"name":"Power Plant, Civilian Grade (S2)","unit":"count","min":3,"max":3},{"name":"Cooler, Civilian Grade (S2)","unit":"count","min":3,"max":3},{"name":"Shield Generator, Civilian Grade (S2)","unit":"count","min":3,"max":3},{"name":"Ship Weapon (S3 or S4)","unit":"count","min":6,"max":6}],
     salvageShips: [],
     salvageShipCount: {"min":null,"max":null},
-    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1,"unresolved":false},{"name":"Abrade Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false}]}],
   },
   {
     id: "28e535c8-740f-47cc-adcb-6238a0b5b724",
@@ -476,7 +476,7 @@ const MISSIONS = [
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":10,"max":10},{"name":"Construction Materials","unit":"SCU","min":6,"max":6},{"name":"Ship Weapon (S3 or S4)","unit":"count","min":2,"max":2},{"name":"Ship Missile","unit":"count","min":4,"max":4},{"name":"Ship Bomb","unit":"count","min":2,"max":2}],
     salvageShips: [],
     salvageShipCount: {"min":null,"max":null},
-    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1,"unresolved":false},{"name":"Abrade Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false}]}],
   },
   {
     id: "fe5b519c-1149-454c-a680-8d2788c3f487",
@@ -513,7 +513,7 @@ const MISSIONS = [
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":10,"max":10},{"name":"Construction Materials","unit":"SCU","min":5,"max":5},{"name":"Quantum Drive (S1)","unit":"count","min":2,"max":2},{"name":"Ship Mining Laser","unit":"count","min":3,"max":3},{"name":"Ship Salvage Head","unit":"count","min":3,"max":3}],
     salvageShips: [],
     salvageShipCount: {"min":null,"max":null},
-    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1,"unresolved":false},{"name":"Abrade Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false}]}],
   },
   {
     id: "44b632f2-e2e2-42e3-b0d5-a19889263c15",
@@ -550,7 +550,7 @@ const MISSIONS = [
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":14,"max":14},{"name":"Construction Materials","unit":"SCU","min":5,"max":5},{"name":"Shield Generator (S1)","unit":"count","min":8,"max":8},{"name":"Ship Weapon (S3 or S4)","unit":"count","min":8,"max":8},{"name":"Construction Rubble","unit":"SCU","min":4,"max":4}],
     salvageShips: [],
     salvageShipCount: {"min":null,"max":null},
-    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1,"unresolved":false},{"name":"Abrade Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false}]}],
   },
   {
     id: "a2e30021-9bbd-4cbe-a014-3a851c86331c",
@@ -587,7 +587,7 @@ const MISSIONS = [
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":9,"max":9},{"name":"Construction Materials","unit":"SCU","min":6,"max":6},{"name":"Power Plant (S1)","unit":"count","min":2,"max":2},{"name":"Ship Weapon (S1 or S2)","unit":"count","min":6,"max":6},{"name":"Cooler (S1)","unit":"count","min":2,"max":2},{"name":"Shield Generator (S1)","unit":"count","min":2,"max":2}],
     salvageShips: [],
     salvageShipCount: {"min":null,"max":null},
-    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1,"unresolved":false},{"name":"Abrade Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false}]}],
   },
   {
     id: "813ea00d-3766-46fd-802f-a9e5775de6b3",
@@ -624,7 +624,7 @@ const MISSIONS = [
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":7,"max":7},{"name":"Construction Rubble","unit":"SCU","min":4,"max":4},{"name":"Power Plant (S1)","unit":"count","min":4,"max":4},{"name":"Shield Generator (S1)","unit":"count","min":2,"max":2},{"name":"Cooler (S1)","unit":"count","min":2,"max":2}],
     salvageShips: [],
     salvageShipCount: {"min":null,"max":null},
-    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1,"unresolved":false},{"name":"Abrade Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false}]}],
   },
   {
     id: "de9667b3-3142-46a3-80ae-f101c338ed4b",
@@ -661,7 +661,7 @@ const MISSIONS = [
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":6,"max":6},{"name":"Construction Materials","unit":"SCU","min":6,"max":6},{"name":"Power Plant (S1)","unit":"count","min":4,"max":4},{"name":"Cooler (S1)","unit":"count","min":4,"max":4},{"name":"Shield Generator (S1)","unit":"count","min":4,"max":4}],
     salvageShips: [],
     salvageShipCount: {"min":null,"max":null},
-    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1,"unresolved":false},{"name":"Abrade Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false}]}],
   },
   {
     id: "5e97df76-fe6d-4a2e-91f6-95f9c7596f3f",
@@ -698,7 +698,7 @@ const MISSIONS = [
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":10,"max":10}],
     salvageShips: [],
     salvageShipCount: {"min":null,"max":null},
-    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1,"unresolved":false},{"name":"Abrade Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false}]}],
   },
   {
     id: "e672b66a-a480-4ef2-b491-aaade45836c4",
@@ -735,7 +735,7 @@ const MISSIONS = [
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":10,"max":10}],
     salvageShips: [],
     salvageShipCount: {"min":null,"max":null},
-    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1,"unresolved":false},{"name":"Abrade Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false}]}],
   },
   {
     id: "eab205c6-d19a-4f4c-af8c-0c823c34c40a",
@@ -772,7 +772,7 @@ const MISSIONS = [
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":10,"max":10}],
     salvageShips: [],
     salvageShipCount: {"min":null,"max":null},
-    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1,"unresolved":false},{"name":"Abrade Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false}]}],
   },
   {
     id: "500a190f-14d5-4587-83f7-d33eb7a37577",
@@ -846,7 +846,7 @@ const MISSIONS = [
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":5,"max":5},{"name":"Construction Materials","unit":"SCU","min":3,"max":3}],
     salvageShips: [],
     salvageShipCount: {"min":null,"max":null},
-    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1,"unresolved":false},{"name":"Abrade Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false}]}],
   },
   {
     id: "06212b32-00ce-43e6-8fd4-4c7e0d833bf1",
@@ -883,7 +883,7 @@ const MISSIONS = [
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":5,"max":5},{"name":"Construction Rubble","unit":"SCU","min":3,"max":3}],
     salvageShips: [],
     salvageShipCount: {"min":null,"max":null},
-    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1,"unresolved":false},{"name":"Abrade Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false}]}],
   },
   {
     id: "7fb2faa7-b6d4-47e9-90ec-7e635cc2a9b0",
@@ -920,7 +920,7 @@ const MISSIONS = [
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":5,"max":5},{"name":"Construction Materials","unit":"SCU","min":3,"max":3}],
     salvageShips: [],
     salvageShipCount: {"min":null,"max":null},
-    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1,"unresolved":false},{"name":"Abrade Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false}]}],
   },
   {
     id: "f8823d3b-df07-40fe-aa2f-ab2e52f30d86",
@@ -994,7 +994,7 @@ const MISSIONS = [
     turnIns: [],
     salvageShips: [],
     salvageShipCount: {"min":null,"max":null},
-    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1,"unresolved":false},{"name":"Abrade Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false}]}],
   },
   {
     id: "787ac783-5a7f-49cf-b4b0-f3571f7ce6d6",
@@ -1031,7 +1031,7 @@ const MISSIONS = [
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":5,"max":5}],
     salvageShips: [],
     salvageShipCount: {"min":null,"max":null},
-    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1,"unresolved":false},{"name":"Abrade Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false}]}],
   },
   {
     id: "67608eaf-63b0-4d4f-9103-7960eeeb9166",
@@ -1068,7 +1068,7 @@ const MISSIONS = [
     turnIns: [],
     salvageShips: [],
     salvageShipCount: {"min":null,"max":null},
-    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1,"unresolved":false},{"name":"Abrade Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false}]}],
   },
   {
     id: "2a20ef29-7922-487f-b42c-70b48fe8031a",
@@ -1105,7 +1105,7 @@ const MISSIONS = [
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":5,"max":5}],
     salvageShips: [],
     salvageShipCount: {"min":null,"max":null},
-    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1,"unresolved":false},{"name":"Abrade Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false}]}],
   },
   {
     id: "9ff34277-7cba-441d-ac0f-1fcfc9d6e16c",
@@ -1142,7 +1142,7 @@ const MISSIONS = [
     turnIns: [],
     salvageShips: [],
     salvageShipCount: {"min":null,"max":null},
-    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1,"unresolved":false},{"name":"Abrade Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false}]}],
   },
   {
     id: "2501a070-bff6-4491-9c49-3456f1bfe128",
@@ -1179,7 +1179,7 @@ const MISSIONS = [
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":5,"max":5}],
     salvageShips: [],
     salvageShipCount: {"min":null,"max":null},
-    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1,"unresolved":false},{"name":"Abrade Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false}]}],
   },
   {
     id: "63550989-f035-4dc6-a8f6-c6f5c8482c33",
@@ -1216,7 +1216,7 @@ const MISSIONS = [
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":1,"max":1}],
     salvageShips: ["Aegis Gladius"],
     salvageShipCount: {"min":1,"max":1},
-    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1,"unresolved":false},{"name":"Abrade Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false}]}],
   },
   {
     id: "73cf6254-785a-41c1-b7a9-bdce2f6380e0",
@@ -1253,7 +1253,7 @@ const MISSIONS = [
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":1,"max":1}],
     salvageShips: ["Aegis Gladius"],
     salvageShipCount: {"min":1,"max":1},
-    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1,"unresolved":false},{"name":"Abrade Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false}]}],
   },
   {
     id: "76ed5ffe-32b6-473a-9605-19f82c5d879e",
@@ -1290,7 +1290,7 @@ const MISSIONS = [
     turnIns: [{"name":"Recycled Material Composite","unit":"SCU","min":1,"max":1}],
     salvageShips: ["Aegis Gladius"],
     salvageShipCount: {"min":1,"max":1},
-    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1},{"name":"Abrade Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1},{"name":"Cinch Scraper Module","weight":1}]}],
+    blueprintRewards: [{"poolName":"BP_REWARDS_AdagioResourceGatheringShipSalvage","chance":1,"blueprints":[{"name":"Trawler Scraper Module","weight":1,"unresolved":false},{"name":"Abrade Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false},{"name":"Cinch Scraper Module","weight":1,"unresolved":false}]}],
   },
   {
     id: "5c455aa4-f18a-4f3e-8195-4d3d20f447a5",
@@ -1806,7 +1806,7 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [],
-    salvageShips: ["Aegis Gladius","Aegis Gladius Valiant","Aegis Redeemer","Aegis Vanguard Harbinger","Aegis Vanguard Hoplite","Aegis Vanguard Sentinel","Aegis Vanguard Warden","Anvil Arrow","Anvil F7C Hornet Mk II","Anvil F7C-M Super Hornet Mk I","Anvil Gladiator","Anvil Hurricane","Anvil Valkyrie","Argo RAFT","C.O. Nomad","Crusader A1 Spirit","Crusader Ares Star Fighter Inferno","Crusader C1 Spirit","Crusader Mercury Star Runner","Drake Buccaneer","Drake Caterpillar","Drake Cutlass Black","Drake Cutlass Steel","Drake Vulture","Esperia Prowler","Esperia Talon Shrike","MISC Freelancer","MISC Freelancer DUR","MISC Freelancer MAX","MISC Freelancer MIS","MISC Reliant Kore","MISC Reliant Tana","Mirai Guardian MX","Origin 400i","RSI Scorpius","RSI Scorpius Antares","RSI Zeus Mk II ES"],
+    salvageShips: ["Aegis Gladius","Aegis Gladius Valiant","Aegis Redeemer","Aegis Vanguard Harbinger","Aegis Vanguard Hoplite","Aegis Vanguard Sentinel","Aegis Vanguard Warden","Anvil Arrow","Anvil F7C Hornet Mk II","Anvil F7C-M Super Hornet Mk I","Anvil Hurricane","Anvil Valkyrie","Argo RAFT","C.O. Nomad","Crusader A1 Spirit","Crusader Ares Star Fighter Inferno","Crusader C1 Spirit","Crusader Mercury Star Runner","Drake Buccaneer","Drake Caterpillar","Drake Cutlass Black","Drake Cutlass Steel","Drake Vulture","Esperia Prowler","Esperia Talon Shrike","MISC Freelancer","MISC Freelancer DUR","MISC Freelancer MAX","MISC Freelancer MIS","MISC Reliant Kore","MISC Reliant Tana","Mirai Guardian MX","Origin 400i","RSI Scorpius","RSI Scorpius Antares","RSI Zeus Mk II CL","RSI Zeus Mk II ES"],
     salvageShipCount: {"min":9,"max":9},
     blueprintRewards: [],
   },
@@ -1843,7 +1843,7 @@ const MISSIONS = [
     requires: [],
     unlocks: [],
     turnIns: [],
-    salvageShips: ["Aegis Gladius","Aegis Gladius Valiant","Aegis Redeemer","Aegis Vanguard Harbinger","Aegis Vanguard Hoplite","Aegis Vanguard Sentinel","Aegis Vanguard Warden","Anvil Arrow","Anvil F7C Hornet Mk II","Anvil F7C-M Super Hornet Mk I","Anvil Gladiator","Anvil Hurricane","Anvil Valkyrie","Argo RAFT","C.O. Nomad","Crusader A1 Spirit","Crusader Ares Star Fighter Inferno","Crusader C1 Spirit","Crusader Mercury Star Runner","Drake Buccaneer","Drake Caterpillar","Drake Cutlass Black","Drake Cutlass Steel","Drake Vulture","Esperia Prowler","Esperia Talon Shrike","MISC Freelancer","MISC Freelancer DUR","MISC Freelancer MAX","MISC Freelancer MIS","MISC Reliant Kore","MISC Reliant Tana","Mirai Guardian MX","Origin 400i","RSI Scorpius","RSI Scorpius Antares","RSI Zeus Mk II ES"],
+    salvageShips: ["Aegis Gladius","Aegis Gladius Valiant","Aegis Redeemer","Aegis Vanguard Harbinger","Aegis Vanguard Hoplite","Aegis Vanguard Sentinel","Aegis Vanguard Warden","Anvil Arrow","Anvil F7C Hornet Mk II","Anvil F7C-M Super Hornet Mk I","Anvil Hurricane","Anvil Valkyrie","Argo RAFT","C.O. Nomad","Crusader A1 Spirit","Crusader Ares Star Fighter Inferno","Crusader C1 Spirit","Crusader Mercury Star Runner","Drake Buccaneer","Drake Caterpillar","Drake Cutlass Black","Drake Cutlass Steel","Drake Vulture","Esperia Prowler","Esperia Talon Shrike","MISC Freelancer","MISC Freelancer DUR","MISC Freelancer MAX","MISC Freelancer MIS","MISC Reliant Kore","MISC Reliant Tana","Mirai Guardian MX","Origin 400i","RSI Scorpius","RSI Scorpius Antares","RSI Zeus Mk II CL","RSI Zeus Mk II ES"],
     salvageShipCount: {"min":9,"max":9},
     blueprintRewards: [],
   },
@@ -2404,6 +2404,49 @@ const MISSIONS = [
   },
 ];
 
+// --- Salvage mission rewardUEC overrides for the 4.8 PTU build
+// (4.8.0-ptu.11811531). 33 contracts had their reward bumped vs LIVE
+// 4.7.2. Applied at runtime only when patchStatus.version >= 4.8 so
+// 4.7.2 users still see the LIVE rewards. Generated from
+// .claude/missions-4.8-reward-overrides.json (diff: 4.7.2 LIVE
+// rewardUEC vs 4.8 PTU rewardUEC). Re-generate by re-running the
+// PTU diff scriptlet against the next merged-4.8.0-ptu.<build>.json.
+const MISSIONS_4_8_REWARD_OVERRIDES = {
+  "63550989-f035-4dc6-a8f6-c6f5c8482c33": 40000,
+  "73cf6254-785a-41c1-b7a9-bdce2f6380e0": 40000,
+  "76ed5ffe-32b6-473a-9605-19f82c5d879e": 40000,
+  "09f5d6ae-c1a2-4dba-ba0d-886c33ea1af6": 346750,
+  "c2bf4edf-eb40-4abb-a81d-03bac07badd8": 499500,
+  "993fbe39-f45a-456a-a94a-a65714c1db49": 515250,
+  "acf17ba4-4007-466c-9081-72aee28232b3": 367000,
+  "7858db48-7eb6-4a6c-b56b-5df1c5235d1d": 862000,
+  "1331671c-4bbd-47bc-b71e-c19def138faa": 348500,
+  "44b632f2-e2e2-42e3-b0d5-a19889263c15": 246750,
+  "28e535c8-740f-47cc-adcb-6238a0b5b724": 235750,
+  "fe5b519c-1149-454c-a680-8d2788c3f487": 235750,
+  "813ea00d-3766-46fd-802f-a9e5775de6b3": 151500,
+  "a2e30021-9bbd-4cbe-a014-3a851c86331c": 166000,
+  "de9667b3-3142-46a3-80ae-f101c338ed4b": 138250,
+  "e672b66a-a480-4ef2-b491-aaade45836c4": 96000,
+  "06212b32-00ce-43e6-8fd4-4c7e0d833bf1": 84500,
+  "5e97df76-fe6d-4a2e-91f6-95f9c7596f3f": 105000,
+  "d28dfeee-2ffa-4ec8-87d9-2a5db01bb5ec": 92750,
+  "eab205c6-d19a-4f4c-af8c-0c823c34c40a": 87500,
+  "7fb2faa7-b6d4-47e9-90ec-7e635cc2a9b0": 77000,
+  "61201483-e22b-4170-ba24-705efb270635": 35250,
+  "f8823d3b-df07-40fe-aa2f-ab2e52f30d86": 56000,
+  "500a190f-14d5-4587-83f7-d33eb7a37577": 108000,
+  "5c455aa4-f18a-4f3e-8195-4d3d20f447a5": 42250,
+  "fff5c566-eeae-4bae-9a03-26ae9b5e8d49": 42250,
+  "4aa7b26e-701d-410e-a128-e9e2864568e0": 38500,
+  "67608eaf-63b0-4d4f-9103-7960eeeb9166": 48250,
+  "e4853f9d-f027-4f83-bd82-1835cc2f6409": 53000,
+  "9ff34277-7cba-441d-ac0f-1fcfc9d6e16c": 44000,
+  "2a20ef29-7922-487f-b42c-70b48fe8031a": 48000,
+  "787ac783-5a7f-49cf-b4b0-f3571f7ce6d6": 52500,
+  "2501a070-bff6-4491-9c49-3456f1bfe128": 43750,
+};
+
 // Auto-generated from scmdb.net 4.8.0-ptu merged catalog.
 // Filter: missionType === "Refueling". Re-run
 // .claude/build-refueling-missions.cjs after refreshing the JSON.
@@ -2414,7 +2457,7 @@ const REFUELING_MISSIONS = [
     faction: "United Wayfarers Club",
     giver: "United Wayfarers Club",
     system: "Multi",
-    reward: 150750,
+    reward: 336750,
     buyIn: 0,
     baseXP: 50,
     legality: "Legal",
@@ -2441,7 +2484,7 @@ const REFUELING_MISSIONS = [
     requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
     unlocks: [],
     turnIns: [],
-    blueprintRewards: [],
+    blueprintRewards: [{"poolName":"BP_REWARDS_FuelNozzle","chance":1,"blueprints":[{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true}]}],
   },
   {
     id: "1080d9fc-d511-4bda-a567-161797dac491",
@@ -2449,7 +2492,7 @@ const REFUELING_MISSIONS = [
     faction: "United Wayfarers Club",
     giver: "United Wayfarers Club",
     system: "Multi",
-    reward: 107000,
+    reward: 209500,
     buyIn: 0,
     baseXP: 200,
     legality: "Legal",
@@ -2476,42 +2519,7 @@ const REFUELING_MISSIONS = [
     requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
     unlocks: [],
     turnIns: [],
-    blueprintRewards: [],
-  },
-  {
-    id: "33944d03-1b31-4457-8717-75b36a6f0ad6",
-    name: "URGENT FLEET REFUEL",
-    faction: "United Wayfarers Club",
-    giver: "United Wayfarers Club",
-    system: "Stanton",
-    reward: 74000,
-    buyIn: 0,
-    baseXP: 50,
-    legality: "Legal",
-    minRank: "Head Contractor",
-    minRankXP: 38000,
-    maxRank: "Elite Contractor",
-    maxRankXP: 95250,
-    timeToComplete: 21.6,
-    canBeShared: true,
-    onceOnly: false,
-    canReacceptAfterAbandoning: false,
-    canReacceptAfterFailing: false,
-    hasPersonalCooldown: false,
-    personalCooldownTime: 1,
-    abandonedCooldownTime: 1,
-    crimeStatMin: null,
-    crimeStatMax: null,
-    notes: "Hey again, I've got a beacon at [LOCATION] and this one's a big one.",
-    description: "Hey again,\n\nI've got a beacon at [LOCATION] and this one's a big one. An entire little fleet of ships all burned out of fuel at the same time. Impressive coordination and lack of planning at the same time. \n\nThe client vessel will pay you at the rate of [FUELRATE] aUEC per SCU of Hydrogen and  [QTFUELRATE] aUEC per SCU of Quantum , and as a United Wayfarers Club contractor, you will also qualify for the UWC service fee listed above upon completion.\n\nHopefully since the area they're in is pretty safe, there shouldn't be too much trouble lurking, but these days you never know. Wouldn't hurt to get them back flying again as quick as you're able.\n\nHappy trails,\n\nDina Deloit\nDispatch Hub\nUnited Wayfarers Club\n\"We’ve got your back\"",
-    locations: [{"name":"Hurston","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"Crusader","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"ArcCorp","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"microTech","type":"Planet","system":"Stanton","planet":null,"moon":null}],
-    destinations: [],
-    prereqLocations: [],
-    chainStartsWith: [],
-    requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
-    unlocks: [],
-    turnIns: [],
-    blueprintRewards: [],
+    blueprintRewards: [{"poolName":"BP_REWARDS_FuelNozzle","chance":1,"blueprints":[{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true}]}],
   },
   {
     id: "0d66c038-2136-4c36-8e77-e449eba8e493",
@@ -2519,7 +2527,7 @@ const REFUELING_MISSIONS = [
     faction: "United Wayfarers Club",
     giver: "United Wayfarers Club",
     system: "Multi",
-    reward: 68250,
+    reward: 146750,
     buyIn: 0,
     baseXP: 150,
     legality: "Legal",
@@ -2546,7 +2554,42 @@ const REFUELING_MISSIONS = [
     requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
     unlocks: [],
     turnIns: [],
-    blueprintRewards: [],
+    blueprintRewards: [{"poolName":"BP_REWARDS_FuelNozzle","chance":1,"blueprints":[{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true}]}],
+  },
+  {
+    id: "33944d03-1b31-4457-8717-75b36a6f0ad6",
+    name: "URGENT FLEET REFUEL",
+    faction: "United Wayfarers Club",
+    giver: "United Wayfarers Club",
+    system: "Stanton",
+    reward: 139750,
+    buyIn: 0,
+    baseXP: 50,
+    legality: "Legal",
+    minRank: "Head Contractor",
+    minRankXP: 38000,
+    maxRank: "Elite Contractor",
+    maxRankXP: 95250,
+    timeToComplete: 21.6,
+    canBeShared: true,
+    onceOnly: false,
+    canReacceptAfterAbandoning: false,
+    canReacceptAfterFailing: false,
+    hasPersonalCooldown: false,
+    personalCooldownTime: 1,
+    abandonedCooldownTime: 1,
+    crimeStatMin: null,
+    crimeStatMax: null,
+    notes: "Hey again, I've got a beacon at [LOCATION] and this one's a big one.",
+    description: "Hey again,\n\nI've got a beacon at [LOCATION] and this one's a big one. An entire little fleet of ships all burned out of fuel at the same time. Impressive coordination and lack of planning at the same time. \n\nThe client vessel will pay you at the rate of [FUELRATE] aUEC per SCU of Hydrogen and  [QTFUELRATE] aUEC per SCU of Quantum , and as a United Wayfarers Club contractor, you will also qualify for the UWC service fee listed above upon completion.\n\nHopefully since the area they're in is pretty safe, there shouldn't be too much trouble lurking, but these days you never know. Wouldn't hurt to get them back flying again as quick as you're able.\n\nHappy trails,\n\nDina Deloit\nDispatch Hub\nUnited Wayfarers Club\n\"We’ve got your back\"",
+    locations: [{"name":"Hurston","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"Crusader","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"ArcCorp","type":"Planet","system":"Stanton","planet":null,"moon":null},{"name":"microTech","type":"Planet","system":"Stanton","planet":null,"moon":null}],
+    destinations: [],
+    prereqLocations: [],
+    chainStartsWith: [],
+    requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
+    unlocks: [],
+    turnIns: [],
+    blueprintRewards: [{"poolName":"BP_REWARDS_FuelNozzle","chance":1,"blueprints":[{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true}]}],
   },
   {
     id: "82e38ec9-3066-4aac-9363-608a4d67383c",
@@ -2554,7 +2597,7 @@ const REFUELING_MISSIONS = [
     faction: "United Wayfarers Club",
     giver: "United Wayfarers Club",
     system: "Nyx",
-    reward: 60000,
+    reward: 113250,
     buyIn: 0,
     baseXP: 50,
     legality: "Legal",
@@ -2581,7 +2624,7 @@ const REFUELING_MISSIONS = [
     requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
     unlocks: [],
     turnIns: [],
-    blueprintRewards: [],
+    blueprintRewards: [{"poolName":"BP_REWARDS_FuelNozzle","chance":1,"blueprints":[{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true}]}],
   },
   {
     id: "14910f0b-9b69-41ae-bd78-d072725b074a",
@@ -2589,7 +2632,7 @@ const REFUELING_MISSIONS = [
     faction: "United Wayfarers Club",
     giver: "United Wayfarers Club",
     system: "Stanton",
-    reward: 50000,
+    reward: 94500,
     buyIn: 0,
     baseXP: 50,
     legality: "Legal",
@@ -2616,7 +2659,7 @@ const REFUELING_MISSIONS = [
     requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
     unlocks: [],
     turnIns: [],
-    blueprintRewards: [],
+    blueprintRewards: [{"poolName":"BP_REWARDS_FuelNozzle","chance":1,"blueprints":[{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true}]}],
   },
   {
     id: "bed4ea01-87f4-444a-a50a-cb9f60c55bcf",
@@ -2624,7 +2667,7 @@ const REFUELING_MISSIONS = [
     faction: "United Wayfarers Club",
     giver: "United Wayfarers Club",
     system: "Nyx",
-    reward: 36750,
+    reward: 69250,
     buyIn: 0,
     baseXP: 150,
     legality: "Legal",
@@ -2651,7 +2694,7 @@ const REFUELING_MISSIONS = [
     requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
     unlocks: [],
     turnIns: [],
-    blueprintRewards: [],
+    blueprintRewards: [{"poolName":"BP_REWARDS_FuelNozzle","chance":1,"blueprints":[{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true}]}],
   },
   {
     id: "85d17b53-5f6c-4c8b-876b-5032d998642c",
@@ -2659,7 +2702,7 @@ const REFUELING_MISSIONS = [
     faction: "United Wayfarers Club",
     giver: "United Wayfarers Club",
     system: "Stanton",
-    reward: 30500,
+    reward: 57750,
     buyIn: 0,
     baseXP: 150,
     legality: "Legal",
@@ -2686,7 +2729,7 @@ const REFUELING_MISSIONS = [
     requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
     unlocks: [],
     turnIns: [],
-    blueprintRewards: [],
+    blueprintRewards: [{"poolName":"BP_REWARDS_FuelNozzle","chance":1,"blueprints":[{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true}]}],
   },
   {
     id: "02f841ac-ebed-47b6-89e6-8973b37398be",
@@ -2694,7 +2737,7 @@ const REFUELING_MISSIONS = [
     faction: "United Wayfarers Club",
     giver: "United Wayfarers Club",
     system: "Multi",
-    reward: 27250,
+    reward: 51500,
     buyIn: 0,
     baseXP: 100,
     legality: "Legal",
@@ -2721,7 +2764,7 @@ const REFUELING_MISSIONS = [
     requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
     unlocks: [],
     turnIns: [],
-    blueprintRewards: [],
+    blueprintRewards: [{"poolName":"BP_REWARDS_FuelNozzle","chance":1,"blueprints":[{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true}]}],
   },
   {
     id: "145a74cc-fda4-4bb9-b274-c6938b32fa71",
@@ -2729,7 +2772,7 @@ const REFUELING_MISSIONS = [
     faction: "United Wayfarers Club",
     giver: "United Wayfarers Club",
     system: "Multi",
-    reward: 27250,
+    reward: 51500,
     buyIn: 0,
     baseXP: 150,
     legality: "Legal",
@@ -2756,7 +2799,7 @@ const REFUELING_MISSIONS = [
     requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
     unlocks: [],
     turnIns: [],
-    blueprintRewards: [],
+    blueprintRewards: [{"poolName":"BP_REWARDS_FuelNozzle","chance":1,"blueprints":[{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true}]}],
   },
   {
     id: "68667545-1978-4dbf-95e7-8fcdc03d017e",
@@ -2764,7 +2807,7 @@ const REFUELING_MISSIONS = [
     faction: "United Wayfarers Club",
     giver: "United Wayfarers Club",
     system: "Pyro",
-    reward: 16750,
+    reward: 29250,
     buyIn: 0,
     baseXP: 200,
     legality: "Legal",
@@ -2799,7 +2842,7 @@ const REFUELING_MISSIONS = [
     faction: "United Wayfarers Club",
     giver: "United Wayfarers Club",
     system: "Multi",
-    reward: 12000,
+    reward: 21000,
     buyIn: 0,
     baseXP: 200,
     legality: "Legal",
@@ -2826,7 +2869,7 @@ const REFUELING_MISSIONS = [
     requires: [{"id":"0ada3f08-3f76-46ec-96e2-fc0f856b8eeb","name":"UWC'S HIRING REFUELERS"}],
     unlocks: [],
     turnIns: [],
-    blueprintRewards: [],
+    blueprintRewards: [{"poolName":"BP_REWARDS_FuelNozzle","chance":1,"blueprints":[{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true},{"name":"Unknown item","weight":1,"unresolved":true}]}],
   },
   {
     id: "0ada3f08-3f76-46ec-96e2-fc0f856b8eeb",
@@ -2834,7 +2877,7 @@ const REFUELING_MISSIONS = [
     faction: "United Wayfarers Club",
     giver: "United Wayfarers Club",
     system: "Nyx",
-    reward: 12000,
+    reward: 21000,
     buyIn: 0,
     baseXP: 200,
     legality: "Legal",
@@ -2869,7 +2912,7 @@ const REFUELING_MISSIONS = [
     faction: "United Wayfarers Club",
     giver: "United Wayfarers Club",
     system: "Stanton",
-    reward: 10000,
+    reward: 17250,
     buyIn: 0,
     baseXP: 200,
     legality: "Legal",
@@ -16483,21 +16526,33 @@ export default function StarCitizenSalvageGuideWebsite() {
     }));
   };
   const saveCrewSession = () => {
-    setCrewSessions((prev) => [
-      {
-        id: `crew-session-${Date.now()}-${Math.floor(Math.random() * 1e6)}`,
-        status: "active",
-        createdAt: Date.now(),
-        completedAt: null,
-        ...crewDraft,
-      },
-      ...prev,
-    ]);
+    setCrewSessions((prev) => {
+      const next = [
+        {
+          id: `crew-session-${Date.now()}-${Math.floor(Math.random() * 1e6)}`,
+          status: "active",
+          createdAt: Date.now(),
+          completedAt: null,
+          ...crewDraft,
+        },
+        ...prev,
+      ];
+      // Persist crew sessions alongside refineryJobs + sellOrders so a
+      // saved session survives page reload + cross-device login.
+      // Without this, the only persistence was React state — sessions
+      // vanished on refresh.
+      saveLedger(refineryJobs, sellOrders, next);
+      return next;
+    });
     setCrewDraft(blankCrewDraft());
     setCrewShipFilter("");
   };
   const deleteCrewSession = (id) =>
-    setCrewSessions((prev) => prev.filter((s) => s.id !== id));
+    setCrewSessions((prev) => {
+      const next = prev.filter((s) => s.id !== id);
+      saveLedger(refineryJobs, sellOrders, next);
+      return next;
+    });
   // Pop an active session back into the draft for further editing.
   // Removes it from the saved list — the user re-saves to put it
   // back. Only allowed for active sessions; completed ones are
@@ -16509,7 +16564,9 @@ export default function StarCitizenSalvageGuideWebsite() {
       // Drop server-managed fields; everything else flows into draft.
       const { id: _id, status: _st, createdAt: _ca, completedAt: _co, ...draftFields } = target;
       setCrewDraft({ ...blankCrewDraft(), ...draftFields });
-      return prev.filter((s) => s.id !== id);
+      const next = prev.filter((s) => s.id !== id);
+      saveLedger(refineryJobs, sellOrders, next);
+      return next;
     });
   };
   // Mark an active session complete: stamps completedAt, locks
@@ -16534,6 +16591,10 @@ export default function StarCitizenSalvageGuideWebsite() {
         (n, e) => n + (Number(e.qty) || 1),
         0
       );
+      // New crew sessions list with this one flipped to "complete".
+      const nextSessions = prev.map((s) =>
+        s.id === id ? { ...s, status: "complete", completedAt } : s
+      );
       // Synthetic ledger entry for Patch History. Only write when
       // there's at least some SCU or aUEC to log.
       if (totalScu > 0 || splitAuec > 0) {
@@ -16550,15 +16611,18 @@ export default function StarCitizenSalvageGuideWebsite() {
         };
         setSellOrders((prevOrders) => {
           const next = [...prevOrders, newOrder];
-          // Persist to server alongside refineryJobs (passes through
-          // saveLedger which guards against pre-hydration writes).
-          saveLedger(refineryJobs, next);
+          // Persist to server alongside refineryJobs + the updated
+          // crew-sessions list so the completion state survives a
+          // page reload / cross-device login.
+          saveLedger(refineryJobs, next, nextSessions);
           return next;
         });
+      } else {
+        // No synthetic sell-order written — still need to persist the
+        // status flip so the session's "Complete" pill survives reload.
+        saveLedger(refineryJobs, sellOrders, nextSessions);
       }
-      return prev.map((s) =>
-        s.id === id ? { ...s, status: "complete", completedAt } : s
-      );
+      return nextSessions;
     });
   };
   const [refineryJobs, setRefineryJobs] = useState([]);
@@ -18412,7 +18476,7 @@ export default function StarCitizenSalvageGuideWebsite() {
           // next version + today's startedAt and Vercel redeploy
           // flips it true on the production server).
           setPatchStatus({
-            version: "4.7.2",
+            version: "4.8",
             startedAt: Date.now(),
             isDropDay: false,
             alreadyClearedThisCycle: false,
@@ -19638,6 +19702,7 @@ export default function StarCitizenSalvageGuideWebsite() {
             ? data.sellOrders.map(canonicalizeSellOrder)
             : []
         );
+        setCrewSessions(Array.isArray(data.crewSessions) ? data.crewSessions : []);
         // Mark hydration complete for THIS user — this is the only path that
         // unlocks saveLedger() for this user's session.
         hydratedForUserRef.current = user.id;
@@ -19661,6 +19726,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                 ? data.sellOrders.map(canonicalizeSellOrder)
                 : []
             );
+            setCrewSessions(Array.isArray(data.crewSessions) ? data.crewSessions : []);
             hydratedForUserRef.current = user.id;
             setIsLedgerLoading(false);
             return;
@@ -19680,14 +19746,22 @@ export default function StarCitizenSalvageGuideWebsite() {
   // fetch returned, clobbering saved data. With explicit saves, a POST can only
   // ever happen as a direct result of a user-triggered mutation after hydration
   // has completed for the current user.
-  const saveLedger = async (nextRefineryJobs, nextSellOrders) => {
+  const saveLedger = async (nextRefineryJobs, nextSellOrders, nextCrewSessionsArg) => {
+    // Optional 3rd arg lets crew-session mutators persist alongside
+    // refinery + sell. When omitted, fall back to the current React
+    // state so refinery/sell-order saves preserve whatever crew
+    // sessions are already loaded.
+    const nextCrewSessions =
+      nextCrewSessionsArg === undefined ? crewSessions : nextCrewSessionsArg;
+    const payload = {
+      refineryJobs: nextRefineryJobs,
+      sellOrders: nextSellOrders,
+      crewSessions: nextCrewSessions,
+    };
     if (!user) {
       if (import.meta.env.DEV && hydratedForUserRef.current === "__dev__") {
         try {
-          localStorage.setItem(
-            "__dev_ledger__",
-            JSON.stringify({ refineryJobs: nextRefineryJobs, sellOrders: nextSellOrders })
-          );
+          localStorage.setItem("__dev_ledger__", JSON.stringify(payload));
         } catch {
           // ignore quota errors
         }
@@ -19700,10 +19774,7 @@ export default function StarCitizenSalvageGuideWebsite() {
     const persistDev = () => {
       if (!import.meta.env.DEV) return;
       try {
-        localStorage.setItem(
-          "__dev_ledger__",
-          JSON.stringify({ refineryJobs: nextRefineryJobs, sellOrders: nextSellOrders })
-        );
+        localStorage.setItem("__dev_ledger__", JSON.stringify(payload));
       } catch {}
     };
     try {
@@ -19711,7 +19782,7 @@ export default function StarCitizenSalvageGuideWebsite() {
         method: "POST",
         credentials: "same-origin",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ refineryJobs: nextRefineryJobs, sellOrders: nextSellOrders }),
+        body: JSON.stringify(payload),
       });
       const info = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -22238,7 +22309,13 @@ export default function StarCitizenSalvageGuideWebsite() {
             "f91fbab9-1e90-4fb8-871d-961053ad1f49",
           ]);
           const salvageSource = refuelingUnlocked
-            ? MISSIONS.filter((m) => !SALVAGE_REMOVED_IN_4_8.has(m.id))
+            ? MISSIONS
+                .filter((m) => !SALVAGE_REMOVED_IN_4_8.has(m.id))
+                .map((m) =>
+                  MISSIONS_4_8_REWARD_OVERRIDES[m.id] !== undefined
+                    ? { ...m, reward: MISSIONS_4_8_REWARD_OVERRIDES[m.id] }
+                    : m
+                )
             : MISSIONS;
           const sourceMissions = isRefuelingTab ? REFUELING_MISSIONS : salvageSource;
           const allFactions = isRefuelingTab
@@ -22944,8 +23021,19 @@ export default function StarCitizenSalvageGuideWebsite() {
                       // Chain ref links can point at either salvage or
                       // refueling contracts — keep both arrays in scope
                       // so the popup can navigate across mission-types.
+                      // On 4.8, apply the PTU rewardUEC overrides so the
+                      // chain-link buttons surface the bumped reward
+                      // values that match the Salvage list view.
+                      const knownRaw = [...MISSIONS, ...REFUELING_MISSIONS];
                       const known = new Map(
-                        [...MISSIONS, ...REFUELING_MISSIONS].map((m) => [m.id, m])
+                        (isPatchAtLeast(patchStatus?.version, "4.8")
+                          ? knownRaw.map((m) =>
+                              MISSIONS_4_8_REWARD_OVERRIDES[m.id] !== undefined
+                                ? { ...m, reward: MISSIONS_4_8_REWARD_OVERRIDES[m.id] }
+                                : m
+                            )
+                          : knownRaw
+                        ).map((m) => [m.id, m])
                       );
                       return (
                         <div className="mt-5 space-y-3">
@@ -23122,13 +23210,29 @@ export default function StarCitizenSalvageGuideWebsite() {
                         (the in-game roll table). Gated on the live
                         patch version — invisible on 4.7.2, surfaces
                         once 4.8 hits production. */}
-                    {isPatchAtLeast(patchStatus?.version, "4.8") && Array.isArray(missionDetail.blueprintRewards) && missionDetail.blueprintRewards.length > 0 && (
+                    {isPatchAtLeast(patchStatus?.version, "4.8") && Array.isArray(missionDetail.blueprintRewards) && missionDetail.blueprintRewards.length > 0 && (() => {
+                      // Belt-and-suspenders: even though the wrapping
+                      // condition already enforces patch >= 4.8, scrub
+                      // any pool whose every entry is an unresolved
+                      // placeholder when not on 4.8. This block only
+                      // executes on 4.8 today, but the explicit guard
+                      // means a future caller cannot accidentally
+                      // surface "Unknown item" chips on a pre-4.8
+                      // patch by reusing this fragment.
+                      const onFourEight = isPatchAtLeast(patchStatus?.version, "4.8");
+                      const visiblePools = missionDetail.blueprintRewards.filter((pool) => {
+                        if (onFourEight) return Array.isArray(pool.blueprints) && pool.blueprints.length > 0;
+                        const allUnresolved = (pool.blueprints || []).every((bp) => bp && bp.unresolved);
+                        return Array.isArray(pool.blueprints) && pool.blueprints.length > 0 && !allUnresolved;
+                      });
+                      if (visiblePools.length === 0) return null;
+                      return (
                       <div className="mt-5">
                         <div className="text-[10px] uppercase tracking-wider text-slate-500">
                           Blueprint rewards
                         </div>
                         <ul className="mt-1 space-y-2">
-                          {missionDetail.blueprintRewards.map((pool, i) => {
+                          {visiblePools.map((pool, i) => {
                             const totalWeight = pool.blueprints.reduce(
                               (acc, bp) => acc + (Number(bp.weight) || 0),
                               0
@@ -23188,7 +23292,8 @@ export default function StarCitizenSalvageGuideWebsite() {
                           })}
                         </ul>
                       </div>
-                    )}
+                      );
+                    })()}
 
                     {/* Flags + cooldowns + sharing crimestat. Hidden
                         when nothing meaningful would render. */}
@@ -26805,7 +26910,19 @@ export default function StarCitizenSalvageGuideWebsite() {
           const head = scraperBlueprintModal;
           const fullName = `${head} Scraper Module`;
           const bp = SCRAPER_BLUEPRINTS[head];
-          const allMissions = [...MISSIONS, ...REFUELING_MISSIONS];
+          // Apply 4.8 PTU rewardUEC overrides so the mission-detail
+          // card opened from a scraper-blueprint source row shows the
+          // bumped reward consistent with the Salvage list view.
+          // Outer gate already enforces patch >= 4.8, but check
+          // again for clarity.
+          const _allMissionsRaw = [...MISSIONS, ...REFUELING_MISSIONS];
+          const allMissions = isPatchAtLeast(patchStatus?.version, "4.8")
+            ? _allMissionsRaw.map((m) =>
+                MISSIONS_4_8_REWARD_OVERRIDES[m.id] !== undefined
+                  ? { ...m, reward: MISSIONS_4_8_REWARD_OVERRIDES[m.id] }
+                  : m
+              )
+            : _allMissionsRaw;
           // Reverse-map: collect missions whose blueprintRewards
           // include this module. Keep one row per (mission, pool)
           // pair so a mission that has the same blueprint in two
@@ -28568,6 +28685,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                   <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Fixes</p>
                   <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
                     <li><strong>SCU yield display now locale-independent</strong> with exactly two decimals everywhere refined SCU appears (Refinery Job Orders Expected Yield + bonus subline, Edit Job preview, In Progress / Ready for Pickup cards, refinery-completion notifications, Crew Salvage refined-SCU column, Statistics leaderboard SCU columns). Previously a yield like <code className="rounded bg-slate-800 px-1 text-cyan-200">188.352 SCU</code> rendered as <code className="rounded bg-slate-800 px-1 text-cyan-200">"188,352 SCU"</code> on French / EU-locale devices (comma-as-decimal), looking like 188 thousand SCU. Display is now pinned to en-US (<code className="rounded bg-slate-800 px-1 text-cyan-200">188.35 SCU</code>) regardless of device locale. Stored ledger values unchanged — display-only fix.</li>
+                    <li><strong>Crew Salvage saved sessions now persist server-side.</strong> Saved sessions used to live in React state only — refreshing the page or logging in from another device wiped the list. <code className="rounded bg-slate-800 px-1 text-cyan-200">/api/ledger</code> now stores <code className="rounded bg-slate-800 px-1 text-cyan-200">crewSessions</code> alongside refinery jobs + sell orders, capped at 200 per user; saving / deleting / editing / completing a session writes through to Redis. Older clients that don't send the field on save have their stored sessions preserved (no accidental wipes). Sessions saved before this build are unrecoverable — they never made it past React state.</li>
                   </ul>
                 </section>
 

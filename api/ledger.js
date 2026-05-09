@@ -1,4 +1,4 @@
-// GET  /api/ledger         — returns { refineryJobs, sellOrders } for the logged-in user
+// GET  /api/ledger         — returns { refineryJobs, sellOrders, crewSessions } for the logged-in user
 // POST /api/ledger         — replaces the ledger with the request body (full snapshot).
 //                            For new refinery jobs, schedules a one-shot QStash callback
 //                            that fires at completesAt and DMs the user via Discord.
@@ -12,6 +12,7 @@ import { getOrigin } from "./_lib/discord.js";
 
 const MAX_REFINERY_JOBS = 500;
 const MAX_SELL_ORDERS = 500;
+const MAX_CREW_SESSIONS = 200;
 
 export function ledgerKey(userId) {
   return `ledger:${userId}`;
@@ -57,6 +58,67 @@ export function sanitizeRefineryJob(j) {
   if (out.method === undefined) delete out.method;
   if (out.materialScu === undefined) delete out.materialScu;
   return out;
+}
+
+// Saved Crew Salvage session — multi-pilot run draft + completion bookkeeping.
+// Persisted alongside refineryJobs/sellOrders in the same Redis key so a
+// single fetch hydrates the whole Ledger surface (refinery + sell + crew).
+// Schema mirrors what the Crew Salvage card writes via setCrewSessions in
+// src/App.jsx: a free-form draft (ship, roles, shipsSalvaged[], per-material
+// SCU buckets, refinery + sell location, split calc) plus four
+// server-managed fields: id / status / createdAt / completedAt.
+export function sanitizeCrewSession(s) {
+  if (!s || typeof s !== "object") return null;
+  const id = String(s.id || "").slice(0, 80);
+  if (!id) return null;
+  const status = s.status === "complete" ? "complete" : "active";
+  const createdAt = Number(s.createdAt);
+  if (!Number.isFinite(createdAt)) return null;
+  const completedAt = s.completedAt == null ? null : Number(s.completedAt);
+  // Roles: { roleName: pilotName } — clamp every field to 80 chars and skip
+  // anything non-string.
+  const rolesIn = s.roles && typeof s.roles === "object" ? s.roles : {};
+  const roles = {};
+  for (const [k, v] of Object.entries(rolesIn)) {
+    if (typeof k !== "string" || typeof v !== "string") continue;
+    roles[k.slice(0, 80)] = v.slice(0, 80);
+  }
+  // shipsSalvaged: [{ ship, qty }] — qty defaults to 1, clamp ship label.
+  const shipsRaw = Array.isArray(s.shipsSalvaged) ? s.shipsSalvaged : [];
+  const shipsSalvaged = shipsRaw
+    .map((e) => {
+      if (!e || typeof e !== "object") return null;
+      const ship = typeof e.ship === "string" ? e.ship.slice(0, 100) : "";
+      if (!ship) return null;
+      const qty = Math.max(1, Math.min(999, Math.floor(Number(e.qty) || 1)));
+      return { ship, qty };
+    })
+    .filter(Boolean)
+    .slice(0, 100);
+  // SCU buckets are stored as raw input strings client-side (formatNumberWithCommas
+  // operates on display only). Coerce to string + clamp length.
+  const numStr = (v) =>
+    v == null
+      ? ""
+      : String(v).replace(/[^\d.\-]/g, "").slice(0, 20);
+  return {
+    id,
+    status,
+    createdAt,
+    completedAt: completedAt != null && Number.isFinite(completedAt) ? completedAt : null,
+    ship: typeof s.ship === "string" ? s.ship.slice(0, 80) : "Reclaimer",
+    roles,
+    shipsSalvaged,
+    scuConstructionSalvage: numStr(s.scuConstructionSalvage),
+    scuConstructionPieces: numStr(s.scuConstructionPieces),
+    scuRMC: numStr(s.scuRMC),
+    refMethod: typeof s.refMethod === "string" ? s.refMethod.slice(0, 80) : "",
+    refLocation: typeof s.refLocation === "string" ? s.refLocation.slice(0, 80) : "",
+    cmatSellLocation: typeof s.cmatSellLocation === "string" ? s.cmatSellLocation.slice(0, 120) : "",
+    rmcSellLocation: typeof s.rmcSellLocation === "string" ? s.rmcSellLocation.slice(0, 120) : "",
+    splitCrewCount: numStr(s.splitCrewCount),
+    splitAuec: numStr(s.splitAuec),
+  };
 }
 
 export function sanitizeSellOrder(o) {
@@ -115,13 +177,16 @@ export default async function handler(req, res) {
 
   if (req.method === "GET") {
     try {
-      const data = (await redis.get(key)) || { refineryJobs: [], sellOrders: [] };
+      const data = (await redis.get(key)) || { refineryJobs: [], sellOrders: [], crewSessions: [] };
       return res.status(200).json({
         refineryJobs: Array.isArray(data.refineryJobs)
           ? data.refineryJobs.map(sanitizeRefineryJob).filter(Boolean)
           : [],
         sellOrders: Array.isArray(data.sellOrders)
           ? data.sellOrders.map(sanitizeSellOrder).filter(Boolean)
+          : [],
+        crewSessions: Array.isArray(data.crewSessions)
+          ? data.crewSessions.map(sanitizeCrewSession).filter(Boolean)
           : [],
       });
     } catch (e) {
@@ -145,12 +210,25 @@ export default async function handler(req, res) {
 
     const refineryJobsRaw = Array.isArray(body.refineryJobs) ? body.refineryJobs : [];
     const sellOrdersRaw = Array.isArray(body.sellOrders) ? body.sellOrders : [];
+    // crewSessions is optional in the request body. When absent (older
+    // client builds, or POSTs from before this field was added), the
+    // server preserves whatever crewSessions are already in Redis so
+    // the client doesn't accidentally wipe saved sessions on every
+    // ledger save. Only when the client explicitly sends crewSessions
+    // (even if empty) does the server overwrite the stored array.
+    const crewSessionsRaw = Array.isArray(body.crewSessions) ? body.crewSessions : null;
 
     const refineryJobs = refineryJobsRaw
       .slice(-MAX_REFINERY_JOBS)
       .map(sanitizeRefineryJob)
       .filter(Boolean);
     const sellOrders = sellOrdersRaw.slice(-MAX_SELL_ORDERS).map(sanitizeSellOrder).filter(Boolean);
+    const crewSessions = crewSessionsRaw === null
+      ? null
+      : crewSessionsRaw
+          .slice(-MAX_CREW_SESSIONS)
+          .map(sanitizeCrewSession)
+          .filter(Boolean);
 
     // Compare incoming jobs to what was previously stored, so we can:
     //   • schedule a new DM for genuinely new jobs
@@ -194,7 +272,22 @@ export default async function handler(req, res) {
     }
 
     try {
-      await redis.set(key, { refineryJobs, sellOrders });
+      // Preserve existing crewSessions when the client didn't send any
+      // (legacy clients or non-crew-session writes). When the client did
+      // send crewSessions, the sanitized array overwrites whatever was
+      // there.
+      let nextCrewSessions = crewSessions;
+      if (nextCrewSessions === null) {
+        try {
+          const existing = await redis.get(key);
+          nextCrewSessions = Array.isArray(existing && existing.crewSessions)
+            ? existing.crewSessions
+            : [];
+        } catch {
+          nextCrewSessions = [];
+        }
+      }
+      await redis.set(key, { refineryJobs, sellOrders, crewSessions: nextCrewSessions });
     } catch (e) {
       console.error("POST /api/ledger failed:", e && e.message ? e.message : e);
       return res.status(500).json({ error: "Could not save ledger" });
@@ -302,7 +395,22 @@ export default async function handler(req, res) {
                   };
                 }
               }
-              await redis.set(key, { refineryJobs, sellOrders });
+              // Preserve existing crewSessions when the client didn't send any
+      // (legacy clients or non-crew-session writes). When the client did
+      // send crewSessions, the sanitized array overwrites whatever was
+      // there.
+      let nextCrewSessions = crewSessions;
+      if (nextCrewSessions === null) {
+        try {
+          const existing = await redis.get(key);
+          nextCrewSessions = Array.isArray(existing && existing.crewSessions)
+            ? existing.crewSessions
+            : [];
+        } catch {
+          nextCrewSessions = [];
+        }
+      }
+      await redis.set(key, { refineryJobs, sellOrders, crewSessions: nextCrewSessions });
             } catch (e) {
               console.warn(
                 "Ledger POST: could not persist messageIds:",
@@ -318,7 +426,11 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       ok: true,
-      counts: { refineryJobs: refineryJobs.length, sellOrders: sellOrders.length },
+      counts: {
+        refineryJobs: refineryJobs.length,
+        sellOrders: sellOrders.length,
+        crewSessions: crewSessions === null ? null : crewSessions.length,
+      },
     });
   }
 

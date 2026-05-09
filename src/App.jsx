@@ -3027,7 +3027,7 @@ const SC_STORAGE_LOCATIONS = {
 // notification bell surfaces a "new site update available" entry until
 // the user opens the What's New modal (or marks it read). Per-browser
 // pointer is stored at localStorage["scs_whatsnew_seen_version"].
-const LATEST_WHATSNEW_VERSION = "v2.7.3";
+const LATEST_WHATSNEW_VERSION = "v2.7.4";
 
 // localStorage key for explicitly dismissed notification ids. Lets
 // users hide the red badge without changing their underlying setup
@@ -17069,6 +17069,14 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [adminMessageDraft, setAdminMessageDraft] = useState("");
   const [adminMessageStatus, setAdminMessageStatus] = useState(null); // { kind: "ok"|"err", text }
   const [adminMessageInFlight, setAdminMessageInFlight] = useState(false);
+  // Full thread for the targeted user, loaded from /api/admin/inbox.
+  // Surfaces user → admin replies alongside the admin's own
+  // outbound history so the operator has full conversation context.
+  const [adminMessageThread, setAdminMessageThread] = useState([]);
+  const [adminMessageThreadLoading, setAdminMessageThreadLoading] = useState(false);
+  // replyToId is set when the operator clicks Reply on a specific
+  // user-authored entry; null means "new top-level reply".
+  const [adminMessageReplyToId, setAdminMessageReplyToId] = useState(null);
   // Quick-send message dialog launched from the All Users → Actions
   // column mailbox button. Independent from the user-detail modal so
   // the admin can shoot a one-liner without opening 30-day history.
@@ -17076,6 +17084,13 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [quickMessageDraft, setQuickMessageDraft] = useState("");
   const [quickMessageStatus, setQuickMessageStatus] = useState(null);
   const [quickMessageInFlight, setQuickMessageInFlight] = useState(false);
+  // Broadcast composer — fans the same body out to every indexed
+  // user. Lives above the All Users table; opens a confirm modal so
+  // a stray click can't blast every account at once.
+  const [broadcastOpen, setBroadcastOpen] = useState(false);
+  const [broadcastDraft, setBroadcastDraft] = useState("");
+  const [broadcastStatus, setBroadcastStatus] = useState(null);
+  const [broadcastInFlight, setBroadcastInFlight] = useState(false);
   // User-side inbox feed. Pulled from /api/notifications/inbox on
   // login + refreshed when the bell is opened. Each entry surfaces
   // in the bell as a "Message from SCSalvager Admin" notification.
@@ -17140,6 +17155,15 @@ export default function StarCitizenSalvageGuideWebsite() {
   // next to the notification bell. Separate from isNotificationsOpen
   // so the two dropdowns don't fight for screen space.
   const [isMailboxOpen, setIsMailboxOpen] = useState(false);
+  // Mailbox compose state: text the user is drafting back to
+  // SCSalvager Admin. `replyToId` is set when replying to a specific
+  // admin message; null for a brand-new outgoing thread. Status
+  // mirrors the admin-side patterns.
+  const [mailboxComposeOpen, setMailboxComposeOpen] = useState(false);
+  const [mailboxComposeDraft, setMailboxComposeDraft] = useState("");
+  const [mailboxComposeReplyToId, setMailboxComposeReplyToId] = useState(null);
+  const [mailboxComposeStatus, setMailboxComposeStatus] = useState(null);
+  const [mailboxComposeInFlight, setMailboxComposeInFlight] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   // Privacy Policy modal — opens from the footer link. Stays decoupled
   // from auth state so anonymous visitors can read it too.
@@ -17735,7 +17759,12 @@ export default function StarCitizenSalvageGuideWebsite() {
     if (!Array.isArray(adminInbox)) return [];
     return [...adminInbox].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
   }, [adminInbox]);
-  const unreadMailboxCount = mailboxMessages.filter((m) => !m.dismissedAt).length;
+  // Unread count drives the red badge. Only inbound (admin → user)
+  // entries that aren't dismissed contribute — user-authored
+  // outgoing messages are "self-read" the moment they're sent.
+  const unreadMailboxCount = mailboxMessages.filter(
+    (m) => !m.dismissedAt && (m.from || "admin") === "admin"
+  ).length;
 
   // Unread count drives the red bell badge.
   const unreadNotificationCount = userNotifications.filter((n) => !n.isRead).length;
@@ -19180,12 +19209,38 @@ export default function StarCitizenSalvageGuideWebsite() {
   // returns the raw JS source instead of JSON, so res.json() throws —
   // the catch falls through to the dev-mock builder so the modal still
   // exercises in preview.
+  const refreshAdminMessageThread = async (userId) => {
+    if (!userId) {
+      setAdminMessageThread([]);
+      return;
+    }
+    setAdminMessageThreadLoading(true);
+    try {
+      const res = await fetch(`/api/admin/inbox?userId=${encodeURIComponent(userId)}`, {
+        credentials: "same-origin",
+      });
+      if (!res.ok) {
+        setAdminMessageThread([]);
+        return;
+      }
+      const data = await res.json();
+      setAdminMessageThread(Array.isArray(data.thread) ? data.thread : []);
+    } catch {
+      setAdminMessageThread([]);
+    } finally {
+      setAdminMessageThreadLoading(false);
+    }
+  };
+
   const openAdminUserDetail = async (u) => {
     setAdminUserDetail({ userId: u.userId, username: u.username, refineryJobs: null, sellOrders: null, activeContracts: null });
     setAdminUserDetailLoading(true);
     setAdminUserDetailError("");
     setAdminClearLedgerStep(0);
     setAdminClearLedgerError("");
+    setAdminMessageThread([]);
+    setAdminMessageReplyToId(null);
+    refreshAdminMessageThread(u.userId);
 
     // Dev mock — seed 10 refinery jobs + 10 sell orders spread across
     // the last ~28 days so the modal exercises sorting, scrolling, and
@@ -19409,6 +19464,77 @@ export default function StarCitizenSalvageGuideWebsite() {
     setAdminMessageInFlight(false);
   };
 
+  // User → SCSalvager Admin send. Routes through the inbox endpoint
+  // with action="send" (new thread) or action="reply" (linked to a
+  // specific admin entry). Optimistically appends to local
+  // adminInbox state so the message renders before the next poll.
+  const sendUserMessageToAdmin = async () => {
+    const trimmed = mailboxComposeDraft.trim();
+    if (!trimmed) {
+      setMailboxComposeStatus({ kind: "err", text: "Message body cannot be empty." });
+      return;
+    }
+    setMailboxComposeInFlight(true);
+    setMailboxComposeStatus(null);
+    try {
+      const res = await fetch("/api/notifications/inbox", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          action: mailboxComposeReplyToId ? "reply" : "send",
+          body: trimmed,
+          replyToId: mailboxComposeReplyToId || undefined,
+        }),
+      });
+      const info = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setMailboxComposeStatus({
+          kind: "err",
+          text: info.error || `Send failed (HTTP ${res.status}).`,
+        });
+        return;
+      }
+      // Refresh from server so the optimistic local state matches
+      // server canon (id, ordering, cap-trim).
+      await refreshAdminInbox();
+      setMailboxComposeDraft("");
+      setMailboxComposeReplyToId(null);
+      setMailboxComposeOpen(false);
+      setMailboxComposeStatus({ kind: "ok", text: "Sent." });
+    } catch (e) {
+      setMailboxComposeStatus({
+        kind: "err",
+        text: e && e.message ? e.message : "Network error.",
+      });
+    } finally {
+      setMailboxComposeInFlight(false);
+    }
+  };
+  const startMailboxReply = (replyToId) => {
+    setMailboxComposeReplyToId(replyToId);
+    setMailboxComposeOpen(true);
+    setMailboxComposeStatus(null);
+  };
+  const startMailboxNewThread = () => {
+    setMailboxComposeReplyToId(null);
+    setMailboxComposeOpen(true);
+    setMailboxComposeStatus(null);
+  };
+  const deleteMailboxMessage = (inboxId) => {
+    // Optimistic remove — drop from local state first; the next
+    // refreshAdminInbox() poll re-confirms with the server-filtered
+    // payload. The server stores it as a soft-delete (deletedAt set)
+    // so admins still see the message in /api/admin/inbox.
+    setAdminInbox((prev) => prev.filter((e) => e.id !== inboxId));
+    fetch("/api/notifications/inbox", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ action: "delete", id: inboxId }),
+    }).catch(() => {});
+  };
+
   // Open / close the quick-send dialog from the All Users Actions
   // column. Resets draft + status every open so the next target
   // starts fresh.
@@ -19463,6 +19589,63 @@ export default function StarCitizenSalvageGuideWebsite() {
     }
   };
 
+  // Broadcast composer: open / close / send. Fanout is server-side
+  // via /api/admin/broadcast-message which iterates every indexed
+  // userId and writes one inbox entry per recipient.
+  const openBroadcastComposer = () => {
+    setBroadcastOpen(true);
+    setBroadcastDraft("");
+    setBroadcastStatus(null);
+    setBroadcastInFlight(false);
+  };
+  const closeBroadcastComposer = () => {
+    setBroadcastOpen(false);
+    setBroadcastDraft("");
+    setBroadcastStatus(null);
+    setBroadcastInFlight(false);
+  };
+  const sendBroadcast = async () => {
+    const trimmed = broadcastDraft.trim();
+    if (!trimmed) {
+      setBroadcastStatus({ kind: "err", text: "Message body cannot be empty." });
+      return;
+    }
+    setBroadcastInFlight(true);
+    setBroadcastStatus(null);
+    try {
+      const res = await fetch("/api/admin/broadcast-message", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ body: trimmed }),
+      });
+      const info = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setBroadcastStatus({
+          kind: "err",
+          text: info.error || `Send failed (HTTP ${res.status}).`,
+        });
+        return;
+      }
+      const { recipientCount = 0, errorCount = 0 } = info;
+      setBroadcastDraft("");
+      setBroadcastStatus({
+        kind: "ok",
+        text:
+          errorCount > 0
+            ? `Sent to ${recipientCount} user${recipientCount === 1 ? "" : "s"} (${errorCount} failed — check server logs).`
+            : `Sent to ${recipientCount} user${recipientCount === 1 ? "" : "s"}.`,
+      });
+    } catch (e) {
+      setBroadcastStatus({
+        kind: "err",
+        text: e && e.message ? e.message : "Network error.",
+      });
+    } finally {
+      setBroadcastInFlight(false);
+    }
+  };
+
   // POST /api/admin/message-user — push a corrective message into
   // the target user's notification bell. Always rendered as
   // "SCSalvager Admin" on the recipient side; the acting admin's id
@@ -19482,7 +19665,11 @@ export default function StarCitizenSalvageGuideWebsite() {
         method: "POST",
         credentials: "same-origin",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ userId: adminUserDetail.userId, body: trimmed }),
+        body: JSON.stringify({
+          userId: adminUserDetail.userId,
+          body: trimmed,
+          replyToId: adminMessageReplyToId || undefined,
+        }),
       });
       const info = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -19493,10 +19680,12 @@ export default function StarCitizenSalvageGuideWebsite() {
         return;
       }
       setAdminMessageDraft("");
+      setAdminMessageReplyToId(null);
       setAdminMessageStatus({
         kind: "ok",
-        text: `Sent. ${info.count || 0} message${info.count === 1 ? "" : "s"} now in their inbox.`,
+        text: `Sent. ${info.count || 0} message${info.count === 1 ? "" : "s"} in their inbox.`,
       });
+      refreshAdminMessageThread(adminUserDetail.userId);
     } catch (e) {
       setAdminMessageStatus({
         kind: "err",
@@ -19942,13 +20131,12 @@ export default function StarCitizenSalvageGuideWebsite() {
   useEffect(() => {
     refreshAdminInbox();
   }, [user]);
-  // Poll the inbox every 60 s while logged in so admin-sent
+  // Poll the inbox every 30 s while logged in so admin-sent
   // messages surface in the mailbox without a manual refresh.
-  // 60 s is a balance between latency and Redis load —
-  // moderation messages aren't urgent enough to warrant 10 s polls.
+  // Balances latency vs Redis load — moderation traffic is light.
   useEffect(() => {
     if (!user) return;
-    const interval = setInterval(refreshAdminInbox, 60_000);
+    const interval = setInterval(refreshAdminInbox, 30_000);
     return () => clearInterval(interval);
   }, [user]);
   // Refresh when the mailbox is opened so the user always sees the
@@ -21465,21 +21653,87 @@ export default function StarCitizenSalvageGuideWebsite() {
                               <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-300">
                                 Messages
                               </span>
-                              {unreadMailboxCount > 0 && (
+                              <div className="flex items-center gap-2">
                                 <button
                                   type="button"
-                                  onClick={() => {
-                                    const ids = mailboxMessages
-                                      .filter((m) => !m.dismissedAt)
-                                      .map((m) => `admin-msg:${m.id}`);
-                                    dismissAllNotifications(ids);
-                                  }}
-                                  className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                                  onClick={startMailboxNewThread}
+                                  className="rounded border border-cyan-400/40 bg-cyan-500/15 px-2 py-0.5 text-[10px] font-semibold text-cyan-200 hover:bg-cyan-500/25"
                                 >
-                                  Mark all as read
+                                  New
                                 </button>
-                              )}
+                                {unreadMailboxCount > 0 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const ids = mailboxMessages
+                                        .filter((m) => !m.dismissedAt && (m.from || "admin") === "admin")
+                                        .map((m) => `admin-msg:${m.id}`);
+                                      dismissAllNotifications(ids);
+                                    }}
+                                    className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                                  >
+                                    Mark all as read
+                                  </button>
+                                )}
+                              </div>
                             </div>
+                            {mailboxComposeOpen && (
+                              <div className="border-b border-slate-800 bg-cyan-500/5 px-3 py-2">
+                                <div className="text-[10px] font-semibold uppercase tracking-wider text-cyan-300">
+                                  {mailboxComposeReplyToId ? "Reply to SCSalvager Admin" : "New message to SCSalvager Admin"}
+                                </div>
+                                <textarea
+                                  value={mailboxComposeDraft}
+                                  onChange={(e) => setMailboxComposeDraft(e.target.value.slice(0, 1000))}
+                                  disabled={mailboxComposeInFlight}
+                                  placeholder="Type your message…"
+                                  rows={3}
+                                  autoFocus
+                                  className="mt-1.5 w-full rounded-md border border-cyan-500/25 bg-slate-950 px-2 py-1.5 text-xs text-slate-100 outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+                                />
+                                <div className="mt-1.5 flex items-center justify-between gap-2">
+                                  <span className="text-[10px] text-slate-500">
+                                    {mailboxComposeDraft.length} / 1,000
+                                  </span>
+                                  <div className="flex gap-1.5">
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setMailboxComposeOpen(false);
+                                        setMailboxComposeDraft("");
+                                        setMailboxComposeReplyToId(null);
+                                        setMailboxComposeStatus(null);
+                                      }}
+                                      disabled={mailboxComposeInFlight}
+                                      className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200 disabled:opacity-50"
+                                    >
+                                      Cancel
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={sendUserMessageToAdmin}
+                                      disabled={mailboxComposeInFlight || !mailboxComposeDraft.trim()}
+                                      className={`rounded border px-2 py-0.5 text-[10px] font-semibold ${
+                                        mailboxComposeInFlight || !mailboxComposeDraft.trim()
+                                          ? "cursor-not-allowed border-slate-700 bg-slate-800/50 text-slate-500"
+                                          : "border-cyan-400 bg-cyan-500/20 text-cyan-100 hover:bg-cyan-500/30"
+                                      }`}
+                                    >
+                                      {mailboxComposeInFlight ? "Sending…" : "Send"}
+                                    </button>
+                                  </div>
+                                </div>
+                                {mailboxComposeStatus && (
+                                  <div
+                                    className={`mt-1 text-[10px] ${
+                                      mailboxComposeStatus.kind === "ok" ? "text-emerald-300" : "text-rose-300"
+                                    }`}
+                                  >
+                                    {mailboxComposeStatus.text}
+                                  </div>
+                                )}
+                              </div>
+                            )}
                             {mailboxMessages.length === 0 ? (
                               <div className="px-3 py-3 text-xs text-slate-400">
                                 No messages.
@@ -21487,6 +21741,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                             ) : (
                               <div className="max-h-[60vh] overflow-y-auto">
                                 {mailboxMessages.map((m) => {
+                                  const direction = m.from === "user" ? "user" : "admin";
                                   const isRead = Boolean(m.dismissedAt);
                                   const ts = m.createdAt
                                     ? new Date(m.createdAt).toLocaleString([], {
@@ -21496,37 +21751,65 @@ export default function StarCitizenSalvageGuideWebsite() {
                                         minute: "2-digit",
                                       })
                                     : "";
+                                  // Unread dot only highlights inbound
+                                  // (admin → user) entries that aren't
+                                  // dismissed yet. User-authored entries
+                                  // (sent by this user) don't get an
+                                  // unread dot — they were already
+                                  // "read" the moment they were sent.
+                                  const showUnreadDot = direction === "admin" && !isRead;
                                   return (
                                     <div
                                       key={m.id}
                                       role="menuitem"
-                                      className={`flex items-start gap-2 border-b border-slate-800 px-3 py-2.5 last:border-b-0 hover:bg-slate-800/60 ${isRead ? "opacity-60" : ""}`}
+                                      className={`flex items-start gap-2 border-b border-slate-800 px-3 py-2.5 last:border-b-0 hover:bg-slate-800/60 ${isRead && direction === "admin" ? "opacity-60" : ""}`}
                                     >
                                       <span
                                         className={`mt-1 inline-block h-1.5 w-1.5 shrink-0 rounded-full ${
-                                          isRead
-                                            ? "bg-slate-600"
-                                            : "bg-rose-400 shadow-[0_0_4px_rgba(244,63,94,0.7)]"
+                                          showUnreadDot
+                                            ? "bg-rose-400 shadow-[0_0_4px_rgba(244,63,94,0.7)]"
+                                            : direction === "user"
+                                              ? "bg-cyan-500/40"
+                                              : "bg-slate-600"
                                         }`}
                                       />
                                       <div className="min-w-0 flex-1">
-                                        <div className="text-xs font-bold text-cyan-200">
-                                          SCSalvager Admin
+                                        <div className={`text-xs font-bold ${direction === "user" ? "text-slate-300" : "text-cyan-200"}`}>
+                                          {direction === "user" ? "You" : "SCSalvager Admin"}
                                         </div>
                                         <div className="mt-0.5 whitespace-pre-wrap break-words text-xs text-slate-200">
                                           {m.body}
                                         </div>
-                                        <div className="mt-1 flex items-center justify-between">
+                                        <div className="mt-1 flex items-center justify-between gap-2">
                                           <span className="text-[10px] text-slate-500">{ts}</span>
-                                          {!isRead && (
+                                          <div className="flex gap-1.5">
+                                            {direction === "admin" && (
+                                              <button
+                                                type="button"
+                                                onClick={() => startMailboxReply(m.id)}
+                                                className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                                              >
+                                                Reply
+                                              </button>
+                                            )}
+                                            {showUnreadDot && (
+                                              <button
+                                                type="button"
+                                                onClick={() => dismissNotification(`admin-msg:${m.id}`)}
+                                                className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                                              >
+                                                Mark read
+                                              </button>
+                                            )}
                                             <button
                                               type="button"
-                                              onClick={() => dismissNotification(`admin-msg:${m.id}`)}
-                                              className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                                              onClick={() => deleteMailboxMessage(m.id)}
+                                              className="rounded border border-rose-500/30 bg-rose-500/10 px-2 py-0.5 text-[10px] font-semibold text-rose-300 hover:border-rose-400/60 hover:bg-rose-500/20"
+                                              title="Delete from your mailbox (admins still see it in moderation history)"
                                             >
-                                              Mark read
+                                              Delete
                                             </button>
-                                          )}
+                                          </div>
                                         </div>
                                       </div>
                                     </div>
@@ -22058,6 +22341,58 @@ export default function StarCitizenSalvageGuideWebsite() {
         </>)}
 
         {activeTab === "home" && (<>
+
+        {/* Broadcast banner — surfaces the newest unread admin
+            broadcast on the Home tab in a yellow card right under
+            the HOME nav. Same dismiss path as the mailbox: a click
+            on Dismiss writes the entry's dismissedAt server-side so
+            it stops surfacing here AND in the Messages dropdown.
+            Multiple unread broadcasts: only the newest one is
+            shown — dismissing it reveals the next oldest. */}
+        {(() => {
+          // Banner only surfaces broadcast entries that are
+          // (a) inbound (admin authored), (b) not yet dismissed by
+          // this user, and (c) less than 24 hours old. After 24 h
+          // the banner auto-hides — the message remains in the
+          // user's mailbox until they delete it.
+          const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
+          const cutoff = Date.now() - TWENTY_FOUR_HOURS_MS;
+          const newestBroadcast = mailboxMessages.find(
+            (m) =>
+              m.from !== "user" &&
+              !m.dismissedAt &&
+              m.broadcastId &&
+              (m.createdAt || 0) >= cutoff
+          );
+          if (!newestBroadcast) return null;
+          return (
+            <div className="mb-5 rounded-2xl border-2 border-amber-400/60 bg-amber-500/10 p-4 shadow-lg shadow-amber-950/20">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="h-4 w-4 shrink-0 text-amber-300">
+                      <path d="M12 2 1 21h22L12 2zm0 6 7.5 13h-15L12 8zm-1 4v4h2v-4h-2zm0 5v2h2v-2h-2z" />
+                    </svg>
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300">
+                      Announcement from SCSalvager Admin
+                    </span>
+                  </div>
+                  <div className="mt-2 whitespace-pre-wrap break-words text-sm text-amber-100">
+                    {newestBroadcast.body}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => dismissNotification(`admin-msg:${newestBroadcast.id}`)}
+                  aria-label="Dismiss announcement"
+                  className="shrink-0 rounded-md border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-xs font-semibold text-amber-200 hover:bg-amber-500/20"
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          );
+        })()}
 
         <DesktopGrid columns={`${refineryPanelWidth}fr ${toolsPanelWidth}fr`} className="mb-8 items-stretch">
           <div className="flex h-full flex-col gap-4">
@@ -26634,6 +26969,21 @@ export default function StarCitizenSalvageGuideWebsite() {
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
+                  {/* Broadcast composer trigger — fanout to every
+                      indexed user in one POST. Confirm modal
+                      gates the actual send so a stray click
+                      can't blast everyone. */}
+                  <button
+                    type="button"
+                    onClick={openBroadcastComposer}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-cyan-400/40 bg-cyan-500/15 px-2.5 py-1 text-xs font-semibold text-cyan-200 hover:bg-cyan-500/25"
+                    title="Send a message to every user"
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="h-3 w-3">
+                      <path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4.236-7.445 4.962a1 1 0 0 1-1.11 0L4 8.236V6l8 5.333L20 6v2.236z" />
+                    </svg>
+                    Broadcast
+                  </button>
                   {/* Online / total counter — reads off the raw
                       adminUsers payload before any client-side
                       sort filters it, so the totals reflect the
@@ -27278,6 +27628,83 @@ export default function StarCitizenSalvageGuideWebsite() {
             material list (slot name → material name + quantity +
             min quality), sourced from scmdb.net's PTU dump. */}
 
+        {/* Broadcast modal — fans the same body out to every user
+            via /api/admin/broadcast-message. Confirm UI keeps a
+            stray click from spamming everyone. */}
+        {broadcastOpen && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+            onClick={() => !broadcastInFlight && closeBroadcastComposer()}
+          >
+            <div
+              className="w-full max-w-md rounded-3xl border border-amber-500/30 bg-slate-900 p-6 shadow-2xl shadow-amber-950/30"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="broadcast-title"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h3 id="broadcast-title" className="text-lg font-bold text-amber-300">
+                    Broadcast to all users
+                  </h3>
+                  <p className="mt-1 text-xs text-slate-400">
+                    Lands in every user's mailbox as <strong>SCSalvager Admin</strong>. One copy per user; each recipient can dismiss / delete independently. Max 1,000 characters.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={closeBroadcastComposer}
+                  disabled={broadcastInFlight}
+                  aria-label="Close"
+                  className="rounded-md border border-slate-700 bg-slate-800/60 px-2 py-1 text-xs text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200 disabled:opacity-50"
+                >
+                  ✕
+                </button>
+              </div>
+              <textarea
+                value={broadcastDraft}
+                onChange={(e) => setBroadcastDraft(e.target.value.slice(0, 1000))}
+                disabled={broadcastInFlight}
+                placeholder="e.g. Site maintenance window tonight 02:00-02:30 UTC."
+                rows={4}
+                autoFocus
+                className="mt-4 w-full rounded-xl border border-amber-500/25 bg-slate-950 px-3 py-2 text-sm text-slate-100 outline-none focus:border-amber-400 disabled:cursor-not-allowed disabled:opacity-50"
+              />
+              <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                <span className="text-[10px] text-slate-500">{broadcastDraft.length} / 1,000</span>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={closeBroadcastComposer}
+                    disabled={broadcastInFlight}
+                    className="rounded-xl border border-slate-700 bg-slate-800/60 px-4 py-2 text-xs font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200 disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={sendBroadcast}
+                    disabled={broadcastInFlight || !broadcastDraft.trim()}
+                    className={`rounded-xl border px-4 py-2 text-xs font-semibold transition ${
+                      broadcastInFlight || !broadcastDraft.trim()
+                        ? "cursor-not-allowed border-slate-700 bg-slate-800/50 text-slate-500"
+                        : "border-amber-400 bg-amber-500/20 text-amber-100 hover:bg-amber-500/30"
+                    }`}
+                  >
+                    {broadcastInFlight ? "Broadcasting…" : "Broadcast to all users"}
+                  </button>
+                </div>
+              </div>
+              {broadcastStatus && (
+                <div className={`mt-2 text-xs ${broadcastStatus.kind === "ok" ? "text-emerald-300" : "text-rose-300"}`}>
+                  {broadcastStatus.text}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Quick-send admin message dialog — launched from the All
             Users → Actions column mailbox button. Posts to the same
             /api/admin/message-user endpoint as the user-detail
@@ -27563,51 +27990,146 @@ export default function StarCitizenSalvageGuideWebsite() {
                 </button>
               </div>
 
-              {/* Admin → user messaging. Posts to /api/admin/message-user
-                  which appends an inbox entry to the target user's
-                  Redis inbox. The user sees it as a "Message from
-                  SCSalvager Admin" entry in their notification bell —
-                  the acting admin's identity is stored for audit
-                  only, never surfaced to the recipient. */}
+              {/* Admin ↔ user messaging thread. Thread loads from
+                  /api/admin/inbox?userId=<id> on modal open and after
+                  every send/reply. User-authored entries (from="user")
+                  are highlighted with a left-border accent so the
+                  operator can spot inbound replies at a glance. */}
               <section className="mt-5 rounded-2xl border border-cyan-500/30 bg-cyan-500/5 p-4">
-                <h4 className="text-cyan-300 text-sm font-semibold">Send admin message</h4>
-                <p className="mt-1 text-xs text-slate-400">
-                  Pushes a notification into this user's bell as <strong>SCSalvager Admin</strong>. Use for corrective actions or follow-ups. Max 1,000 characters.
-                </p>
-                <textarea
-                  value={adminMessageDraft}
-                  onChange={(e) => setAdminMessageDraft(e.target.value.slice(0, 1000))}
-                  disabled={adminMessageInFlight}
-                  placeholder="e.g. Please stop submitting bogus price reports — they were rolled back."
-                  rows={3}
-                  className="mt-2 w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm text-slate-100 outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
-                />
-                <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
-                  <span className="text-[10px] text-slate-500">
-                    {adminMessageDraft.length} / 1,000
-                  </span>
+                <div className="flex items-center justify-between">
+                  <h4 className="text-cyan-300 text-sm font-semibold">Messages thread</h4>
                   <button
                     type="button"
-                    onClick={sendAdminMessageToUser}
-                    disabled={adminMessageInFlight || !adminMessageDraft.trim()}
-                    className={`rounded-xl border px-4 py-2 text-xs font-semibold transition ${
-                      adminMessageInFlight || !adminMessageDraft.trim()
-                        ? "cursor-not-allowed border-slate-700 bg-slate-800/50 text-slate-500"
-                        : "border-cyan-400 bg-cyan-500/20 text-cyan-100 hover:bg-cyan-500/30"
-                    }`}
+                    onClick={() => refreshAdminMessageThread(adminUserDetail.userId)}
+                    disabled={adminMessageThreadLoading}
+                    className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200 disabled:opacity-50"
                   >
-                    {adminMessageInFlight ? "Sending…" : "Send Admin Message"}
+                    {adminMessageThreadLoading ? "Refreshing…" : "Refresh"}
                   </button>
                 </div>
-                {adminMessageStatus && (
-                  <div
-                    className={`mt-2 text-xs ${
-                      adminMessageStatus.kind === "ok" ? "text-emerald-300" : "text-rose-300"
-                    }`}
-                  >
-                    {adminMessageStatus.text}
+                {adminMessageThread.length === 0 ? (
+                  <div className="mt-2 rounded-xl border border-dashed border-slate-700 p-3 text-xs text-slate-500">
+                    {adminMessageThreadLoading ? "Loading thread…" : "No messages yet."}
+                  </div>
+                ) : (
+                  <div className="mt-2 max-h-64 space-y-2 overflow-y-auto pr-1">
+                    {adminMessageThread.map((m) => {
+                      const isUser = m.from === "user";
+                      const isDeleted = Boolean(m.deletedAt);
+                      const ts = m.createdAt
+                        ? new Date(m.createdAt).toLocaleString([], {
+                            month: "short",
+                            day: "numeric",
+                            hour: "numeric",
+                            minute: "2-digit",
+                          })
+                        : "";
+                      const delTs = isDeleted
+                        ? new Date(m.deletedAt).toLocaleString([], {
+                            month: "short",
+                            day: "numeric",
+                            hour: "numeric",
+                            minute: "2-digit",
+                          })
+                        : "";
+                      return (
+                        <div
+                          key={m.id}
+                          className={`rounded-md border px-3 py-2 text-xs ${
+                            isDeleted
+                              ? "border-rose-500/40 bg-rose-500/5 opacity-80"
+                              : isUser
+                                ? "border-l-4 border-l-amber-400 border-slate-700 bg-slate-900/60"
+                                : "border-cyan-500/25 bg-slate-900/40"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <span className={`font-bold ${isUser ? "text-amber-200" : "text-cyan-200"}`}>
+                              {isUser ? `${adminUserDetail.username || "User"}` : "SCSalvager Admin"}
+                              {m.broadcastId ? (
+                                <span className="ml-1.5 rounded bg-amber-500/15 px-1 py-0.5 text-[9px] font-bold uppercase tracking-wider text-amber-300">
+                                  Broadcast
+                                </span>
+                              ) : null}
+                              {isDeleted ? (
+                                <span className="ml-1.5 rounded bg-rose-500/15 px-1 py-0.5 text-[9px] font-bold uppercase tracking-wider text-rose-300">
+                                  Deleted by user · {delTs}
+                                </span>
+                              ) : null}
+                            </span>
+                            <span className="text-[10px] text-slate-500">{ts}</span>
+                          </div>
+                          <div className={`mt-1 whitespace-pre-wrap break-words ${isDeleted ? "text-slate-400 line-through" : "text-slate-200"}`}>
+                            {m.body}
+                          </div>
+                          {isUser && !isDeleted && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setAdminMessageReplyToId(m.id);
+                                setAdminMessageDraft("");
+                                setAdminMessageStatus(null);
+                              }}
+                              className="mt-1.5 rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                            >
+                              Reply
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
+                <div className="mt-3 border-t border-cyan-500/20 pt-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-cyan-300">
+                      {adminMessageReplyToId ? "Reply to user" : "Send as SCSalvager Admin"}
+                    </span>
+                    {adminMessageReplyToId && (
+                      <button
+                        type="button"
+                        onClick={() => setAdminMessageReplyToId(null)}
+                        className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                      >
+                        Cancel reply
+                      </button>
+                    )}
+                  </div>
+                  <textarea
+                    value={adminMessageDraft}
+                    onChange={(e) => setAdminMessageDraft(e.target.value.slice(0, 1000))}
+                    disabled={adminMessageInFlight}
+                    placeholder="Type your message…"
+                    rows={3}
+                    className="mt-1.5 w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm text-slate-100 outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+                  />
+                  <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                    <span className="text-[10px] text-slate-500">
+                      {adminMessageDraft.length} / 1,000
+                    </span>
+                    <button
+                      type="button"
+                      onClick={sendAdminMessageToUser}
+                      disabled={adminMessageInFlight || !adminMessageDraft.trim()}
+                      className={`rounded-xl border px-4 py-2 text-xs font-semibold transition ${
+                        adminMessageInFlight || !adminMessageDraft.trim()
+                          ? "cursor-not-allowed border-slate-700 bg-slate-800/50 text-slate-500"
+                          : "border-cyan-400 bg-cyan-500/20 text-cyan-100 hover:bg-cyan-500/30"
+                      }`}
+                    >
+                      {adminMessageInFlight ? "Sending…" : "Send"}
+                    </button>
+                  </div>
+                  {adminMessageStatus && (
+                    <div
+                      className={`mt-2 text-xs ${
+                        adminMessageStatus.kind === "ok" ? "text-emerald-300" : "text-rose-300"
+                      }`}
+                    >
+                      {adminMessageStatus.text}
+                    </div>
+                  )}
+                </div>
               </section>
 
               {adminUserDetailLoading && (
@@ -29178,6 +29700,20 @@ export default function StarCitizenSalvageGuideWebsite() {
               </div>
 
               <div className="mt-5 space-y-7 text-sm text-slate-300 leading-relaxed">
+
+                <section>
+                  <h4 className="text-cyan-300 text-base font-bold">v2.7.4 — May 9, 2026</h4>
+                  <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li><strong>Two-way messaging</strong> with SCSalvager Admin. <strong>Reply</strong> button on every admin message threads your response back to that message; <strong>New</strong> button at the top of the Messages dropdown starts a fresh thread. Admins see both sides of the conversation in their moderation view, and can reply directly to a specific message you sent.</li>
+                    <li><strong>Site-wide announcement banner</strong>. When SCSalvager Admin broadcasts an announcement, it surfaces as a yellow banner on the Home tab right under the HOME nav AND lands in your Messages mailbox. Banner <strong>auto-hides after 24 hours</strong>; you can also dismiss it manually. The full message stays in the mailbox until you delete it.</li>
+                    <li><strong>Delete message</strong>. Per-entry Delete button drops a message from your Messages view. The deletion is yours — admins still see deleted messages in their moderation history (with a "Deleted by user" tag) so they retain context for compliance and follow-ups, but the message no longer appears in your mailbox or banner.</li>
+                  </ul>
+                  <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Changes</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li>Messages mailbox poll cadence tightened from 60 seconds to <strong>30 seconds</strong>. New admin-sent messages reach you within ~30 s of the admin clicking Send — still no manual reload required.</li>
+                  </ul>
+                </section>
 
                 <section>
                   <h4 className="text-cyan-300 text-base font-bold">v2.7.3 — May 8, 2026</h4>

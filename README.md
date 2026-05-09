@@ -5,6 +5,16 @@ Made by Chrissyy · Referral: STAR-CH2W-R73F
 
 ## What's in this build
 
+UPDATE 5/9/2026 v2.7.4
+
+Added:
+- **Two-way messaging** with SCSalvager Admin. **Reply** button on every admin message threads your response back to that message; **New** button at the top of the Messages dropdown starts a fresh thread. Admins see both sides of the conversation in their moderation view, and can reply directly to a specific message you sent.
+- **Site-wide announcement banner**. When SCSalvager Admin broadcasts an announcement, it surfaces as a yellow banner on the Home tab right under the HOME nav AND lands in your Messages mailbox. Banner **auto-hides after 24 hours**; you can also dismiss it manually. The full message stays in the mailbox until you delete it.
+- **Delete message**. Per-entry Delete button drops a message from your Messages view. The deletion is yours — admins still see deleted messages in their moderation history (with a "Deleted by user" tag) so they retain context for compliance and follow-ups, but the message no longer appears in your mailbox or banner.
+
+Changes:
+- Messages mailbox poll cadence tightened from 60 seconds to **30 seconds**. New admin-sent messages reach you within ~30 s of the admin clicking Send — still no manual reload required.
+
 UPDATE 5/8/2026 v2.7.3
 
 Added:

@@ -76,8 +76,17 @@ export default async function handler(req, res) {
       body: messageBody,
       createdAt: Date.now(),
       dismissedAt: null,
+      // "admin" means SCSalvager Admin sent it. The companion
+      // /api/notifications/inbox POST action="send" writes "user"
+      // for user-originated entries. Threads are the same array;
+      // direction is read off this field.
+      from: "admin",
       // Recorded for audit only — never returned to the recipient.
       fromAdminId: session.userId,
+      // Optional reply linkage when the admin is responding to a
+      // user-originated entry; populated by the admin-thread API
+      // when it forwards a reply.
+      replyToId: typeof body.replyToId === "string" ? body.replyToId.slice(0, 80) : null,
     };
     list.unshift(entry);
     // Trim to newest MAX_INBOX_PER_USER. Drops oldest entries first

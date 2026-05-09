@@ -42,8 +42,14 @@ Modals:
   - Admins can target a specific user reply via the per-entry Reply button on the thread, which stamps `replyToId` on the outbound entry.
 - **Broadcast to all users** (added 2026-05-09):
   - New endpoint `POST /api/admin/broadcast-message` (admin-only). Body `{ body }`. Iterates `listUserIds()` and writes one inbox entry per recipient (each entry has its own `id` so per-recipient dismiss state is independent). Entries carry a shared `broadcastId` for audit grouping.
-  - Trigger: **Broadcast** button in the All Users header (left of the online counter). Opens a confirm modal with a 1,000-char textarea. Response reports `recipientCount` + `errorCount`; per-user Redis errors don't fail the whole broadcast.
-  - Recipient surfaces: every recipient sees the broadcast in their Messages mailbox AND on a **yellow banner on the Home tab** (right under the HOME nav). Banner auto-hides after **24 hours** since `createdAt`; user can also dismiss it manually (same `dismissedAt` flip as a regular message dismiss). Multiple unread broadcasts: only the newest non-expired one renders; dismissing reveals the next.
+  - Trigger: **Broadcast** button in the All Users header. Opens a confirm modal with a 1,000-char textarea. Response reports `recipientCount` + `errorCount`; per-user Redis errors don't fail the whole broadcast.
+  - Recipient surface: each user sees the broadcast in their Messages mailbox. The yellow Home-tab banner is NO LONGER driven by broadcasts (see "Site-wide announcement banner" below) — broadcasts are mailbox-only as of the 2026-05-09 patch.
+- **Site-wide announcement banner** (added 2026-05-09):
+  - New endpoint `POST /api/admin/announcement` (admin-only). Body `{ body }`. Writes to a single global Redis key `site:announcements` (cap **20** newest, body cap 1,000 chars). Stores `postedByAdminId` for audit; never returned to readers.
+  - New public endpoint `GET /api/announcements`. Returns active (under 24 h since `createdAt`) entries; `postedByAdminId` stripped. Cached 30 s. Drives the Home-tab banner.
+  - Trigger: **Post Announcement** button in the All Users header (left of Broadcast). Opens a modal with a 1,000-char textarea. On submit, the admin's local site-announcements cache refreshes immediately so the banner updates without waiting for the 60 s poll.
+  - Recipient surface: yellow banner on the Home tab right under the HOME nav, visible to every visitor (logged-in or guest). **Time-gated only** — survives refresh, no Dismiss button, auto-hides 24 h after `createdAt`. NOT written into per-user mailboxes.
+  - Polling: client polls `/api/announcements` every 60 s + on initial Home tab mount.
 - **User-deletable messages** (added 2026-05-09):
   - Users can drop a message from their view via the per-entry **Delete** button in the dropdown. Routes through `POST /api/notifications/inbox { action: "delete", id }` which sets `deletedAt` on the entry — **soft delete only**.
   - User-side `GET /api/notifications/inbox` filters out entries with `deletedAt` set; the user no longer sees them.

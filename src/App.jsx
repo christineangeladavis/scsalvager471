@@ -17091,10 +17091,22 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [broadcastDraft, setBroadcastDraft] = useState("");
   const [broadcastStatus, setBroadcastStatus] = useState(null);
   const [broadcastInFlight, setBroadcastInFlight] = useState(false);
+  // Announcement composer — distinct from broadcast: writes to the
+  // global site-announcements key, surfaces as a yellow Home-tab
+  // banner, NOT into per-user inboxes.
+  const [announcementOpen, setAnnouncementOpen] = useState(false);
+  const [announcementDraft, setAnnouncementDraft] = useState("");
+  const [announcementStatus, setAnnouncementStatus] = useState(null);
+  const [announcementInFlight, setAnnouncementInFlight] = useState(false);
   // User-side inbox feed. Pulled from /api/notifications/inbox on
   // login + refreshed when the bell is opened. Each entry surfaces
   // in the bell as a "Message from SCSalvager Admin" notification.
   const [adminInbox, setAdminInbox] = useState([]);
+  // Site-wide announcements (separate from per-user broadcasts in
+  // adminInbox). Source: GET /api/announcements. Drives the yellow
+  // banner on the Home tab. Survives refresh — banner only hides
+  // when 24 h elapses since createdAt.
+  const [siteAnnouncements, setSiteAnnouncements] = useState([]);
   const [adminClearLedgerStep, setAdminClearLedgerStep] = useState(0); // 0=picker visible,1=first confirm,2=second confirm
   const [adminClearLedgerInFlight, setAdminClearLedgerInFlight] = useState(false);
   const [adminClearLedgerError, setAdminClearLedgerError] = useState("");
@@ -19589,6 +19601,59 @@ export default function StarCitizenSalvageGuideWebsite() {
     }
   };
 
+  // Announcement composer — posts a global yellow banner that
+  // surfaces on the Home tab for every visitor. Auto-hides
+  // server-side at 24 h since createdAt.
+  const openAnnouncementComposer = () => {
+    setAnnouncementOpen(true);
+    setAnnouncementDraft("");
+    setAnnouncementStatus(null);
+    setAnnouncementInFlight(false);
+  };
+  const closeAnnouncementComposer = () => {
+    setAnnouncementOpen(false);
+    setAnnouncementDraft("");
+    setAnnouncementStatus(null);
+    setAnnouncementInFlight(false);
+  };
+  const postAnnouncement = async () => {
+    const trimmed = announcementDraft.trim();
+    if (!trimmed) {
+      setAnnouncementStatus({ kind: "err", text: "Announcement body cannot be empty." });
+      return;
+    }
+    setAnnouncementInFlight(true);
+    setAnnouncementStatus(null);
+    try {
+      const res = await fetch("/api/admin/announcement", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ body: trimmed }),
+      });
+      const info = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setAnnouncementStatus({
+          kind: "err",
+          text: info.error || `Post failed (HTTP ${res.status}).`,
+        });
+        return;
+      }
+      // Optimistically refresh local cache so the banner updates
+      // for this admin without waiting for the next 60 s poll.
+      await refreshSiteAnnouncements();
+      setAnnouncementDraft("");
+      setAnnouncementStatus({ kind: "ok", text: "Announcement is live on the Home banner." });
+    } catch (e) {
+      setAnnouncementStatus({
+        kind: "err",
+        text: e && e.message ? e.message : "Network error.",
+      });
+    } finally {
+      setAnnouncementInFlight(false);
+    }
+  };
+
   // Broadcast composer: open / close / send. Fanout is server-side
   // via /api/admin/broadcast-message which iterates every indexed
   // userId and writes one inbox entry per recipient.
@@ -20131,6 +20196,27 @@ export default function StarCitizenSalvageGuideWebsite() {
   useEffect(() => {
     refreshAdminInbox();
   }, [user]);
+
+  // Site-wide announcements — separate from per-user inboxes. Open
+  // to anyone, no auth needed. Drives the Home-tab yellow banner.
+  const refreshSiteAnnouncements = async () => {
+    try {
+      const res = await fetch("/api/announcements");
+      if (!res.ok) return;
+      const data = await res.json();
+      setSiteAnnouncements(Array.isArray(data.announcements) ? data.announcements : []);
+    } catch {
+      // silent — banner falls back to empty
+    }
+  };
+  useEffect(() => {
+    refreshSiteAnnouncements();
+    // Poll every 60 s. Less hot than the per-user mailbox since
+    // announcements are global and lighter on Redis.
+    const interval = setInterval(refreshSiteAnnouncements, 60_000);
+    return () => clearInterval(interval);
+  }, []);
+
   // Poll the inbox every 30 s while logged in so admin-sent
   // messages surface in the mailbox without a manual refresh.
   // Balances latency vs Redis load — moderation traffic is light.
@@ -22350,45 +22436,27 @@ export default function StarCitizenSalvageGuideWebsite() {
             Multiple unread broadcasts: only the newest one is
             shown — dismissing it reveals the next oldest. */}
         {(() => {
-          // Banner only surfaces broadcast entries that are
-          // (a) inbound (admin authored), (b) not yet dismissed by
-          // this user, and (c) less than 24 hours old. After 24 h
-          // the banner auto-hides — the message remains in the
-          // user's mailbox until they delete it.
-          const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
-          const cutoff = Date.now() - TWENTY_FOUR_HOURS_MS;
-          const newestBroadcast = mailboxMessages.find(
-            (m) =>
-              m.from !== "user" &&
-              !m.dismissedAt &&
-              m.broadcastId &&
-              (m.createdAt || 0) >= cutoff
-          );
-          if (!newestBroadcast) return null;
+          // Banner reads from /api/announcements which is its own
+          // global Redis key, separate from per-user inboxes.
+          // Server already filters to under-24h entries; the client
+          // just renders the newest. No dismiss button — banner is
+          // purely time-gated and survives refresh.
+          const newest = siteAnnouncements[0];
+          if (!newest) return null;
           return (
             <div className="mb-5 rounded-2xl border-2 border-amber-400/60 bg-amber-500/10 p-4 shadow-lg shadow-amber-950/20">
-              <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-3">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="h-4 w-4 shrink-0 text-amber-300 mt-0.5">
+                  <path d="M12 2 1 21h22L12 2zm0 6 7.5 13h-15L12 8zm-1 4v4h2v-4h-2zm0 5v2h2v-2h-2z" />
+                </svg>
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="h-4 w-4 shrink-0 text-amber-300">
-                      <path d="M12 2 1 21h22L12 2zm0 6 7.5 13h-15L12 8zm-1 4v4h2v-4h-2zm0 5v2h2v-2h-2z" />
-                    </svg>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300">
-                      Announcement from SCSalvager Admin
-                    </span>
-                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300">
+                    Announcement from SCSalvager Admin
+                  </span>
                   <div className="mt-2 whitespace-pre-wrap break-words text-sm text-amber-100">
-                    {newestBroadcast.body}
+                    {newest.body}
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => dismissNotification(`admin-msg:${newestBroadcast.id}`)}
-                  aria-label="Dismiss announcement"
-                  className="shrink-0 rounded-md border border-amber-500/40 bg-amber-500/10 px-2 py-1 text-xs font-semibold text-amber-200 hover:bg-amber-500/20"
-                >
-                  Dismiss
-                </button>
               </div>
             </div>
           );
@@ -26969,15 +27037,29 @@ export default function StarCitizenSalvageGuideWebsite() {
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
+                  {/* Post Announcement — global yellow banner on
+                      Home tab. NOT a per-user mailbox write.
+                      Auto-hides 24 h after createdAt. */}
+                  <button
+                    type="button"
+                    onClick={openAnnouncementComposer}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-amber-400/40 bg-amber-500/15 px-2.5 py-1 text-xs font-semibold text-amber-200 hover:bg-amber-500/25"
+                    title="Post a site-wide yellow banner on the Home tab"
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="h-3 w-3">
+                      <path d="M12 2 1 21h22L12 2zm0 6 7.5 13h-15L12 8zm-1 4v4h2v-4h-2zm0 5v2h2v-2h-2z" />
+                    </svg>
+                    Post Announcement
+                  </button>
                   {/* Broadcast composer trigger — fanout to every
-                      indexed user in one POST. Confirm modal
-                      gates the actual send so a stray click
-                      can't blast everyone. */}
+                      indexed user's mailbox in one POST. Distinct
+                      from Post Announcement: broadcast goes to
+                      mailboxes only, no Home-tab banner. */}
                   <button
                     type="button"
                     onClick={openBroadcastComposer}
                     className="inline-flex items-center gap-1.5 rounded-lg border border-cyan-400/40 bg-cyan-500/15 px-2.5 py-1 text-xs font-semibold text-cyan-200 hover:bg-cyan-500/25"
-                    title="Send a message to every user"
+                    title="Send a mailbox message to every user"
                   >
                     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="h-3 w-3">
                       <path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4.236-7.445 4.962a1 1 0 0 1-1.11 0L4 8.236V6l8 5.333L20 6v2.236z" />
@@ -27627,6 +27709,83 @@ export default function StarCitizenSalvageGuideWebsite() {
             blueprint (with pool name + chance) and the fabricator
             material list (slot name → material name + quantity +
             min quality), sourced from scmdb.net's PTU dump. */}
+
+        {/* Announcement modal — posts a site-wide yellow banner
+            via /api/admin/announcement. Auto-hides at 24 h. Does
+            NOT write per-user mailbox entries. */}
+        {announcementOpen && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+            onClick={() => !announcementInFlight && closeAnnouncementComposer()}
+          >
+            <div
+              className="w-full max-w-md rounded-3xl border border-amber-500/30 bg-slate-900 p-6 shadow-2xl shadow-amber-950/30"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="announcement-title"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h3 id="announcement-title" className="text-lg font-bold text-amber-300">
+                    Post site-wide announcement
+                  </h3>
+                  <p className="mt-1 text-xs text-slate-400">
+                    Renders as a yellow banner on the Home tab for every visitor. <strong>Auto-hides 24 hours</strong> after posting. Does not write to per-user mailboxes — use Broadcast for that. Max 1,000 characters.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={closeAnnouncementComposer}
+                  disabled={announcementInFlight}
+                  aria-label="Close"
+                  className="rounded-md border border-slate-700 bg-slate-800/60 px-2 py-1 text-xs text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200 disabled:opacity-50"
+                >
+                  ✕
+                </button>
+              </div>
+              <textarea
+                value={announcementDraft}
+                onChange={(e) => setAnnouncementDraft(e.target.value.slice(0, 1000))}
+                disabled={announcementInFlight}
+                placeholder="e.g. Site maintenance window tonight 02:00-02:30 UTC. Ledger writes paused during the window."
+                rows={4}
+                autoFocus
+                className="mt-4 w-full rounded-xl border border-amber-500/25 bg-slate-950 px-3 py-2 text-sm text-slate-100 outline-none focus:border-amber-400 disabled:cursor-not-allowed disabled:opacity-50"
+              />
+              <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                <span className="text-[10px] text-slate-500">{announcementDraft.length} / 1,000</span>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={closeAnnouncementComposer}
+                    disabled={announcementInFlight}
+                    className="rounded-xl border border-slate-700 bg-slate-800/60 px-4 py-2 text-xs font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200 disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={postAnnouncement}
+                    disabled={announcementInFlight || !announcementDraft.trim()}
+                    className={`rounded-xl border px-4 py-2 text-xs font-semibold transition ${
+                      announcementInFlight || !announcementDraft.trim()
+                        ? "cursor-not-allowed border-slate-700 bg-slate-800/50 text-slate-500"
+                        : "border-amber-400 bg-amber-500/20 text-amber-100 hover:bg-amber-500/30"
+                    }`}
+                  >
+                    {announcementInFlight ? "Posting…" : "Post Announcement"}
+                  </button>
+                </div>
+              </div>
+              {announcementStatus && (
+                <div className={`mt-2 text-xs ${announcementStatus.kind === "ok" ? "text-emerald-300" : "text-rose-300"}`}>
+                  {announcementStatus.text}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Broadcast modal — fans the same body out to every user
             via /api/admin/broadcast-message. Confirm UI keeps a
@@ -29706,12 +29865,13 @@ export default function StarCitizenSalvageGuideWebsite() {
                   <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
                   <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
                     <li><strong>Two-way messaging</strong> with SCSalvager Admin. <strong>Reply</strong> button on every admin message threads your response back to that message; <strong>New</strong> button at the top of the Messages dropdown starts a fresh thread. Admins see both sides of the conversation in their moderation view, and can reply directly to a specific message you sent.</li>
-                    <li><strong>Site-wide announcement banner</strong>. When SCSalvager Admin broadcasts an announcement, it surfaces as a yellow banner on the Home tab right under the HOME nav AND lands in your Messages mailbox. Banner <strong>auto-hides after 24 hours</strong>; you can also dismiss it manually. The full message stays in the mailbox until you delete it.</li>
+                    <li><strong>Site-wide announcement banner</strong>. SCSalvager Admin can post a yellow banner that surfaces on the Home tab right under the HOME nav for every visitor. Banner is purely time-gated: <strong>auto-hides 24 hours after posting</strong>, survives page refresh, and is independent from per-user mailbox messages. Mailbox-targeted broadcasts (separate feature) land in your Messages dropdown but do not drive this banner.</li>
                     <li><strong>Delete message</strong>. Per-entry Delete button drops a message from your Messages view. The deletion is yours — admins still see deleted messages in their moderation history (with a "Deleted by user" tag) so they retain context for compliance and follow-ups, but the message no longer appears in your mailbox or banner.</li>
                   </ul>
                   <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Changes</p>
                   <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
                     <li>Messages mailbox poll cadence tightened from 60 seconds to <strong>30 seconds</strong>. New admin-sent messages reach you within ~30 s of the admin clicking Send — still no manual reload required.</li>
+                    <li>The Home-tab yellow announcement banner is now driven by a dedicated <strong>Post Announcement</strong> action, separate from per-user broadcasts. Broadcasts still arrive in your Messages mailbox; announcements live on the Home banner only. The banner is purely time-gated — survives page refresh and re-login, hides automatically <strong>24 hours</strong> after the admin posts it.</li>
                   </ul>
                 </section>
 

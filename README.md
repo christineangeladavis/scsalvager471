@@ -16,6 +16,9 @@ Fixes:
 - **SCU yield display now locale-independent** with exactly two decimals everywhere refined SCU appears (Refinery Job Orders Expected Yield + bonus subline, Edit Job preview, In Progress / Ready for Pickup cards, refinery-completion notifications, Crew Salvage refined-SCU column, Statistics leaderboard SCU columns). Previously a yield like `188.352 SCU` rendered as `"188,352 SCU"` on French / EU-locale devices (comma-as-decimal), so the value looked like 188 thousand SCU rather than 188 SCU and change. Display is now pinned to en-US (`188.35 SCU`) regardless of device locale. Stored ledger values unchanged — display-only fix.
 - **Crew Salvage saved sessions now persist server-side.** Saved sessions used to live in React state only — refreshing the page or logging in from another device wiped the list. `/api/ledger` now stores `crewSessions` alongside refinery jobs + sell orders (capped at 200 per user); saving / deleting / editing / completing a session writes through to Redis. Older clients that don't send the field on save have their stored sessions preserved (no accidental wipes). Sessions saved before this build are unrecoverable — they never made it past React state.
 
+Notes:
+- Your notification bell can now receive messages from **SCSalvager Admin**. We'll only use this for corrective actions (e.g. flagged price reports rolled back) or critical follow-ups. Dismiss in the bell to mark read; dismissed state persists across devices.
+
 UPDATE 5/5/2026 v2.7.2
 
 Added:

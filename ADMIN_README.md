@@ -24,6 +24,15 @@ Modals:
 
 ---
 
+## 2026-05-09 — Admin → user messaging via the notification bell
+
+- New endpoint `POST /api/admin/message-user` (admin-only). Body: `{ userId, body }`. Appends an entry to Redis key `inbox:<userId>` (cap **20 newest per user**, oldest dropped on overflow, body capped at 1,000 chars). The acting admin's userId is stored on each entry as `fromAdminId` for audit but **never returned to the recipient** — recipients always see the hardcoded sender label "SCSalvager Admin".
+- New endpoint `/api/notifications/inbox`:
+  - `GET` — returns the caller's inbox entries (id / body / createdAt / dismissedAt). `fromAdminId` is stripped before serialization.
+  - `POST { action: "dismiss", id }` — flips `dismissedAt` on one entry so the bell stops counting it toward the unread badge.
+- Admin Panel UI lives on the **All Users → row click → user-detail modal**. Section "Send admin message" carries a `<textarea maxLength=1000>` + character counter + Send button. Errors / success render inline below the button. Sending clears the draft and refreshes the inbox count.
+- Recipient surface: messages render in the existing notification bell as `Message from SCSalvager Admin` entries. Read state is server-driven (entry's `dismissedAt`), so dismiss survives reload + cross-device login. The bell's mark-all-read still works — it fans out one POST per admin-message id since there's no batch-dismiss endpoint.
+
 ## 2026-05-08 — Junior2065 added to admin fallback list
 
 - `FALLBACK_ADMIN_IDS` in `api/_lib/admin.js` now contains two entries: site owner (`125372743637008384`) and **Junior2065** (`237446168206901259`). Both stay admin even if `ADMIN_DISCORD_ID` env var on Vercel gets cleared / misspelled. The env var still wins when set — the fallback list only resolves when env is empty.

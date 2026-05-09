@@ -17064,6 +17064,15 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [adminUserDetail, setAdminUserDetail] = useState(null);
   const [adminUserDetailLoading, setAdminUserDetailLoading] = useState(false);
   const [adminUserDetailError, setAdminUserDetailError] = useState("");
+  // Admin → user message UI state. Lives on the user-detail modal.
+  // Reset every time the modal opens for a different user.
+  const [adminMessageDraft, setAdminMessageDraft] = useState("");
+  const [adminMessageStatus, setAdminMessageStatus] = useState(null); // { kind: "ok"|"err", text }
+  const [adminMessageInFlight, setAdminMessageInFlight] = useState(false);
+  // User-side inbox feed. Pulled from /api/notifications/inbox on
+  // login + refreshed when the bell is opened. Each entry surfaces
+  // in the bell as a "Message from SCSalvager Admin" notification.
+  const [adminInbox, setAdminInbox] = useState([]);
   const [adminClearLedgerStep, setAdminClearLedgerStep] = useState(0); // 0=picker visible,1=first confirm,2=second confirm
   const [adminClearLedgerInFlight, setAdminClearLedgerInFlight] = useState(false);
   const [adminClearLedgerError, setAdminClearLedgerError] = useState("");
@@ -17171,6 +17180,27 @@ export default function StarCitizenSalvageGuideWebsite() {
   };
   const dismissNotification = (id) => {
     if (id === "whatsnew") markWhatsNewSeen();
+    // Admin → user message ids carry the "admin-msg:" prefix and are
+    // dismissed server-side so the dismissed state survives a reload
+    // / cross-device login. Optimistically flip the local copy so the
+    // bell repaints immediately.
+    if (typeof id === "string" && id.startsWith("admin-msg:")) {
+      const inboxId = id.slice("admin-msg:".length);
+      setAdminInbox((prev) =>
+        prev.map((e) =>
+          e.id === inboxId && !e.dismissedAt ? { ...e, dismissedAt: Date.now() } : e
+        )
+      );
+      // Fire and forget — failure leaves the optimistic flip in
+      // place; the next refreshAdminInbox() corrects it if needed.
+      fetch("/api/notifications/inbox", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ action: "dismiss", id: inboxId }),
+      }).catch(() => {});
+      return;
+    }
     setDismissedNotifications((prev) => {
       if (prev.includes(id)) return prev;
       const next = [...prev, id];
@@ -17180,9 +17210,32 @@ export default function StarCitizenSalvageGuideWebsite() {
   };
   const dismissAllNotifications = (ids) => {
     if (ids.includes("whatsnew")) markWhatsNewSeen();
+    // Pull out admin-message ids and dismiss them through the
+    // inbox endpoint; everything else flows through the
+    // localStorage-backed setDismissedNotifications path.
+    const adminIds = ids.filter((id) => typeof id === "string" && id.startsWith("admin-msg:"));
+    const localIds = ids.filter((id) => !(typeof id === "string" && id.startsWith("admin-msg:")));
+    if (adminIds.length > 0) {
+      const inboxIds = adminIds.map((id) => id.slice("admin-msg:".length));
+      setAdminInbox((prev) =>
+        prev.map((e) =>
+          inboxIds.includes(e.id) && !e.dismissedAt ? { ...e, dismissedAt: Date.now() } : e
+        )
+      );
+      // No batch-dismiss endpoint — fan out one POST per id.
+      for (const inboxId of inboxIds) {
+        fetch("/api/notifications/inbox", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ action: "dismiss", id: inboxId }),
+        }).catch(() => {});
+      }
+    }
+    if (localIds.length === 0) return;
     setDismissedNotifications((prev) => {
       const set = new Set(prev);
-      for (const id of ids) set.add(id);
+      for (const id of localIds) set.add(id);
       const next = Array.from(set);
       persistDismissed(next);
       return next;
@@ -17639,11 +17692,33 @@ export default function StarCitizenSalvageGuideWebsite() {
         body: "Your handle is set but unverified. Paste the one-time token into your RSI Short Bio so your verified name shows on the leaderboard.",
       });
     }
+    // Admin → user messages. Always rendered with the hardcoded
+    // "Message from SCSalvager Admin" title regardless of which
+    // operator sent the message — no admin identity surfaces to the
+    // recipient. Read state is server-driven (dismissedAt set on the
+    // entry); dismissing in the bell hits POST /api/notifications/inbox
+    // with action=dismiss.
+    for (const entry of adminInbox) {
+      if (!entry || !entry.id) continue;
+      out.push({
+        id: `admin-msg:${entry.id}`,
+        target: "admin-message",
+        title: "Message from SCSalvager Admin",
+        body: entry.body || "",
+        // Source data carried alongside so the bell can drive the
+        // dismiss network call without re-deriving the inbox id.
+        inboxId: entry.id,
+        createdAt: entry.createdAt || 0,
+        serverDismissedAt: entry.dismissedAt || null,
+      });
+    }
     // Tag (don't filter) so read items stay visible in the dropdown
     // but stop counting toward the red badge. The user explicitly
     // asked to keep them on screen after Mark-as-read.
     //   - whatsnew: read state tracks the seen-version pointer, so a
     //     future release naturally resurfaces it as unread.
+    //   - admin-msg:*: read state comes from the inbox entry's own
+    //     dismissedAt timestamp, set by the dismiss endpoint.
     //   - state-derived items (dms-off, rsi-*): read state comes from
     //     dismissedNotifications. The notification stops appearing
     //     entirely once the underlying condition is fixed (because
@@ -17651,13 +17726,17 @@ export default function StarCitizenSalvageGuideWebsite() {
     //     state is irrelevant.
     const dismissed = new Set(dismissedNotifications);
     return out.map((n) => {
-      const isRead =
-        n.id === "whatsnew"
-          ? whatsNewSeenVersion === LATEST_WHATSNEW_VERSION
-          : dismissed.has(n.id);
+      let isRead;
+      if (n.id === "whatsnew") {
+        isRead = whatsNewSeenVersion === LATEST_WHATSNEW_VERSION;
+      } else if (n.target === "admin-message") {
+        isRead = Boolean(n.serverDismissedAt);
+      } else {
+        isRead = dismissed.has(n.id);
+      }
       return { ...n, isRead };
     });
-  }, [user, prefs, whatsNewSeenVersion, dismissedNotifications]);
+  }, [user, prefs, whatsNewSeenVersion, dismissedNotifications, adminInbox]);
 
   // Unread count drives the red bell badge.
   const unreadNotificationCount = userNotifications.filter((n) => !n.isRead).length;
@@ -19326,6 +19405,53 @@ export default function StarCitizenSalvageGuideWebsite() {
     setAdminClearLedgerError("");
     setAdminClearLedgerInFlight(false);
     setAdminEditEntry(null);
+    setAdminMessageDraft("");
+    setAdminMessageStatus(null);
+    setAdminMessageInFlight(false);
+  };
+
+  // POST /api/admin/message-user — push a corrective message into
+  // the target user's notification bell. Always rendered as
+  // "SCSalvager Admin" on the recipient side; the acting admin's id
+  // is recorded server-side for audit but never returned in the
+  // inbox payload.
+  const sendAdminMessageToUser = async () => {
+    if (!adminUserDetail?.userId) return;
+    const trimmed = adminMessageDraft.trim();
+    if (!trimmed) {
+      setAdminMessageStatus({ kind: "err", text: "Message body cannot be empty." });
+      return;
+    }
+    setAdminMessageInFlight(true);
+    setAdminMessageStatus(null);
+    try {
+      const res = await fetch("/api/admin/message-user", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ userId: adminUserDetail.userId, body: trimmed }),
+      });
+      const info = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setAdminMessageStatus({
+          kind: "err",
+          text: info.error || `Send failed (HTTP ${res.status}).`,
+        });
+        return;
+      }
+      setAdminMessageDraft("");
+      setAdminMessageStatus({
+        kind: "ok",
+        text: `Sent. ${info.count || 0} message${info.count === 1 ? "" : "s"} now in their inbox.`,
+      });
+    } catch (e) {
+      setAdminMessageStatus({
+        kind: "err",
+        text: e && e.message ? e.message : "Network error.",
+      });
+    } finally {
+      setAdminMessageInFlight(false);
+    }
   };
 
   // --- Admin clear with scope. The pending scope lives in
@@ -19737,6 +19863,31 @@ export default function StarCitizenSalvageGuideWebsite() {
         setIsLedgerLoading(false);
       });
     return () => { cancelled = true; };
+  }, [user]);
+
+  // --- Admin inbox: pull on login so the notification bell can
+  // surface admin → user messages. Refreshed when the bell opens
+  // (see refreshAdminInbox below). Failures degrade silently —
+  // the bell falls back to the derived setup-nag list.
+  const refreshAdminInbox = async () => {
+    if (!user) {
+      setAdminInbox([]);
+      return;
+    }
+    try {
+      const res = await fetch("/api/notifications/inbox", { credentials: "same-origin" });
+      if (!res.ok) {
+        if (import.meta.env.DEV) setAdminInbox([]);
+        return;
+      }
+      const data = await res.json();
+      setAdminInbox(Array.isArray(data.inbox) ? data.inbox : []);
+    } catch {
+      // Network / parse failure — leave whatever we had previously.
+    }
+  };
+  useEffect(() => {
+    refreshAdminInbox();
   }, [user]);
 
   // --- Ledger: explicit save function ---
@@ -27105,6 +27256,53 @@ export default function StarCitizenSalvageGuideWebsite() {
                 </button>
               </div>
 
+              {/* Admin → user messaging. Posts to /api/admin/message-user
+                  which appends an inbox entry to the target user's
+                  Redis inbox. The user sees it as a "Message from
+                  SCSalvager Admin" entry in their notification bell —
+                  the acting admin's identity is stored for audit
+                  only, never surfaced to the recipient. */}
+              <section className="mt-5 rounded-2xl border border-cyan-500/30 bg-cyan-500/5 p-4">
+                <h4 className="text-cyan-300 text-sm font-semibold">Send admin message</h4>
+                <p className="mt-1 text-xs text-slate-400">
+                  Pushes a notification into this user's bell as <strong>SCSalvager Admin</strong>. Use for corrective actions or follow-ups. Max 1,000 characters.
+                </p>
+                <textarea
+                  value={adminMessageDraft}
+                  onChange={(e) => setAdminMessageDraft(e.target.value.slice(0, 1000))}
+                  disabled={adminMessageInFlight}
+                  placeholder="e.g. Please stop submitting bogus price reports — they were rolled back."
+                  rows={3}
+                  className="mt-2 w-full rounded-xl border border-cyan-500/25 bg-slate-900 px-3 py-2 text-sm text-slate-100 outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+                />
+                <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                  <span className="text-[10px] text-slate-500">
+                    {adminMessageDraft.length} / 1,000
+                  </span>
+                  <button
+                    type="button"
+                    onClick={sendAdminMessageToUser}
+                    disabled={adminMessageInFlight || !adminMessageDraft.trim()}
+                    className={`rounded-xl border px-4 py-2 text-xs font-semibold transition ${
+                      adminMessageInFlight || !adminMessageDraft.trim()
+                        ? "cursor-not-allowed border-slate-700 bg-slate-800/50 text-slate-500"
+                        : "border-cyan-400 bg-cyan-500/20 text-cyan-100 hover:bg-cyan-500/30"
+                    }`}
+                  >
+                    {adminMessageInFlight ? "Sending…" : "Send Admin Message"}
+                  </button>
+                </div>
+                {adminMessageStatus && (
+                  <div
+                    className={`mt-2 text-xs ${
+                      adminMessageStatus.kind === "ok" ? "text-emerald-300" : "text-rose-300"
+                    }`}
+                  >
+                    {adminMessageStatus.text}
+                  </div>
+                )}
+              </section>
+
               {adminUserDetailLoading && (
                 <div className="mt-6 rounded-2xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">
                   Loading 30-day history…
@@ -28686,6 +28884,10 @@ export default function StarCitizenSalvageGuideWebsite() {
                   <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
                     <li><strong>SCU yield display now locale-independent</strong> with exactly two decimals everywhere refined SCU appears (Refinery Job Orders Expected Yield + bonus subline, Edit Job preview, In Progress / Ready for Pickup cards, refinery-completion notifications, Crew Salvage refined-SCU column, Statistics leaderboard SCU columns). Previously a yield like <code className="rounded bg-slate-800 px-1 text-cyan-200">188.352 SCU</code> rendered as <code className="rounded bg-slate-800 px-1 text-cyan-200">"188,352 SCU"</code> on French / EU-locale devices (comma-as-decimal), looking like 188 thousand SCU. Display is now pinned to en-US (<code className="rounded bg-slate-800 px-1 text-cyan-200">188.35 SCU</code>) regardless of device locale. Stored ledger values unchanged — display-only fix.</li>
                     <li><strong>Crew Salvage saved sessions now persist server-side.</strong> Saved sessions used to live in React state only — refreshing the page or logging in from another device wiped the list. <code className="rounded bg-slate-800 px-1 text-cyan-200">/api/ledger</code> now stores <code className="rounded bg-slate-800 px-1 text-cyan-200">crewSessions</code> alongside refinery jobs + sell orders, capped at 200 per user; saving / deleting / editing / completing a session writes through to Redis. Older clients that don't send the field on save have their stored sessions preserved (no accidental wipes). Sessions saved before this build are unrecoverable — they never made it past React state.</li>
+                  </ul>
+                  <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Notes</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li>Your notification bell can now receive messages from <strong>SCSalvager Admin</strong>. We'll only use this for corrective actions (e.g. flagged price reports rolled back) or critical follow-ups. Dismiss in the bell to mark read; dismissed state persists across devices.</li>
                   </ul>
                 </section>
 

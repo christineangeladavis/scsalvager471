@@ -36,7 +36,16 @@
 //     refinedConstructionPieces:  number,
 //     refinedConstructionRubble:  number,
 //     topSalvagers: [
-//       { username: string, scuRefined: number, profitAuec: number, verified: boolean }
+//       {
+//         username: string,
+//         scuRefined: number,
+//         salvageRefined: number,   // Construction Salvage subtotal
+//         piecesRefined:  number,   // Construction Pieces  subtotal
+//         rubbleRefined:  number,   // Construction Rubble  subtotal
+//         profitAuec: number,
+//         verified: boolean,
+//         avatarDataUrl: string
+//       }
 //     ]
 //   }
 //
@@ -96,6 +105,13 @@ export default async function handler(req, res) {
     let userScu = 0;
     let userFees = 0;
     let userProfit = 0;
+    // Per-material refined totals for THIS user. Surfaced on the
+    // Statistics leaderboard as Salvage / Pieces / Rubble Refined
+    // columns. Same completion gate as userScu (pickedUpAt set,
+    // non-deleted), so the column sum equals the SCU Refined cell.
+    let userSalvage = 0;
+    let userPieces = 0;
+    let userRubble = 0;
 
     for (const j of jobs) {
       if (!j || j.deletedAt) continue;
@@ -116,10 +132,13 @@ export default async function handler(req, res) {
         const yieldScu = Number(j.yield);
         if (j.material === "Construction Salvage") {
           refinedConstructionSalvage += yieldScu;
+          userSalvage += yieldScu;
         } else if (j.material === "Construction Pieces") {
           refinedConstructionPieces += yieldScu;
+          userPieces += yieldScu;
         } else if (j.material === "Construction Rubble") {
           refinedConstructionRubble += yieldScu;
+          userRubble += yieldScu;
         }
       }
     }
@@ -170,6 +189,9 @@ export default async function handler(req, res) {
       perUser.push({
         username: displayName,
         scuRefined: userScu,
+        salvageRefined: userSalvage,
+        piecesRefined: userPieces,
+        rubbleRefined: userRubble,
         profitAuec: userProfit,
         verified,
         avatarDataUrl,
@@ -208,6 +230,9 @@ export default async function handler(req, res) {
     topSalvagers: topSalvagers.map((u) => ({
       username: u.username,
       scuRefined: Math.round(u.scuRefined * 100) / 100,
+      salvageRefined: Math.round(u.salvageRefined * 100) / 100,
+      piecesRefined: Math.round(u.piecesRefined * 100) / 100,
+      rubbleRefined: Math.round(u.rubbleRefined * 100) / 100,
       profitAuec: Math.round(u.profitAuec),
       verified: Boolean(u.verified),
       avatarDataUrl: u.avatarDataUrl || "",

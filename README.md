@@ -10,6 +10,10 @@ UPDATE 5/8/2026 v2.7.3
 Added:
 - Crew Salvage **Reclaimer** roster picks up three turret stations: **Manned Turret**, **Remote Turret 1**, **Remote Turret 2**. Reclaimer now lists 8 stations total (was 5). Split Calculator + Roles header automatically pick up the new stations — `Roles · X / 8 stations crewed`.
 - Crew Salvage **Moth** roster gains a **Missile Operator** station, slotted directly after Pilot. Moth now lists 6 stations total (was 5).
+- Statistics top-salvagers leaderboard gains three per-material columns: **Salvage Refined**, **Pieces Refined**, **Rubble Refined**. Each cell sums the user's completed refinery jobs filtered by material so the three columns add up to the SCU Refined cell. Sort order unchanged — still ranks by total SCU Refined.
+
+Fixes:
+- **SCU yield display now locale-independent** with exactly two decimals everywhere refined SCU appears (Refinery Job Orders Expected Yield + bonus subline, Edit Job preview, In Progress / Ready for Pickup cards, refinery-completion notifications, Crew Salvage refined-SCU column, Statistics leaderboard SCU columns). Previously a yield like `188.352 SCU` rendered as `"188,352 SCU"` on French / EU-locale devices (comma-as-decimal), so the value looked like 188 thousand SCU rather than 188 SCU and change. Display is now pinned to en-US (`188.35 SCU`) regardless of device locale. Stored ledger values unchanged — display-only fix.
 
 UPDATE 5/5/2026 v2.7.2
 

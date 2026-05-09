@@ -16075,6 +16075,21 @@ function stripCommaInput(value) {
   return v;
 }
 
+// Format a refined-SCU value with locale-independent decimal-dot
+// notation and exactly two decimals. Pinned to en-US so French
+// (and other comma-decimal) locales can't render `188.35` as
+// `"188,35"` — that string is indistinguishable from `188,352`
+// (en-US thousands separator) and was confusing users on iOS who
+// read "188,35" as "one hundred eighty-eight thousand thirty-five".
+function formatScu(n) {
+  const num = Number(n);
+  if (!Number.isFinite(num)) return "0.00";
+  return num.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
 function hmsToSeconds(form) {
   const h = Math.max(0, Number(form.hours) || 0);
   const m = Math.max(0, Number(form.minutes) || 0);
@@ -17722,11 +17737,11 @@ export default function StarCitizenSalvageGuideWebsite() {
       refinedConstructionPieces: 4185.0,
       refinedConstructionRubble: 2810.75,
       topSalvagers: [
-        { username: "Chrissyy", scuRefined: 6210.4, profitAuec: 9_840_000, verified: true },
-        { username: "Denavago", scuRefined: 4180.2, profitAuec: 6_312_500, verified: false },
-        { username: "TestPilot42", scuRefined: 3050.6, profitAuec: 4_905_000, verified: true },
-        { username: "RefiningQueen", scuRefined: 2840.0, profitAuec: 4_220_300, verified: false },
-        { username: "ScrapKing", scuRefined: 1420.8, profitAuec: 2_180_500, verified: false },
+        { username: "Chrissyy",      scuRefined: 6210.4, salvageRefined: 3120.2, piecesRefined: 2080.1, rubbleRefined: 1010.1, profitAuec: 9_840_000, verified: true },
+        { username: "Denavago",      scuRefined: 4180.2, salvageRefined: 2150.0, piecesRefined: 1380.2, rubbleRefined:  650.0, profitAuec: 6_312_500, verified: false },
+        { username: "TestPilot42",   scuRefined: 3050.6, salvageRefined: 1500.6, piecesRefined: 1050.0, rubbleRefined:  500.0, profitAuec: 4_905_000, verified: true },
+        { username: "RefiningQueen", scuRefined: 2840.0, salvageRefined: 1400.0, piecesRefined:  940.0, rubbleRefined:  500.0, profitAuec: 4_220_300, verified: false },
+        { username: "ScrapKing",     scuRefined: 1420.8, salvageRefined:  720.4, piecesRefined:  500.0, rubbleRefined:  200.4, profitAuec: 2_180_500, verified: false },
       ],
     });
 
@@ -19850,7 +19865,7 @@ export default function StarCitizenSalvageGuideWebsite() {
           source: "refinery",
           type: "Refined",
           ts: j.pickedUpAt,
-          primary: `${Number(j.yield).toLocaleString()} SCU ${j.material}`,
+          primary: `${formatScu(j.yield)} SCU ${j.material}`,
           secondary: parts.join(" · "),
           notificationStatus: j.notificationStatus || null,
         };
@@ -23554,10 +23569,10 @@ export default function StarCitizenSalvageGuideWebsite() {
                   <div className="grid grid-cols-2 gap-2 rounded-xl border border-slate-800 bg-slate-900/40 p-3">
                     <div>
                       <div className="text-[11px] uppercase tracking-wider text-slate-500">Expected Yield</div>
-                      <div className="mt-0.5 text-sm font-bold text-emerald-300">{jobFormPreview.totalYield.toFixed(1)} SCU</div>
+                      <div className="mt-0.5 text-sm font-bold text-emerald-300">{formatScu(jobFormPreview.totalYield)} SCU</div>
                       {jobFormPreview.locationBonusRate > 0 && (
                         <div className="mt-0.5 text-[10px] text-emerald-400/80">
-                          incl. +{jobFormPreview.refineryBonusYield.toFixed(1)} SCU · {jobFormPreview.location.name} +{(jobFormPreview.locationBonusRate * 100).toFixed(0)}%
+                          incl. +{formatScu(jobFormPreview.refineryBonusYield)} SCU · {jobFormPreview.location.name} +{(jobFormPreview.locationBonusRate * 100).toFixed(0)}%
                         </div>
                       )}
                     </div>
@@ -23626,7 +23641,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                           <div className="flex items-start justify-between gap-2">
                             <div className="min-w-0">
                               <div className="font-semibold text-white truncate">{j.material}</div>
-                              <div className="text-xs text-slate-400">{Number(j.yield).toLocaleString()} SCU · {Number(j.cost).toLocaleString()} aUEC{j.location ? ` · ${j.location}` : ""}</div>
+                              <div className="text-xs text-slate-400">{formatScu(j.yield)} SCU · {Number(j.cost).toLocaleString()} aUEC{j.location ? ` · ${j.location}` : ""}</div>
                             </div>
                             <div className="shrink-0 text-right">
                               <div className="font-mono text-sm font-bold text-amber-300">{formatRemaining(j.completesAt - now)}</div>
@@ -23657,7 +23672,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                           <div className="flex items-start justify-between gap-2">
                             <div className="min-w-0">
                               <div className="font-semibold text-white truncate">{j.material}</div>
-                              <div className="text-xs text-slate-400">{Number(j.yield).toLocaleString()} SCU · {Number(j.cost).toLocaleString()} aUEC{j.location ? ` · ${j.location}` : ""}</div>
+                              <div className="text-xs text-slate-400">{formatScu(j.yield)} SCU · {Number(j.cost).toLocaleString()} aUEC{j.location ? ` · ${j.location}` : ""}</div>
                               {j.notificationStatus && (
                                 <div className="mt-1">{notificationPill(j.notificationStatus)}</div>
                               )}
@@ -24886,7 +24901,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                                   <td className="px-3 py-2 text-slate-200">{r.label}</td>
                                   <td className="px-3 py-2 text-right text-amber-300">{r.inputScu.toLocaleString(undefined, { maximumFractionDigits: 1 })}</td>
                                   <td className="px-3 py-2 text-right text-amber-200">
-                                    {isRmc ? <span className="text-slate-600">—</span> : r.refinedScu.toLocaleString(undefined, { maximumFractionDigits: 1 })}
+                                    {isRmc ? <span className="text-slate-600">—</span> : formatScu(r.refinedScu)}
                                   </td>
                                   <td className="px-3 py-2 text-right font-bold text-emerald-300">{Math.round(r.saleAuec).toLocaleString()}</td>
                                 </tr>
@@ -25088,10 +25103,10 @@ export default function StarCitizenSalvageGuideWebsite() {
                         <div className="grid grid-cols-2 gap-2 rounded-xl border border-slate-800 bg-slate-900/40 p-3">
                           <div>
                             <div className="text-[11px] uppercase tracking-wider text-slate-500">Expected Yield</div>
-                            <div className="mt-0.5 text-sm font-bold text-emerald-300">{editFormPreview.totalYield.toFixed(1)} SCU</div>
+                            <div className="mt-0.5 text-sm font-bold text-emerald-300">{formatScu(editFormPreview.totalYield)} SCU</div>
                             {editFormPreview.locationBonusRate > 0 && (
                               <div className="mt-0.5 text-[10px] text-emerald-400/80">
-                                incl. +{editFormPreview.refineryBonusYield.toFixed(1)} SCU · {editFormPreview.location.name} +{(editFormPreview.locationBonusRate * 100).toFixed(0)}%
+                                incl. +{formatScu(editFormPreview.refineryBonusYield)} SCU · {editFormPreview.location.name} +{(editFormPreview.locationBonusRate * 100).toFixed(0)}%
                               </div>
                             )}
                           </div>
@@ -25776,6 +25791,9 @@ export default function StarCitizenSalvageGuideWebsite() {
                               <th className="px-4 py-3">#</th>
                               <th className="px-4 py-3">Salvager</th>
                               <th className="px-4 py-3 text-right">SCU Refined</th>
+                              <th className="px-4 py-3 text-right">Salvage Refined</th>
+                              <th className="px-4 py-3 text-right">Pieces Refined</th>
+                              <th className="px-4 py-3 text-right">Rubble Refined</th>
                               <th className="px-4 py-3 text-right">Total Profit</th>
                             </tr>
                           </thead>
@@ -25813,7 +25831,16 @@ export default function StarCitizenSalvageGuideWebsite() {
                                   </span>
                                 </td>
                                 <td className="px-4 py-3 text-right font-bold text-amber-300">
-                                  {Number(u.scuRefined).toLocaleString(undefined, { maximumFractionDigits: 2 })} SCU
+                                  {formatScu(u.scuRefined)} SCU
+                                </td>
+                                <td className="px-4 py-3 text-right text-amber-200/90">
+                                  {formatScu(u.salvageRefined)} SCU
+                                </td>
+                                <td className="px-4 py-3 text-right text-amber-200/90">
+                                  {formatScu(u.piecesRefined)} SCU
+                                </td>
+                                <td className="px-4 py-3 text-right text-amber-200/90">
+                                  {formatScu(u.rubbleRefined)} SCU
                                 </td>
                                 <td className="px-4 py-3 text-right font-bold text-emerald-300">
                                   {Number(u.profitAuec).toLocaleString()} aUEC
@@ -28536,6 +28563,11 @@ export default function StarCitizenSalvageGuideWebsite() {
                   <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
                     <li>Crew Salvage <strong>Reclaimer</strong> roster picks up three turret stations: <strong>Manned Turret</strong>, <strong>Remote Turret 1</strong>, <strong>Remote Turret 2</strong>. Reclaimer now lists 8 stations total (was 5). Header counter updates to <code className="rounded bg-slate-800 px-1 text-cyan-200">Roles · X / 8 stations crewed</code>.</li>
                     <li>Crew Salvage <strong>Moth</strong> roster gains a <strong>Missile Operator</strong> station, slotted directly after Pilot. Moth now lists 6 stations total (was 5).</li>
+                    <li>Statistics top-salvagers leaderboard gains three per-material columns: <strong>Salvage Refined</strong>, <strong>Pieces Refined</strong>, <strong>Rubble Refined</strong>. Each cell sums the user's completed refinery jobs filtered by material, so the three columns add up to the SCU Refined cell. Sort order unchanged — still ranks by total SCU Refined.</li>
+                  </ul>
+                  <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Fixes</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li><strong>SCU yield display now locale-independent</strong> with exactly two decimals everywhere refined SCU appears (Refinery Job Orders Expected Yield + bonus subline, Edit Job preview, In Progress / Ready for Pickup cards, refinery-completion notifications, Crew Salvage refined-SCU column, Statistics leaderboard SCU columns). Previously a yield like <code className="rounded bg-slate-800 px-1 text-cyan-200">188.352 SCU</code> rendered as <code className="rounded bg-slate-800 px-1 text-cyan-200">"188,352 SCU"</code> on French / EU-locale devices (comma-as-decimal), looking like 188 thousand SCU. Display is now pinned to en-US (<code className="rounded bg-slate-800 px-1 text-cyan-200">188.35 SCU</code>) regardless of device locale. Stored ledger values unchanged — display-only fix.</li>
                   </ul>
                 </section>
 

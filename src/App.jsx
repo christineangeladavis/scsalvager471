@@ -19548,6 +19548,21 @@ export default function StarCitizenSalvageGuideWebsite() {
     setMailboxComposeOpen(true);
     setMailboxComposeStatus(null);
   };
+  // Admin-side: remove an entry from THIS admin's user-mail
+  // overview. Per-admin local state — the entry stays in the
+  // originating user's inbox (so the user-detail thread still
+  // shows it) and stays in other admins' overviews. Used when an
+  // admin has handled a user message and wants it out of their
+  // own dropdown.
+  const deleteAdminUserMail = (inboxId) => {
+    setAdminUserMailOverview((prev) => prev.filter((e) => e.id !== inboxId));
+    fetch("/api/admin/inbox-overview", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ action: "dismiss", id: inboxId }),
+    }).catch(() => {});
+  };
   const deleteMailboxMessage = (inboxId) => {
     // Optimistic remove — drop from local state first; the next
     // refreshAdminInbox() poll re-confirms with the server-filtered
@@ -21891,28 +21906,45 @@ export default function StarCitizenSalvageGuideWebsite() {
                                         })
                                       : "";
                                     return (
-                                      <button
+                                      <div
                                         key={`u-${m.id}`}
-                                        type="button"
-                                        onClick={() => {
-                                          setIsMailboxOpen(false);
-                                          openAdminUserDetail({
-                                            userId: m.userId,
-                                            username: m.username,
-                                          });
-                                        }}
-                                        className="block w-full border-b border-amber-500/20 px-3 py-2.5 text-left last:border-b-0 hover:bg-amber-500/10"
+                                        className="border-b border-amber-500/20 px-3 py-2.5 last:border-b-0 hover:bg-amber-500/10"
                                       >
-                                        <div className="flex items-center justify-between gap-2">
-                                          <span className="text-xs font-bold text-amber-200">
-                                            {m.username}
-                                          </span>
-                                          <span className="text-[10px] text-slate-500">{ts}</span>
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            setIsMailboxOpen(false);
+                                            openAdminUserDetail({
+                                              userId: m.userId,
+                                              username: m.username,
+                                            });
+                                          }}
+                                          className="block w-full text-left"
+                                        >
+                                          <div className="flex items-center justify-between gap-2">
+                                            <span className="text-xs font-bold text-amber-200">
+                                              {m.username}
+                                            </span>
+                                            <span className="text-[10px] text-slate-500">{ts}</span>
+                                          </div>
+                                          <div className="mt-0.5 line-clamp-2 break-words text-xs text-slate-200">
+                                            {m.body}
+                                          </div>
+                                        </button>
+                                        <div className="mt-1 flex justify-end">
+                                          <button
+                                            type="button"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              deleteAdminUserMail(m.id);
+                                            }}
+                                            className="rounded border border-rose-500/30 bg-rose-500/10 px-2 py-0.5 text-[10px] font-semibold text-rose-300 hover:border-rose-400/60 hover:bg-rose-500/20"
+                                            title="Remove from your overview (still visible in the user's thread)"
+                                          >
+                                            Delete
+                                          </button>
                                         </div>
-                                        <div className="mt-0.5 line-clamp-2 break-words text-xs text-slate-200">
-                                          {m.body}
-                                        </div>
-                                      </button>
+                                      </div>
                                     );
                                   })}
                                 </div>

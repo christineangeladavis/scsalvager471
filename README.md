@@ -17,6 +17,7 @@ Changes:
 - The Home-tab yellow announcement banner is now driven by a dedicated **Post Announcement** action, separate from per-user broadcasts. Broadcasts still arrive in your Messages mailbox; announcements live on the Home banner only. The banner is purely time-gated — survives page refresh and re-login, hides automatically **24 hours** after the admin posts it.
 - Messages you send to SCSalvager Admin now surface directly in the admin's Messages mailbox (with your username + a preview), so admins can see and respond to incoming mail without having to dig per-user. Admins continue to see the full thread + history when they open your user record.
 - Both **users and admins** can **delete** messages from their inbox. User deletes drop the message from your own view (admins keep a moderation-side record so context survives). Admin deletes drop a message from that admin's overview (the user's own thread is unaffected).
+- **SCSalvager Desktop** is now downloadable from **Settings → Desktop App**. Native client (Windows / macOS arm64 / Linux) wraps the site with a system tray, refinery countdown badge, OS toasts when a job is ready, F9 / tray screenshot capture for the in-game refinery setup screen (uses the existing crop modal before upload), an offline read-only ledger cache, and silent auto-update on launch.
 
 UPDATE 5/8/2026 v2.7.3
 

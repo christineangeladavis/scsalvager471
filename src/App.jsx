@@ -19304,7 +19304,7 @@ export default function StarCitizenSalvageGuideWebsite() {
 
       {/* Scrollable UI content */}
       <div
-        className={`relative ${isTauri ? "px-3 py-3" : "mx-auto max-w-7xl px-4 py-8 md:px-8"}`}
+        className={`relative ${isTauri ? "pl-44 px-3 py-3" : "mx-auto max-w-7xl px-4 py-8 md:px-8"}`}
         style={{ zIndex: 10, flex: 1, display: "flex", flexDirection: "column", width: "100%" }}
       >
         {updateAvailable && !updateModalDismissed && (() => {
@@ -19967,8 +19967,32 @@ export default function StarCitizenSalvageGuideWebsite() {
           </div>
         </header>
 
-        {/* --- Tab navigation --- */}
-        <nav className="mb-6 flex gap-1 border-b border-cyan-500/25" role="tablist">
+        {/* --- Tab navigation ---
+            Layout split:
+              - Web → top horizontal bar under the header
+              - Tauri → fixed-position vertical sidebar pinned
+                to the left edge, full viewport height, scrolls
+                independently of content. Wrapper above gets a
+                matching pl-44 so content stays clear of the
+                176px sidebar. */}
+        <nav
+          className={
+            isTauri
+              ? "fixed left-0 top-0 bottom-0 z-30 flex w-44 flex-col gap-0.5 overflow-y-auto border-r border-cyan-500/25 bg-slate-950/95 p-2 backdrop-blur"
+              : "mb-6 flex gap-1 border-b border-cyan-500/25"
+          }
+          role="tablist"
+        >
+          {isTauri && (
+            <div className="mb-2 border-b border-slate-700/40 px-2 py-2">
+              <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-300">
+                SCSalvager
+              </div>
+              <div className="text-[9px] text-slate-500">
+                {patchStatus?.version ? `Patch ${patchStatus.version}` : "Desktop"}
+              </div>
+            </div>
+          )}
           {[
             { id: "home", label: "Home" },
             { id: "ships", label: "Ship Details" },
@@ -19990,6 +20014,16 @@ export default function StarCitizenSalvageGuideWebsite() {
             // anything useful; show a small lock icon + tooltip while
             // logged out so the requirement is visible at a glance.
             const showLedgerLock = (tab.id === "ledger" || tab.id === "stats") && !user && !authLoading;
+            const horizontalCls = `-mb-px inline-flex items-center gap-1.5 border-b-2 px-3 py-3 text-xs font-semibold uppercase tracking-wider transition sm:px-5 sm:text-sm sm:tracking-[0.2em] ${
+              isActive
+                ? "border-cyan-400 text-cyan-200"
+                : "border-transparent text-slate-400 hover:border-cyan-500/40 hover:text-slate-200"
+            }`;
+            const verticalCls = `inline-flex items-center justify-between gap-2 rounded-md border-l-4 px-3 py-2 text-xs font-semibold tracking-wider transition ${
+              isActive
+                ? "border-cyan-400 bg-cyan-500/15 text-cyan-100"
+                : "border-transparent text-slate-400 hover:bg-slate-800/50 hover:text-slate-200"
+            }`;
             return (
               <button
                 key={tab.id}
@@ -19998,13 +20032,9 @@ export default function StarCitizenSalvageGuideWebsite() {
                 aria-selected={isActive}
                 onClick={() => setActiveTab(tab.id)}
                 title={showLedgerLock ? "Requires login" : undefined}
-                className={`-mb-px inline-flex items-center gap-1.5 border-b-2 px-3 py-3 text-xs font-semibold uppercase tracking-wider transition sm:px-5 sm:text-sm sm:tracking-[0.2em] ${
-                  isActive
-                    ? "border-cyan-400 text-cyan-200"
-                    : "border-transparent text-slate-400 hover:border-cyan-500/40 hover:text-slate-200"
-                }`}
+                className={isTauri ? verticalCls : horizontalCls}
               >
-                {tab.label}
+                <span>{tab.label}</span>
                 {showLedgerLock && (
                   <svg
                     viewBox="0 0 24 24"

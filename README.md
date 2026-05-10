@@ -30,6 +30,7 @@ Removed:
 Fixes:
 - **Admin User mail now groups by sender.** Ten messages from the same user previously rendered as ten separate rows; now they collapse into a single row showing the latest preview plus a count badge. Mark as read clears all messages from that user from your admin overview (their thread stays untouched).
 - **Inbox message rows now show consistent "Mark as read" labeling** instead of mixing "Dismiss" / "Delete all" / "Mark read" across the header pill, the Inbox tab list, and the admin user mail block.
+- **Mark as read no longer makes the message disappear.** Admin User mail entries stay visible in the Inbox tab after Mark as read — the row goes muted (opacity-60, neutral count badge) instead of being removed. The unread badge on the mailbox pill drops to the unread count only; the header pill's User mail block hides fully-read groups so it stays a fresh-stuff feed.
 
 UPDATE 5/8/2026 v2.7.3
 

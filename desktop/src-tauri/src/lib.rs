@@ -167,11 +167,19 @@ fn ensure_session_token(app: &AppHandle) -> Option<String> {
 // -----------------------------------------------------------------
 
 fn build_tray(app: &AppHandle) -> tauri::Result<()> {
+    let capture = MenuItem::with_id(
+        app,
+        "capture",
+        "Capture refinery screenshot",
+        true,
+        None::<&str>,
+    )?;
+    let sep0 = PredefinedMenuItem::separator(app)?;
     let show = MenuItem::with_id(app, "show", "Show window", true, None::<&str>)?;
     let hide = MenuItem::with_id(app, "hide", "Hide window", true, None::<&str>)?;
     let sep = PredefinedMenuItem::separator(app)?;
     let quit = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
-    let menu = Menu::with_items(app, &[&show, &hide, &sep, &quit])?;
+    let menu = Menu::with_items(app, &[&capture, &sep0, &show, &hide, &sep, &quit])?;
 
     // Embed the PNG at compile time. default_window_icon() returns
     // None when no `icon` field is set on the window in
@@ -186,6 +194,16 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
         .menu(&menu)
         .show_menu_on_left_click(false)
         .on_menu_event(|app, event| match event.id.as_ref() {
+            "capture" => {
+                // EAC blocks the F9 global hotkey while Star
+                // Citizen has focus, so the tray menu acts as
+                // the reliable capture trigger. xcap reads the
+                // SC window's pixels even when SC is backgrounded
+                // (Windows BitBlt against the window's backbuffer
+                // works for non-focused windows), so the user
+                // only needs to alt-tab once + click this item.
+                handle_screenshot_hotkey(app.clone());
+            }
             "show" => {
                 if let Some(w) = app.get_webview_window("main") {
                     let _ = w.show();

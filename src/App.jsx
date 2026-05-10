@@ -20249,6 +20249,37 @@ export default function StarCitizenSalvageGuideWebsite() {
             return;
           } catch {}
         }
+        // Desktop offline fallback — if Tauri seeded a cached
+        // ledger payload from a previous online session, hydrate
+        // from that so the user can browse last-known state
+        // read-only. Banner via setLedgerSaveError signals the
+        // stale data + age. Saves are blocked because
+        // hydratedForUserRef.current never gets set, so the user
+        // can't accidentally overwrite cloud state with cached
+        // data.
+        if (typeof window !== "undefined" &&
+            window.__SCSALVAGER_DESKTOP__ &&
+            typeof window.__SCSALVAGER_DESKTOP__.ledgerCache === "string") {
+          try {
+            const data = JSON.parse(window.__SCSALVAGER_DESKTOP__.ledgerCache);
+            setRefineryJobs(Array.isArray(data.refineryJobs) ? data.refineryJobs : []);
+            setSellOrders(
+              Array.isArray(data.sellOrders)
+                ? data.sellOrders.map(canonicalizeSellOrder)
+                : []
+            );
+            setCrewSessions(Array.isArray(data.crewSessions) ? data.crewSessions : []);
+            const ts = Number(window.__SCSALVAGER_DESKTOP__.ledgerCacheUpdatedAt || 0);
+            const ageStr = ts
+              ? ` (cached ${new Date(ts).toLocaleString()})`
+              : "";
+            setLedgerSaveError(
+              `Offline — showing cached ledger${ageStr}. Saves disabled until you're back online.`
+            );
+            setIsLedgerLoading(false);
+            return;
+          } catch {}
+        }
         // Load failed — leave ref as null so we never save empty data back.
         setLedgerSaveError("Could not load your ledger. Refresh to retry.");
         setIsLedgerLoading(false);

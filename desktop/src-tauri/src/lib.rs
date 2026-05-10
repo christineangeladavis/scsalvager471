@@ -44,6 +44,7 @@ const SESSION_COOKIE: &str = "scs_session";
 const SCSALVAGER_ORIGIN: &str = "https://scsalvager.net";
 const POLL_INTERVAL_SECS: u64 = 30;
 const AUTH_FILE_NAME: &str = "auth.json";
+const LEDGER_CACHE_FILE_NAME: &str = "ledger-cache.json";
 // Window-title substring used to find the Star Citizen window
 // among all visible OS windows. Case-insensitive match. Will
 // match "Star Citizen" but not "RSI Launcher".
@@ -130,6 +131,60 @@ fn read_session_token(app: &AppHandle) -> Option<String> {
     let bytes = std::fs::read(&path).ok()?;
     let parsed: serde_json::Value = serde_json::from_slice(&bytes).ok()?;
     parsed.get("token")?.as_str().map(|s| s.to_string())
+}
+
+// -----------------------------------------------------------------
+// Offline ledger cache — Phase 5 #3.
+// -----------------------------------------------------------------
+// Background poll mirrors every successful /api/ledger response to
+// <appData>/ledger-cache.json and pushes the JSON onto the WebView
+// bridge via window.__SCSALVAGER_DESKTOP__.ledgerCache. The web
+// app reads the bridge value as a fallback whenever the network
+// fetch fails (laptop in a tunnel, scsalvager.net down, etc.) so
+// the user can browse their last-known ledger state read-only.
+
+fn ledger_cache_path(app: &AppHandle) -> Option<PathBuf> {
+    app.path()
+        .app_data_dir()
+        .ok()
+        .map(|d| d.join(LEDGER_CACHE_FILE_NAME))
+}
+
+fn write_ledger_cache(app: &AppHandle, raw: &str) {
+    let Some(path) = ledger_cache_path(app) else { return };
+    if let Some(parent) = path.parent() {
+        let _ = std::fs::create_dir_all(parent);
+    }
+    let _ = std::fs::write(&path, raw);
+    push_ledger_cache_to_webview(app, raw);
+}
+
+fn push_ledger_cache_to_webview(app: &AppHandle, raw: &str) {
+    let Some(window) = app.get_webview_window("main") else { return };
+    // Embed the JSON safely as a string literal — outer
+    // serde_json::to_string handles every escape so the eval
+    // can't break on quotes / backslashes / newlines in the
+    // ledger payload.
+    let escaped = match serde_json::to_string(raw) {
+        Ok(s) => s,
+        Err(_) => return,
+    };
+    let js = format!(
+        r#"
+        (function () {{
+            var b = window.__SCSALVAGER_DESKTOP__ = window.__SCSALVAGER_DESKTOP__ || {{}};
+            b.ledgerCache = {escaped};
+            b.ledgerCacheUpdatedAt = Date.now();
+        }})();
+        "#,
+    );
+    let _ = window.eval(&js);
+}
+
+fn seed_ledger_cache_into_webview(app: &AppHandle) {
+    let Some(path) = ledger_cache_path(app) else { return };
+    let Ok(raw) = std::fs::read_to_string(&path) else { return };
+    push_ledger_cache_to_webview(app, &raw);
 }
 
 // Bridge: when the user signs in via the in-WebView Discord OAuth
@@ -392,7 +447,13 @@ async fn poll_once(
     if !res.status().is_success() {
         return Err(format!("status {}", res.status()));
     }
-    let body: LedgerResponse = res.json().await.map_err(|e| format!("parse: {e}"))?;
+    // Capture the raw response text first so we can mirror it to
+    // the on-disk + WebView cache before parsing. Lets the web
+    // app fall back to this exact byte-for-byte payload when
+    // online fetch fails later.
+    let raw = res.text().await.map_err(|e| format!("read body: {e}"))?;
+    write_ledger_cache(app, &raw);
+    let body: LedgerResponse = serde_json::from_str(&raw).map_err(|e| format!("parse: {e}"))?;
     let now = now_millis();
 
     // Refresh tray tooltip with fresh state every poll.
@@ -787,6 +848,11 @@ pub fn run() {
                     }
                 }
             }
+
+            // Seed the WebView with any cached ledger payload from
+            // a previous session so the offline fallback is
+            // available before the first poll completes.
+            seed_ledger_cache_into_webview(app.handle());
 
             // Kick off the background poll loop. Sleeps 30 s between
             // iterations; no-op when no session token on disk.

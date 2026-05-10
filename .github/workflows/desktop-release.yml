@@ -98,6 +98,30 @@ jobs:
           # (no .sig sibling to ship).
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+
+          # Windows Authenticode code signing — eliminates the
+          # SmartScreen "Windows protected your PC" warning on
+          # install. Operator buys an OV/EV cert from DigiCert /
+          # Sectigo, exports as .pfx, then sets:
+          #   WINDOWS_CERTIFICATE = base64-encoded .pfx contents
+          #   WINDOWS_CERTIFICATE_PASSWORD = pfx export password
+          # as GitHub Actions secrets. tauri-action picks them up
+          # automatically. Without these set, Windows builds ship
+          # unsigned and SmartScreen will warn first-time
+          # installers.
+          WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
+          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+
+          # macOS Apple notarization — eliminates the "unidentified
+          # developer" Gatekeeper warning. Requires an Apple
+          # Developer Program membership (~$99/yr).
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           projectPath: desktop

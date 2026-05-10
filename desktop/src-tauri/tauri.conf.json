@@ -30,6 +30,9 @@
   "bundle": {
     "active": true,
     "targets": ["msi", "nsis", "deb", "appimage", "dmg"],
+    "publisher": "SCSalvager.net",
+    "homepage": "https://scsalvager.net",
+    "copyright": "© 2026 SCSalvager.net",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -39,7 +42,14 @@
     ],
     "category": "Utility",
     "shortDescription": "SCSalvager Desktop — refinery + sales tracker for Star Citizen.",
-    "longDescription": "Tauri shell that wraps scsalvager.net with native tray, hotkeys, refinery countdown badge, and screenshot upload from the Star Citizen window."
+    "longDescription": "Tauri shell that wraps scsalvager.net with native tray, hotkeys, refinery countdown badge, and screenshot upload from the Star Citizen window.",
+    "windows": {
+      "digestAlgorithm": "sha256",
+      "timestampUrl": "http://timestamp.digicert.com",
+      "wix": {
+        "language": ["en-US"]
+      }
+    }
   },
   "plugins": {
     "deep-link": {

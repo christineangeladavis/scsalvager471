@@ -28,6 +28,66 @@ Roadmap (see `desktop/PLAN.md`):
   (`.github/workflows/desktop-release.yml`) builds Win MSI / macOS
   DMG / Linux AppImage on tag push.
 
+## Windows SmartScreen / "not safe" warning
+
+Unsigned Windows binaries trigger the SmartScreen "Windows protected
+your PC" prompt on first launch. Two fixes:
+
+### Long-term: Authenticode code-signing certificate
+
+Eliminates the warning entirely.
+
+1. Buy a code-signing cert. Three tiers:
+   - **OV (Organization Validation)** ~$100–200/yr (Sectigo, DigiCert).
+     Cheaper, but SmartScreen may still warn until your binary
+     accumulates reputation (~thousands of installs over weeks).
+   - **EV (Extended Validation)** ~$300–500/yr. Hardware token
+     ships physically. SmartScreen passes immediately on first
+     install. Best UX.
+   - **Azure Trusted Signing** ~$10/month flat (Microsoft).
+     Cloud-hosted signing service, no token to manage.
+2. Export the cert as a password-protected `.pfx` file.
+3. Base64-encode the `.pfx`:
+   ```powershell
+   $bytes = [IO.File]::ReadAllBytes("C:\path\to\cert.pfx")
+   [Convert]::ToBase64String($bytes) | Set-Clipboard
+   ```
+4. Add to GitHub Actions secrets (Settings → Secrets and
+   variables → Actions):
+   - `WINDOWS_CERTIFICATE` = the base64 string from step 3
+   - `WINDOWS_CERTIFICATE_PASSWORD` = the .pfx export password
+5. Push a new `desktop-v*` tag. tauri-action picks up the secrets
+   automatically and signs the .msi + .exe.
+
+### Short-term: User workaround
+
+Until a cert is in place, instruct downloaders:
+
+> When you run the installer, Windows will show "Windows protected
+> your PC". Click **More info** → **Run anyway**. You only need to
+> do this once — subsequent updates auto-apply via the in-app
+> updater.
+
+Document the workaround on the download landing page on
+scsalvager.net and in the GitHub Release body.
+
+## macOS Gatekeeper / "unidentified developer" warning
+
+Same situation on macOS: unsigned `.dmg` triggers the "cannot be
+opened because the developer cannot be verified" alert.
+
+Fix: Apple Developer Program ($99/yr). Add these GitHub Actions
+secrets:
+- `APPLE_CERTIFICATE` (base64-encoded .p12)
+- `APPLE_CERTIFICATE_PASSWORD`
+- `APPLE_SIGNING_IDENTITY` (e.g. "Developer ID Application: Your Name (TEAMID)")
+- `APPLE_ID` (your Apple ID email)
+- `APPLE_PASSWORD` (an app-specific password from appleid.apple.com)
+- `APPLE_TEAM_ID`
+
+User workaround in the meantime: right-click the .app → Open →
+Open. Confirm the "unidentified developer" prompt once.
+
 ## Signed releases — one-time setup
 
 The updater pipeline is wired but won't sign anything until the

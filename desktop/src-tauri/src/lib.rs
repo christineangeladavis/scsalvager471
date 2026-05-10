@@ -17,6 +17,7 @@
 // commented out below so the diff is small when we get there.
 
 use tauri::Manager;
+use tauri_plugin_deep_link::DeepLinkExt;
 use url::Url;
 
 const SESSION_COOKIE: &str = "scs_session";

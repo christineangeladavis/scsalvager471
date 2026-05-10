@@ -25047,7 +25047,11 @@ export default function StarCitizenSalvageGuideWebsite() {
                 </div>
               )}
 
-              {/* Personal inbox list */}
+              {/* Personal inbox list — admin↔this-user thread.
+                  Non-admin users see this as their primary surface.
+                  Admins also see it (covers admin-to-admin mail) but
+                  the grouped user-mail block below carries the bulk
+                  of the volume. */}
               <h3 className="mt-5 text-sm font-semibold text-cyan-200">
                 From SCSalvager Admin · {mailboxMessages.length}
               </h3>
@@ -25106,88 +25110,91 @@ export default function StarCitizenSalvageGuideWebsite() {
                   })}
                 </ul>
               )}
-            </div>
 
-            {/* Admin section: aggregated user → admin mail */}
-            {user?.isAdmin && (
-              <div className="rounded-3xl border border-amber-500/30 bg-amber-500/5 p-5 shadow-xl shadow-amber-950/20 backdrop-blur">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-xl font-bold text-amber-300">User mail · {groupedUserMail.length} {groupedUserMail.length === 1 ? "user" : "users"} · {adminUserMailOverview.length} msg</h2>
-                    <p className="mt-1 text-sm text-slate-400">
-                      Incoming messages from users grouped by sender — latest preview only. Click an entry to open that user's full thread + composer in the user-detail modal.
-                    </p>
+              {/* Admin-only: aggregated user → admin mail, merged
+                  inline with the personal inbox. Same Inbox surface,
+                  not a separate card — one place for every incoming
+                  message the admin needs to action. */}
+              {user?.isAdmin && (
+                <>
+                  <div className="mt-6 flex items-center justify-between gap-2">
+                    <h3 className="text-sm font-semibold text-amber-300">
+                      User mail · {groupedUserMail.length} {groupedUserMail.length === 1 ? "user" : "users"} · {adminUserMailOverview.length} msg
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={refreshAdminUserMailOverview}
+                      className="rounded border border-slate-700 bg-slate-800/60 px-2 py-1 text-[10px] font-semibold text-slate-300 hover:border-amber-400/40 hover:text-amber-200"
+                    >
+                      Refresh
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={refreshAdminUserMailOverview}
-                    className="rounded border border-slate-700 bg-slate-800/60 px-2 py-1 text-[10px] font-semibold text-slate-300 hover:border-amber-400/40 hover:text-amber-200"
-                  >
-                    Refresh
-                  </button>
-                </div>
-                {groupedUserMail.length === 0 ? (
-                  <div className="mt-3 rounded-2xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">
-                    No user mail in flight.
-                  </div>
-                ) : (
-                  <ul className="mt-3 space-y-2">
-                    {groupedUserMail.map((g) => {
-                      const latest = g.messages[g.messages.length - 1];
-                      const latestTs = g.latestTs ? new Date(g.latestTs).toLocaleString() : "";
-                      return (
-                        <li
-                          key={g.userId}
-                          className="rounded-md border border-amber-500/25 bg-slate-900/60 px-3 py-2 text-sm"
-                        >
-                          <div className="flex items-center justify-between gap-2">
-                            <button
-                              type="button"
-                              onClick={() =>
-                                openAdminUserDetail({ userId: g.userId, username: g.username })
-                              }
-                              className="flex items-center gap-1.5 text-xs font-bold text-amber-200 hover:underline"
-                            >
-                              {g.username}
-                              <span className="rounded-full border border-amber-400/50 bg-amber-500/15 px-1.5 text-[10px] font-bold text-amber-100">
-                                {g.messages.length}
-                              </span>
-                            </button>
-                            <span className="text-[10px] text-slate-500">latest · {latestTs}</span>
-                          </div>
-                          {/* Latest-only preview. Full per-user thread
-                              (oldest -> newest) lives in the user
-                              detail modal, reached via Open thread. */}
-                          <div className="mt-1 whitespace-pre-wrap break-words text-slate-200">
-                            {latest?.body}
-                          </div>
-                          <div className="mt-2 flex flex-wrap gap-1.5">
-                            <button
-                              type="button"
-                              onClick={() =>
-                                openAdminUserDetail({ userId: g.userId, username: g.username })
-                              }
-                              className="rounded border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-200 hover:bg-amber-500/20"
-                            >
-                              Open thread
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                for (const m of g.messages) deleteAdminUserMail(m.id);
-                              }}
-                              className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
-                            >
-                              Mark as read
-                            </button>
-                          </div>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )}
-              </div>
-            )}
+                  <p className="mt-1 text-xs text-slate-500">
+                    Incoming messages from users grouped by sender — latest preview only. Click an entry to open that user's full thread + composer.
+                  </p>
+                  {groupedUserMail.length === 0 ? (
+                    <div className="mt-2 rounded-2xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">
+                      No user mail in flight.
+                    </div>
+                  ) : (
+                    <ul className="mt-2 space-y-2">
+                      {groupedUserMail.map((g) => {
+                        const latest = g.messages[g.messages.length - 1];
+                        const latestTs = g.latestTs ? new Date(g.latestTs).toLocaleString() : "";
+                        return (
+                          <li
+                            key={g.userId}
+                            className="rounded-md border border-amber-500/25 bg-slate-900/60 px-3 py-2 text-sm"
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  openAdminUserDetail({ userId: g.userId, username: g.username })
+                                }
+                                className="flex items-center gap-1.5 text-xs font-bold text-amber-200 hover:underline"
+                              >
+                                {g.username}
+                                <span className="rounded-full border border-amber-400/50 bg-amber-500/15 px-1.5 text-[10px] font-bold text-amber-100">
+                                  {g.messages.length}
+                                </span>
+                              </button>
+                              <span className="text-[10px] text-slate-500">latest · {latestTs}</span>
+                            </div>
+                            {/* Latest-only preview. Full per-user thread
+                                (oldest -> newest) lives in the user
+                                detail modal, reached via Open thread. */}
+                            <div className="mt-1 whitespace-pre-wrap break-words text-slate-200">
+                              {latest?.body}
+                            </div>
+                            <div className="mt-2 flex flex-wrap gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  openAdminUserDetail({ userId: g.userId, username: g.username })
+                                }
+                                className="rounded border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-200 hover:bg-amber-500/20"
+                              >
+                                Open thread
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  for (const m of g.messages) deleteAdminUserMail(m.id);
+                                }}
+                                className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                              >
+                                Mark as read
+                              </button>
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </>
+              )}
+            </div>
           </div>
         )}
 

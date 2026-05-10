@@ -240,9 +240,19 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
         true,
         None::<&str>,
     )?;
+    let crew_widget = MenuItem::with_id(
+        app,
+        "toggle_crew_widget",
+        "Toggle crew salvage widget (always on top)",
+        true,
+        None::<&str>,
+    )?;
     let sep = PredefinedMenuItem::separator(app)?;
     let quit = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
-    let menu = Menu::with_items(app, &[&capture, &sep0, &show, &hide, &compact, &sep, &quit])?;
+    let menu = Menu::with_items(
+        app,
+        &[&capture, &sep0, &show, &hide, &compact, &crew_widget, &sep, &quit],
+    )?;
 
     // Embed the PNG at compile time. default_window_icon() returns
     // None when no `icon` field is set on the window in
@@ -280,35 +290,13 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
                 }
             }
             "toggle_compact" => {
-                // Compact mode: shrink to a refinery-countdown
-                // card, set always_on_top, navigate the WebView
-                // to the #compact hash route. App.jsx detects
-                // the hash and renders the stripped-down view.
-                // Toggle off restores normal size + drops the
-                // top-most flag.
-                if let Some(w) = app.get_webview_window("main") {
-                    let currently_on_top = w.is_always_on_top().unwrap_or(false);
-                    if currently_on_top {
-                        let _ = w.set_always_on_top(false);
-                        let _ = w.set_size(tauri::LogicalSize::new(1400.0, 900.0));
-                        let _ = w.eval(
-                            "if (window.location.hash === '#compact') { \
-                                window.location.hash = ''; \
-                            }",
-                        );
-                    } else {
-                        let _ = w.set_always_on_top(true);
-                        let _ = w.set_size(tauri::LogicalSize::new(380.0, 220.0));
-                        let _ = w.eval(
-                            "if (window.location.hash !== '#compact') { \
-                                window.location.hash = '#compact'; \
-                            }",
-                        );
-                        let _ = w.show();
-                        let _ = w.unminimize();
-                        let _ = w.set_focus();
-                    }
-                }
+                toggle_widget_mode(app, "#compact", 380.0, 220.0);
+            }
+            "toggle_crew_widget" => {
+                // Crew salvage live summary widget — bigger than
+                // compact because it has more rows (3 SCU
+                // buckets + per-role contribution + split aUEC).
+                toggle_widget_mode(app, "#crew-widget", 420.0, 320.0);
             }
             "quit" => {
                 app.exit(0);
@@ -344,6 +332,32 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
 fn update_tray_tooltip(app: &AppHandle, tooltip: &str) {
     if let Some(tray) = app.tray_by_id("main") {
         let _ = tray.set_tooltip(Some(tooltip));
+    }
+}
+
+// Shared "always-on-top widget mode" toggle. Used by the compact
+// refinery card AND the crew salvage live summary, with each
+// providing its own hash route + window dimensions. Tracking
+// toggle state via is_always_on_top() means clicking either
+// menu item exits whichever widget is currently up — switching
+// modes works in two clicks (off + on) without any extra state.
+fn toggle_widget_mode(app: &AppHandle, hash: &str, width: f64, height: f64) {
+    let Some(w) = app.get_webview_window("main") else { return };
+    let currently_on_top = w.is_always_on_top().unwrap_or(false);
+    if currently_on_top {
+        let _ = w.set_always_on_top(false);
+        let _ = w.set_size(tauri::LogicalSize::new(1400.0, 900.0));
+        let _ = w.eval("if (window.location.hash !== '') { window.location.hash = ''; }");
+    } else {
+        let _ = w.set_always_on_top(true);
+        let _ = w.set_size(tauri::LogicalSize::new(width, height));
+        let js = format!(
+            "if (window.location.hash !== '{hash}') {{ window.location.hash = '{hash}'; }}"
+        );
+        let _ = w.eval(&js);
+        let _ = w.show();
+        let _ = w.unminimize();
+        let _ = w.set_focus();
     }
 }
 

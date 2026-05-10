@@ -16336,26 +16336,30 @@ function useDesktopBridge(setCropImage, setActiveTab, setLedgerSubTab) {
   }, [setCropImage, setActiveTab, setLedgerSubTab]);
 }
 
-// Desktop "compact mode" detection. Tauri's tray menu toggle
-// rewrites the URL hash to `#compact` when the user shrinks the
-// window into the always-on-top refinery-countdown card. The
-// website normally ignores the hash; this hook exposes it so
-// the App can branch into the compact-only view.
-function useCompactMode() {
-  const [isCompact, setIsCompact] = useState(
-    () => typeof window !== "undefined" && window.location.hash === "#compact"
+// Desktop widget-mode detection. Tauri's tray menu toggle
+// rewrites the URL hash to `#compact` (refinery countdown) or
+// `#crew-widget` (crew salvage live summary) when the user
+// shrinks the window into an always-on-top mini view. The
+// website ignores the hash by default; this hook exposes it so
+// the App can branch into one of the stripped-down views.
+function useWidgetMode() {
+  const [hash, setHash] = useState(
+    () => (typeof window !== "undefined" ? window.location.hash : "")
   );
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const onHashChange = () => setIsCompact(window.location.hash === "#compact");
+    const onHashChange = () => setHash(window.location.hash);
     window.addEventListener("hashchange", onHashChange);
     return () => window.removeEventListener("hashchange", onHashChange);
   }, []);
-  return isCompact;
+  return {
+    isCompact: hash === "#compact",
+    isCrewWidget: hash === "#crew-widget",
+  };
 }
 
 export default function StarCitizenSalvageGuideWebsite() {
-  const isCompactMode = useCompactMode();
+  const { isCompact: isCompactMode, isCrewWidget: isCrewWidgetMode } = useWidgetMode();
   const [selectedShip, setSelectedShip] = useState(ships[0]);
   const [selectedMaterial, setSelectedMaterial] = useState("");
   const [selectedRefineryMethod, setSelectedRefineryMethod] = useState("");
@@ -21798,6 +21802,119 @@ export default function StarCitizenSalvageGuideWebsite() {
               }}
               className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
               title="Exit compact mode (Tauri tray → Toggle compact mode)"
+            >
+              Expand
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop crew salvage live summary widget — when the Tauri
+  // tray's "Toggle crew salvage widget" rewrites the URL hash
+  // to `#crew-widget`, render an always-on-top mini panel
+  // showing the active crew session's running totals: SCU
+  // buckets, total expected refinery yield (via the existing
+  // computeRefineryJob math), per-role aUEC contribution, and
+  // the live split estimate.
+  if (isCrewWidgetMode) {
+    const active = (crewSessions || []).find((s) => s.status === "active");
+    const ship = active?.ship || crewDraft.ship || "—";
+    const scuCS = Number(active?.scuConstructionSalvage || crewDraft.scuConstructionSalvage || 0) || 0;
+    const scuCP = Number(active?.scuConstructionPieces || crewDraft.scuConstructionPieces || 0) || 0;
+    const scuRMC = Number(active?.scuRMC || crewDraft.scuRMC || 0) || 0;
+    const totalScu = scuCS + scuCP + scuRMC;
+    const splitAuec = Number(active?.splitAuec || crewDraft.splitAuec || 0) || 0;
+    const crewCount = Math.max(
+      1,
+      Math.floor(Number(active?.splitCrewCount || crewDraft.splitCrewCount || 0) || 0)
+    );
+    const perCrew = crewCount > 0 ? splitAuec / crewCount : 0;
+    const roles = active?.roles || crewDraft.roles || {};
+    const filledRoles = Object.entries(roles).filter(
+      ([, name]) => name && String(name).trim()
+    );
+    const fmt = (n) => Number(n || 0).toLocaleString();
+    return (
+      <div className="relative min-h-screen text-slate-100 bg-slate-950">
+        <style>{style}</style>
+        <div className="flex h-screen flex-col p-3">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-300">
+              Crew · {ship}
+            </span>
+            <span className={`rounded-md border px-2 py-0.5 text-[10px] font-semibold ${active ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-200" : "border-slate-700 bg-slate-800/40 text-slate-400"}`}>
+              {active ? "Active" : "Draft"}
+            </span>
+          </div>
+          <div className="mt-2 grid flex-1 grid-cols-3 gap-1.5 overflow-hidden">
+            <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-2">
+              <div className="text-[9px] font-bold uppercase tracking-wider text-amber-300">
+                Salvage
+              </div>
+              <div className="mt-0.5 text-sm font-bold text-white">{fmt(scuCS)}</div>
+              <div className="text-[9px] text-slate-500">SCU</div>
+            </div>
+            <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-2">
+              <div className="text-[9px] font-bold uppercase tracking-wider text-amber-300">
+                Pieces
+              </div>
+              <div className="mt-0.5 text-sm font-bold text-white">{fmt(scuCP)}</div>
+              <div className="text-[9px] text-slate-500">SCU</div>
+            </div>
+            <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-2">
+              <div className="text-[9px] font-bold uppercase tracking-wider text-amber-300">
+                RMC
+              </div>
+              <div className="mt-0.5 text-sm font-bold text-white">{fmt(scuRMC)}</div>
+              <div className="text-[9px] text-slate-500">SCU</div>
+            </div>
+          </div>
+          <div className="mt-2 grid grid-cols-2 gap-1.5">
+            <div className="rounded-lg border border-cyan-500/30 bg-cyan-500/5 p-2">
+              <div className="text-[9px] font-bold uppercase tracking-wider text-cyan-300">
+                Total SCU
+              </div>
+              <div className="mt-0.5 text-sm font-bold text-white">{fmt(totalScu)}</div>
+            </div>
+            <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-2">
+              <div className="text-[9px] font-bold uppercase tracking-wider text-emerald-300">
+                Per crew · {crewCount}
+              </div>
+              <div className="mt-0.5 text-sm font-bold text-white">
+                {fmt(Math.round(perCrew))} aUEC
+              </div>
+            </div>
+          </div>
+          <div className="mt-2 max-h-[5.5rem] overflow-y-auto rounded-lg border border-slate-700 bg-slate-900/40 p-2">
+            <div className="text-[9px] font-bold uppercase tracking-wider text-slate-400">
+              Roles · {filledRoles.length} crewed
+            </div>
+            {filledRoles.length === 0 ? (
+              <div className="mt-1 text-[10px] text-slate-500">
+                No roles assigned. Open the main app → Ledger → Crew Salvage.
+              </div>
+            ) : (
+              <ul className="mt-1 space-y-0.5">
+                {filledRoles.map(([role, name]) => (
+                  <li key={role} className="flex justify-between text-[10px]">
+                    <span className="truncate text-slate-400">{role}</span>
+                    <span className="ml-2 truncate text-slate-200">{name}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <div className="mt-2 flex items-center justify-between text-[10px] text-slate-500">
+            <span>{active ? "Live session" : "Draft only"}</span>
+            <button
+              type="button"
+              onClick={() => {
+                window.location.hash = "";
+              }}
+              className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+              title="Exit widget mode (Tauri tray → Toggle crew salvage widget)"
             >
               Expand
             </button>

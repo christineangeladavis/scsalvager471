@@ -51,7 +51,7 @@
       "endpoints": [
         "https://scsalvager.net/api/desktop/manifest?target={{target}}&arch={{arch}}&current_version={{current_version}}"
       ],
-      "pubkey": "PLACEHOLDER_REPLACE_WITH_OUTPUT_OF_TAURI_SIGNER_GENERATE",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEUwRDNEQkQzNUYyQjgwM0MKUldROGdDdGYwOXZUNEVtWjROaEIxT09BcldvVnprMjBqR2tEbHlUMWJuOTdDOEJTMGNZUlZ2MTEK",
       "windows": {
         "installMode": "passive"
       }

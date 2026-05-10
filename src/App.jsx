@@ -19417,6 +19417,7 @@ export default function StarCitizenSalvageGuideWebsite() {
           )}
           <div className="flex flex-col gap-3 bg-gradient-to-br from-slate-900 via-slate-950 to-blue-950 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-5">
             <div className="flex flex-wrap items-center gap-2 sm:self-center">
+              {!isTauri && (
               <a
                 href="https://discord.gg/BrAtUj2k6q"
                 target="_blank"
@@ -19428,6 +19429,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                 </svg>
                 Join our Discord
               </a>
+              )}
               {/* Donate — header variant. Hidden in the desktop
                   app shell (Tauri runtime detected) — donation
                   is web-marketing chrome, not relevant inside
@@ -19461,15 +19463,17 @@ export default function StarCitizenSalvageGuideWebsite() {
                       running total without opening Statistics. Sums
                       every visible sell order's aUEC (positive sales
                       and negative mission buy-ins both included). */}
-                  <div
-                    className="hidden items-center gap-1.5 rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-2.5 py-1.5 text-xs font-semibold text-emerald-200 sm:inline-flex"
-                    title="Lifetime aUEC across every logged sell order + mission settlement"
-                  >
-                    <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" className="h-3 w-3 text-emerald-300">
-                      <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm-1-4V8h2v4h-2zm0-6V6h2v.01H9z" />
-                    </svg>
-                    {Number(lifetimeAUEC || 0).toLocaleString()} aUEC
-                  </div>
+                  {!isTauri && (
+                    <div
+                      className="hidden items-center gap-1.5 rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-2.5 py-1.5 text-xs font-semibold text-emerald-200 sm:inline-flex"
+                      title="Lifetime aUEC across every logged sell order + mission settlement"
+                    >
+                      <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" className="h-3 w-3 text-emerald-300">
+                        <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm-1-4V8h2v4h-2zm0-6V6h2v.01H9z" />
+                      </svg>
+                      {Number(lifetimeAUEC || 0).toLocaleString()} aUEC
+                    </div>
+                  )}
                   {/* Mailbox — dedicated home for admin → user
                       messages. Separate from the bell so corrective
                       actions don't get mixed with setup-nag /
@@ -20000,12 +20004,56 @@ export default function StarCitizenSalvageGuideWebsite() {
         >
           {isTauri && (
             <div className="mb-2 border-b border-slate-700/40 px-2 py-2">
-              <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-300">
-                SCSalvager
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-300">
+                    SCSalvager
+                  </div>
+                  <div className="text-[9px] text-slate-500">
+                    {patchStatus?.version ? `Patch ${patchStatus.version}` : "Desktop"}
+                  </div>
+                </div>
+                {user && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsNotificationsOpen((v) => !v);
+                      setIsMailboxOpen(false);
+                      setIsUserMenuOpen(false);
+                    }}
+                    aria-label={
+                      unreadNotificationCount > 0
+                        ? `Notifications (${unreadNotificationCount} unread)`
+                        : "Notifications"
+                    }
+                    title="Notifications"
+                    className="relative flex h-7 w-7 items-center justify-center rounded-md border border-cyan-500/25 bg-slate-900/70 text-slate-300 hover:border-cyan-400/50 hover:text-cyan-200"
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="h-3 w-3">
+                      <path d="M12 22a2.5 2.5 0 0 0 2.45-2H9.55A2.5 2.5 0 0 0 12 22zm6.36-6V11a6.37 6.37 0 0 0-5-6.32V4a1.36 1.36 0 1 0-2.72 0v.68A6.37 6.37 0 0 0 5.64 11v5l-1.92 1.92A1 1 0 0 0 4.43 19.5h15.14a1 1 0 0 0 .71-1.58z" />
+                    </svg>
+                    {unreadNotificationCount > 0 && (
+                      <span
+                        aria-hidden="true"
+                        className="pointer-events-none absolute -right-1 -top-1 flex h-3.5 min-w-[0.875rem] items-center justify-center rounded-full border border-slate-900 bg-rose-500 px-0.5 text-[8px] font-bold text-white"
+                      >
+                        {unreadNotificationCount > 9 ? "9+" : unreadNotificationCount}
+                      </span>
+                    )}
+                  </button>
+                )}
               </div>
-              <div className="text-[9px] text-slate-500">
-                {patchStatus?.version ? `Patch ${patchStatus.version}` : "Desktop"}
-              </div>
+              <a
+                href="https://discord.gg/BrAtUj2k6q"
+                target="_blank"
+                rel="noreferrer"
+                className="mt-1.5 inline-flex w-full items-center justify-center gap-1.5 rounded-md border border-indigo-400/40 bg-indigo-500/15 px-2 py-1 text-[10px] font-semibold text-indigo-100 hover:bg-indigo-500/25"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3" aria-hidden="true">
+                  <path d="M20.317 4.369A19.79 19.79 0 0 0 16.558 3a.074.074 0 0 0-.079.037c-.34.607-.719 1.396-.984 2.013a18.27 18.27 0 0 0-5.487 0 12.51 12.51 0 0 0-1-2.013.077.077 0 0 0-.078-.037 19.736 19.736 0 0 0-3.76 1.369.07.07 0 0 0-.032.027C2.533 8.046 1.864 11.625 2.193 15.16a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.105 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.371-.291a.074.074 0 0 1 .077-.01c3.927 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.009c.12.099.245.198.372.292a.077.077 0 0 1-.006.128 12.3 12.3 0 0 1-1.873.891.077.077 0 0 0-.041.106 15.86 15.86 0 0 0 1.226 1.993.076.076 0 0 0 .084.029 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-4.087-.838-7.638-3.549-10.787a.06.06 0 0 0-.031-.028zM8.02 13.331c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.974 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+                </svg>
+                Discord
+              </a>
             </div>
           )}
           {[
@@ -20017,6 +20065,11 @@ export default function StarCitizenSalvageGuideWebsite() {
             { id: "missions", label: "Missions" },
             { id: "ledger", label: "Ledger" },
             { id: "stats", label: "Statistics" },
+            // Inbox — login-gated. User-side: messages from
+            // SCSalvager Admin (mirrors the mailbox dropdown).
+            // Admin-side: incoming user mail aggregated across
+            // every user (mirrors /api/admin/inbox-overview).
+            ...(user ? [{ id: "inbox", label: "Inbox" }] : []),
             // Admin-only Active Refineries view: visible to the configured
             // admin Discord user, plus always in dev so the tab can be
             // exercised in the local preview without auth.
@@ -22201,7 +22254,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                 Splits the Ledger surface into three pages so the
                 forms, the patch-scoped history, and the crew
                 roster don't all stack on one long scroll. */}
-            <nav className="flex gap-1 border-b border-cyan-500/25" role="tablist" aria-label="Ledger sub-sections">
+            <nav className={`flex gap-1 border-b border-cyan-500/25 ${isTauri ? "sticky top-0 z-10 bg-slate-950/95 backdrop-blur" : ""}`} role="tablist" aria-label="Ledger sub-sections">
               {[
                 { id: "orders",  label: "Refinery & Sell Orders" },
                 { id: "history", label: "Patch History" },
@@ -24685,6 +24738,223 @@ export default function StarCitizenSalvageGuideWebsite() {
                   </div>
                 )}
               </>
+            )}
+          </div>
+        )}
+
+        {activeTab === "inbox" && user && (
+          <div className="space-y-6">
+            <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
+              <div className="flex items-center justify-between gap-2">
+                <div>
+                  <h2 className="text-xl font-bold text-cyan-300">Inbox</h2>
+                  <p className="mt-1 text-sm text-slate-400">
+                    {user?.isAdmin
+                      ? "Messages from SCSalvager Admin (your personal inbox) and incoming user mail aggregated across every user."
+                      : "Messages from SCSalvager Admin. Reply or delete from here, or use the mailbox icon in the header."}
+                  </p>
+                </div>
+                {mailboxComposeOpen ? null : (
+                  <button
+                    type="button"
+                    onClick={startMailboxNewThread}
+                    className="rounded-lg border border-cyan-400/40 bg-cyan-500/15 px-3 py-1.5 text-xs font-semibold text-cyan-200 hover:bg-cyan-500/25"
+                  >
+                    New thread
+                  </button>
+                )}
+              </div>
+
+              {/* Compose row when active */}
+              {mailboxComposeOpen && (
+                <div className="mt-4 rounded-2xl border border-cyan-500/30 bg-cyan-500/5 p-3">
+                  <div className="text-[10px] font-semibold uppercase tracking-wider text-cyan-300">
+                    {mailboxComposeReplyToId ? "Reply to SCSalvager Admin" : "New message to SCSalvager Admin"}
+                  </div>
+                  <textarea
+                    value={mailboxComposeDraft}
+                    onChange={(e) => setMailboxComposeDraft(e.target.value.slice(0, 1000))}
+                    disabled={mailboxComposeInFlight}
+                    placeholder="Type your message…"
+                    rows={3}
+                    className="mt-1.5 w-full rounded-md border border-cyan-500/25 bg-slate-950 px-2 py-1.5 text-xs text-slate-100 outline-none focus:border-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
+                  />
+                  <div className="mt-1.5 flex items-center justify-between gap-2">
+                    <span className="text-[10px] text-slate-500">{mailboxComposeDraft.length} / 1,000</span>
+                    <div className="flex gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMailboxComposeOpen(false);
+                          setMailboxComposeDraft("");
+                          setMailboxComposeReplyToId(null);
+                          setMailboxComposeStatus(null);
+                        }}
+                        disabled={mailboxComposeInFlight}
+                        className="rounded border border-slate-700 bg-slate-800/60 px-2 py-1 text-[11px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200 disabled:opacity-50"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={sendUserMessageToAdmin}
+                        disabled={mailboxComposeInFlight || !mailboxComposeDraft.trim()}
+                        className={`rounded border px-2 py-1 text-[11px] font-semibold ${
+                          mailboxComposeInFlight || !mailboxComposeDraft.trim()
+                            ? "cursor-not-allowed border-slate-700 bg-slate-800/50 text-slate-500"
+                            : "border-cyan-400 bg-cyan-500/20 text-cyan-100 hover:bg-cyan-500/30"
+                        }`}
+                      >
+                        {mailboxComposeInFlight ? "Sending…" : "Send"}
+                      </button>
+                    </div>
+                  </div>
+                  {mailboxComposeStatus && (
+                    <div className={`mt-1.5 text-[11px] ${mailboxComposeStatus.kind === "ok" ? "text-emerald-300" : "text-rose-300"}`}>
+                      {mailboxComposeStatus.text}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Personal inbox list */}
+              <h3 className="mt-5 text-sm font-semibold text-cyan-200">
+                From SCSalvager Admin · {mailboxMessages.length}
+              </h3>
+              {mailboxMessages.length === 0 ? (
+                <div className="mt-2 rounded-2xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">
+                  No messages yet.
+                </div>
+              ) : (
+                <ul className="mt-2 space-y-2">
+                  {mailboxMessages.map((m) => {
+                    const direction = m.from === "user" ? "user" : "admin";
+                    const isRead = Boolean(m.dismissedAt);
+                    const ts = m.createdAt
+                      ? new Date(m.createdAt).toLocaleString()
+                      : "";
+                    return (
+                      <li
+                        key={m.id}
+                        className={`rounded-md border px-3 py-2 text-sm ${
+                          direction === "user"
+                            ? "border-l-4 border-l-amber-400 border-slate-700 bg-slate-900/60"
+                            : "border-cyan-500/25 bg-slate-900/40"
+                        } ${isRead && direction === "admin" ? "opacity-60" : ""}`}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <span className={`text-xs font-bold ${direction === "user" ? "text-slate-300" : "text-cyan-200"}`}>
+                            {direction === "user" ? "You" : "SCSalvager Admin"}
+                          </span>
+                          <span className="text-[10px] text-slate-500">{ts}</span>
+                        </div>
+                        <div className="mt-1 whitespace-pre-wrap break-words text-slate-200">
+                          {m.body}
+                        </div>
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          {direction === "admin" && (
+                            <button
+                              type="button"
+                              onClick={() => startMailboxReply(m.id)}
+                              className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                            >
+                              Reply
+                            </button>
+                          )}
+                          {direction === "admin" && !isRead && (
+                            <button
+                              type="button"
+                              onClick={() => dismissNotification(`admin-msg:${m.id}`)}
+                              className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                            >
+                              Mark read
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => deleteMailboxMessage(m.id)}
+                            className="rounded border border-rose-500/30 bg-rose-500/10 px-2 py-0.5 text-[10px] font-semibold text-rose-300 hover:border-rose-400/60 hover:bg-rose-500/20"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+
+            {/* Admin section: aggregated user → admin mail */}
+            {user?.isAdmin && (
+              <div className="rounded-3xl border border-amber-500/30 bg-amber-500/5 p-5 shadow-xl shadow-amber-950/20 backdrop-blur">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-xl font-bold text-amber-300">User mail · {adminUserMailOverview.length}</h2>
+                    <p className="mt-1 text-sm text-slate-400">
+                      Incoming messages from users across every inbox. Click an entry to open that user's full thread + composer in the user-detail modal.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={refreshAdminUserMailOverview}
+                    className="rounded border border-slate-700 bg-slate-800/60 px-2 py-1 text-[10px] font-semibold text-slate-300 hover:border-amber-400/40 hover:text-amber-200"
+                  >
+                    Refresh
+                  </button>
+                </div>
+                {adminUserMailOverview.length === 0 ? (
+                  <div className="mt-3 rounded-2xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">
+                    No user mail in flight.
+                  </div>
+                ) : (
+                  <ul className="mt-3 space-y-2">
+                    {adminUserMailOverview.map((m) => {
+                      const ts = m.createdAt ? new Date(m.createdAt).toLocaleString() : "";
+                      return (
+                        <li
+                          key={m.id}
+                          className="rounded-md border border-amber-500/25 bg-slate-900/60 px-3 py-2 text-sm"
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                openAdminUserDetail({ userId: m.userId, username: m.username })
+                              }
+                              className="text-xs font-bold text-amber-200 hover:underline"
+                            >
+                              {m.username}
+                            </button>
+                            <span className="text-[10px] text-slate-500">{ts}</span>
+                          </div>
+                          <div className="mt-1 whitespace-pre-wrap break-words text-slate-200">
+                            {m.body}
+                          </div>
+                          <div className="mt-2 flex flex-wrap gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                openAdminUserDetail({ userId: m.userId, username: m.username })
+                              }
+                              className="rounded border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-200 hover:bg-amber-500/20"
+                            >
+                              Open thread
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => deleteAdminUserMail(m.id)}
+                              className="rounded border border-rose-500/30 bg-rose-500/10 px-2 py-0.5 text-[10px] font-semibold text-rose-300 hover:border-rose-400/60 hover:bg-rose-500/20"
+                            >
+                              Dismiss
+                            </button>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </div>
             )}
           </div>
         )}

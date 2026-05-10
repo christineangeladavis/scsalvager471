@@ -14560,6 +14560,34 @@ export default function StarCitizenSalvageGuideWebsite() {
   // dropdown so they don't have to open per-user threads to see
   // incoming mail. Empty array on non-admin sessions.
   const [adminUserMailOverview, setAdminUserMailOverview] = useState([]);
+  // Group user → admin mail by sender. The raw overview is a flat
+  // list — admins want to see one row per user with all their
+  // unread messages collapsed in. Messages within each group are
+  // sorted ascending so the modal/expanded view reads top-down
+  // oldest → newest, matching the per-user thread view.
+  const groupedUserMail = useMemo(() => {
+    const byUser = new Map();
+    for (const m of adminUserMailOverview) {
+      const key = m.userId;
+      if (!byUser.has(key)) {
+        byUser.set(key, {
+          userId: m.userId,
+          username: m.username,
+          messages: [],
+          latestTs: 0,
+        });
+      }
+      const g = byUser.get(key);
+      g.messages.push(m);
+      if ((m.createdAt || 0) > g.latestTs) g.latestTs = m.createdAt || 0;
+    }
+    for (const g of byUser.values()) {
+      g.messages.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+    }
+    // Groups sorted by most-recent activity descending — fresh
+    // user traffic surfaces at the top of the admin's mailbox.
+    return Array.from(byUser.values()).sort((a, b) => b.latestTs - a.latestTs);
+  }, [adminUserMailOverview]);
   const [adminClearLedgerStep, setAdminClearLedgerStep] = useState(0); // 0=picker visible,1=first confirm,2=second confirm
   const [adminClearLedgerInFlight, setAdminClearLedgerInFlight] = useState(false);
   const [adminClearLedgerError, setAdminClearLedgerError] = useState("");
@@ -19689,15 +19717,16 @@ export default function StarCitizenSalvageGuideWebsite() {
                                 an entry pops the user-detail modal
                                 for that user with the thread
                                 pre-loaded. */}
-                            {user?.isAdmin && adminUserMailOverview.length > 0 && (
+                            {user?.isAdmin && groupedUserMail.length > 0 && (
                               <div className="border-b border-amber-500/30 bg-amber-500/5">
                                 <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-amber-300">
-                                  User mail · {adminUserMailOverview.length}
+                                  User mail · {groupedUserMail.length} {groupedUserMail.length === 1 ? "user" : "users"} · {adminUserMailOverview.length} msg
                                 </div>
                                 <div className="max-h-[40vh] overflow-y-auto">
-                                  {adminUserMailOverview.map((m) => {
-                                    const ts = m.createdAt
-                                      ? new Date(m.createdAt).toLocaleString([], {
+                                  {groupedUserMail.map((g) => {
+                                    const latest = g.messages[g.messages.length - 1];
+                                    const ts = latest?.createdAt
+                                      ? new Date(latest.createdAt).toLocaleString([], {
                                           month: "short",
                                           day: "numeric",
                                           hour: "numeric",
@@ -19706,7 +19735,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                                       : "";
                                     return (
                                       <div
-                                        key={`u-${m.id}`}
+                                        key={`u-${g.userId}`}
                                         className="border-b border-amber-500/20 px-3 py-2.5 last:border-b-0 hover:bg-amber-500/10"
                                       >
                                         <button
@@ -19714,20 +19743,23 @@ export default function StarCitizenSalvageGuideWebsite() {
                                           onClick={() => {
                                             setIsMailboxOpen(false);
                                             openAdminUserDetail({
-                                              userId: m.userId,
-                                              username: m.username,
+                                              userId: g.userId,
+                                              username: g.username,
                                             });
                                           }}
                                           className="block w-full text-left"
                                         >
                                           <div className="flex items-center justify-between gap-2">
-                                            <span className="text-xs font-bold text-amber-200">
-                                              {m.username}
+                                            <span className="flex items-center gap-1.5 text-xs font-bold text-amber-200">
+                                              {g.username}
+                                              <span className="rounded-full border border-amber-400/50 bg-amber-500/15 px-1.5 text-[10px] font-bold text-amber-100">
+                                                {g.messages.length}
+                                              </span>
                                             </span>
                                             <span className="text-[10px] text-slate-500">{ts}</span>
                                           </div>
                                           <div className="mt-0.5 line-clamp-2 break-words text-xs text-slate-200">
-                                            {m.body}
+                                            {latest?.body}
                                           </div>
                                         </button>
                                         <div className="mt-1 flex justify-end">
@@ -19735,12 +19767,12 @@ export default function StarCitizenSalvageGuideWebsite() {
                                             type="button"
                                             onClick={(e) => {
                                               e.stopPropagation();
-                                              deleteAdminUserMail(m.id);
+                                              for (const m of g.messages) deleteAdminUserMail(m.id);
                                             }}
                                             className="rounded border border-rose-500/30 bg-rose-500/10 px-2 py-0.5 text-[10px] font-semibold text-rose-300 hover:border-rose-400/60 hover:bg-rose-500/20"
-                                            title="Remove from your overview (still visible in the user's thread)"
+                                            title="Remove all messages from this user from your overview (still visible in the user's thread)"
                                           >
-                                            Delete
+                                            Delete all
                                           </button>
                                         </div>
                                       </div>
@@ -25057,39 +25089,68 @@ export default function StarCitizenSalvageGuideWebsite() {
                     Refresh
                   </button>
                 </div>
-                {adminUserMailOverview.length === 0 ? (
+                {groupedUserMail.length === 0 ? (
                   <div className="mt-3 rounded-2xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">
                     No user mail in flight.
                   </div>
                 ) : (
                   <ul className="mt-3 space-y-2">
-                    {adminUserMailOverview.map((m) => {
-                      const ts = m.createdAt ? new Date(m.createdAt).toLocaleString() : "";
+                    {groupedUserMail.map((g) => {
+                      const latestTs = g.latestTs ? new Date(g.latestTs).toLocaleString() : "";
                       return (
                         <li
-                          key={m.id}
+                          key={g.userId}
                           className="rounded-md border border-amber-500/25 bg-slate-900/60 px-3 py-2 text-sm"
                         >
                           <div className="flex items-center justify-between gap-2">
                             <button
                               type="button"
                               onClick={() =>
-                                openAdminUserDetail({ userId: m.userId, username: m.username })
+                                openAdminUserDetail({ userId: g.userId, username: g.username })
                               }
-                              className="text-xs font-bold text-amber-200 hover:underline"
+                              className="flex items-center gap-1.5 text-xs font-bold text-amber-200 hover:underline"
                             >
-                              {m.username}
+                              {g.username}
+                              <span className="rounded-full border border-amber-400/50 bg-amber-500/15 px-1.5 text-[10px] font-bold text-amber-100">
+                                {g.messages.length}
+                              </span>
                             </button>
-                            <span className="text-[10px] text-slate-500">{ts}</span>
+                            <span className="text-[10px] text-slate-500">latest · {latestTs}</span>
                           </div>
-                          <div className="mt-1 whitespace-pre-wrap break-words text-slate-200">
-                            {m.body}
-                          </div>
+                          {/* Per-user message list — oldest at top,
+                              newest at bottom, matching the per-user
+                              thread modal so the read order is the
+                              same on both surfaces. */}
+                          <ul className="mt-2 space-y-1.5">
+                            {g.messages.map((m) => {
+                              const ts = m.createdAt ? new Date(m.createdAt).toLocaleString() : "";
+                              return (
+                                <li
+                                  key={m.id}
+                                  className="rounded border border-amber-500/15 bg-slate-950/50 px-2 py-1.5"
+                                >
+                                  <div className="flex items-center justify-between gap-2">
+                                    <span className="text-[10px] text-slate-500">{ts}</span>
+                                    <button
+                                      type="button"
+                                      onClick={() => deleteAdminUserMail(m.id)}
+                                      className="rounded border border-rose-500/30 bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-rose-300 hover:border-rose-400/60 hover:bg-rose-500/20"
+                                    >
+                                      Dismiss
+                                    </button>
+                                  </div>
+                                  <div className="mt-0.5 whitespace-pre-wrap break-words text-slate-200">
+                                    {m.body}
+                                  </div>
+                                </li>
+                              );
+                            })}
+                          </ul>
                           <div className="mt-2 flex flex-wrap gap-1.5">
                             <button
                               type="button"
                               onClick={() =>
-                                openAdminUserDetail({ userId: m.userId, username: m.username })
+                                openAdminUserDetail({ userId: g.userId, username: g.username })
                               }
                               className="rounded border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-200 hover:bg-amber-500/20"
                             >
@@ -25097,10 +25158,12 @@ export default function StarCitizenSalvageGuideWebsite() {
                             </button>
                             <button
                               type="button"
-                              onClick={() => deleteAdminUserMail(m.id)}
+                              onClick={() => {
+                                for (const m of g.messages) deleteAdminUserMail(m.id);
+                              }}
                               className="rounded border border-rose-500/30 bg-rose-500/10 px-2 py-0.5 text-[10px] font-semibold text-rose-300 hover:border-rose-400/60 hover:bg-rose-500/20"
                             >
-                              Dismiss
+                              Dismiss all
                             </button>
                           </div>
                         </li>

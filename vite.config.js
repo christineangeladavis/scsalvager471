@@ -55,7 +55,36 @@ export default defineConfig({
   define: {
     __BUILD_VERSION__: JSON.stringify(buildVersion),
   },
-  build: { outDir: 'dist', assetsInlineLimit: 0 },
+  build: {
+    outDir: 'dist',
+    assetsInlineLimit: 0,
+    // Bump the chunk-size warning past our actual main-bundle
+    // size. App.jsx is one giant single-file component (~1.7 MB
+    // source) so the post-minify bundle naturally lives just
+    // over the default 500 KB threshold. The warning was just
+    // noise on every CI run.
+    chunkSizeWarningLimit: 1500,
+    rollupOptions: {
+      output: {
+        // Split vendor libs into their own chunks for better
+        // browser caching across deploys — when only App.jsx
+        // changes (the common case), users keep their cached
+        // react-dom + xlsx + tailwind chunks instead of
+        // re-downloading them.
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('scheduler')) {
+              return 'react-vendor';
+            }
+            if (id.includes('xlsx')) {
+              return 'xlsx';
+            }
+            return 'vendor';
+          }
+        },
+      },
+    },
+  },
   test: {
     environment: 'node',
     globals: true,

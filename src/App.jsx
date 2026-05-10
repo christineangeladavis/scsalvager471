@@ -24981,7 +24981,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                   <p className="mt-1 text-sm text-slate-400">
                     {user?.isAdmin
                       ? "Messages from SCSalvager Admin (your personal inbox) and incoming user mail aggregated across every user."
-                      : "Messages from SCSalvager Admin. Reply or delete from here, or use the mailbox icon in the header."}
+                      : "Messages from SCSalvager Admin. Reply or mark as read from here, or use the mailbox icon in the header."}
                   </p>
                 </div>
                 {mailboxComposeOpen ? null : (
@@ -25097,16 +25097,9 @@ export default function StarCitizenSalvageGuideWebsite() {
                               onClick={() => dismissNotification(`admin-msg:${m.id}`)}
                               className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
                             >
-                              Mark read
+                              Mark as read
                             </button>
                           )}
-                          <button
-                            type="button"
-                            onClick={() => deleteMailboxMessage(m.id)}
-                            className="rounded border border-rose-500/30 bg-rose-500/10 px-2 py-0.5 text-[10px] font-semibold text-rose-300 hover:border-rose-400/60 hover:bg-rose-500/20"
-                          >
-                            Delete
-                          </button>
                         </div>
                       </li>
                     );
@@ -25120,9 +25113,9 @@ export default function StarCitizenSalvageGuideWebsite() {
               <div className="rounded-3xl border border-amber-500/30 bg-amber-500/5 p-5 shadow-xl shadow-amber-950/20 backdrop-blur">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-xl font-bold text-amber-300">User mail · {adminUserMailOverview.length}</h2>
+                    <h2 className="text-xl font-bold text-amber-300">User mail · {groupedUserMail.length} {groupedUserMail.length === 1 ? "user" : "users"} · {adminUserMailOverview.length} msg</h2>
                     <p className="mt-1 text-sm text-slate-400">
-                      Incoming messages from users across every inbox. Click an entry to open that user's full thread + composer in the user-detail modal.
+                      Incoming messages from users grouped by sender — latest preview only. Click an entry to open that user's full thread + composer in the user-detail modal.
                     </p>
                   </div>
                   <button

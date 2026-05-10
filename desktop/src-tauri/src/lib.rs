@@ -689,21 +689,18 @@ pub fn run() {
             spawn_background_poll(app.handle().clone());
 
             // Register the refinery-screenshot global hotkey
-            // (PrintScreen). Fires from anywhere — the user
-            // doesn't need to alt-tab out of Star Citizen. xcap
-            // captures the SC window pixels even while the game
-            // owns focus.
+            // (F9). Fires from anywhere — the user doesn't need
+            // to alt-tab out of Star Citizen. xcap captures the
+            // SC window pixels even while the game owns focus.
             //
-            // Note for Windows: the OS normally copies the
-            // screen to the clipboard on PrtSc. Tauri's global
-            // shortcut intercepts the keypress before the OS
-            // hook fires, so the clipboard side-effect is
-            // suppressed while the app is running. If a future
-            // build needs the original clipboard behavior back,
-            // unregister the shortcut first.
-            let capture_shortcut = Shortcut::new(None, Code::PrintScreen);
+            // Switched from PrintScreen to F9 because Windows
+            // intercepts PrtSc at the keyboard driver / Snipping
+            // Tool / Game Bar layer before Tauri's global hook
+            // sees the keypress. F9 is unbound by default in
+            // Star Citizen and clean across Windows utilities.
+            let capture_shortcut = Shortcut::new(None, Code::F9);
             match app.global_shortcut().register(capture_shortcut) {
-                Ok(()) => eprintln!("[hotkey] PrintScreen → SC screenshot capture"),
+                Ok(()) => eprintln!("[hotkey] F9 → SC screenshot capture"),
                 Err(e) => eprintln!("[hotkey] register failed: {e}"),
             }
 

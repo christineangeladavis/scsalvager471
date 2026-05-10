@@ -1,0 +1,7 @@
+# Tauri desktop app source — built locally / via GitHub Actions, not on Vercel.
+desktop/
+
+# Build artifacts that don't belong in the Vercel deployment.
+node_modules/
+dist/
+.claude/

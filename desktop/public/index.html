@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>SCSalvager Desktop</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <body>
+    <p>Loading SCSalvager…</p>
+    <script>
+      // Tauri requires a frontendDist on disk. The main window's
+      // url is configured to load https://scsalvager.net/api/auth/
+      // desktop-callback directly, so this placeholder is only
+      // visible if the WebView can't reach the network at boot.
+      window.location.href = "https://scsalvager.net/";
+    </script>
+  </body>
+</html>

@@ -35,6 +35,19 @@ export default async function handler(req, res) {
   }
 
   const state = generateToken();
+  // Optional `?return=desktop-callback` puts a short-lived
+  // `scs_return_to` cookie next to the state cookie so the OAuth
+  // callback can redirect to the desktop deep-link bridge instead
+  // of `/`. Other return values are rejected to avoid open
+  // redirects. Add new whitelisted targets here.
+  const ALLOWED_RETURN_TARGETS = new Set(["desktop-callback"]);
+  const requestedReturn = (req.query && typeof req.query.return === "string"
+    ? req.query.return
+    : ""
+  ).trim();
+  const returnTarget = ALLOWED_RETURN_TARGETS.has(requestedReturn)
+    ? requestedReturn
+    : "";
   const redirectUri = getCallbackUri(req);
   // Log the resolved redirect_uri + the host headers that fed it so we
   // can diagnose "Invalid OAuth2 redirect_uri" errors by grepping
@@ -52,7 +65,15 @@ export default async function handler(req, res) {
     state,
   });
 
-  res.setHeader("Set-Cookie", buildCookie(STATE_COOKIE, state, { maxAge: STATE_TTL_SECONDS }));
+  const cookies = [buildCookie(STATE_COOKIE, state, { maxAge: STATE_TTL_SECONDS })];
+  if (returnTarget) {
+    // 10-minute TTL matches the state cookie; cleared by the
+    // callback after consumption regardless of outcome.
+    cookies.push(
+      buildCookie("scs_return_to", returnTarget, { maxAge: STATE_TTL_SECONDS })
+    );
+  }
+  res.setHeader("Set-Cookie", cookies);
   res.writeHead(302, { Location: authorizeUrl });
   res.end();
 }

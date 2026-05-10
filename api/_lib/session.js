@@ -42,8 +42,22 @@ export function generateToken() {
 }
 
 export async function getSession(req, redis) {
+  // Cookie path is the primary auth surface (web client). The
+  // desktop app reuses cookie auth inside its WebView, but its
+  // Rust background poll runs outside the WebView and can't read
+  // those cookies — fall back to Authorization: Bearer <token>
+  // for that path. The token is the same opaque session id we
+  // hand the WebView via cookie; storage backing in Redis is
+  // identical, so no separate session shape needed.
   const cookies = parseCookies(req.headers.cookie || "");
-  const token = cookies[SESSION_COOKIE];
+  let token = cookies[SESSION_COOKIE];
+  if (!token) {
+    const authHeader = req.headers.authorization || req.headers.Authorization || "";
+    if (typeof authHeader === "string" && authHeader.toLowerCase().startsWith("bearer ")) {
+      const candidate = authHeader.slice(7).trim();
+      if (candidate) token = candidate;
+    }
+  }
   if (!token) return null;
   try {
     const data = await redis.get(`session:${token}`);

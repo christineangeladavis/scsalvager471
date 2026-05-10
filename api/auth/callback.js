@@ -82,8 +82,19 @@ export default async function handler(req, res) {
       username: displayName,
     });
 
+    // Honor an optional return target (set by /api/auth/login when
+    // the desktop app initiated the flow). Whitelist enforced here
+    // too so a stray cookie value can't open-redirect anywhere.
+    const returnTarget = (cookies["scs_return_to"] || "").trim();
+    let postLoginPath = "/";
+    if (returnTarget === "desktop-callback") {
+      postLoginPath = "/api/auth/desktop-callback";
+    }
+
     res.setHeader("Set-Cookie", [
       buildCookie(STATE_COOKIE, "", { maxAge: 0 }),
+      // Always clear scs_return_to after consumption — single-use.
+      buildCookie("scs_return_to", "", { maxAge: 0 }),
       // SameSite=Lax (not Strict) so the cookie still rides on
       // top-level cross-site navigations like Discord -> our OAuth
       // callbacks. Strict would block notifications-callback from
@@ -93,7 +104,7 @@ export default async function handler(req, res) {
       // POST/iframe-style cross-site requests.
       buildCookie(SESSION_COOKIE, sessionToken, { maxAge: SESSION_TTL_SECONDS, sameSite: "Lax" }),
     ]);
-    res.writeHead(302, { Location: "/" });
+    res.writeHead(302, { Location: postLoginPath });
     res.end();
   } catch (e) {
     console.error("Auth callback error:", e && e.message ? e.message : e);

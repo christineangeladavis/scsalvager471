@@ -1,0 +1,51 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "SCSalvager",
+  "version": "0.1.0",
+  "identifier": "net.scsalvager.desktop",
+  "build": {
+    "beforeDevCommand": "",
+    "beforeBuildCommand": "",
+    "frontendDist": "../public",
+    "devUrl": null
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "SCSalvager",
+        "width": 1400,
+        "height": 900,
+        "minWidth": 980,
+        "minHeight": 640,
+        "resizable": true,
+        "fullscreen": false,
+        "url": "https://scsalvager.net/api/auth/desktop-callback"
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["msi", "nsis", "deb", "appimage", "dmg"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "category": "Utility",
+    "shortDescription": "SCSalvager Desktop — refinery + sales tracker for Star Citizen.",
+    "longDescription": "Tauri shell that wraps scsalvager.net with native tray, hotkeys, refinery countdown badge, and screenshot upload from the Star Citizen window."
+  },
+  "plugins": {
+    "deep-link": {
+      "desktop": {
+        "schemes": ["scsalvager"]
+      }
+    }
+  }
+}

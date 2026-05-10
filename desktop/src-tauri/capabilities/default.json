@@ -1,0 +1,10 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Capability surface for the SCSalvager Desktop main window. Phase 1 only needs deep-link + single-instance support; later phases will add tray, hotkey, notification, and shell capabilities.",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "deep-link:default"
+  ]
+}

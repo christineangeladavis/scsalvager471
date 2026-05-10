@@ -19394,8 +19394,7 @@ export default function StarCitizenSalvageGuideWebsite() {
             </div>
           );
         })()}
-        {!isTauri && (
-        <header className="mb-8 overflow-hidden rounded-3xl border border-cyan-500/30 shadow-2xl shadow-cyan-950/40">
+        <header className={`mb-6 rounded-3xl border border-cyan-500/30 shadow-2xl shadow-cyan-950/40 ${isTauri ? "sticky top-0 z-20 bg-slate-950/95 backdrop-blur" : "overflow-hidden mb-8"}`}>
           {/* Banner displayed at ~75% of its natural height (h-80 →
               320px). object-cover preserves the artwork's center
               band when the viewport is narrower than 1600px. The
@@ -19982,7 +19981,6 @@ export default function StarCitizenSalvageGuideWebsite() {
             </div>
           </div>
         </header>
-        )}
 
         {/* --- Tab navigation ---
             Layout split:
@@ -20065,12 +20063,10 @@ export default function StarCitizenSalvageGuideWebsite() {
               </button>
             );
           })}
-          {/* Sidebar footer — desktop-only user controls. Order
-              top-to-bottom: aUEC pill, Inbox + Notifications
-              labelled buttons with red unread badges, then
-              user avatar pinned to the bottom edge via mt-auto.
-              The user-menu dropdown opens UPWARD (bottom-full)
-              since the button is at the bottom of the sidebar. */}
+          {/* Sidebar footer — desktop-only. aUEC pill above the
+              user dropdown pinned to the bottom edge via
+              mt-auto. Bell + mailbox stay in the sticky top
+              header where their dropdowns are wired. */}
           {isTauri && user && (
             <div className="mt-auto flex flex-col gap-1.5 border-t border-slate-700/40 pt-2">
               {/* Lifetime aUEC */}
@@ -20082,62 +20078,6 @@ export default function StarCitizenSalvageGuideWebsite() {
                   <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm-1-4V8h2v4h-2zm0-6V6h2v.01H9z" />
                 </svg>
                 <span className="truncate">{Number(lifetimeAUEC || 0).toLocaleString()} aUEC</span>
-              </div>
-
-              {/* Inbox / mailbox */}
-              <div>
-                <div className="px-1 text-[9px] font-bold uppercase tracking-wider text-slate-500">
-                  Inbox
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsMailboxOpen((v) => !v);
-                    setIsNotificationsOpen(false);
-                    setIsUserMenuOpen(false);
-                  }}
-                  className="mt-0.5 flex w-full items-center justify-between rounded-md border border-slate-700 bg-slate-800/40 px-2 py-1.5 text-[11px] text-slate-200 hover:border-cyan-400/40"
-                >
-                  <span className="flex items-center gap-1.5">
-                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="h-3 w-3">
-                      <path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4.236-7.445 4.962a1 1 0 0 1-1.11 0L4 8.236V6l8 5.333L20 6v2.236z" />
-                    </svg>
-                    Messages
-                  </span>
-                  {unreadMailboxCount > 0 && (
-                    <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-[9px] font-bold text-white">
-                      {unreadMailboxCount > 9 ? "9+" : unreadMailboxCount}
-                    </span>
-                  )}
-                </button>
-              </div>
-
-              {/* Notifications */}
-              <div>
-                <div className="px-1 text-[9px] font-bold uppercase tracking-wider text-slate-500">
-                  Notifications
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsNotificationsOpen((v) => !v);
-                    setIsMailboxOpen(false);
-                    setIsUserMenuOpen(false);
-                  }}
-                  className="mt-0.5 flex w-full items-center justify-between rounded-md border border-slate-700 bg-slate-800/40 px-2 py-1.5 text-[11px] text-slate-200 hover:border-cyan-400/40"
-                >
-                  <span className="flex items-center gap-1.5">
-                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="h-3 w-3">
-                      <path d="M12 22a2.5 2.5 0 0 0 2.45-2H9.55A2.5 2.5 0 0 0 12 22zm6.36-6V11a6.37 6.37 0 0 0-5-6.32V4a1.36 1.36 0 1 0-2.72 0v.68A6.37 6.37 0 0 0 5.64 11v5l-1.92 1.92A1 1 0 0 0 4.43 19.5h15.14a1 1 0 0 0 .71-1.58z" />
-                    </svg>
-                    Bell
-                  </span>
-                  {unreadNotificationCount > 0 && (
-                    <span className="rounded-full bg-rose-500 px-1.5 py-0.5 text-[9px] font-bold text-white">
-                      {unreadNotificationCount > 9 ? "9+" : unreadNotificationCount}
-                    </span>
-                  )}
-                </button>
               </div>
 
               {/* User avatar / name + dropdown — opens UPWARD

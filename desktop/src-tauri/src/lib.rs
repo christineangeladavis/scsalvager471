@@ -125,6 +125,37 @@ fn read_session_token(app: &AppHandle) -> Option<String> {
     parsed.get("token")?.as_str().map(|s| s.to_string())
 }
 
+// Bridge: when the user signs in via the in-WebView Discord OAuth
+// flow (the normal path now that the WebView opens at the site
+// root), the session cookie lives in Tauri's WebView cookie jar.
+// The deep-link path is the only place that previously wrote
+// auth.json, so the background poller had no token to use and
+// returned 401. This pulls the scs_session cookie out of the
+// WebView and mirrors it to disk so the poller can authenticate.
+//
+// HttpOnly cookies aren't accessible to page JavaScript but ARE
+// accessible to the host process via Tauri's cookies API.
+fn try_pull_session_from_webview(app: &AppHandle) -> Option<String> {
+    let window = app.get_webview_window("main")?;
+    let url = Url::parse("https://scsalvager.net/").ok()?;
+    let cookies = window.cookies_for_url(url).ok()?;
+    cookies
+        .into_iter()
+        .find(|c| c.name() == SESSION_COOKIE)
+        .map(|c| c.value().to_string())
+}
+
+fn ensure_session_token(app: &AppHandle) -> Option<String> {
+    if let Some(t) = read_session_token(app) {
+        return Some(t);
+    }
+    let pulled = try_pull_session_from_webview(app)?;
+    if let Err(e) = write_session_token(app, &pulled) {
+        eprintln!("[poll] persist pulled token failed: {e}");
+    }
+    Some(pulled)
+}
+
 // -----------------------------------------------------------------
 // Tray icon, tooltip, menu (Phase 2).
 // -----------------------------------------------------------------
@@ -349,12 +380,27 @@ fn spawn_background_poll(app: AppHandle) {
             .unwrap_or_else(|_| reqwest::Client::new());
         let seen: Arc<Mutex<HashSet<String>>> = Arc::new(Mutex::new(HashSet::new()));
         loop {
-            if let Some(token) = read_session_token(&app) {
+            // ensure_session_token covers both auth paths:
+            //   1. Deep-link bridge wrote auth.json
+            //   2. In-WebView OAuth set the cookie inside Tauri's
+            //      cookie jar; we pull it via cookies_for_url and
+            //      mirror to auth.json
+            // No-op when the user hasn't signed in yet.
+            if let Some(token) = ensure_session_token(&app) {
                 if let Err(e) = poll_once(&client, &token, &seen, &app).await {
                     // Quiet failures — most likely network blip or session
                     // not yet established. Only log to stderr; tray tooltip
                     // stays at its last good value.
                     eprintln!("[poll] {e}");
+                    // 401 means the cached token went stale (server
+                    // rotated the session). Clear auth.json so the
+                    // next iteration re-pulls a fresh cookie from
+                    // the WebView jar.
+                    if e.contains("401") {
+                        if let Some(path) = auth_file_path(&app) {
+                            let _ = std::fs::remove_file(path);
+                        }
+                    }
                 }
             }
             tokio::time::sleep(Duration::from_secs(POLL_INTERVAL_SECS)).await;

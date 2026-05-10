@@ -14643,6 +14643,26 @@ export default function StarCitizenSalvageGuideWebsite() {
   // next to the notification bell. Separate from isNotificationsOpen
   // so the two dropdowns don't fight for screen space.
   const [isMailboxOpen, setIsMailboxOpen] = useState(false);
+  // Same ref+rect pattern as the user menu — portaled below the
+  // mailbox icon to escape the header's overflow-hidden.
+  const mailboxBtnRef = useRef(null);
+  const [mailboxRect, setMailboxRect] = useState(null);
+  useEffect(() => {
+    if (!isMailboxOpen) return;
+    const update = () => {
+      const el = mailboxBtnRef.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      setMailboxRect({ top: r.bottom + 4, right: window.innerWidth - r.right });
+    };
+    update();
+    window.addEventListener("scroll", update, true);
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update, true);
+      window.removeEventListener("resize", update);
+    };
+  }, [isMailboxOpen]);
   // Mailbox compose state: text the user is drafting back to
   // SCSalvager Admin. `replyToId` is set when replying to a specific
   // admin message; null for a brand-new outgoing thread. Status
@@ -19514,6 +19534,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                   {user && !isTauri && (
                     <div className="relative">
                       <button
+                        ref={mailboxBtnRef}
                         type="button"
                         onClick={() => {
                           setIsMailboxOpen((v) => !v);
@@ -19545,15 +19566,16 @@ export default function StarCitizenSalvageGuideWebsite() {
                           </span>
                         )}
                       </button>
-                      {isMailboxOpen && (
+                      {isMailboxOpen && mailboxRect && createPortal(
                         <>
                           <div
-                            className="fixed inset-0 z-40"
+                            className="fixed inset-0 z-[59]"
                             onClick={() => setIsMailboxOpen(false)}
                           />
                           <div
                             role="menu"
-                            className="absolute right-0 bottom-full z-50 mb-1 w-80 overflow-hidden rounded-lg border border-cyan-500/25 bg-slate-900 shadow-xl shadow-cyan-950/40"
+                            style={{ top: mailboxRect.top, right: mailboxRect.right }}
+                            className="fixed z-[60] w-80 overflow-hidden rounded-lg border border-cyan-500/25 bg-slate-900 shadow-xl shadow-cyan-950/40"
                           >
                             <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950/60 px-3 py-2">
                               <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-300">
@@ -19707,13 +19729,24 @@ export default function StarCitizenSalvageGuideWebsite() {
                                 </div>
                               </div>
                             )}
-                            {mailboxMessages.length === 0 && !(user?.isAdmin && adminUserMailOverview.length > 0) ? (
-                              <div className="px-3 py-3 text-xs text-slate-400">
-                                No messages.
-                              </div>
-                            ) : mailboxMessages.length === 0 ? null : (
+                            {(() => {
+                              // Pill list shows unread inbound messages only.
+                              // Read messages stay accessible from the
+                              // Inbox tab, where the full thread lives.
+                              const unreadOnly = mailboxMessages.filter(
+                                (m) => (m.from || "admin") === "admin" && !m.dismissedAt
+                              );
+                              if (unreadOnly.length === 0 && !(user?.isAdmin && adminUserMailOverview.length > 0)) {
+                                return (
+                                  <div className="px-3 py-3 text-xs text-slate-400">
+                                    No unread messages.
+                                  </div>
+                                );
+                              }
+                              if (unreadOnly.length === 0) return null;
+                              return (
                               <div className="max-h-[60vh] overflow-y-auto">
-                                {mailboxMessages.map((m) => {
+                                {unreadOnly.map((m) => {
                                   const direction = m.from === "user" ? "user" : "admin";
                                   const isRead = Boolean(m.dismissedAt);
                                   const ts = m.createdAt
@@ -19731,11 +19764,16 @@ export default function StarCitizenSalvageGuideWebsite() {
                                   // unread dot — they were already
                                   // "read" the moment they were sent.
                                   const showUnreadDot = direction === "admin" && !isRead;
+                                  const goToThread = () => {
+                                    setIsMailboxOpen(false);
+                                    setActiveTab("inbox");
+                                  };
                                   return (
                                     <div
                                       key={m.id}
                                       role="menuitem"
-                                      className={`flex items-start gap-2 border-b border-slate-800 px-3 py-2.5 last:border-b-0 hover:bg-slate-800/60 ${isRead && direction === "admin" ? "opacity-60" : ""}`}
+                                      onClick={goToThread}
+                                      className={`flex cursor-pointer items-start gap-2 border-b border-slate-800 px-3 py-2.5 last:border-b-0 hover:bg-slate-800/60 ${isRead && direction === "admin" ? "opacity-60" : ""}`}
                                     >
                                       <span
                                         className={`mt-1 inline-block h-1.5 w-1.5 shrink-0 rounded-full ${
@@ -19759,7 +19797,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                                             {direction === "admin" && (
                                               <button
                                                 type="button"
-                                                onClick={() => startMailboxReply(m.id)}
+                                                onClick={(e) => { e.stopPropagation(); startMailboxReply(m.id); }}
                                                 className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
                                               >
                                                 Reply
@@ -19768,7 +19806,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                                             {showUnreadDot && (
                                               <button
                                                 type="button"
-                                                onClick={() => dismissNotification(`admin-msg:${m.id}`)}
+                                                onClick={(e) => { e.stopPropagation(); dismissNotification(`admin-msg:${m.id}`); }}
                                                 className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
                                               >
                                                 Mark read
@@ -19776,7 +19814,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                                             )}
                                             <button
                                               type="button"
-                                              onClick={() => deleteMailboxMessage(m.id)}
+                                              onClick={(e) => { e.stopPropagation(); deleteMailboxMessage(m.id); }}
                                               className="rounded border border-rose-500/30 bg-rose-500/10 px-2 py-0.5 text-[10px] font-semibold text-rose-300 hover:border-rose-400/60 hover:bg-rose-500/20"
                                               title="Delete from your mailbox (admins still see it in moderation history)"
                                             >
@@ -19789,9 +19827,11 @@ export default function StarCitizenSalvageGuideWebsite() {
                                   );
                                 })}
                               </div>
-                            )}
+                              );
+                            })()}
                           </div>
-                        </>
+                        </>,
+                        document.body
                       )}
                     </div>
                   )}

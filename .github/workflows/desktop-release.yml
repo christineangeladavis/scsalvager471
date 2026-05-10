@@ -52,7 +52,9 @@ jobs:
             libgtk-3-dev \
             libayatana-appindicator3-dev \
             librsvg2-dev \
-            patchelf
+            patchelf \
+            libpipewire-0.3-dev \
+            libxdo-dev
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable

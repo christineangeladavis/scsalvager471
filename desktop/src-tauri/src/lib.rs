@@ -478,19 +478,6 @@ fn spawn_background_poll(app: AppHandle) {
 // Phase 3 — Star Citizen window screenshot capture + upload.
 // -----------------------------------------------------------------
 
-#[allow(non_snake_case)]
-#[derive(Debug, Deserialize)]
-struct AnalyzeResponse {
-    rawMaterialName: Option<String>,
-    totalSCU: Option<f64>,
-    locationName: Option<String>,
-    methodName: Option<String>,
-    #[allow(dead_code)]
-    processingTimeSeconds: Option<i64>,
-    #[allow(dead_code)]
-    costAUEC: Option<i64>,
-}
-
 fn capture_sc_window_png() -> Result<Vec<u8>, String> {
     let windows = xcap::Window::all().map_err(|e| format!("enumerate windows: {e}"))?;
     let target = windows
@@ -517,34 +504,6 @@ fn capture_sc_window_png() -> Result<Vec<u8>, String> {
             .map_err(|e| format!("encode png: {e}"))?;
     }
     Ok(buf)
-}
-
-async fn upload_screenshot(
-    client: &reqwest::Client,
-    token: &str,
-    png_bytes: Vec<u8>,
-) -> Result<AnalyzeResponse, String> {
-    let b64 = base64::engine::general_purpose::STANDARD.encode(&png_bytes);
-    let url = format!("{SCSALVAGER_ORIGIN}/api/refinery/analyze");
-    let res = client
-        .post(&url)
-        .bearer_auth(token)
-        .json(&serde_json::json!({
-            "imageBase64": b64,
-            "mediaType": "image/png",
-        }))
-        .send()
-        .await
-        .map_err(|e| format!("send: {e}"))?;
-    let status = res.status();
-    if !status.is_success() {
-        let body_preview = res.text().await.unwrap_or_default();
-        let snippet: String = body_preview.chars().take(140).collect();
-        return Err(format!("HTTP {status} — {snippet}"));
-    }
-    res.json::<AnalyzeResponse>()
-        .await
-        .map_err(|e| format!("parse: {e}"))
 }
 
 fn handle_screenshot_hotkey(app: AppHandle) {
@@ -574,56 +533,65 @@ fn handle_screenshot_hotkey(app: AppHandle) {
             }
         };
 
-        let token = match ensure_session_token(&app) {
-            Some(t) => t,
-            None => {
-                let _ = app
-                    .notification()
-                    .builder()
-                    .title("Refinery Screenshot Failed")
-                    .body("Not signed in. Open SCSalvager and log in first.")
-                    .show();
-                return;
-            }
+        // Hand the captured PNG off to the WebView's crop modal.
+        // Rust no longer uploads directly — the user gets a chance
+        // to drag-select the refinery panel before it ships, which
+        // tightens Anthropic API usage + improves OCR accuracy.
+        // App.jsx exposes window.__SCSALVAGER_DESKTOP__.openRefineryCrop
+        // for this exact handoff; we call it via WebView eval.
+        let b64 = base64::engine::general_purpose::STANDARD.encode(&png);
+        let Some(window) = app.get_webview_window("main") else {
+            let _ = app
+                .notification()
+                .builder()
+                .title("Refinery Screenshot Failed")
+                .body("Main window missing.")
+                .show();
+            return;
         };
-
-        let client = reqwest::Client::builder()
-            .user_agent("scsalvager-desktop/0.1")
-            .build()
-            .unwrap_or_else(|_| reqwest::Client::new());
-
-        match upload_screenshot(&client, &token, png).await {
-            Ok(parsed) => {
-                let mat = parsed
-                    .rawMaterialName
-                    .clone()
-                    .unwrap_or_else(|| "?".into());
-                // /api/refinery/analyze returns raw cSCU; SCU = cSCU / 100.
-                let scu = parsed.totalSCU.unwrap_or(0.0) / 100.0;
-                let loc = parsed.locationName.clone().unwrap_or_else(|| "?".into());
-                let method = parsed.methodName.clone().unwrap_or_else(|| "?".into());
-                let body = format!("{mat} · {scu:.2} SCU · {method} at {loc}");
-                let _ = app
-                    .notification()
-                    .builder()
-                    .title("Refinery Captured")
-                    .body(&body)
-                    .show();
-                if let Some(w) = app.get_webview_window("main") {
-                    let _ = w.show();
-                    let _ = w.unminimize();
-                    let _ = w.set_focus();
-                }
-            }
-            Err(e) => {
-                let _ = app
-                    .notification()
-                    .builder()
-                    .title("Refinery Screenshot Failed")
-                    .body(&e)
-                    .show();
-            }
+        // Bring the window forward + unminimize FIRST so the crop
+        // modal is immediately visible.
+        let _ = window.show();
+        let _ = window.unminimize();
+        let _ = window.set_focus();
+        // If compact-mode is on, exit it so the crop modal has
+        // room to render. The web hook listens for hashchange.
+        let _ = window.eval(
+            "if (window.location.hash === '#compact') { window.location.hash = ''; }",
+        );
+        // Hand off to the React bridge. Falls back to a quiet
+        // toast when the bridge isn't registered (web app still
+        // loading, or running an older bundle without the
+        // desktop-bridge hook).
+        let js = format!(
+            r#"
+            (function () {{
+                var b = window.__SCSALVAGER_DESKTOP__;
+                if (b && typeof b.openRefineryCrop === 'function') {{
+                    b.openRefineryCrop({b64_json}, "image/png");
+                }} else {{
+                    console.warn("[scsalvager-desktop] crop bridge not registered");
+                }}
+            }})();
+            "#,
+            b64_json = serde_json::to_string(&b64).unwrap_or_else(|_| "\"\"".to_string()),
+        );
+        if let Err(e) = window.eval(&js) {
+            eprintln!("[capture] eval failed: {e:?}");
+            let _ = app
+                .notification()
+                .builder()
+                .title("Refinery Screenshot Failed")
+                .body(&format!("WebView eval: {e}"))
+                .show();
+            return;
         }
+        let _ = app
+            .notification()
+            .builder()
+            .title("Refinery Screenshot Ready")
+            .body("Crop the refinery panel in the SCSalvager window, then click Confirm.")
+            .show();
     });
 }
 

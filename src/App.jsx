@@ -16306,6 +16306,36 @@ function StockComponentsTable({ stockComponents }) {
   );
 }
 
+// Desktop bridge — exposes a global the Rust Tauri code calls to
+// hand off a captured Star Citizen refinery screenshot. The web
+// crop modal then takes over so the user can crop before the
+// /api/refinery/analyze upload. Falls back gracefully when not
+// running inside Tauri (the bridge object simply isn't called).
+function useDesktopBridge(setCropImage, setActiveTab, setLedgerSubTab) {
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.__SCSALVAGER_DESKTOP__ = {
+      // Called by Rust after Star Citizen window capture.
+      openRefineryCrop: (base64, mediaType) => {
+        if (!base64 || typeof base64 !== "string") return;
+        const mt = mediaType || "image/png";
+        const dataUrl = `data:${mt};base64,${base64}`;
+        setCropImage({ dataUrl, mediaType: mt, kind: "refinery" });
+        // Bring the user to the Refinery Job Orders surface so
+        // the auto-filled form is visible after they confirm
+        // the crop.
+        setActiveTab("ledger");
+        setLedgerSubTab("refinery");
+      },
+    };
+    return () => {
+      if (window.__SCSALVAGER_DESKTOP__) {
+        delete window.__SCSALVAGER_DESKTOP__;
+      }
+    };
+  }, [setCropImage, setActiveTab, setLedgerSubTab]);
+}
+
 // Desktop "compact mode" detection. Tauri's tray menu toggle
 // rewrites the URL hash to `#compact` when the user shrinks the
 // window into the always-on-top refinery-countdown card. The
@@ -16682,6 +16712,11 @@ export default function StarCitizenSalvageGuideWebsite() {
   // <img> element); we translate to natural coordinates at confirm time.
   const [cropImage, setCropImage] = useState(null);
   const [cropRect, setCropRect] = useState(null);
+  // Desktop bridge — wired so the Tauri Rust code can hand off a
+  // captured Star Citizen window via the global
+  // window.__SCSALVAGER_DESKTOP__.openRefineryCrop(base64, mt).
+  // No-op in pure web because the Rust caller doesn't exist there.
+  useDesktopBridge(setCropImage, setActiveTab, setLedgerSubTab);
   const cropImgRef = useRef(null);
   const cropDragStartRef = useRef(null);
   // Default shape for a fresh sell order entry. The Clear button next

@@ -13665,6 +13665,22 @@ function useDesktopBridge(setCropImage, setActiveTab, setLedgerSubTab) {
   }, [setCropImage, setActiveTab, setLedgerSubTab]);
 }
 
+// Tauri-runtime detection. The desktop shell exposes
+// __TAURI_INTERNALS__ on window before any user JS runs; pure web
+// pages don't. Hook returns a stable boolean so render branches
+// can swap web-only chrome (donate buttons, full footer, narrow
+// max-width container) for desktop-appropriate variants.
+function useIsTauri() {
+  const [isTauri, setIsTauri] = useState(
+    () => typeof window !== "undefined" && Boolean(window.__TAURI_INTERNALS__)
+  );
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    setIsTauri(Boolean(window.__TAURI_INTERNALS__));
+  }, []);
+  return isTauri;
+}
+
 // Desktop widget-mode detection. Tauri's tray menu toggle
 // rewrites the URL hash to `#compact` (refinery countdown) or
 // `#crew-widget` (crew salvage live summary) when the user
@@ -13689,6 +13705,7 @@ function useWidgetMode() {
 
 export default function StarCitizenSalvageGuideWebsite() {
   const { isCompact: isCompactMode, isCrewWidget: isCrewWidgetMode } = useWidgetMode();
+  const isTauri = useIsTauri();
   // Lazy-loaded mission data. The arrays were ~316 KB inline; now
   // they ship as separate JSON chunks Vite splits on dynamic
   // import. Initial render gets [] (skeleton state until the
@@ -19286,7 +19303,10 @@ export default function StarCitizenSalvageGuideWebsite() {
       <div className="space-bg" />
 
       {/* Scrollable UI content */}
-      <div className="relative mx-auto max-w-7xl px-4 py-8 md:px-8" style={{ zIndex: 10, flex: 1, display: "flex", flexDirection: "column", width: "100%" }}>
+      <div
+        className={`relative ${isTauri ? "px-3 py-3" : "mx-auto max-w-7xl px-4 py-8 md:px-8"}`}
+        style={{ zIndex: 10, flex: 1, display: "flex", flexDirection: "column", width: "100%" }}
+      >
         {updateAvailable && !updateModalDismissed && (() => {
           // Centered update-available modal. Replaces the page-top
           // amber banner — the modal forces the user to look at it
@@ -19366,13 +19386,20 @@ export default function StarCitizenSalvageGuideWebsite() {
               radial mask fades the edges to transparent for a soft
               dissolve into the header background; -webkit-mask
               mirror covers Safari. */}
-          <img
-            src="/scsalvager_banner.jpg"
-            alt="SCSalvager.net — Salvage · Recover · Profit"
-            className="block w-full h-80 object-cover [mask-image:radial-gradient(ellipse_at_center,black_55%,transparent_98%)] [-webkit-mask-image:radial-gradient(ellipse_at_center,black_55%,transparent_98%)]"
-            width="1600"
-            height="565"
-          />
+          {/* Banner — hidden in the desktop app shell. The 320px
+              hero eats too much vertical real estate inside a
+              desktop window where space matters more than visual
+              flourish. Web users still see it as the marketing
+              landing visual. */}
+          {!isTauri && (
+            <img
+              src="/scsalvager_banner.jpg"
+              alt="SCSalvager.net — Salvage · Recover · Profit"
+              className="block w-full h-80 object-cover [mask-image:radial-gradient(ellipse_at_center,black_55%,transparent_98%)] [-webkit-mask-image:radial-gradient(ellipse_at_center,black_55%,transparent_98%)]"
+              width="1600"
+              height="565"
+            />
+          )}
           <div className="flex flex-col gap-3 bg-gradient-to-br from-slate-900 via-slate-950 to-blue-950 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-5">
             <div className="flex flex-wrap items-center gap-2 sm:self-center">
               <a
@@ -19386,18 +19413,22 @@ export default function StarCitizenSalvageGuideWebsite() {
                 </svg>
                 Join our Discord
               </a>
-              {/* Donate — header variant. Same shape/colors as the
-                  "Patch Verified" pill on the right side of the
-                  header so the two reads as a matched pair. Opens
-                  StreamElements tip page in a new tab. */}
-              <a
-                href="https://streamelements.com/chrissynightingale/tip"
-                target="_blank"
-                rel="noreferrer noopener"
-                className="rounded-2xl border border-cyan-400/30 bg-cyan-500/10 px-4 py-3 text-sm font-semibold text-cyan-100 hover:bg-cyan-500/20 hover:border-cyan-400/50"
-              >
-                Donate
-              </a>
+              {/* Donate — header variant. Hidden in the desktop
+                  app shell (Tauri runtime detected) — donation
+                  is web-marketing chrome, not relevant inside
+                  the installed-app context. The footer Donate
+                  pill is also hidden in Tauri (see footer
+                  block). Web users still see both as before. */}
+              {!isTauri && (
+                <a
+                  href="https://streamelements.com/chrissynightingale/tip"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="rounded-2xl border border-cyan-400/30 bg-cyan-500/10 px-4 py-3 text-sm font-semibold text-cyan-100 hover:bg-cyan-500/20 hover:border-cyan-400/50"
+                >
+                  Donate
+                </a>
+              )}
             </div>
             <div className="flex flex-row items-center justify-between gap-3 sm:justify-end">
               <div className="flex items-center gap-2">
@@ -27247,6 +27278,14 @@ export default function StarCitizenSalvageGuideWebsite() {
           </div>
         )}
 
+        {/* Footer hidden in the desktop app shell — the legal /
+            data / donate / Discord chrome is browser-marketing
+            real estate. Privacy / Terms links live in Settings;
+            Discord invite lives on the header pill; donate +
+            referral copy belongs on the marketing site, not in
+            the installed app. Web users still see the full
+            footer as before. */}
+        {!isTauri && (
         <footer className="mt-auto border-t border-slate-800 pt-5 pb-6 text-sm text-slate-400" style={{ marginTop: "auto" }}>
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <span>
@@ -27297,6 +27336,7 @@ export default function StarCitizenSalvageGuideWebsite() {
             </div>
           </div>
         </footer>
+        )}
 
         {/* Privacy Policy modal — also lives in the repo at PRIVACY.md.
             Updating this content? Update both. */}

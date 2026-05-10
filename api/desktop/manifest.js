@@ -39,9 +39,12 @@ const RELEASES_URL =
 // Maps the (target, arch) combo Tauri sends to the asset filename
 // suffix the GitHub Actions build produces. Update both sides
 // together when adding a new platform target.
+// darwin-x86_64 dropped from the matrix — Intel macOS runners on
+// GHA have a tiny pool and most Mac salvagers are on arm64. If
+// Intel Mac demand surfaces, re-add the matrix entry + a
+// "darwin-x86_64" line here.
 const ASSET_BY_PLATFORM = {
   "windows-x86_64": { match: /_x64-setup\.nsis\.zip$|_x64\.msi\.zip$|_x64-setup\.exe\.zip$/i, key: "windows-x86_64" },
-  "darwin-x86_64": { match: /_x64\.app\.tar\.gz$/i, key: "darwin-x86_64" },
   "darwin-aarch64": { match: /_aarch64\.app\.tar\.gz$/i, key: "darwin-aarch64" },
   "linux-x86_64": { match: /amd64\.AppImage\.tar\.gz$/i, key: "linux-x86_64" },
 };
@@ -51,9 +54,12 @@ function platformKey(target, arch) {
   const a = (arch || "").toLowerCase();
   if (t.startsWith("windows")) return "windows-x86_64";
   if (t.startsWith("darwin") || t.startsWith("macos")) {
-    return a.includes("aarch64") || a.includes("arm64")
-      ? "darwin-aarch64"
-      : "darwin-x86_64";
+    // Only arm64 macOS is built today (see ASSET_BY_PLATFORM
+    // comment). Intel Mac clients get null = 204 = "up to date".
+    if (a.includes("aarch64") || a.includes("arm64")) {
+      return "darwin-aarch64";
+    }
+    return null;
   }
   if (t.startsWith("linux")) return "linux-x86_64";
   return null;

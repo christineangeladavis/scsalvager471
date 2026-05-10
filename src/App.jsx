@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   refineryLocations,
   refineryMaterials,
@@ -14610,6 +14611,29 @@ export default function StarCitizenSalvageGuideWebsite() {
 
   // --- UI state for the user menu and Settings modal ---
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  // Position cache for the web header user dropdown. The dropdown is
+  // portaled to <body> so it can escape the header's overflow-hidden
+  // (which clips the rounded banner). When the menu opens we read
+  // the trigger button's bounding rect to anchor the menu in viewport
+  // coords. Re-read on scroll/resize while open so it tracks.
+  const userMenuBtnRef = useRef(null);
+  const [userMenuRect, setUserMenuRect] = useState(null);
+  useEffect(() => {
+    if (!isUserMenuOpen) return;
+    const update = () => {
+      const el = userMenuBtnRef.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      setUserMenuRect({ top: r.bottom + 4, right: window.innerWidth - r.right });
+    };
+    update();
+    window.addEventListener("scroll", update, true);
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update, true);
+      window.removeEventListener("resize", update);
+    };
+  }, [isUserMenuOpen]);
   // Notification bell — left of the user menu in the header. Surfaces
   // setup nags (DMs not enabled, RSI handle not linked/verified) so
   // logged-in users have a one-click path to the Settings section
@@ -19891,6 +19915,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                   </div>
                   <div className="relative">
                     <button
+                      ref={userMenuBtnRef}
                       type="button"
                       onClick={() => setIsUserMenuOpen((v) => !v)}
                       aria-haspopup="menu"
@@ -19938,16 +19963,17 @@ export default function StarCitizenSalvageGuideWebsite() {
                         <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.06l3.71-3.83a.75.75 0 111.08 1.04l-4.25 4.39a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clipRule="evenodd" />
                       </svg>
                     </button>
-                    {isUserMenuOpen && (
+                    {isUserMenuOpen && userMenuRect && createPortal(
                       <>
                         {/* Click-outside catcher */}
                         <div
-                          className="fixed inset-0 z-40"
+                          className="fixed inset-0 z-[59]"
                           onClick={() => setIsUserMenuOpen(false)}
                         />
                         <div
                           role="menu"
-                          className="absolute right-0 top-full z-50 mt-1 w-44 overflow-hidden rounded-lg border border-cyan-500/25 bg-slate-900 shadow-xl shadow-cyan-950/40"
+                          style={{ top: userMenuRect.top, right: userMenuRect.right }}
+                          className="fixed z-[60] w-44 overflow-hidden rounded-lg border border-cyan-500/25 bg-slate-900 shadow-xl shadow-cyan-950/40"
                         >
                           <button
                             type="button"
@@ -19968,7 +19994,8 @@ export default function StarCitizenSalvageGuideWebsite() {
                             Logout
                           </a>
                         </div>
-                      </>
+                      </>,
+                      document.body
                     )}
                   </div>
                   </>

@@ -14639,6 +14639,26 @@ export default function StarCitizenSalvageGuideWebsite() {
   // logged-in users have a one-click path to the Settings section
   // that fixes each one.
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  // Same ref+rect pattern as the user menu / mailbox — portaled below
+  // the bell icon to escape the header's overflow-hidden.
+  const notifBtnRef = useRef(null);
+  const [notifRect, setNotifRect] = useState(null);
+  useEffect(() => {
+    if (!isNotificationsOpen) return;
+    const update = () => {
+      const el = notifBtnRef.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      setNotifRect({ top: r.bottom + 4, right: window.innerWidth - r.right });
+    };
+    update();
+    window.addEventListener("scroll", update, true);
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update, true);
+      window.removeEventListener("resize", update);
+    };
+  }, [isNotificationsOpen]);
   // Mailbox = dedicated dropdown for admin → user messages. Sits
   // next to the notification bell. Separate from isNotificationsOpen
   // so the two dropdowns don't fight for screen space.
@@ -19808,18 +19828,11 @@ export default function StarCitizenSalvageGuideWebsite() {
                                                 type="button"
                                                 onClick={(e) => { e.stopPropagation(); dismissNotification(`admin-msg:${m.id}`); }}
                                                 className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                                                title="Hide from this unread list — message stays in your Inbox tab"
                                               >
-                                                Mark read
+                                                Dismiss
                                               </button>
                                             )}
-                                            <button
-                                              type="button"
-                                              onClick={(e) => { e.stopPropagation(); deleteMailboxMessage(m.id); }}
-                                              className="rounded border border-rose-500/30 bg-rose-500/10 px-2 py-0.5 text-[10px] font-semibold text-rose-300 hover:border-rose-400/60 hover:bg-rose-500/20"
-                                              title="Delete from your mailbox (admins still see it in moderation history)"
-                                            >
-                                              Delete
-                                            </button>
                                           </div>
                                         </div>
                                       </div>
@@ -19837,6 +19850,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                   )}
                   <div className="relative">
                     <button
+                      ref={notifBtnRef}
                       type="button"
                       onClick={() => {
                         setIsNotificationsOpen((v) => !v);
@@ -19868,15 +19882,16 @@ export default function StarCitizenSalvageGuideWebsite() {
                         </span>
                       )}
                     </button>
-                    {isNotificationsOpen && (
+                    {isNotificationsOpen && notifRect && createPortal(
                       <>
                         <div
-                          className="fixed inset-0 z-40"
+                          className="fixed inset-0 z-[59]"
                           onClick={() => setIsNotificationsOpen(false)}
                         />
                         <div
                           role="menu"
-                          className="absolute right-0 bottom-full z-50 mb-1 w-80 overflow-hidden rounded-lg border border-cyan-500/25 bg-slate-900 shadow-xl shadow-cyan-950/40"
+                          style={{ top: notifRect.top, right: notifRect.right }}
+                          className="fixed z-[60] w-80 overflow-hidden rounded-lg border border-cyan-500/25 bg-slate-900 shadow-xl shadow-cyan-950/40"
                         >
                           <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950/60 px-3 py-2">
                             <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-300">
@@ -19954,7 +19969,8 @@ export default function StarCitizenSalvageGuideWebsite() {
                             })
                           )}
                         </div>
-                      </>
+                      </>,
+                      document.body
                     )}
                   </div>
                   <div className="relative">

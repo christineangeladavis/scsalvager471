@@ -20012,10 +20012,10 @@ export default function StarCitizenSalvageGuideWebsite() {
             <div className="mb-2 border-b border-slate-700/40 px-2 py-2">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-300">
+                  <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-cyan-300">
                     SCSalvager
                   </div>
-                  <div className="text-[9px] text-slate-500">
+                  <div className="text-[10px] text-slate-500">
                     {patchStatus?.version ? `Patch ${patchStatus.version}` : "Desktop"}
                   </div>
                 </div>
@@ -20138,7 +20138,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                 href="https://discord.gg/BrAtUj2k6q"
                 target="_blank"
                 rel="noreferrer"
-                className="mt-1.5 inline-flex w-full items-center justify-center gap-1.5 rounded-md border border-indigo-400/40 bg-indigo-500/15 px-2 py-1 text-[10px] font-semibold text-indigo-100 hover:bg-indigo-500/25"
+                className="mt-1.5 inline-flex w-full items-center justify-center gap-1.5 rounded-md border border-indigo-400/40 bg-indigo-500/15 px-2 py-1 text-[11px] font-semibold text-indigo-100 hover:bg-indigo-500/25"
               >
                 <svg viewBox="0 0 24 24" fill="currentColor" className="h-3 w-3" aria-hidden="true">
                   <path d="M20.317 4.369A19.79 19.79 0 0 0 16.558 3a.074.074 0 0 0-.079.037c-.34.607-.719 1.396-.984 2.013a18.27 18.27 0 0 0-5.487 0 12.51 12.51 0 0 0-1-2.013.077.077 0 0 0-.078-.037 19.736 19.736 0 0 0-3.76 1.369.07.07 0 0 0-.032.027C2.533 8.046 1.864 11.625 2.193 15.16a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.105 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.371-.291a.074.074 0 0 1 .077-.01c3.927 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.009c.12.099.245.198.372.292a.077.077 0 0 1-.006.128 12.3 12.3 0 0 1-1.873.891.077.077 0 0 0-.041.106 15.86 15.86 0 0 0 1.226 1.993.076.076 0 0 0 .084.029 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-4.087-.838-7.638-3.549-10.787a.06.06 0 0 0-.031-.028zM8.02 13.331c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.974 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.095 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
@@ -20178,7 +20178,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                 ? "border-cyan-400 text-cyan-200"
                 : "border-transparent text-slate-400 hover:border-cyan-500/40 hover:text-slate-200"
             }`;
-            const verticalCls = `inline-flex items-center justify-between gap-2 rounded-md border-l-4 px-3 py-2 text-xs font-semibold tracking-wider transition ${
+            const verticalCls = `inline-flex items-center justify-between gap-2 rounded-md border-l-4 px-3 py-2 text-[13px] font-semibold tracking-wider transition ${
               isActive
                 ? "border-cyan-400 bg-cyan-500/15 text-cyan-100"
                 : "border-transparent text-slate-400 hover:bg-slate-800/50 hover:text-slate-200"
@@ -20215,7 +20215,7 @@ export default function StarCitizenSalvageGuideWebsite() {
             <div className="mt-auto flex flex-col gap-1.5 border-t border-slate-700/40 pt-2">
               {/* Lifetime aUEC */}
               <div
-                className="flex items-center gap-1.5 rounded-md border border-emerald-500/25 bg-emerald-500/10 px-2 py-1.5 text-[11px] font-semibold text-emerald-200"
+                className="flex items-center gap-1.5 rounded-md border border-emerald-500/25 bg-emerald-500/10 px-2 py-1.5 text-[12px] font-semibold text-emerald-200"
                 title="Lifetime aUEC"
               >
                 <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" className="h-3 w-3 text-emerald-300">
@@ -20226,7 +20226,7 @@ export default function StarCitizenSalvageGuideWebsite() {
 
               {/* User avatar + name (flat, non-collapsing).
                   Settings + Sign out sit directly underneath. */}
-              <div className="mt-1 flex items-center gap-2 rounded-md border border-slate-700 bg-slate-800/40 px-2 py-1.5 text-[11px] text-slate-200">
+              <div className="mt-1 flex items-center gap-2 rounded-md border border-slate-700 bg-slate-800/40 px-2 py-1.5 text-[12px] text-slate-200">
                 {(prefs?.avatarDataUrl || (user && user.avatar)) ? (
                   <img
                     src={
@@ -20248,21 +20248,21 @@ export default function StarCitizenSalvageGuideWebsite() {
               <button
                 type="button"
                 onClick={() => setIsSettingsOpen(true)}
-                className="block w-full rounded-md border border-slate-700 bg-slate-800/40 px-2 py-1.5 text-left text-[11px] text-slate-200 hover:border-cyan-400/40 hover:text-cyan-200"
+                className="block w-full rounded-md border border-slate-700 bg-slate-800/40 px-2 py-1.5 text-left text-[12px] text-slate-200 hover:border-cyan-400/40 hover:text-cyan-200"
               >
                 Settings
               </button>
               <a
                 href="/api/auth/logout"
-                className="block w-full rounded-md border border-rose-500/30 bg-rose-500/10 px-2 py-1.5 text-left text-[11px] text-rose-200 hover:border-rose-400/60 hover:bg-rose-500/20"
+                className="block w-full rounded-md border border-rose-500/30 bg-rose-500/10 px-2 py-1.5 text-left text-[12px] text-rose-200 hover:border-rose-400/60 hover:bg-rose-500/20"
               >
                 Sign out
               </a>
               {/* Patch Verified pill — sidebar bottom (Tauri).
                   Header equivalent is hidden in the desktop shell. */}
-              <div className="rounded-md border border-cyan-400/30 bg-cyan-500/10 px-2 py-1 text-[10px] text-cyan-100">
+              <div className="rounded-md border border-cyan-400/30 bg-cyan-500/10 px-2 py-1 text-[11px] text-cyan-100">
                 <div className="font-semibold">Patch Verified</div>
-                <div className="text-[9px] text-cyan-200/80">{patchStatus?.version || "4.7.2"}</div>
+                <div className="text-[10px] text-cyan-200/80">{patchStatus?.version || "4.7.2"}</div>
               </div>
             </div>
           )}

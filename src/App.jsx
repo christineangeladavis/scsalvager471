@@ -19447,6 +19447,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                 </a>
               )}
             </div>
+            {!isTauri && (
             <div className="flex flex-row items-center justify-between gap-3 sm:justify-end">
               <div className="flex items-center gap-2">
                 {authLoading ? (
@@ -19479,8 +19480,10 @@ export default function StarCitizenSalvageGuideWebsite() {
                       actions don't get mixed with setup-nag /
                       What's New. Opens a dropdown listing every
                       message; dismissed messages stay visible but
-                      stop counting toward the unread badge. */}
-                  {user && (
+                      stop counting toward the unread badge.
+                      Hidden in Tauri — sidebar Inbox tab serves
+                      this surface in the desktop shell. */}
+                  {user && !isTauri && (
                     <div className="relative">
                       <button
                         type="button"
@@ -19983,6 +19986,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                 <div>{patchStatus?.version || "4.7.2"}</div>
               </div>
             </div>
+            )}
           </div>
         </header>
 
@@ -20014,33 +20018,118 @@ export default function StarCitizenSalvageGuideWebsite() {
                   </div>
                 </div>
                 {user && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsNotificationsOpen((v) => !v);
-                      setIsMailboxOpen(false);
-                      setIsUserMenuOpen(false);
-                    }}
-                    aria-label={
-                      unreadNotificationCount > 0
-                        ? `Notifications (${unreadNotificationCount} unread)`
-                        : "Notifications"
-                    }
-                    title="Notifications"
-                    className="relative flex h-7 w-7 items-center justify-center rounded-md border border-cyan-500/25 bg-slate-900/70 text-slate-300 hover:border-cyan-400/50 hover:text-cyan-200"
-                  >
-                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="h-3 w-3">
-                      <path d="M12 22a2.5 2.5 0 0 0 2.45-2H9.55A2.5 2.5 0 0 0 12 22zm6.36-6V11a6.37 6.37 0 0 0-5-6.32V4a1.36 1.36 0 1 0-2.72 0v.68A6.37 6.37 0 0 0 5.64 11v5l-1.92 1.92A1 1 0 0 0 4.43 19.5h15.14a1 1 0 0 0 .71-1.58z" />
-                    </svg>
-                    {unreadNotificationCount > 0 && (
-                      <span
-                        aria-hidden="true"
-                        className="pointer-events-none absolute -right-1 -top-1 flex h-3.5 min-w-[0.875rem] items-center justify-center rounded-full border border-slate-900 bg-rose-500 px-0.5 text-[8px] font-bold text-white"
-                      >
-                        {unreadNotificationCount > 9 ? "9+" : unreadNotificationCount}
-                      </span>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsNotificationsOpen((v) => !v);
+                        setIsMailboxOpen(false);
+                        setIsUserMenuOpen(false);
+                      }}
+                      aria-label={
+                        unreadNotificationCount > 0
+                          ? `Notifications (${unreadNotificationCount} unread)`
+                          : "Notifications"
+                      }
+                      title="Notifications"
+                      className="relative flex h-7 w-7 items-center justify-center rounded-md border border-cyan-500/25 bg-slate-900/70 text-slate-300 hover:border-cyan-400/50 hover:text-cyan-200"
+                    >
+                      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="h-3 w-3">
+                        <path d="M12 22a2.5 2.5 0 0 0 2.45-2H9.55A2.5 2.5 0 0 0 12 22zm6.36-6V11a6.37 6.37 0 0 0-5-6.32V4a1.36 1.36 0 1 0-2.72 0v.68A6.37 6.37 0 0 0 5.64 11v5l-1.92 1.92A1 1 0 0 0 4.43 19.5h15.14a1 1 0 0 0 .71-1.58z" />
+                      </svg>
+                      {unreadNotificationCount > 0 && (
+                        <span
+                          aria-hidden="true"
+                          className="pointer-events-none absolute -right-1 -top-1 flex h-3.5 min-w-[0.875rem] items-center justify-center rounded-full border border-slate-900 bg-rose-500 px-0.5 text-[8px] font-bold text-white"
+                        >
+                          {unreadNotificationCount > 9 ? "9+" : unreadNotificationCount}
+                        </span>
+                      )}
+                    </button>
+                    {isNotificationsOpen && (
+                      <>
+                        <div
+                          className="fixed inset-0 z-40"
+                          onClick={() => setIsNotificationsOpen(false)}
+                        />
+                        <div
+                          role="menu"
+                          className="absolute left-full top-0 z-50 ml-2 w-72 overflow-hidden rounded-lg border border-cyan-500/25 bg-slate-900 shadow-xl shadow-cyan-950/40"
+                        >
+                          <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950/60 px-3 py-2">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-300">
+                              Notifications
+                            </span>
+                            {unreadNotificationCount > 0 && (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  dismissAllNotifications(
+                                    userNotifications
+                                      .filter((n) => !n.isRead)
+                                      .map((n) => n.id)
+                                  )
+                                }
+                                className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                              >
+                                Mark all as read
+                              </button>
+                            )}
+                          </div>
+                          {userNotifications.length === 0 ? (
+                            <div className="px-3 py-3 text-xs text-slate-400">
+                              All caught up.
+                            </div>
+                          ) : (
+                            userNotifications.map((n) => {
+                              const onOpen = () => {
+                                setIsNotificationsOpen(false);
+                                if (n.target === "whatsnew") {
+                                  setIsWhatsNewOpen(true);
+                                  markWhatsNewSeen();
+                                } else {
+                                  setIsSettingsOpen(true);
+                                  dismissNotification(n.id);
+                                }
+                              };
+                              const ctaLabel =
+                                n.target === "whatsnew"
+                                  ? "Open What's New →"
+                                  : "Open Settings →";
+                              return (
+                                <div
+                                  key={n.id}
+                                  role="menuitem"
+                                  className={`flex items-start gap-2 border-b border-slate-800 px-3 py-2.5 last:border-b-0 hover:bg-slate-800/60 ${n.isRead ? "opacity-60" : ""}`}
+                                >
+                                  <span
+                                    className={`mt-1 inline-block h-1.5 w-1.5 shrink-0 rounded-full ${
+                                      n.isRead
+                                        ? "bg-slate-600"
+                                        : "bg-rose-400 shadow-[0_0_4px_rgba(244,63,94,0.7)]"
+                                    }`}
+                                  />
+                                  <div className="min-w-0 flex-1">
+                                    <button
+                                      type="button"
+                                      onClick={onOpen}
+                                      className="block w-full text-left"
+                                    >
+                                      <div className={`text-xs font-semibold ${n.isRead ? "text-slate-300" : "text-slate-100"}`}>
+                                        {n.title}
+                                      </div>
+                                      <div className="mt-0.5 text-[11px] leading-snug text-slate-400">{n.body}</div>
+                                      <div className="mt-1 text-[10px] font-semibold uppercase tracking-wider text-cyan-300">{ctaLabel}</div>
+                                    </button>
+                                  </div>
+                                </div>
+                              );
+                            })
+                          )}
+                        </div>
+                      </>
                     )}
-                  </button>
+                  </div>
                 )}
               </div>
               <a
@@ -20195,6 +20284,12 @@ export default function StarCitizenSalvageGuideWebsite() {
                     </div>
                   </>
                 )}
+              </div>
+              {/* Patch Verified pill — sidebar bottom (Tauri).
+                  Header equivalent is hidden in the desktop shell. */}
+              <div className="rounded-md border border-cyan-400/30 bg-cyan-500/10 px-2 py-1 text-[10px] text-cyan-100">
+                <div className="font-semibold">Patch Verified</div>
+                <div className="text-[9px] text-cyan-200/80">{patchStatus?.version || "4.7.2"}</div>
               </div>
             </div>
           )}

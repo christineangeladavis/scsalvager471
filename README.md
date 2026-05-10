@@ -22,7 +22,6 @@ Changes:
 HOTFIX 5/10/2026:
 
 Removed:
-- **Kruger Intergalactic Stingray** dropped from the patch 4.8 pre-staged Crew Salvage roster.
 - **Mailbox pill Delete button**. The header Messages dropdown now offers **Dismiss** only — hides the message from your unread list without deleting it. Full conversation history stays in the **Inbox** tab and on the admin's moderation side.
 
 Fixes:
@@ -101,7 +100,7 @@ Added:
 - Crew Salvage three SCU buckets — **Construction Salvage** (Reclaimer-only), **Construction Pieces** (Moth-only), **Recycled Material Composite** (always shown, 1:1 sale ratio, no refinery). Refinery + Sales Calculator computes per-material refined SCU, best aUEC/SCU from the site's known sell points, total refinery cost, and net projected sale. Split Calculator divides total aUEC by crew count for per-share take.
 - Crew Salvage sessions: Save Session → in-flight session card in the left sidebar (grouped by day, newest first); click to expand for full detail. Edit pops back into the draft form; **Mark Complete** locks edits and logs a synthetic *Crew Salvage* row to your Patch History (cyan pill, mission name + total SCU + total aUEC). Recent Sales feed excludes those entries.
 - **Ships Salvaged** picker now sources exclusively from the [SPViewer.eu](https://www.spviewer.eu) vehicle dataset (upstream: `api.uexcorp.uk/2.0/vehicles`) — 217 player-pilotable ships across 18 manufacturers. Concept ships, NPC-only hulls (Vanduul Clans), Retaliator Cargo/Torpedo modules, and the Retaliator Bomber loadout variant are filtered at build time so the picker only lists whole ships you'd actually salvage. Manufacturer dropdown drives off the same dataset — no more "Other" bucket.
-- Six **patch 4.8** ships pre-staged in the picker, gated on the live patch version: Drake Ironclad, Drake Ironclad Assault, Drake Pitbull, MISC Starlite, Aegis Tiburon, Kruger Intergalactic Stingray. Auto-appear once 4.8 goes live; no separate code push needed.
+- Six **patch 4.8** ships pre-staged in the picker, gated on the live patch version: Drake Ironclad, Drake Ironclad Assault, Drake Pitbull, MISC Starlite, Aegis Tiburon, Origin M80. Auto-appear once 4.8 goes live; no separate code push needed.
 - Home → Scraper Module Performance: each module's detail card now ships with a **Quality Level** slider (500 → 1000) that lights up on the patch 4.8 drop. Slider is 33% width with a paired numeric input you can type into directly, and the comparison table's Speed / Radius / Efficiency columns update live as you scrub (linear 0–20% boost). Gated on the live patch version — invisible until 4.8 hits production.
 - Missions tab now ships with **sub-tabs**: Salvage Missions (live 4.7.2 catalog, 59 entries) and **Refueling Missions** (12 United Wayfarers Club contracts pulled from the scmdb.net 4.8 PTU dump). Both share the same filter row, table, and detail popup; sub-tab swap flips the source array and the faction option list. Refueling sub-tab is gated on the live patch — hidden on 4.7.2, auto-appears once 4.8 goes live.
 - New **United Wayfarers Club** faction option in the Missions filter dropdown — appears only on the Refueling sub-tab.

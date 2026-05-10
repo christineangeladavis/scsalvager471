@@ -112,3 +112,46 @@ jobs:
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.rust-target == 'aarch64-apple-darwin' && '--target aarch64-apple-darwin' || (matrix.rust-target == 'x86_64-apple-darwin' && '--target x86_64-apple-darwin' || '') }}
+
+      # Rename uploaded release assets so the OS label sits in
+      # every filename. Tauri's default bundle names only carry
+      # the architecture (x64 / aarch64 / amd64); operators and
+      # downloaders want the OS visible too. Rename matches each
+      # OS's specific bundle extensions so other matrix runners
+      # don't get their assets touched. .sig siblings are
+      # renamed in lockstep with the installer they sign.
+      - name: Rename release assets to include OS label
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -e
+          TAG="${{ steps.tag.outputs.tag }}"
+          OS_LABEL="${{ matrix.target }}"
+          REPO="${{ github.repository }}"
+          REL_ID=$(gh api "repos/$REPO/releases/tags/$TAG" --jq '.id')
+
+          case "$OS_LABEL" in
+            windows-*) EXT_RE='(\.msi|\.msi\.zip|-setup\.exe|-setup\.nsis\.zip)(\.sig)?$' ;;
+            darwin-*)  EXT_RE='(\.dmg|\.app\.tar\.gz)(\.sig)?$' ;;
+            linux-*)   EXT_RE='(\.AppImage|\.AppImage\.tar\.gz|\.deb)(\.sig)?$' ;;
+            *)         EXT_RE='__never_match__' ;;
+          esac
+
+          gh api "repos/$REPO/releases/$REL_ID/assets" --paginate \
+            --jq '.[] | "\(.id)|\(.name)"' \
+            | while IFS='|' read -r ASSET_ID ASSET_NAME; do
+                # Skip if already prefixed with this OS label.
+                if [[ "$ASSET_NAME" == *"-${OS_LABEL}_"* ]]; then continue; fi
+                # Skip files that don't belong to this OS.
+                if ! [[ "$ASSET_NAME" =~ $EXT_RE ]]; then continue; fi
+                # Insert the OS label after the first product-name
+                # token, before the underscore that prefixes the
+                # version. SCSalvager_0.1.0_x64.msi becomes
+                # SCSalvager-windows-x86_64_0.1.0_x64.msi.
+                NEW_NAME="${ASSET_NAME%%_*}-${OS_LABEL}_${ASSET_NAME#*_}"
+                echo "Rename: $ASSET_NAME -> $NEW_NAME"
+                gh api -X PATCH "repos/$REPO/releases/assets/$ASSET_ID" \
+                  --field name="$NEW_NAME" >/dev/null
+              done

@@ -19379,7 +19379,7 @@ export default function StarCitizenSalvageGuideWebsite() {
             </div>
           );
         })()}
-        <header className="mb-8 overflow-hidden rounded-3xl border border-cyan-500/30 shadow-2xl shadow-cyan-950/40">
+        <header className={`mb-8 overflow-hidden rounded-3xl border border-cyan-500/30 shadow-2xl shadow-cyan-950/40 ${isTauri ? "sticky top-0 z-20 bg-slate-950/95 backdrop-blur" : ""}`}>
           {/* Banner displayed at ~75% of its natural height (h-80 →
               320px). object-cover preserves the artwork's center
               band when the viewport is narrower than 1600px. The

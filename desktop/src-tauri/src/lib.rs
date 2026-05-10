@@ -491,6 +491,7 @@ async fn upload_screenshot(
 }
 
 fn handle_screenshot_hotkey(app: AppHandle) {
+    eprintln!("[capture] hotkey received, beginning capture pipeline");
     tauri::async_runtime::spawn(async move {
         // Capture happens off the UI thread. xcap is sync so wrap
         // in spawn_blocking to keep tokio runtime healthy.
@@ -594,13 +595,17 @@ pub fn run() {
         .plugin(
             tauri_plugin_global_shortcut::Builder::new()
                 .with_handler(|app, shortcut, event| {
+                    eprintln!(
+                        "[hotkey] event state={:?} shortcut={:?}",
+                        event.state(),
+                        shortcut
+                    );
                     if event.state() == ShortcutState::Pressed {
                         // We only register one shortcut today (the
                         // refinery capture hotkey), so any pressed
                         // event triggers the same handler. When we
                         // add more shortcuts in Phase 5, switch on
                         // shortcut.matches(...) to dispatch.
-                        let _ = shortcut;
                         handle_screenshot_hotkey(app.clone());
                     }
                 })

@@ -20003,7 +20003,7 @@ export default function StarCitizenSalvageGuideWebsite() {
         <nav
           className={
             isTauri
-              ? "fixed left-0 top-0 bottom-0 z-30 flex w-44 flex-col gap-0.5 overflow-y-auto border-r border-cyan-500/25 bg-slate-950/95 p-2 backdrop-blur"
+              ? "fixed left-0 top-0 bottom-0 z-30 flex w-44 flex-col gap-0.5 overflow-y-auto border-r border-cyan-500/25 bg-slate-950 p-2"
               : "mb-6 flex gap-1 border-b border-cyan-500/25"
           }
           role="tablist"

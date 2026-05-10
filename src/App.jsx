@@ -17161,6 +17161,10 @@ export default function StarCitizenSalvageGuideWebsite() {
   // banner on the Home tab. Survives refresh — banner only hides
   // when 24 h elapses since createdAt.
   const [siteAnnouncements, setSiteAnnouncements] = useState([]);
+  // Desktop downloads — populated from /api/desktop/downloads
+  // (proxies the latest GitHub Release). Drives the Settings →
+  // Desktop App download buttons.
+  const [desktopDownloads, setDesktopDownloads] = useState(null);
   // Admin-only: aggregated user → admin messages across every
   // indexed user. Source: GET /api/admin/inbox-overview. Drives
   // the "User messages" section in the admin's Messages mailbox
@@ -20364,6 +20368,26 @@ export default function StarCitizenSalvageGuideWebsite() {
     const interval = setInterval(refreshSiteAnnouncements, 60_000);
     return () => clearInterval(interval);
   }, []);
+
+  // Lazy-load desktop release info on first Settings open. The
+  // GitHub-API proxy is cheap (cached 5 min server-side) but still
+  // not worth pulling for visitors who never crack Settings.
+  useEffect(() => {
+    if (!isSettingsOpen) return;
+    if (desktopDownloads !== null) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/desktop/downloads");
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!cancelled) setDesktopDownloads(data);
+      } catch {
+        // silent — section just stays in loading state
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [isSettingsOpen, desktopDownloads]);
 
   // Poll the inbox every 30 s while logged in so admin-sent
   // messages surface in the mailbox without a manual refresh.
@@ -29564,6 +29588,105 @@ export default function StarCitizenSalvageGuideWebsite() {
                   </div>
                 </section>
               )}
+
+              {/* Desktop App download section — pulls the latest
+                  GitHub Release via /api/desktop/downloads and
+                  highlights the button matching the visitor's OS.
+                  Hidden when no release is available yet (the
+                  manifest endpoint returns version: null). */}
+              {(() => {
+                if (!desktopDownloads || !desktopDownloads.version) return null;
+                const ua = typeof navigator !== "undefined" ? navigator.userAgent || "" : "";
+                let detected = "";
+                if (/Windows/i.test(ua)) detected = "windows";
+                else if (/Mac OS X|Macintosh/i.test(ua)) detected = "macos";
+                else if (/Linux/i.test(ua)) detected = "linux";
+                const fmtSize = (b) => {
+                  if (!Number.isFinite(b)) return "";
+                  if (b >= 1024 * 1024) return `${(b / (1024 * 1024)).toFixed(1)} MB`;
+                  if (b >= 1024) return `${(b / 1024).toFixed(0)} KB`;
+                  return `${b} B`;
+                };
+                const platforms = [
+                  { key: "windows", label: "Windows" },
+                  { key: "macos", label: "macOS (Apple Silicon)" },
+                  { key: "linux", label: "Linux" },
+                ];
+                return (
+                  <section className="mt-6">
+                    <h4 className="text-xs font-semibold uppercase tracking-wider text-cyan-300">
+                      Desktop App
+                    </h4>
+                    <div className="mt-3 rounded-xl border border-cyan-500/30 bg-cyan-500/5 p-4">
+                      <div className="flex flex-wrap items-baseline justify-between gap-2">
+                        <div>
+                          <p className="text-sm font-bold text-cyan-100">
+                            SCSalvager Desktop {desktopDownloads.version}
+                          </p>
+                          <p className="mt-0.5 text-xs text-slate-400">
+                            Native app with system tray, refinery countdown, F9 / tray screenshot capture, OS toasts, offline ledger cache. Auto-updates on launch.
+                          </p>
+                        </div>
+                        {desktopDownloads.releaseUrl && (
+                          <a
+                            href={desktopDownloads.releaseUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[10px] font-semibold text-cyan-300 underline-offset-2 hover:underline"
+                          >
+                            Release notes →
+                          </a>
+                        )}
+                      </div>
+                      <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                        {platforms.map(({ key, label }) => {
+                          const dl = desktopDownloads.downloads[key];
+                          if (!dl) {
+                            return (
+                              <div
+                                key={key}
+                                className="rounded-lg border border-slate-700 bg-slate-900/40 px-3 py-2 text-xs text-slate-500"
+                                title={`No ${label} build in this release`}
+                              >
+                                {label}
+                                <div className="mt-0.5 text-[10px]">Not available</div>
+                              </div>
+                            );
+                          }
+                          const isDetected = detected === key;
+                          return (
+                            <a
+                              key={key}
+                              href={dl.url}
+                              className={`block rounded-lg border px-3 py-2 text-xs font-semibold transition ${
+                                isDetected
+                                  ? "border-cyan-400 bg-cyan-500/20 text-cyan-100 hover:bg-cyan-500/30"
+                                  : "border-slate-700 bg-slate-900/40 text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                              }`}
+                              title={dl.name}
+                            >
+                              <div className="flex items-center justify-between gap-2">
+                                <span>{label}</span>
+                                {isDetected && (
+                                  <span className="rounded bg-cyan-500/30 px-1 py-0.5 text-[9px] font-bold uppercase tracking-wider text-cyan-100">
+                                    Your OS
+                                  </span>
+                                )}
+                              </div>
+                              <div className="mt-1 text-[10px] font-normal text-slate-400">
+                                Download · {fmtSize(dl.size)}
+                              </div>
+                            </a>
+                          );
+                        })}
+                      </div>
+                      <p className="mt-3 text-[10px] text-slate-500">
+                        Windows users: SmartScreen may show "Windows protected your PC" on first install — click <strong>More info → Run anyway</strong>. Subsequent updates apply automatically via the in-app updater.
+                      </p>
+                    </div>
+                  </section>
+                );
+              })()}
 
               {/* Danger Zone — account deletion.
                   Two-step confirmation flow:

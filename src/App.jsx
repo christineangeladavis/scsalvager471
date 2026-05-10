@@ -20104,11 +20104,11 @@ export default function StarCitizenSalvageGuideWebsite() {
                     />
                   ) : (
                     <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-slate-700 bg-cyan-500/15 text-[10px] font-bold text-cyan-200">
-                      {(displayName || user?.username || "?").charAt(0).toUpperCase()}
+                      {((prefs?.displayName) || user?.username || "?").charAt(0).toUpperCase()}
                     </span>
                   )}
                   <span className="min-w-0 flex-1 truncate text-left">
-                    {displayName || user?.username || "Signed in"}
+                    {(prefs?.displayName) || user?.username || "Signed in"}
                   </span>
                 </button>
                 {isUserMenuOpen && (
@@ -20132,17 +20132,13 @@ export default function StarCitizenSalvageGuideWebsite() {
                       >
                         Settings
                       </button>
-                      <button
-                        type="button"
+                      <a
                         role="menuitem"
-                        onClick={async () => {
-                          setIsUserMenuOpen(false);
-                          await handleLogout();
-                        }}
+                        href="/api/auth/logout"
                         className="block w-full border-t border-slate-800 px-3 py-2 text-left text-xs text-rose-300 hover:bg-rose-500/10"
                       >
                         Sign out
-                      </button>
+                      </a>
                     </div>
                   </>
                 )}

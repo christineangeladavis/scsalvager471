@@ -9,18 +9,61 @@ talks to the same `/api/*` endpoints as the web client. No backend rewrite.
 
 ## Status
 
-Phase 1 scaffold. Ships an OS-window WebView pointed at the
-`/api/auth/desktop-callback` bridge so first launch lands signed in.
+Phase 3 shipped. SCSalvager Desktop runs as a native window pointed at
+scsalvager.net with system tray, OS toasts, background refinery poller,
+F9 / tray-menu screenshot capture for the in-game refinery setup screen,
+and a Tauri auto-updater that pulls signed installers from GitHub
+Releases via `/api/desktop/manifest`.
 
 Roadmap (see `desktop/PLAN.md`):
 
-- **Phase 1** ✅ scaffold — Tauri config, deep-link OAuth bridge.
-- **Phase 2** — system tray + OS notifications + native screenshot picker
-  + background refinery poller.
-- **Phase 3** — global hotkeys + Star Citizen window capture + optional
-  always-on-top overlay.
-- **Phase 4** — auto-updater + signed installers (Windows MSI, macOS DMG,
-  Linux AppImage) + GitHub Actions matrix build.
+- **Phase 1** ✅ — scaffold + deep-link OAuth bridge.
+- **Phase 2** ✅ — system tray + OS notifications + 30 s background poll.
+- **Phase 3a** ✅ — global hotkey + xcap window capture + upload to
+  `/api/refinery/analyze` (Tray menu fallback for in-game capture
+  because EAC blocks low-level keyboard hooks).
+- **Phase 3b** ✅ — `tauri-plugin-updater` + `/api/desktop/manifest`
+  endpoint that resolves GitHub Releases per platform.
+- **Phase 3c** ✅ — GitHub Actions matrix workflow
+  (`.github/workflows/desktop-release.yml`) builds Win MSI / macOS
+  DMG / Linux AppImage on tag push.
+
+## Signed releases — one-time setup
+
+The updater pipeline is wired but won't sign anything until the
+operator populates the signing key. Steps (one-time, ~5 minutes):
+
+1. Generate a minisign keypair locally:
+   ```powershell
+   cd desktop
+   npx tauri signer generate -w "$env:USERPROFILE\.tauri\scsalvager.key"
+   ```
+   The command prints a public key block + writes the private key
+   (encrypted with a password you provide) to the path above.
+
+2. Paste the public key into `desktop/src-tauri/tauri.conf.json` →
+   `plugins.updater.pubkey`, replacing `PLACEHOLDER_REPLACE_WITH_OUTPUT_OF_TAURI_SIGNER_GENERATE`.
+
+3. Add the private key + password as GitHub Actions secrets
+   (Settings → Secrets and variables → Actions):
+   - `TAURI_SIGNING_PRIVATE_KEY` — contents of
+     `~/.tauri/scsalvager.key` (the file written in step 1)
+   - `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` — the password you
+     entered during generation
+
+4. Cut a release:
+   ```powershell
+   git tag desktop-v0.2.0
+   git push origin desktop-v0.2.0
+   ```
+   The GitHub Actions workflow builds Win/macOS/Linux installers,
+   signs each with your private key, and uploads them + `.sig`
+   sibling files to a new GitHub Release.
+
+5. Running desktop apps poll `/api/desktop/manifest` 15 s after
+   launch, see the new version, fetch the signed installer,
+   verify against the embedded public key, and prompt the user
+   to quit + reopen.
 
 ## One-time setup
 

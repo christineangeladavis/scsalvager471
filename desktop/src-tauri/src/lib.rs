@@ -172,7 +172,7 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
     // tauri.conf.json (bundle.icon is only used by the installer
     // bundler, not the running window). Embedding via
     // tauri::include_image! guarantees the tray always has an icon.
-    let icon: Image<'_> = tauri::include_image!("../icons/icon.png");
+    let icon: Image<'_> = tauri::include_image!("icons/icon.png");
 
     TrayIconBuilder::with_id("main")
         .icon(icon)

@@ -14575,14 +14575,17 @@ export default function StarCitizenSalvageGuideWebsite() {
           username: m.username,
           messages: [],
           latestTs: 0,
+          unreadCount: 0,
         });
       }
       const g = byUser.get(key);
       g.messages.push(m);
       if ((m.createdAt || 0) > g.latestTs) g.latestTs = m.createdAt || 0;
+      if (!m.dismissedAt) g.unreadCount += 1;
     }
     for (const g of byUser.values()) {
       g.messages.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+      g.allRead = g.unreadCount === 0;
     }
     // Groups sorted by most-recent activity descending — fresh
     // user traffic surfaces at the top of the admin's mailbox.
@@ -15347,7 +15350,10 @@ export default function StarCitizenSalvageGuideWebsite() {
       (m) => !m.dismissedAt && (m.from || "admin") === "admin"
     ).length;
     if (user && user.isAdmin) {
-      n += adminUserMailOverview.length;
+      // Only unread (non-dismissed) user mail counts toward the
+      // badge. Marked-as-read entries stay visible in the overview
+      // but don't keep the badge lit.
+      n += adminUserMailOverview.filter((m) => !m.dismissedAt).length;
     }
     return n;
   }, [mailboxMessages, user, adminUserMailOverview]);
@@ -17107,14 +17113,16 @@ export default function StarCitizenSalvageGuideWebsite() {
     setMailboxComposeOpen(true);
     setMailboxComposeStatus(null);
   };
-  // Admin-side: remove an entry from THIS admin's user-mail
-  // overview. Per-admin local state — the entry stays in the
-  // originating user's inbox (so the user-detail thread still
-  // shows it) and stays in other admins' overviews. Used when an
-  // admin has handled a user message and wants it out of their
-  // own dropdown.
+  // Admin-side: mark an entry from THIS admin's user-mail
+  // overview as read. The entry stays visible in the overview
+  // (rendered muted) so the admin can still reach back into the
+  // thread later — only the unread badge drops. Per-admin local
+  // state; the originating user's inbox is untouched, and other
+  // admins' overviews keep their own read state.
   const deleteAdminUserMail = (inboxId) => {
-    setAdminUserMailOverview((prev) => prev.filter((e) => e.id !== inboxId));
+    setAdminUserMailOverview((prev) =>
+      prev.map((e) => (e.id === inboxId && !e.dismissedAt ? { ...e, dismissedAt: Date.now() } : e))
+    );
     fetch("/api/admin/inbox-overview", {
       method: "POST",
       credentials: "same-origin",
@@ -17867,7 +17875,20 @@ export default function StarCitizenSalvageGuideWebsite() {
           });
         }
       });
-      setAdminUserMailOverview(mocked);
+      // Same merge logic as the production path so locally-dismissed
+      // dev fixture rows don't reappear unread every poll.
+      setAdminUserMailOverview((prev) => {
+        const incomingIds = new Set(mocked.map((m) => m.id));
+        const stickyReads = prev.filter((m) => m.dismissedAt && !incomingIds.has(m.id));
+        // For dev fixture: also preserve dismissedAt on entries that
+        // ARE still in the incoming set, so HMR / refresh poll
+        // doesn't reset the read flag.
+        const mergedIncoming = mocked.map((m) => {
+          const local = prev.find((p) => p.id === m.id);
+          return local?.dismissedAt ? { ...m, dismissedAt: local.dismissedAt } : m;
+        });
+        return [...mergedIncoming, ...stickyReads];
+      });
       return;
     }
     try {
@@ -17877,7 +17898,16 @@ export default function StarCitizenSalvageGuideWebsite() {
         return;
       }
       const data = await res.json();
-      setAdminUserMailOverview(Array.isArray(data.messages) ? data.messages : []);
+      const incoming = Array.isArray(data.messages) ? data.messages : [];
+      // Merge with locally-dismissed entries the server no longer
+      // returns. Marking as read POSTs dismiss to the server (so the
+      // unread count drops) but we keep the row visible client-side
+      // so the admin can still see what they handled.
+      setAdminUserMailOverview((prev) => {
+        const incomingIds = new Set(incoming.map((m) => m.id));
+        const stickyReads = prev.filter((m) => m.dismissedAt && !incomingIds.has(m.id));
+        return [...incoming, ...stickyReads];
+      });
     } catch {
       // silent — degrade to empty
     }
@@ -19778,13 +19808,13 @@ export default function StarCitizenSalvageGuideWebsite() {
                                 an entry pops the user-detail modal
                                 for that user with the thread
                                 pre-loaded. */}
-                            {user?.isAdmin && groupedUserMail.length > 0 && (
+                            {user?.isAdmin && groupedUserMail.some((g) => !g.allRead) && (
                               <div className="border-b border-amber-500/30 bg-amber-500/5">
                                 <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-amber-300">
-                                  User mail · {groupedUserMail.length} {groupedUserMail.length === 1 ? "user" : "users"} · {adminUserMailOverview.length} msg
+                                  User mail · {groupedUserMail.filter((g) => !g.allRead).length} unread / {groupedUserMail.length} {groupedUserMail.length === 1 ? "user" : "users"}
                                 </div>
                                 <div className="max-h-[40vh] overflow-y-auto">
-                                  {groupedUserMail.map((g) => {
+                                  {groupedUserMail.filter((g) => !g.allRead).map((g) => {
                                     const latest = g.messages[g.messages.length - 1];
                                     const ts = latest?.createdAt
                                       ? new Date(latest.createdAt).toLocaleString([], {
@@ -19814,7 +19844,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                                             <span className="flex items-center gap-1.5 text-xs font-bold text-amber-200">
                                               {g.username}
                                               <span className="rounded-full border border-amber-400/50 bg-amber-500/15 px-1.5 text-[10px] font-bold text-amber-100">
-                                                {g.messages.length}
+                                                {g.unreadCount}
                                               </span>
                                             </span>
                                             <span className="text-[10px] text-slate-500">{ts}</span>
@@ -19831,7 +19861,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                                               for (const m of g.messages) deleteAdminUserMail(m.id);
                                             }}
                                             className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
-                                            title="Mark this user's mail as read in your overview (full thread stays in the user's record)"
+                                            title="Mark this user's mail as read (entries stay visible in the Inbox tab)"
                                           >
                                             Mark as read
                                           </button>
@@ -25130,7 +25160,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     return (
                       <li
                         key={entry.id}
-                        className="rounded-md border border-amber-500/25 bg-slate-900/60 px-3 py-2 text-sm"
+                        className={`rounded-md border border-amber-500/25 bg-slate-900/60 px-3 py-2 text-sm ${g.allRead ? "opacity-60" : ""}`}
                       >
                         <div className="flex items-center justify-between gap-2">
                           <button
@@ -25141,8 +25171,8 @@ export default function StarCitizenSalvageGuideWebsite() {
                             className="flex items-center gap-1.5 text-xs font-bold text-amber-200 hover:underline"
                           >
                             {g.username}
-                            <span className="rounded-full border border-amber-400/50 bg-amber-500/15 px-1.5 text-[10px] font-bold text-amber-100">
-                              {g.messages.length}
+                            <span className={`rounded-full border px-1.5 text-[10px] font-bold ${g.allRead ? "border-slate-600 bg-slate-800/60 text-slate-400" : "border-amber-400/50 bg-amber-500/15 text-amber-100"}`}>
+                              {g.allRead ? `${g.messages.length}` : `${g.unreadCount} new · ${g.messages.length}`}
                             </span>
                           </button>
                           <span className="text-[10px] text-slate-500">{latestTs}</span>
@@ -25160,15 +25190,17 @@ export default function StarCitizenSalvageGuideWebsite() {
                           >
                             Open thread
                           </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              for (const m of g.messages) deleteAdminUserMail(m.id);
-                            }}
-                            className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
-                          >
-                            Mark as read
-                          </button>
+                          {!g.allRead && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                for (const m of g.messages) deleteAdminUserMail(m.id);
+                              }}
+                              className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                            >
+                              Mark as read
+                            </button>
+                          )}
                         </div>
                       </li>
                     );

@@ -20373,25 +20373,26 @@ export default function StarCitizenSalvageGuideWebsite() {
     return () => clearInterval(interval);
   }, []);
 
-  // Lazy-load desktop release info on first Settings open. The
-  // GitHub-API proxy is cheap (cached 5 min server-side) but still
-  // not worth pulling for visitors who never crack Settings.
+  // Lazy-load desktop release info on every Settings open. The
+  // server caches 5 min so the GitHub-API call doesn't fan out to
+  // GitHub on every open, but the client always re-fetches in
+  // case a release shipped (or the repo went from private →
+  // public, etc.) since the last time the modal opened.
   useEffect(() => {
     if (!isSettingsOpen) return;
-    if (desktopDownloads !== null) return;
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch("/api/desktop/downloads");
+        const res = await fetch("/api/desktop/downloads", { cache: "no-store" });
         if (!res.ok) return;
         const data = await res.json();
         if (!cancelled) setDesktopDownloads(data);
       } catch {
-        // silent — section just stays in loading state
+        // silent — section just stays hidden
       }
     })();
     return () => { cancelled = true; };
-  }, [isSettingsOpen, desktopDownloads]);
+  }, [isSettingsOpen]);
 
   // Poll the inbox every 30 s while logged in so admin-sent
   // messages surface in the mailbox without a manual refresh.

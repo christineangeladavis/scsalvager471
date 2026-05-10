@@ -42,13 +42,20 @@ export default async function handler(req, res) {
 
   let releases = [];
   try {
-    const ghRes = await fetch(RELEASES_URL, {
-      headers: {
-        Accept: "application/vnd.github+json",
-        "User-Agent": "scsalvager-desktop-downloads",
-      },
-    });
+    const headers = {
+      Accept: "application/vnd.github+json",
+      "User-Agent": "scsalvager-desktop-downloads",
+    };
+    // Repo is private — without an auth token GitHub returns 404
+    // for /releases. Operator stores a fine-grained PAT
+    // (contents:read on this repo) as GITHUB_RELEASE_TOKEN in
+    // Vercel project env vars. Endpoint degrades to version:null
+    // when the token is missing or invalid.
+    const ghToken = process.env.GITHUB_RELEASE_TOKEN;
+    if (ghToken) headers.Authorization = `Bearer ${ghToken}`;
+    const ghRes = await fetch(RELEASES_URL, { headers });
     if (!ghRes.ok) {
+      console.warn("[downloads] GitHub returned", ghRes.status);
       return res.status(200).json({ version: null, downloads: {} });
     }
     releases = await ghRes.json();

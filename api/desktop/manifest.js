@@ -101,12 +101,16 @@ export default async function handler(req, res) {
 
   let release;
   try {
-    const ghRes = await fetch(RELEASES_URL, {
-      headers: {
-        Accept: "application/vnd.github+json",
-        "User-Agent": "scsalvager-desktop-manifest",
-      },
-    });
+    const headers = {
+      Accept: "application/vnd.github+json",
+      "User-Agent": "scsalvager-desktop-manifest",
+    };
+    // Repo is private — auth token required for /releases.
+    // Operator stores a fine-grained PAT (contents:read on this
+    // repo) as GITHUB_RELEASE_TOKEN in Vercel env vars.
+    const ghToken = process.env.GITHUB_RELEASE_TOKEN;
+    if (ghToken) headers.Authorization = `Bearer ${ghToken}`;
+    const ghRes = await fetch(RELEASES_URL, { headers });
     if (!ghRes.ok) {
       // No release yet, or rate-limited. Tell the updater "up to
       // date" so it backs off until we ship a real release.
@@ -141,8 +145,22 @@ export default async function handler(req, res) {
 
   let signature;
   try {
-    const sigRes = await fetch(sigAsset.browser_download_url, {
-      headers: { "User-Agent": "scsalvager-desktop-manifest" },
+    const sigHeaders = {
+      "User-Agent": "scsalvager-desktop-manifest",
+      Accept: "application/octet-stream",
+    };
+    // Asset downloads on a private repo require auth too.
+    // Same fine-grained PAT (contents:read) works.
+    const sigToken = process.env.GITHUB_RELEASE_TOKEN;
+    if (sigToken) sigHeaders.Authorization = `Bearer ${sigToken}`;
+    // For private-repo asset downloads, prefer the API endpoint
+    // (api.github.com/.../assets/<id>) over browser_download_url.
+    // The API endpoint accepts Bearer auth + Accept: octet-stream
+    // and follows the redirect to the signed S3 URL automatically.
+    const sigUrl = `https://api.github.com/repos/christineangeladavis/scsalvager471/releases/assets/${sigAsset.id}`;
+    const sigRes = await fetch(sigUrl, {
+      headers: sigHeaders,
+      redirect: "follow",
     });
     if (!sigRes.ok) {
       console.warn("[manifest] sig fetch failed:", sigRes.status);

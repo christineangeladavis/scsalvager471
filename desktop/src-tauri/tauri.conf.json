@@ -46,6 +46,15 @@
       "desktop": {
         "schemes": ["scsalvager"]
       }
+    },
+    "updater": {
+      "endpoints": [
+        "https://scsalvager.net/api/desktop/manifest?target={{target}}&arch={{arch}}&current_version={{current_version}}"
+      ],
+      "pubkey": "PLACEHOLDER_REPLACE_WITH_OUTPUT_OF_TAURI_SIGNER_GENERATE",
+      "windows": {
+        "installMode": "passive"
+      }
     }
   }
 }

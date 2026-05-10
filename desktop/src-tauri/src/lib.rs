@@ -37,6 +37,7 @@ use tauri::{
 };
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 use tauri_plugin_notification::NotificationExt;
+use tauri_plugin_updater::UpdaterExt;
 use url::Url;
 
 const SESSION_COOKIE: &str = "scs_session";
@@ -589,6 +590,102 @@ fn handle_screenshot_hotkey(app: AppHandle) {
 }
 
 // -----------------------------------------------------------------
+// Phase 3b — Auto-updater.
+// -----------------------------------------------------------------
+//
+// On startup (after a short grace period so the UI lands first),
+// hit /api/desktop/manifest. If a signed update exists, prompt
+// the user via OS notification — they keep working uninterrupted
+// until they click. Click → download + install + relaunch.
+//
+// Manifest is signed with the operator's minisign private key;
+// the public key embedded in tauri.conf.json verifies. Without a
+// real key the updater plugin will refuse every manifest as
+// invalid signature, which is fine for dev builds — the check
+// just no-ops.
+
+fn spawn_update_checker(app: AppHandle) {
+    tauri::async_runtime::spawn(async move {
+        // Grace period so the WebView and tray have time to settle
+        // before the updater starts thrashing the network.
+        tokio::time::sleep(Duration::from_secs(15)).await;
+
+        let updater = match app.updater() {
+            Ok(u) => u,
+            Err(e) => {
+                eprintln!("[updater] init failed: {e}");
+                return;
+            }
+        };
+        let update = match updater.check().await {
+            Ok(u) => u,
+            Err(e) => {
+                // Network blip, manifest 404, signature mismatch —
+                // all non-fatal; the app keeps running on the
+                // current version. Logged so we can grep.
+                eprintln!("[updater] check failed: {e}");
+                return;
+            }
+        };
+        let Some(update) = update else {
+            eprintln!("[updater] up to date");
+            return;
+        };
+        let new_version = update.version.clone();
+        eprintln!("[updater] new version available: {new_version}");
+
+        // OS notification announces the update. The user keeps
+        // working; clicking the notification later (or relaunching
+        // the app) triggers the actual download. For Phase 3b we
+        // download immediately and install on next quit.
+        let _ = app
+            .notification()
+            .builder()
+            .title("SCSalvager update available")
+            .body(&format!(
+                "Version {new_version} is downloading. Quit + reopen to apply."
+            ))
+            .show();
+
+        let mut downloaded: u64 = 0;
+        let result = update
+            .download_and_install(
+                |chunk_len, content_len| {
+                    downloaded += chunk_len as u64;
+                    if let Some(total) = content_len {
+                        eprintln!("[updater] downloaded {downloaded}/{total} bytes");
+                    }
+                },
+                || {
+                    eprintln!("[updater] download finished, will apply on next launch");
+                },
+            )
+            .await;
+        match result {
+            Ok(()) => {
+                let _ = app
+                    .notification()
+                    .builder()
+                    .title("SCSalvager update ready")
+                    .body(&format!(
+                        "Version {new_version} downloaded. Quit + reopen to install."
+                    ))
+                    .show();
+            }
+            Err(e) => {
+                eprintln!("[updater] download failed: {e}");
+                let _ = app
+                    .notification()
+                    .builder()
+                    .title("SCSalvager update failed")
+                    .body(&format!("Could not download update: {e}"))
+                    .show();
+            }
+        }
+    });
+}
+
+// -----------------------------------------------------------------
 // Tauri entry.
 // -----------------------------------------------------------------
 
@@ -611,6 +708,7 @@ pub fn run() {
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .on_window_event(|window, event| {
             // Close button minimizes to tray rather than quitting so the
             // background refinery poller keeps running. The tray menu's
@@ -687,6 +785,12 @@ pub fn run() {
             // Kick off the background poll loop. Sleeps 30 s between
             // iterations; no-op when no session token on disk.
             spawn_background_poll(app.handle().clone());
+
+            // Check for app updates after a short grace period.
+            // No-op if the manifest endpoint returns nothing, the
+            // signature doesn't verify, or we're already on the
+            // newest version.
+            spawn_update_checker(app.handle().clone());
 
             // Register the refinery-screenshot global hotkey
             // (F9) WITH its handler in a single on_shortcut call.

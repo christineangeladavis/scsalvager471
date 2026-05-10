@@ -28453,6 +28453,9 @@ export default function StarCitizenSalvageGuideWebsite() {
                   <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Hotfix · May 10, 2026 · Removed</p>
                   <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
                     <li><strong>Mailbox pill Delete button.</strong> The header Messages dropdown now offers <strong>Dismiss</strong> only — hides the message from your unread list without deleting it. Full conversation history stays in the <strong>Inbox</strong> tab and on the admin's moderation side.</li>
+                    <li><strong>Inbox tab Delete button.</strong> Inbox messages now offer <strong>Reply</strong> and <strong>Mark as read</strong> only — read messages keep their place in your inbox, nothing gets deleted on click.</li>
+                    <li><strong>Separate "User mail" section</strong> in the admin Inbox. Incoming user mail is now merged into the same Inbox feed, grouped by sender, with one row per user (latest message preview). One inbox, one surface — Open thread still loads the full per-user conversation.</li>
+                    <li><strong>"From SCSalvager Admin" section header</strong> in the Inbox. Redundant — the Inbox tab IS the inbox, and per-message rows already show who sent each message.</li>
                   </ul>
                   <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Hotfix · May 10, 2026 · Fixes</p>
                   <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
@@ -28461,6 +28464,8 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <li><strong>Mailbox pill is now an unread-only feed.</strong> The header Messages dropdown filters to inbound messages you haven't dismissed yet — read messages stay accessible from the <strong>Inbox</strong> tab. Clicking a message row jumps you straight to the Inbox tab.</li>
                     <li><strong>Message threads now read chronologically</strong> — oldest at top, newest at bottom — both in your Messages mailbox and in the admin's per-user moderation view. Matches Discord / iMessage / SMS conventions instead of the prior newest-first inbox style.</li>
                     <li><strong>Mailbox poll cadence tightened from 30 s to 15 s.</strong> Admin replies surface in your mailbox roughly twice as fast.</li>
+                    <li><strong>Admin User mail now groups by sender.</strong> Ten messages from the same user previously rendered as ten separate rows; now they collapse into a single row showing the latest preview plus a count badge. <strong>Mark as read</strong> clears all messages from that user from your admin overview (their thread stays untouched).</li>
+                    <li><strong>Inbox action buttons now use consistent "Mark as read" labeling</strong> across the header pill, the Inbox tab list, and the admin user mail block — replaces the prior mix of Dismiss / Delete all / Mark read.</li>
                   </ul>
                 </section>
 

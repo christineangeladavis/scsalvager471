@@ -23,13 +23,13 @@ HOTFIX 5/10/2026:
 
 Removed:
 - **Mailbox pill Delete button**. The header Messages dropdown now offers **Dismiss** only — hides the message from your unread list without deleting it. Full conversation history stays in the **Inbox** tab and on the admin's moderation side.
+- **Inbox tab Delete button.** Inbox messages now offer **Reply** and **Mark as read** only — read messages keep their place in your inbox, nothing gets deleted on click.
+- **Separate "User mail" section** in the admin Inbox. Incoming user mail is now merged into the same Inbox feed, grouped by sender, with one row per user (latest message preview). One inbox, one surface — Open thread still loads the full per-user conversation.
+- **"From SCSalvager Admin" section header** in the Inbox. Redundant — the Inbox tab IS the inbox, and per-message rows already show who sent each message.
 
 Fixes:
-- **User dropdown Logout no longer clipped.** The header user menu was being cut off at the bottom of the rounded header — Settings rendered, Logout was hidden behind the page. The dropdown now portals to the page body so it overlays everything cleanly.
-- **Mailbox dropdown opens below the icon** instead of upward (matched to the user menu placement so the open direction is consistent). Notifications bell dropdown now opens below the icon for the same reason.
-- **Mailbox pill is now an unread-only feed.** The header Messages dropdown filters to inbound messages you haven't dismissed yet — read messages stay accessible from the **Inbox** tab. Clicking a message row jumps you straight to the Inbox tab.
-- **Message threads now read chronologically** — oldest at top, newest at bottom — both in your Messages mailbox and in the admin's per-user moderation view. Matches Discord / iMessage / SMS conventions instead of the prior newest-first inbox style.
-- **Mailbox poll cadence tightened from 30 s to 15 s.** Admin replies surface in your mailbox roughly twice as fast.
+- **Admin User mail now groups by sender.** Ten messages from the same user previously rendered as ten separate rows; now they collapse into a single row showing the latest preview plus a count badge. Mark as read clears all messages from that user from your admin overview (their thread stays untouched).
+- **Inbox message rows now show consistent "Mark as read" labeling** instead of mixing "Dismiss" / "Delete all" / "Mark read" across the header pill, the Inbox tab list, and the admin user mail block.
 
 UPDATE 5/8/2026 v2.7.3
 

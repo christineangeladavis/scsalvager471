@@ -15245,7 +15245,11 @@ export default function StarCitizenSalvageGuideWebsite() {
   // visually mixed with setup-nag / What's New items.
   const mailboxMessages = useMemo(() => {
     if (!Array.isArray(adminInbox)) return [];
-    return [...adminInbox].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    // Ascending order — oldest at top, newest at bottom — so threaded
+    // conversations read chronologically (matches Discord / iMessage /
+    // SMS conventions). Earlier we sorted DESC for an "inbox" feel,
+    // but per-user threading reads cleaner top-down.
+    return [...adminInbox].sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
   }, [adminInbox]);
   // Unread count drives the red badge. Only inbound (admin → user)
   // entries that aren't dismissed contribute — user-authored
@@ -26510,7 +26514,9 @@ export default function StarCitizenSalvageGuideWebsite() {
                   </div>
                 ) : (
                   <div className="mt-2 max-h-64 space-y-2 overflow-y-auto pr-1">
-                    {adminMessageThread.map((m) => {
+                    {[...adminMessageThread]
+                      .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0))
+                      .map((m) => {
                       const isUser = m.from === "user";
                       const isDeleted = Boolean(m.deletedAt);
                       const ts = m.createdAt

@@ -51,7 +51,10 @@ jobs:
             librsvg2-dev \
             patchelf \
             libpipewire-0.3-dev \
-            libxdo-dev
+            libxdo-dev \
+            libgbm-dev \
+            libdrm-dev \
+            libwayland-dev
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable

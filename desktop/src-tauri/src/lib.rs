@@ -405,6 +405,20 @@ pub fn run() {
             // Subscribe to subsequent deep-link activations.
             let dl_handle = app.handle().clone();
             use tauri_plugin_deep_link::DeepLinkExt;
+            // Production (MSI / NSIS / DMG / .desktop file) registers
+            // scsalvager:// at install time via the bundler. Debug
+            // builds never run an installer, so the OS doesn't know
+            // which executable to dispatch the scheme to. register()
+            // writes the scheme into the Windows user registry
+            // (HKCU\Software\Classes\scsalvager) on Windows and is a
+            // no-op-but-safe on other platforms. Without this, the
+            // browser's "Open SCSalvager Desktop" link fails silently.
+            #[cfg(desktop)]
+            {
+                if let Err(e) = app.deep_link().register("scsalvager") {
+                    eprintln!("[deep-link] register scheme failed: {e}");
+                }
+            }
             app.deep_link().on_open_url(move |event| {
                 for url in event.urls() {
                     if let Some(token) = extract_token_from_deep_link(url.as_str()) {

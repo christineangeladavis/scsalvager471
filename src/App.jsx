@@ -15319,6 +15319,23 @@ export default function StarCitizenSalvageGuideWebsite() {
     // but per-user threading reads cleaner top-down.
     return [...adminInbox].sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
   }, [adminInbox]);
+  // Unified Inbox feed. Personal messages (admin↔this-user thread)
+  // and grouped per-user mail (admin sessions only) live in one
+  // chronologically sorted list. Each row carries a discriminator
+  // so the JSX renderer can pick the right shape — there's no
+  // separate "User mail" block any more.
+  const inboxEntries = useMemo(() => {
+    const out = [];
+    for (const m of mailboxMessages) {
+      out.push({ kind: "personal", ts: m.createdAt || 0, id: `p-${m.id}`, data: m });
+    }
+    if (user?.isAdmin) {
+      for (const g of groupedUserMail) {
+        out.push({ kind: "user", ts: g.latestTs || 0, id: `u-${g.userId}`, data: g });
+      }
+    }
+    return out.sort((a, b) => a.ts - b.ts);
+  }, [mailboxMessages, groupedUserMail, user?.isAdmin]);
   // Unread count drives the red badge. Only inbound (admin → user)
   // entries that aren't dismissed contribute — user-authored
   // outgoing messages are "self-read" the moment they're sent.
@@ -25047,149 +25064,116 @@ export default function StarCitizenSalvageGuideWebsite() {
                 </div>
               )}
 
-              {/* Inbox list — admin↔this-user thread.
-                  Non-admin users see this as their primary surface.
-                  Admins also see it (covers admin-to-admin mail) but
-                  the grouped user-mail block below carries the bulk
-                  of the volume. */}
-              {mailboxMessages.length === 0 ? (
+              {/* Unified Inbox list. One feed: personal admin↔user
+                  messages + (for admins) grouped per-user mail rows.
+                  No separate User mail block — every incoming
+                  message lives in the same chronological surface. */}
+              {inboxEntries.length === 0 ? (
                 <div className="mt-5 rounded-2xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">
                   No messages yet.
                 </div>
               ) : (
                 <ul className="mt-5 space-y-2">
-                  {mailboxMessages.map((m) => {
-                    const direction = m.from === "user" ? "user" : "admin";
-                    const isRead = Boolean(m.dismissedAt);
-                    const ts = m.createdAt
-                      ? new Date(m.createdAt).toLocaleString()
-                      : "";
+                  {inboxEntries.map((entry) => {
+                    if (entry.kind === "personal") {
+                      const m = entry.data;
+                      const direction = m.from === "user" ? "user" : "admin";
+                      const isRead = Boolean(m.dismissedAt);
+                      const ts = m.createdAt
+                        ? new Date(m.createdAt).toLocaleString()
+                        : "";
+                      return (
+                        <li
+                          key={entry.id}
+                          className={`rounded-md border px-3 py-2 text-sm ${
+                            direction === "user"
+                              ? "border-l-4 border-l-amber-400 border-slate-700 bg-slate-900/60"
+                              : "border-cyan-500/25 bg-slate-900/40"
+                          } ${isRead && direction === "admin" ? "opacity-60" : ""}`}
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <span className={`text-xs font-bold ${direction === "user" ? "text-slate-300" : "text-cyan-200"}`}>
+                              {direction === "user" ? "You" : "SCSalvager Admin"}
+                            </span>
+                            <span className="text-[10px] text-slate-500">{ts}</span>
+                          </div>
+                          <div className="mt-1 whitespace-pre-wrap break-words text-slate-200">
+                            {m.body}
+                          </div>
+                          <div className="mt-2 flex flex-wrap gap-1.5">
+                            {direction === "admin" && (
+                              <button
+                                type="button"
+                                onClick={() => startMailboxReply(m.id)}
+                                className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                              >
+                                Reply
+                              </button>
+                            )}
+                            {direction === "admin" && !isRead && (
+                              <button
+                                type="button"
+                                onClick={() => dismissNotification(`admin-msg:${m.id}`)}
+                                className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                              >
+                                Mark as read
+                              </button>
+                            )}
+                          </div>
+                        </li>
+                      );
+                    }
+                    // kind === "user" — grouped per-sender entry
+                    const g = entry.data;
+                    const latest = g.messages[g.messages.length - 1];
+                    const latestTs = g.latestTs ? new Date(g.latestTs).toLocaleString() : "";
                     return (
                       <li
-                        key={m.id}
-                        className={`rounded-md border px-3 py-2 text-sm ${
-                          direction === "user"
-                            ? "border-l-4 border-l-amber-400 border-slate-700 bg-slate-900/60"
-                            : "border-cyan-500/25 bg-slate-900/40"
-                        } ${isRead && direction === "admin" ? "opacity-60" : ""}`}
+                        key={entry.id}
+                        className="rounded-md border border-amber-500/25 bg-slate-900/60 px-3 py-2 text-sm"
                       >
                         <div className="flex items-center justify-between gap-2">
-                          <span className={`text-xs font-bold ${direction === "user" ? "text-slate-300" : "text-cyan-200"}`}>
-                            {direction === "user" ? "You" : "SCSalvager Admin"}
-                          </span>
-                          <span className="text-[10px] text-slate-500">{ts}</span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              openAdminUserDetail({ userId: g.userId, username: g.username })
+                            }
+                            className="flex items-center gap-1.5 text-xs font-bold text-amber-200 hover:underline"
+                          >
+                            {g.username}
+                            <span className="rounded-full border border-amber-400/50 bg-amber-500/15 px-1.5 text-[10px] font-bold text-amber-100">
+                              {g.messages.length}
+                            </span>
+                          </button>
+                          <span className="text-[10px] text-slate-500">{latestTs}</span>
                         </div>
                         <div className="mt-1 whitespace-pre-wrap break-words text-slate-200">
-                          {m.body}
+                          {latest?.body}
                         </div>
                         <div className="mt-2 flex flex-wrap gap-1.5">
-                          {direction === "admin" && (
-                            <button
-                              type="button"
-                              onClick={() => startMailboxReply(m.id)}
-                              className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
-                            >
-                              Reply
-                            </button>
-                          )}
-                          {direction === "admin" && !isRead && (
-                            <button
-                              type="button"
-                              onClick={() => dismissNotification(`admin-msg:${m.id}`)}
-                              className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
-                            >
-                              Mark as read
-                            </button>
-                          )}
+                          <button
+                            type="button"
+                            onClick={() =>
+                              openAdminUserDetail({ userId: g.userId, username: g.username })
+                            }
+                            className="rounded border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-200 hover:bg-amber-500/20"
+                          >
+                            Open thread
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              for (const m of g.messages) deleteAdminUserMail(m.id);
+                            }}
+                            className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                          >
+                            Mark as read
+                          </button>
                         </div>
                       </li>
                     );
                   })}
                 </ul>
-              )}
-
-              {/* Admin-only: aggregated user → admin mail, merged
-                  inline with the personal inbox. Same Inbox surface,
-                  not a separate card — one place for every incoming
-                  message the admin needs to action. */}
-              {user?.isAdmin && (
-                <>
-                  <div className="mt-6 flex items-center justify-between gap-2">
-                    <h3 className="text-sm font-semibold text-amber-300">
-                      User mail · {groupedUserMail.length} {groupedUserMail.length === 1 ? "user" : "users"} · {adminUserMailOverview.length} msg
-                    </h3>
-                    <button
-                      type="button"
-                      onClick={refreshAdminUserMailOverview}
-                      className="rounded border border-slate-700 bg-slate-800/60 px-2 py-1 text-[10px] font-semibold text-slate-300 hover:border-amber-400/40 hover:text-amber-200"
-                    >
-                      Refresh
-                    </button>
-                  </div>
-                  <p className="mt-1 text-xs text-slate-500">
-                    Incoming messages from users grouped by sender — latest preview only. Click an entry to open that user's full thread + composer.
-                  </p>
-                  {groupedUserMail.length === 0 ? (
-                    <div className="mt-2 rounded-2xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">
-                      No user mail in flight.
-                    </div>
-                  ) : (
-                    <ul className="mt-2 space-y-2">
-                      {groupedUserMail.map((g) => {
-                        const latest = g.messages[g.messages.length - 1];
-                        const latestTs = g.latestTs ? new Date(g.latestTs).toLocaleString() : "";
-                        return (
-                          <li
-                            key={g.userId}
-                            className="rounded-md border border-amber-500/25 bg-slate-900/60 px-3 py-2 text-sm"
-                          >
-                            <div className="flex items-center justify-between gap-2">
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  openAdminUserDetail({ userId: g.userId, username: g.username })
-                                }
-                                className="flex items-center gap-1.5 text-xs font-bold text-amber-200 hover:underline"
-                              >
-                                {g.username}
-                                <span className="rounded-full border border-amber-400/50 bg-amber-500/15 px-1.5 text-[10px] font-bold text-amber-100">
-                                  {g.messages.length}
-                                </span>
-                              </button>
-                              <span className="text-[10px] text-slate-500">latest · {latestTs}</span>
-                            </div>
-                            {/* Latest-only preview. Full per-user thread
-                                (oldest -> newest) lives in the user
-                                detail modal, reached via Open thread. */}
-                            <div className="mt-1 whitespace-pre-wrap break-words text-slate-200">
-                              {latest?.body}
-                            </div>
-                            <div className="mt-2 flex flex-wrap gap-1.5">
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  openAdminUserDetail({ userId: g.userId, username: g.username })
-                                }
-                                className="rounded border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-200 hover:bg-amber-500/20"
-                              >
-                                Open thread
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  for (const m of g.messages) deleteAdminUserMail(m.id);
-                                }}
-                                className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
-                              >
-                                Mark as read
-                              </button>
-                            </div>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  )}
-                </>
               )}
             </div>
           </div>

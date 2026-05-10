@@ -20,7 +20,7 @@
         "minHeight": 640,
         "resizable": true,
         "fullscreen": false,
-        "url": "https://scsalvager.net/api/auth/desktop-callback"
+        "url": "https://scsalvager.net/"
       }
     ],
     "security": {

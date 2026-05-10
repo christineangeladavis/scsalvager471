@@ -24980,8 +24980,8 @@ export default function StarCitizenSalvageGuideWebsite() {
                   <h2 className="text-xl font-bold text-cyan-300">Inbox</h2>
                   <p className="mt-1 text-sm text-slate-400">
                     {user?.isAdmin
-                      ? "Messages from SCSalvager Admin (your personal inbox) and incoming user mail aggregated across every user."
-                      : "Messages from SCSalvager Admin. Reply or mark as read from here, or use the mailbox icon in the header."}
+                      ? "Your inbox plus incoming user mail aggregated across every user."
+                      : "Your inbox. Reply or mark as read from here, or use the mailbox icon in the header."}
                   </p>
                 </div>
                 {mailboxComposeOpen ? null : (
@@ -25047,20 +25047,17 @@ export default function StarCitizenSalvageGuideWebsite() {
                 </div>
               )}
 
-              {/* Personal inbox list — admin↔this-user thread.
+              {/* Inbox list — admin↔this-user thread.
                   Non-admin users see this as their primary surface.
                   Admins also see it (covers admin-to-admin mail) but
                   the grouped user-mail block below carries the bulk
                   of the volume. */}
-              <h3 className="mt-5 text-sm font-semibold text-cyan-200">
-                From SCSalvager Admin · {mailboxMessages.length}
-              </h3>
               {mailboxMessages.length === 0 ? (
-                <div className="mt-2 rounded-2xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">
+                <div className="mt-5 rounded-2xl border border-dashed border-slate-700 p-6 text-center text-sm text-slate-500">
                   No messages yet.
                 </div>
               ) : (
-                <ul className="mt-2 space-y-2">
+                <ul className="mt-5 space-y-2">
                   {mailboxMessages.map((m) => {
                     const direction = m.from === "user" ? "user" : "admin";
                     const isRead = Boolean(m.dismissedAt);

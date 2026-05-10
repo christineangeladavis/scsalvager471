@@ -17756,7 +17756,7 @@ export default function StarCitizenSalvageGuideWebsite() {
   useEffect(() => {
     refreshAdminUserMailOverview();
     if (!user || !user.isAdmin) return;
-    const interval = setInterval(refreshAdminUserMailOverview, 30_000);
+    const interval = setInterval(refreshAdminUserMailOverview, 15_000);
     return () => clearInterval(interval);
   }, [user]);
   // Refresh on mailbox open so admin always sees fresh state
@@ -17806,12 +17806,12 @@ export default function StarCitizenSalvageGuideWebsite() {
     return () => { cancelled = true; };
   }, [isSettingsOpen]);
 
-  // Poll the inbox every 30 s while logged in so admin-sent
+  // Poll the inbox every 15 s while logged in so admin-sent
   // messages surface in the mailbox without a manual refresh.
   // Balances latency vs Redis load — moderation traffic is light.
   useEffect(() => {
     if (!user) return;
-    const interval = setInterval(refreshAdminInbox, 30_000);
+    const interval = setInterval(refreshAdminInbox, 15_000);
     return () => clearInterval(interval);
   }, [user]);
   // Refresh when the mailbox is opened so the user always sees the

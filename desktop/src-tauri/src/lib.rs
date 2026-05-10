@@ -178,9 +178,16 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
     let sep0 = PredefinedMenuItem::separator(app)?;
     let show = MenuItem::with_id(app, "show", "Show window", true, None::<&str>)?;
     let hide = MenuItem::with_id(app, "hide", "Hide window", true, None::<&str>)?;
+    let compact = MenuItem::with_id(
+        app,
+        "toggle_compact",
+        "Toggle compact mode (always on top)",
+        true,
+        None::<&str>,
+    )?;
     let sep = PredefinedMenuItem::separator(app)?;
     let quit = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
-    let menu = Menu::with_items(app, &[&capture, &sep0, &show, &hide, &sep, &quit])?;
+    let menu = Menu::with_items(app, &[&capture, &sep0, &show, &hide, &compact, &sep, &quit])?;
 
     // Embed the PNG at compile time. default_window_icon() returns
     // None when no `icon` field is set on the window in
@@ -215,6 +222,37 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
             "hide" => {
                 if let Some(w) = app.get_webview_window("main") {
                     let _ = w.hide();
+                }
+            }
+            "toggle_compact" => {
+                // Compact mode: shrink to a refinery-countdown
+                // card, set always_on_top, navigate the WebView
+                // to the #compact hash route. App.jsx detects
+                // the hash and renders the stripped-down view.
+                // Toggle off restores normal size + drops the
+                // top-most flag.
+                if let Some(w) = app.get_webview_window("main") {
+                    let currently_on_top = w.is_always_on_top().unwrap_or(false);
+                    if currently_on_top {
+                        let _ = w.set_always_on_top(false);
+                        let _ = w.set_size(tauri::LogicalSize::new(1400.0, 900.0));
+                        let _ = w.eval(
+                            "if (window.location.hash === '#compact') { \
+                                window.location.hash = ''; \
+                            }",
+                        );
+                    } else {
+                        let _ = w.set_always_on_top(true);
+                        let _ = w.set_size(tauri::LogicalSize::new(380.0, 220.0));
+                        let _ = w.eval(
+                            "if (window.location.hash !== '#compact') { \
+                                window.location.hash = '#compact'; \
+                            }",
+                        );
+                        let _ = w.show();
+                        let _ = w.unminimize();
+                        let _ = w.set_focus();
+                    }
                 }
             }
             "quit" => {

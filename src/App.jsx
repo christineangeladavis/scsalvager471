@@ -16306,7 +16306,26 @@ function StockComponentsTable({ stockComponents }) {
   );
 }
 
+// Desktop "compact mode" detection. Tauri's tray menu toggle
+// rewrites the URL hash to `#compact` when the user shrinks the
+// window into the always-on-top refinery-countdown card. The
+// website normally ignores the hash; this hook exposes it so
+// the App can branch into the compact-only view.
+function useCompactMode() {
+  const [isCompact, setIsCompact] = useState(
+    () => typeof window !== "undefined" && window.location.hash === "#compact"
+  );
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const onHashChange = () => setIsCompact(window.location.hash === "#compact");
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
+  return isCompact;
+}
+
 export default function StarCitizenSalvageGuideWebsite() {
+  const isCompactMode = useCompactMode();
   const [selectedShip, setSelectedShip] = useState(ships[0]);
   const [selectedMaterial, setSelectedMaterial] = useState("");
   const [selectedRefineryMethod, setSelectedRefineryMethod] = useState("");
@@ -21601,6 +21620,102 @@ export default function StarCitizenSalvageGuideWebsite() {
       minute: "2-digit",
     });
   };
+
+  // Desktop compact mode — when the Tauri tray's "Toggle compact
+  // mode" item rewrites the URL hash to `#compact`, render a
+  // stripped refinery-countdown card instead of the full app.
+  // All hooks above stayed mounted so state survives the toggle.
+  if (isCompactMode) {
+    const now = Date.now();
+    const activeJobs = (refineryJobs || []).filter(
+      (j) => !j.deletedAt && !j.pickedUpAt
+    );
+    const readyJobs = activeJobs.filter(
+      (j) => Number.isFinite(j.completesAt) && j.completesAt <= now
+    );
+    const inProgressJobs = activeJobs.filter(
+      (j) => !Number.isFinite(j.completesAt) || j.completesAt > now
+    );
+    const nextJob = inProgressJobs.reduce(
+      (best, j) =>
+        !best || (j.completesAt || Infinity) < (best.completesAt || Infinity)
+          ? j
+          : best,
+      null
+    );
+    const formatRemaining = (ms) => {
+      if (!Number.isFinite(ms) || ms <= 0) return "ready";
+      const s = Math.floor(ms / 1000);
+      const h = Math.floor(s / 3600);
+      const m = Math.floor((s % 3600) / 60);
+      const sec = s % 60;
+      if (h > 0) return `${h}h ${String(m).padStart(2, "0")}m`;
+      if (m > 0) return `${m}m ${String(sec).padStart(2, "0")}s`;
+      return `${sec}s`;
+    };
+    return (
+      <div className="relative min-h-screen text-slate-100 bg-slate-950">
+        <style>{style}</style>
+        <div className="flex h-screen flex-col p-3">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-300">
+              SCSalvager
+            </span>
+            <span className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-200">
+              {Number(lifetimeAUEC || 0).toLocaleString()} aUEC
+            </span>
+          </div>
+          <div className="mt-2 flex-1 overflow-hidden rounded-xl border border-cyan-500/30 bg-slate-900/60 p-3">
+            {readyJobs.length > 0 ? (
+              <>
+                <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-300">
+                  Ready for pickup · {readyJobs.length}
+                </div>
+                <div className="mt-1 truncate text-sm font-bold text-white">
+                  {readyJobs[0].material}
+                </div>
+                <div className="text-[10px] text-slate-400 truncate">
+                  {Number(readyJobs[0].yield || 0).toFixed(2)} SCU · {readyJobs[0].location || "—"}
+                </div>
+              </>
+            ) : nextJob ? (
+              <>
+                <div className="text-[10px] font-bold uppercase tracking-wider text-cyan-300">
+                  Next pickup
+                </div>
+                <div className="mt-1 truncate text-sm font-bold text-white">
+                  {nextJob.material}
+                </div>
+                <div className="text-[10px] text-slate-400 truncate">
+                  {Number(nextJob.yield || 0).toFixed(2)} SCU · {nextJob.location || "—"}
+                </div>
+                <div className="mt-1 font-mono text-base font-bold text-amber-300">
+                  {formatRemaining(nextJob.completesAt - now)}
+                </div>
+              </>
+            ) : (
+              <div className="flex h-full items-center justify-center text-xs text-slate-500">
+                No active refinery jobs
+              </div>
+            )}
+          </div>
+          <div className="mt-2 flex items-center justify-between text-[10px] text-slate-500">
+            <span>{activeJobs.length} active · {readyJobs.length} ready</span>
+            <button
+              type="button"
+              onClick={() => {
+                window.location.hash = "";
+              }}
+              className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+              title="Exit compact mode (Tauri tray → Toggle compact mode)"
+            >
+              Expand
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-screen text-slate-100" style={{ display: "flex", flexDirection: "column" }}>

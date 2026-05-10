@@ -27,6 +27,7 @@ use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
+use base64::Engine;
 use serde::Deserialize;
 use tauri::{
     image::Image,
@@ -34,6 +35,7 @@ use tauri::{
     tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
     AppHandle, Manager,
 };
+use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 use tauri_plugin_notification::NotificationExt;
 use url::Url;
 
@@ -41,6 +43,10 @@ const SESSION_COOKIE: &str = "scs_session";
 const SCSALVAGER_ORIGIN: &str = "https://scsalvager.net";
 const POLL_INTERVAL_SECS: u64 = 30;
 const AUTH_FILE_NAME: &str = "auth.json";
+// Window-title substring used to find the Star Citizen window
+// among all visible OS windows. Case-insensitive match. Will
+// match "Star Citizen" but not "RSI Launcher".
+const SC_WINDOW_TITLE_HINT: &str = "star citizen";
 
 // -----------------------------------------------------------------
 // Deep-link handling (Phase 1, untouched).
@@ -412,6 +418,158 @@ fn spawn_background_poll(app: AppHandle) {
 }
 
 // -----------------------------------------------------------------
+// Phase 3 — Star Citizen window screenshot capture + upload.
+// -----------------------------------------------------------------
+
+#[allow(non_snake_case)]
+#[derive(Debug, Deserialize)]
+struct AnalyzeResponse {
+    rawMaterialName: Option<String>,
+    totalSCU: Option<f64>,
+    locationName: Option<String>,
+    methodName: Option<String>,
+    #[allow(dead_code)]
+    processingTimeSeconds: Option<i64>,
+    #[allow(dead_code)]
+    costAUEC: Option<i64>,
+}
+
+fn capture_sc_window_png() -> Result<Vec<u8>, String> {
+    let windows = xcap::Window::all().map_err(|e| format!("enumerate windows: {e}"))?;
+    let target = windows
+        .into_iter()
+        .find(|w| {
+            w.title()
+                .map(|t| t.to_lowercase().contains(SC_WINDOW_TITLE_HINT))
+                .unwrap_or(false)
+        })
+        .ok_or_else(|| {
+            "Star Citizen window not found. Is the game running and visible?".to_string()
+        })?;
+    let img = target
+        .capture_image()
+        .map_err(|e| format!("capture image: {e}"))?;
+    let mut buf: Vec<u8> = Vec::new();
+    {
+        // PNG encode the RGBA buffer xcap returns. image 0.25 takes
+        // a writer + RGBA bytes via DynamicImage::ImageRgba8.
+        let dynimg = image::DynamicImage::ImageRgba8(img);
+        let mut cursor = std::io::Cursor::new(&mut buf);
+        dynimg
+            .write_to(&mut cursor, image::ImageFormat::Png)
+            .map_err(|e| format!("encode png: {e}"))?;
+    }
+    Ok(buf)
+}
+
+async fn upload_screenshot(
+    client: &reqwest::Client,
+    token: &str,
+    png_bytes: Vec<u8>,
+) -> Result<AnalyzeResponse, String> {
+    let b64 = base64::engine::general_purpose::STANDARD.encode(&png_bytes);
+    let url = format!("{SCSALVAGER_ORIGIN}/api/refinery/analyze");
+    let res = client
+        .post(&url)
+        .bearer_auth(token)
+        .json(&serde_json::json!({
+            "imageBase64": b64,
+            "mediaType": "image/png",
+        }))
+        .send()
+        .await
+        .map_err(|e| format!("send: {e}"))?;
+    let status = res.status();
+    if !status.is_success() {
+        let body_preview = res.text().await.unwrap_or_default();
+        let snippet: String = body_preview.chars().take(140).collect();
+        return Err(format!("HTTP {status} — {snippet}"));
+    }
+    res.json::<AnalyzeResponse>()
+        .await
+        .map_err(|e| format!("parse: {e}"))
+}
+
+fn handle_screenshot_hotkey(app: AppHandle) {
+    tauri::async_runtime::spawn(async move {
+        // Capture happens off the UI thread. xcap is sync so wrap
+        // in spawn_blocking to keep tokio runtime healthy.
+        let png = match tauri::async_runtime::spawn_blocking(capture_sc_window_png).await {
+            Ok(Ok(b)) => b,
+            Ok(Err(e)) => {
+                let _ = app
+                    .notification()
+                    .builder()
+                    .title("Refinery Screenshot Failed")
+                    .body(&e)
+                    .show();
+                return;
+            }
+            Err(e) => {
+                let _ = app
+                    .notification()
+                    .builder()
+                    .title("Refinery Screenshot Failed")
+                    .body(&format!("blocking task: {e}"))
+                    .show();
+                return;
+            }
+        };
+
+        let token = match ensure_session_token(&app) {
+            Some(t) => t,
+            None => {
+                let _ = app
+                    .notification()
+                    .builder()
+                    .title("Refinery Screenshot Failed")
+                    .body("Not signed in. Open SCSalvager and log in first.")
+                    .show();
+                return;
+            }
+        };
+
+        let client = reqwest::Client::builder()
+            .user_agent("scsalvager-desktop/0.1")
+            .build()
+            .unwrap_or_else(|_| reqwest::Client::new());
+
+        match upload_screenshot(&client, &token, png).await {
+            Ok(parsed) => {
+                let mat = parsed
+                    .rawMaterialName
+                    .clone()
+                    .unwrap_or_else(|| "?".into());
+                // /api/refinery/analyze returns raw cSCU; SCU = cSCU / 100.
+                let scu = parsed.totalSCU.unwrap_or(0.0) / 100.0;
+                let loc = parsed.locationName.clone().unwrap_or_else(|| "?".into());
+                let method = parsed.methodName.clone().unwrap_or_else(|| "?".into());
+                let body = format!("{mat} · {scu:.2} SCU · {method} at {loc}");
+                let _ = app
+                    .notification()
+                    .builder()
+                    .title("Refinery Captured")
+                    .body(&body)
+                    .show();
+                if let Some(w) = app.get_webview_window("main") {
+                    let _ = w.show();
+                    let _ = w.unminimize();
+                    let _ = w.set_focus();
+                }
+            }
+            Err(e) => {
+                let _ = app
+                    .notification()
+                    .builder()
+                    .title("Refinery Screenshot Failed")
+                    .body(&e)
+                    .show();
+            }
+        }
+    });
+}
+
+// -----------------------------------------------------------------
 // Tauri entry.
 // -----------------------------------------------------------------
 
@@ -433,6 +591,21 @@ pub fn run() {
         }))
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_notification::init())
+        .plugin(
+            tauri_plugin_global_shortcut::Builder::new()
+                .with_handler(|app, shortcut, event| {
+                    if event.state() == ShortcutState::Pressed {
+                        // We only register one shortcut today (the
+                        // refinery capture hotkey), so any pressed
+                        // event triggers the same handler. When we
+                        // add more shortcuts in Phase 5, switch on
+                        // shortcut.matches(...) to dispatch.
+                        let _ = shortcut;
+                        handle_screenshot_hotkey(app.clone());
+                    }
+                })
+                .build(),
+        )
         .on_window_event(|window, event| {
             // Close button minimizes to tray rather than quitting so the
             // background refinery poller keeps running. The tray menu's
@@ -509,6 +682,18 @@ pub fn run() {
             // Kick off the background poll loop. Sleeps 30 s between
             // iterations; no-op when no session token on disk.
             spawn_background_poll(app.handle().clone());
+
+            // Register the refinery-screenshot global hotkey
+            // (Ctrl+Shift+R). Fires from anywhere — the user
+            // doesn't need to alt-tab out of Star Citizen. xcap
+            // captures the SC window pixels even while the game
+            // owns focus.
+            let capture_shortcut =
+                Shortcut::new(Some(Modifiers::CONTROL | Modifiers::SHIFT), Code::KeyR);
+            match app.global_shortcut().register(capture_shortcut) {
+                Ok(()) => eprintln!("[hotkey] Ctrl+Shift+R → SC screenshot capture"),
+                Err(e) => eprintln!("[hotkey] register failed: {e}"),
+            }
 
             Ok(())
         })

@@ -13706,6 +13706,21 @@ function useWidgetMode() {
 export default function StarCitizenSalvageGuideWebsite() {
   const { isCompact: isCompactMode, isCrewWidget: isCrewWidgetMode } = useWidgetMode();
   const isTauri = useIsTauri();
+  // In the Tauri shell, drop the root font-size so every
+  // rem-based Tailwind utility (text-sm, p-4, gap-4, mb-8, etc.)
+  // scales proportionally smaller. Web users are unaffected
+  // because the effect only writes to documentElement when the
+  // Tauri runtime is detected. 13.5px ≈ 84% of the default 16px,
+  // a noticeable density gain without making text strain to read.
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (!isTauri) return;
+    const prev = document.documentElement.style.fontSize;
+    document.documentElement.style.fontSize = "13.5px";
+    return () => {
+      document.documentElement.style.fontSize = prev;
+    };
+  }, [isTauri]);
   // Lazy-loaded mission data. The arrays were ~316 KB inline; now
   // they ship as separate JSON chunks Vite splits on dynamic
   // import. Initial render gets [] (skeleton state until the
@@ -19925,7 +19940,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                         />
                         <div
                           role="menu"
-                          className="absolute right-0 bottom-full z-50 mb-1 w-44 overflow-hidden rounded-lg border border-cyan-500/25 bg-slate-900 shadow-xl shadow-cyan-950/40"
+                          className="absolute right-0 top-full z-50 mt-1 w-44 overflow-hidden rounded-lg border border-cyan-500/25 bg-slate-900 shadow-xl shadow-cyan-950/40"
                         >
                           <button
                             type="button"

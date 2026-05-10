@@ -592,25 +592,7 @@ pub fn run() {
         }))
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_notification::init())
-        .plugin(
-            tauri_plugin_global_shortcut::Builder::new()
-                .with_handler(|app, shortcut, event| {
-                    eprintln!(
-                        "[hotkey] event state={:?} shortcut={:?}",
-                        event.state(),
-                        shortcut
-                    );
-                    if event.state() == ShortcutState::Pressed {
-                        // We only register one shortcut today (the
-                        // refinery capture hotkey), so any pressed
-                        // event triggers the same handler. When we
-                        // add more shortcuts in Phase 5, switch on
-                        // shortcut.matches(...) to dispatch.
-                        handle_screenshot_hotkey(app.clone());
-                    }
-                })
-                .build(),
-        )
+        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .on_window_event(|window, event| {
             // Close button minimizes to tray rather than quitting so the
             // background refinery poller keeps running. The tray menu's
@@ -689,17 +671,22 @@ pub fn run() {
             spawn_background_poll(app.handle().clone());
 
             // Register the refinery-screenshot global hotkey
-            // (F9). Fires from anywhere — the user doesn't need
-            // to alt-tab out of Star Citizen. xcap captures the
-            // SC window pixels even while the game owns focus.
-            //
-            // Switched from PrintScreen to F9 because Windows
-            // intercepts PrtSc at the keyboard driver / Snipping
-            // Tool / Game Bar layer before Tauri's global hook
-            // sees the keypress. F9 is unbound by default in
-            // Star Citizen and clean across Windows utilities.
+            // (F9) WITH its handler in a single on_shortcut call.
+            // The earlier with_handler + register split appeared
+            // to register the shortcut without actually wiring
+            // the OS hook on Windows — keypresses didn't reach
+            // the handler. on_shortcut binds them atomically.
             let capture_shortcut = Shortcut::new(None, Code::F9);
-            match app.global_shortcut().register(capture_shortcut) {
+            let cap_handle = app.handle().clone();
+            match app.global_shortcut().on_shortcut(
+                capture_shortcut,
+                move |_app, _shortcut, event| {
+                    eprintln!("[hotkey] F9 event state={:?}", event.state());
+                    if event.state() == ShortcutState::Pressed {
+                        handle_screenshot_hotkey(cap_handle.clone());
+                    }
+                },
+            ) {
                 Ok(()) => eprintln!("[hotkey] F9 → SC screenshot capture"),
                 Err(e) => eprintln!("[hotkey] register failed: {e}"),
             }

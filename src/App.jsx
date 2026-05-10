@@ -19394,7 +19394,8 @@ export default function StarCitizenSalvageGuideWebsite() {
             </div>
           );
         })()}
-        <header className={`mb-6 rounded-3xl border border-cyan-500/30 shadow-2xl shadow-cyan-950/40 ${isTauri ? "sticky top-0 z-20 bg-slate-950/95 backdrop-blur" : "overflow-hidden mb-8"}`}>
+        {!isTauri && (
+        <header className="mb-8 overflow-hidden rounded-3xl border border-cyan-500/30 shadow-2xl shadow-cyan-950/40">
           {/* Banner displayed at ~75% of its natural height (h-80 →
               320px). object-cover preserves the artwork's center
               band when the viewport is narrower than 1600px. The
@@ -19989,6 +19990,7 @@ export default function StarCitizenSalvageGuideWebsite() {
             )}
           </div>
         </header>
+        )}
 
         {/* --- Tab navigation ---
             Layout split:
@@ -20054,7 +20056,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                         />
                         <div
                           role="menu"
-                          className="absolute left-full top-0 z-50 ml-2 w-72 overflow-hidden rounded-lg border border-cyan-500/25 bg-slate-900 shadow-xl shadow-cyan-950/40"
+                          className="fixed left-44 top-2 z-[60] ml-2 w-72 overflow-hidden rounded-lg border border-cyan-500/25 bg-slate-900 shadow-xl shadow-cyan-950/40"
                         >
                           <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950/60 px-3 py-2">
                             <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-300">
@@ -20222,69 +20224,40 @@ export default function StarCitizenSalvageGuideWebsite() {
                 <span className="truncate">{Number(lifetimeAUEC || 0).toLocaleString()} aUEC</span>
               </div>
 
-              {/* User avatar / name + dropdown — opens UPWARD
-                  since the button is at the bottom of the
-                  sidebar. */}
-              <div className="relative mt-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsUserMenuOpen((v) => !v);
-                    setIsMailboxOpen(false);
-                    setIsNotificationsOpen(false);
-                  }}
-                  className="flex w-full items-center gap-2 rounded-md border border-slate-700 bg-slate-800/40 px-2 py-1.5 text-[11px] text-slate-200 hover:border-cyan-400/40"
-                >
-                  {(prefs?.avatarDataUrl || (user && user.avatar)) ? (
-                    <img
-                      src={
-                        prefs?.avatarDataUrl ||
-                        `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`
-                      }
-                      alt=""
-                      className="h-5 w-5 shrink-0 rounded-full border border-slate-700 object-cover"
-                    />
-                  ) : (
-                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-slate-700 bg-cyan-500/15 text-[10px] font-bold text-cyan-200">
-                      {((prefs?.displayName) || user?.username || "?").charAt(0).toUpperCase()}
-                    </span>
-                  )}
-                  <span className="min-w-0 flex-1 truncate text-left">
-                    {(prefs?.displayName) || user?.username || "Signed in"}
+              {/* User avatar + name (flat, non-collapsing).
+                  Settings + Sign out sit directly underneath. */}
+              <div className="mt-1 flex items-center gap-2 rounded-md border border-slate-700 bg-slate-800/40 px-2 py-1.5 text-[11px] text-slate-200">
+                {(prefs?.avatarDataUrl || (user && user.avatar)) ? (
+                  <img
+                    src={
+                      prefs?.avatarDataUrl ||
+                      `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`
+                    }
+                    alt=""
+                    className="h-5 w-5 shrink-0 rounded-full border border-slate-700 object-cover"
+                  />
+                ) : (
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-slate-700 bg-cyan-500/15 text-[10px] font-bold text-cyan-200">
+                    {((prefs?.displayName) || user?.username || "?").charAt(0).toUpperCase()}
                   </span>
-                </button>
-                {isUserMenuOpen && (
-                  <>
-                    <div
-                      className="fixed inset-0 z-40"
-                      onClick={() => setIsUserMenuOpen(false)}
-                    />
-                    <div
-                      role="menu"
-                      className="absolute left-0 right-0 bottom-full z-50 mb-1 overflow-hidden rounded-lg border border-cyan-500/25 bg-slate-900 shadow-xl shadow-cyan-950/40"
-                    >
-                      <button
-                        type="button"
-                        role="menuitem"
-                        onClick={() => {
-                          setIsUserMenuOpen(false);
-                          setIsSettingsOpen(true);
-                        }}
-                        className="block w-full px-3 py-2 text-left text-xs text-slate-200 hover:bg-slate-800"
-                      >
-                        Settings
-                      </button>
-                      <a
-                        role="menuitem"
-                        href="/api/auth/logout"
-                        className="block w-full border-t border-slate-800 px-3 py-2 text-left text-xs text-rose-300 hover:bg-rose-500/10"
-                      >
-                        Sign out
-                      </a>
-                    </div>
-                  </>
                 )}
+                <span className="min-w-0 flex-1 truncate text-left">
+                  {(prefs?.displayName) || user?.username || "Signed in"}
+                </span>
               </div>
+              <button
+                type="button"
+                onClick={() => setIsSettingsOpen(true)}
+                className="block w-full rounded-md border border-slate-700 bg-slate-800/40 px-2 py-1.5 text-left text-[11px] text-slate-200 hover:border-cyan-400/40 hover:text-cyan-200"
+              >
+                Settings
+              </button>
+              <a
+                href="/api/auth/logout"
+                className="block w-full rounded-md border border-rose-500/30 bg-rose-500/10 px-2 py-1.5 text-left text-[11px] text-rose-200 hover:border-rose-400/60 hover:bg-rose-500/20"
+              >
+                Sign out
+              </a>
               {/* Patch Verified pill — sidebar bottom (Tauri).
                   Header equivalent is hidden in the desktop shell. */}
               <div className="rounded-md border border-cyan-400/30 bg-cyan-500/10 px-2 py-1 text-[10px] text-cyan-100">
@@ -21280,7 +21253,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                   Hidden entirely on 4.7.2 — auto-appears once the
                   live patch advances to 4.8. */}
               {refuelingUnlocked && (
-                <nav className="flex gap-1 border-b border-cyan-500/25" role="tablist" aria-label="Missions sub-sections">
+                <nav className={`flex gap-1 border-b border-cyan-500/25 ${isTauri ? "sticky top-0 z-10 bg-slate-950/95 backdrop-blur" : ""}`} role="tablist" aria-label="Missions sub-sections">
                   {[
                     { id: "salvage",   label: "Salvage Missions" },
                     { id: "refueling", label: "Refueling Missions" },
@@ -21515,7 +21488,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                   </div>
                 ) : (
                   <div className="mt-5 overflow-x-auto overflow-y-auto max-h-[40rem] rounded-2xl border border-slate-700 [scrollbar-width:thin] [scrollbar-color:rgb(6_182_212_/_0.7)_rgb(2_6_23)] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-slate-950 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-500/70 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-cyan-400">
-                    <table className="w-full min-w-[960px] text-left text-sm md:min-w-0">
+                    <table className="w-full text-left text-sm">
                       <thead className="bg-slate-950 text-slate-300 sticky top-0 z-10">
                         <tr>
                           {[
@@ -25057,7 +25030,7 @@ export default function StarCitizenSalvageGuideWebsite() {
         {activeTab === "admin" && (user?.isAdmin || import.meta.env.DEV) && (
           <div className="space-y-6">
             {/* Admin sub-nav */}
-            <div className="flex flex-wrap gap-1 border-b border-cyan-500/20" role="tablist" aria-label="Admin sections">
+            <div className={`flex flex-wrap gap-1 border-b border-cyan-500/20 ${isTauri ? "sticky top-0 z-10 bg-slate-950/95 backdrop-blur" : ""}`} role="tablist" aria-label="Admin sections">
               {[
                 { id: "users", label: "All Users" },
                 { id: "guests", label: "Guest Logins" },
@@ -25158,7 +25131,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                         </div>
                       ) : (
                         <div className="max-h-[22rem] overflow-x-auto overflow-y-auto rounded-2xl border border-slate-700 [scrollbar-width:thin] [scrollbar-color:rgb(6_182_212_/_0.7)_rgb(2_6_23)] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-slate-950 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-500/70 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-cyan-400">
-                          <table className="w-full min-w-[760px] text-left text-sm md:min-w-0">
+                          <table className="w-full text-left text-sm">
                             <thead className="bg-slate-950 text-slate-300 sticky top-0 z-10">
                               <tr>
                                 <th className="px-4 py-3">User</th>
@@ -25227,7 +25200,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                         </div>
                       ) : (
                         <div className="max-h-[22rem] overflow-x-auto overflow-y-auto rounded-2xl border border-slate-700 [scrollbar-width:thin] [scrollbar-color:rgb(6_182_212_/_0.7)_rgb(2_6_23)] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-slate-950 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-500/70 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-cyan-400">
-                          <table className="w-full min-w-[720px] text-left text-sm md:min-w-0">
+                          <table className="w-full text-left text-sm">
                             <thead className="bg-slate-950 text-slate-300 sticky top-0 z-10">
                               <tr>
                                 <th className="px-4 py-3">User</th>
@@ -25283,7 +25256,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                         </div>
                       ) : (
                         <div className="max-h-[22rem] overflow-x-auto overflow-y-auto rounded-2xl border border-slate-700 [scrollbar-width:thin] [scrollbar-color:rgb(6_182_212_/_0.7)_rgb(2_6_23)] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-slate-950 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-500/70 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-cyan-400">
-                          <table className="w-full min-w-[720px] text-left text-sm md:min-w-0">
+                          <table className="w-full text-left text-sm">
                             <thead className="bg-slate-950 text-slate-300 sticky top-0 z-10">
                               <tr>
                                 <th className="px-4 py-3">User</th>
@@ -25516,7 +25489,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                 // Sticky thead keeps column titles visible while
                 // scrolling.
                 <div className="mt-5 overflow-x-auto overflow-y-auto max-h-[32rem] rounded-2xl border border-slate-700 [scrollbar-width:thin] [scrollbar-color:rgb(6_182_212_/_0.7)_rgb(2_6_23)] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-slate-950 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-500/70 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-cyan-400">
-                  <table className="w-full min-w-[720px] text-left text-sm md:min-w-0">
+                  <table className="w-full text-left text-sm">
                     <thead className="bg-slate-950 text-slate-300 sticky top-0 z-10">
                       <tr>
                         <th
@@ -25682,7 +25655,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                 // site-wide globals in index.html — no per-element
                 // Tailwind variants needed.
                 <div className="mt-5 overflow-x-auto overflow-y-auto max-h-[44rem] rounded-2xl border border-slate-700">
-                  <table className="w-full min-w-[720px] text-left text-sm md:min-w-0">
+                  <table className="w-full text-left text-sm">
                     <thead className="bg-slate-950 text-slate-300 sticky top-0 z-10">
                       <tr>
                         <th className="px-4 py-3">When</th>

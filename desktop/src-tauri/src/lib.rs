@@ -167,10 +167,12 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
     let quit = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
     let menu = Menu::with_items(app, &[&show, &hide, &sep, &quit])?;
 
-    let icon: Image<'_> = app
-        .default_window_icon()
-        .cloned()
-        .ok_or_else(|| tauri::Error::AssetNotFound("default window icon".into()))?;
+    // Embed the PNG at compile time. default_window_icon() returns
+    // None when no `icon` field is set on the window in
+    // tauri.conf.json (bundle.icon is only used by the installer
+    // bundler, not the running window). Embedding via
+    // tauri::include_image! guarantees the tray always has an icon.
+    let icon: Image<'_> = tauri::include_image!("../icons/icon.png");
 
     TrayIconBuilder::with_id("main")
         .icon(icon)
@@ -217,6 +219,7 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
             }
         })
         .build(app)?;
+    eprintln!("[tray] built OK — look for the icon in the Windows notification area (may be hidden in the chevron overflow)");
     Ok(())
 }
 

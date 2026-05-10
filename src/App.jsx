@@ -17805,8 +17805,52 @@ export default function StarCitizenSalvageGuideWebsite() {
   // dropdown without having to click each user. No-op on
   // non-admin sessions (the endpoint 403s; we just clear state).
   const refreshAdminUserMailOverview = async () => {
-    if (!user || !user.isAdmin) {
+    if (!import.meta.env.DEV && (!user || !user.isAdmin)) {
       setAdminUserMailOverview([]);
+      return;
+    }
+    // Dev fixture: 4 fake users × 10 messages each so the admin
+    // mailbox grouping + per-user thread order can be exercised in
+    // vite-dev without seeding Redis. Production traffic still
+    // goes through /api/admin/inbox-overview.
+    if (import.meta.env.DEV) {
+      const fixtureUsers = [
+        { userId: "dev_user_alpha",   username: "AlphaCargo" },
+        { userId: "dev_user_bravo",   username: "BravoSalvager" },
+        { userId: "dev_user_charlie", username: "CharlieRefiner" },
+        { userId: "dev_user_delta",   username: "DeltaPilot" },
+      ];
+      const samples = [
+        "Quick question about the Levski bonus math.",
+        "Got a screenshot of a refinery yield mismatch — can I send it your way?",
+        "Crew Salvage session save failed for me again, retried twice.",
+        "Could you DM me about the patch 4.8 sell-point prices?",
+        "Saw a new mission on PTU not in the list yet.",
+        "Refueling contract reward changed mid-mission, was that expected?",
+        "Confirming the Pyrometric Chrom yield boost at Levski.",
+        "Site froze on the Statistics tab when I sorted by aUEC.",
+        "Found a duplicate entry in my 30-day history.",
+        "Thanks for the desktop client — running great so far.",
+      ];
+      const now = Date.now();
+      const mocked = [];
+      fixtureUsers.forEach((u, ui) => {
+        for (let i = 0; i < 10; i++) {
+          mocked.push({
+            id: `dev-${u.userId}-${i}`,
+            userId: u.userId,
+            username: u.username,
+            body: samples[i % samples.length],
+            // Stagger timestamps so oldest -> newest sort has work to do.
+            // Each user's messages span the last 10 hours, offset by
+            // user index so the latest-activity-per-group ordering is
+            // visible too.
+            createdAt: now - (ui * 60 * 60 * 1000) - ((9 - i) * 12 * 60 * 1000),
+            from: "user",
+          });
+        }
+      });
+      setAdminUserMailOverview(mocked);
       return;
     }
     try {
@@ -25096,6 +25140,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                 ) : (
                   <ul className="mt-3 space-y-2">
                     {groupedUserMail.map((g) => {
+                      const latest = g.messages[g.messages.length - 1];
                       const latestTs = g.latestTs ? new Date(g.latestTs).toLocaleString() : "";
                       return (
                         <li
@@ -25117,35 +25162,12 @@ export default function StarCitizenSalvageGuideWebsite() {
                             </button>
                             <span className="text-[10px] text-slate-500">latest · {latestTs}</span>
                           </div>
-                          {/* Per-user message list — oldest at top,
-                              newest at bottom, matching the per-user
-                              thread modal so the read order is the
-                              same on both surfaces. */}
-                          <ul className="mt-2 space-y-1.5">
-                            {g.messages.map((m) => {
-                              const ts = m.createdAt ? new Date(m.createdAt).toLocaleString() : "";
-                              return (
-                                <li
-                                  key={m.id}
-                                  className="rounded border border-amber-500/15 bg-slate-950/50 px-2 py-1.5"
-                                >
-                                  <div className="flex items-center justify-between gap-2">
-                                    <span className="text-[10px] text-slate-500">{ts}</span>
-                                    <button
-                                      type="button"
-                                      onClick={() => deleteAdminUserMail(m.id)}
-                                      className="rounded border border-rose-500/30 bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-rose-300 hover:border-rose-400/60 hover:bg-rose-500/20"
-                                    >
-                                      Dismiss
-                                    </button>
-                                  </div>
-                                  <div className="mt-0.5 whitespace-pre-wrap break-words text-slate-200">
-                                    {m.body}
-                                  </div>
-                                </li>
-                              );
-                            })}
-                          </ul>
+                          {/* Latest-only preview. Full per-user thread
+                              (oldest -> newest) lives in the user
+                              detail modal, reached via Open thread. */}
+                          <div className="mt-1 whitespace-pre-wrap break-words text-slate-200">
+                            {latest?.body}
+                          </div>
                           <div className="mt-2 flex flex-wrap gap-1.5">
                             <button
                               type="button"

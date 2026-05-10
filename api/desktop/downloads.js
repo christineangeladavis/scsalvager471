@@ -22,7 +22,7 @@
 // limit doesn't matter even with broad traffic.
 
 const RELEASES_URL =
-  "https://api.github.com/repos/christineangeladavis/scsalvager471/releases";
+  "https://api.github.com/repos/ChrissyNightingale/scsalvager471/releases";
 
 // Filename suffixes per platform — we want the "user-facing"
 // installer (MSI / NSIS .exe / DMG / AppImage), NOT the .tar.gz

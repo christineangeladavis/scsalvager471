@@ -13,7 +13,7 @@
 // secrets.
 
 const FALLBACK_ADMIN_IDS = [
-  // christineangeladavis (site owner)
+  // ChrissyNightingale (site owner)
   "125372743637008384",
   // Junior2065
   "237446168206901259",

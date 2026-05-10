@@ -34,7 +34,7 @@
 // "up to date" and skips the install prompt.
 
 const RELEASES_URL =
-  "https://api.github.com/repos/christineangeladavis/scsalvager471/releases/latest";
+  "https://api.github.com/repos/ChrissyNightingale/scsalvager471/releases/latest";
 
 // Maps the (target, arch) combo Tauri sends to the asset filename
 // suffix the GitHub Actions build produces. Update both sides
@@ -157,7 +157,7 @@ export default async function handler(req, res) {
     // (api.github.com/.../assets/<id>) over browser_download_url.
     // The API endpoint accepts Bearer auth + Accept: octet-stream
     // and follows the redirect to the signed S3 URL automatically.
-    const sigUrl = `https://api.github.com/repos/christineangeladavis/scsalvager471/releases/assets/${sigAsset.id}`;
+    const sigUrl = `https://api.github.com/repos/ChrissyNightingale/scsalvager471/releases/assets/${sigAsset.id}`;
     const sigRes = await fetch(sigUrl, {
       headers: sigHeaders,
       redirect: "follow",

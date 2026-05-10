@@ -19813,10 +19813,10 @@ export default function StarCitizenSalvageGuideWebsite() {
                                               e.stopPropagation();
                                               for (const m of g.messages) deleteAdminUserMail(m.id);
                                             }}
-                                            className="rounded border border-rose-500/30 bg-rose-500/10 px-2 py-0.5 text-[10px] font-semibold text-rose-300 hover:border-rose-400/60 hover:bg-rose-500/20"
-                                            title="Remove all messages from this user from your overview (still visible in the user's thread)"
+                                            className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                                            title="Mark this user's mail as read in your overview (full thread stays in the user's record)"
                                           >
-                                            Delete all
+                                            Mark as read
                                           </button>
                                         </div>
                                       </div>
@@ -25183,9 +25183,9 @@ export default function StarCitizenSalvageGuideWebsite() {
                               onClick={() => {
                                 for (const m of g.messages) deleteAdminUserMail(m.id);
                               }}
-                              className="rounded border border-rose-500/30 bg-rose-500/10 px-2 py-0.5 text-[10px] font-semibold text-rose-300 hover:border-rose-400/60 hover:bg-rose-500/20"
+                              className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
                             >
-                              Dismiss all
+                              Mark as read
                             </button>
                           </div>
                         </li>

@@ -415,8 +415,24 @@ pub fn run() {
             // browser's "Open SCSalvager Desktop" link fails silently.
             #[cfg(desktop)]
             {
-                if let Err(e) = app.deep_link().register("scsalvager") {
-                    eprintln!("[deep-link] register scheme failed: {e}");
+                // register_all() pulls schemes from tauri.conf.json's
+                // plugins.deep-link.desktop.schemes — covers every
+                // scheme listed there in one shot.
+                match app.deep_link().register_all() {
+                    Ok(()) => eprintln!("[deep-link] register_all OK"),
+                    Err(e) => {
+                        eprintln!("[deep-link] register_all failed: {e}");
+                        // Fallback: try a single explicit register
+                        // for the one scheme we actually use.
+                        if let Err(e2) = app.deep_link().register("scsalvager") {
+                            eprintln!("[deep-link] explicit register failed: {e2}");
+                        }
+                    }
+                }
+                // Diagnostic: log the resolved exe path so we can
+                // verify the registry entry points where we expect.
+                if let Ok(exe) = std::env::current_exe() {
+                    eprintln!("[deep-link] dev exe = {exe:?}");
                 }
             }
             app.deep_link().on_open_url(move |event| {

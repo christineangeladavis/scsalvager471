@@ -28384,6 +28384,19 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <li>Both <strong>users and admins</strong> can <strong>delete</strong> messages from their inbox. User deletes drop the message from your own view (admins keep a moderation-side record so context survives). Admin deletes drop a message from that admin's overview (the user's own thread is unaffected).</li>
                     <li><strong>SCSalvager Desktop</strong> is now downloadable from <strong>Settings → Desktop App</strong>. Native client (Windows / macOS arm64 / Linux) wraps the site with a system tray, refinery countdown badge, OS toasts when a job is ready, F9 / tray screenshot capture for the in-game refinery setup screen (uses the existing crop modal before upload), an offline read-only ledger cache, and silent auto-update on launch.</li>
                   </ul>
+                  <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Hotfix · May 10, 2026 · Removed</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li><strong>Kruger Intergalactic Stingray</strong> dropped from the patch 4.8 pre-staged Crew Salvage roster.</li>
+                    <li><strong>Mailbox pill Delete button.</strong> The header Messages dropdown now offers <strong>Dismiss</strong> only — hides the message from your unread list without deleting it. Full conversation history stays in the <strong>Inbox</strong> tab and on the admin's moderation side.</li>
+                  </ul>
+                  <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Hotfix · May 10, 2026 · Fixes</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li><strong>User dropdown Logout no longer clipped.</strong> The header user menu was being cut off at the bottom of the rounded header — Settings rendered, Logout was hidden behind the page. The dropdown now portals to the page body so it overlays everything cleanly.</li>
+                    <li><strong>Mailbox dropdown opens below the icon</strong> instead of upward (matched to the user menu placement so the open direction is consistent). Notifications bell dropdown now opens below the icon for the same reason.</li>
+                    <li><strong>Mailbox pill is now an unread-only feed.</strong> The header Messages dropdown filters to inbound messages you haven't dismissed yet — read messages stay accessible from the <strong>Inbox</strong> tab. Clicking a message row jumps you straight to the Inbox tab.</li>
+                    <li><strong>Message threads now read chronologically</strong> — oldest at top, newest at bottom — both in your Messages mailbox and in the admin's per-user moderation view. Matches Discord / iMessage / SMS conventions instead of the prior newest-first inbox style.</li>
+                    <li><strong>Mailbox poll cadence tightened from 30 s to 15 s.</strong> Admin replies surface in your mailbox roughly twice as fast.</li>
+                  </ul>
                 </section>
 
                 <section>

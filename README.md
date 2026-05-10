@@ -19,6 +19,19 @@ Changes:
 - Both **users and admins** can **delete** messages from their inbox. User deletes drop the message from your own view (admins keep a moderation-side record so context survives). Admin deletes drop a message from that admin's overview (the user's own thread is unaffected).
 - **SCSalvager Desktop** is now downloadable from **Settings → Desktop App**. Native client (Windows / macOS arm64 / Linux) wraps the site with a system tray, refinery countdown badge, OS toasts when a job is ready, F9 / tray screenshot capture for the in-game refinery setup screen (uses the existing crop modal before upload), an offline read-only ledger cache, and silent auto-update on launch.
 
+HOTFIX 5/10/2026:
+
+Removed:
+- **Kruger Intergalactic Stingray** dropped from the patch 4.8 pre-staged Crew Salvage roster.
+- **Mailbox pill Delete button**. The header Messages dropdown now offers **Dismiss** only — hides the message from your unread list without deleting it. Full conversation history stays in the **Inbox** tab and on the admin's moderation side.
+
+Fixes:
+- **User dropdown Logout no longer clipped.** The header user menu was being cut off at the bottom of the rounded header — Settings rendered, Logout was hidden behind the page. The dropdown now portals to the page body so it overlays everything cleanly.
+- **Mailbox dropdown opens below the icon** instead of upward (matched to the user menu placement so the open direction is consistent). Notifications bell dropdown now opens below the icon for the same reason.
+- **Mailbox pill is now an unread-only feed.** The header Messages dropdown filters to inbound messages you haven't dismissed yet — read messages stay accessible from the **Inbox** tab. Clicking a message row jumps you straight to the Inbox tab.
+- **Message threads now read chronologically** — oldest at top, newest at bottom — both in your Messages mailbox and in the admin's per-user moderation view. Matches Discord / iMessage / SMS conventions instead of the prior newest-first inbox style.
+- **Mailbox poll cadence tightened from 30 s to 15 s.** Admin replies surface in your mailbox roughly twice as fast.
+
 UPDATE 5/8/2026 v2.7.3
 
 Added:

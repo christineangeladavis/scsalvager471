@@ -14401,7 +14401,6 @@ export default function StarCitizenSalvageGuideWebsite() {
     { name: "Pitbull",                       manufacturer: "Drake Interplanetary",  sinceVersion: "4.8" },
     { name: "Starlite",                      manufacturer: "Musashi Industrial and Starflight Concern", sinceVersion: "4.8" },
     { name: "Tiburon",                       manufacturer: "Aegis Dynamics",         sinceVersion: "4.8" },
-    { name: "Stingray",                      manufacturer: "Kruger Intergalactic",   sinceVersion: "4.8" },
     { name: "M80",                           manufacturer: "Origin Jumpworks",       sinceVersion: "4.8" },
   ]), []);
   // Numeric-segment compare: "4.7.2" < "4.8" < "4.10". Empty /

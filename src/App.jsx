@@ -14806,6 +14806,9 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [mailboxComposeStatus, setMailboxComposeStatus] = useState(null);
   const [mailboxComposeInFlight, setMailboxComposeInFlight] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  // Desktop release-notes modal — sourced from DESKTOP_README.md.
+  // Opens from the Settings → Desktop App "Release notes" button.
+  const [isDesktopNotesOpen, setIsDesktopNotesOpen] = useState(false);
   // Privacy Policy modal — opens from the footer link. Stays decoupled
   // from auth state so anonymous visitors can read it too.
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
@@ -28232,19 +28235,16 @@ export default function StarCitizenSalvageGuideWebsite() {
                             SCSalvager Desktop {desktopDownloads.version}
                           </p>
                           <p className="mt-0.5 text-xs text-slate-400">
-                            Native app with system tray, refinery countdown, F9 / tray screenshot capture, OS toasts, offline ledger cache. Auto-updates on launch.
+                            Native app with system tray, refinery countdown, tray screenshot capture (refinery + commodity sale), OS toasts, frameless overlay widgets, offline ledger cache. Auto-updates on launch.
                           </p>
                         </div>
-                        {desktopDownloads.releaseUrl && (
-                          <a
-                            href={desktopDownloads.releaseUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[10px] font-semibold text-cyan-300 underline-offset-2 hover:underline"
-                          >
-                            Release notes →
-                          </a>
-                        )}
+                        <button
+                          type="button"
+                          onClick={() => setIsDesktopNotesOpen(true)}
+                          className="text-[10px] font-semibold text-cyan-300 underline-offset-2 hover:underline"
+                        >
+                          Release notes →
+                        </button>
                       </div>
                       <div className="mt-3 grid gap-2 sm:grid-cols-3">
                         {platforms.map(({ key, label }) => {
@@ -28747,6 +28747,115 @@ export default function StarCitizenSalvageGuideWebsite() {
             orders at once. The rectangle is captured in displayed-image
             coordinates and translated to natural pixels at confirm
             time so the cropped output preserves full source resolution. */}
+        {/* Desktop release-notes modal — opens from Settings → Desktop
+            App → "Release notes →". Content mirrors DESKTOP_README.md
+            so the canonical text + the rendered modal stay in sync. */}
+        {isDesktopNotesOpen && (
+          <div
+            className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+            onClick={() => setIsDesktopNotesOpen(false)}
+          >
+            <div
+              className="w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-3xl border border-cyan-500/30 bg-slate-900 p-6 shadow-2xl shadow-cyan-950/40"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+            >
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-lg font-bold text-cyan-300">SCSalvager Desktop — Release Notes</h3>
+                  <p className="mt-1 text-xs text-slate-500">Native Tauri shell wrapping scsalvager.net. Auto-updates via the in-app updater.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsDesktopNotesOpen(false)}
+                  className="rounded-md border border-slate-700 bg-slate-800/60 px-2 py-1 text-xs text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="mt-5 space-y-6 text-sm text-slate-300 leading-relaxed">
+                <section>
+                  <h4 className="text-cyan-300 text-base font-bold">v0.2.6 (queued)</h4>
+                  <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1">
+                    <li><strong>In-app update modal</strong> when clicking the tray's "Check for updates…" item. Up-to-date / available + Update Now / downloading progress / ready / error states all surface in the WebView instead of OS toasts.</li>
+                  </ul>
+                  <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Changes</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1">
+                    <li>Manual update check no longer fires OS toasts — feedback routes through the modal. Window auto-shows/focuses even when minimized to tray. Launch-time auto-check still uses OS notifications + silent background download.</li>
+                  </ul>
+                </section>
+                <section>
+                  <h4 className="text-cyan-300 text-base font-bold">v0.2.5</h4>
+                  <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1">
+                    <li><strong>Version in window titlebar</strong> — the main window title now reads <code className="rounded bg-slate-800 px-1 text-cyan-200">SCSalvager Desktop v&lt;version&gt;</code>, set at runtime from <code className="rounded bg-slate-800 px-1 text-cyan-200">CARGO_PKG_VERSION</code>.</li>
+                    <li><strong>Admin tables fill the window height</strong> — Admin Panel → All Users, Guest Logins, and the Missions table grow with the window via <code className="rounded bg-slate-800 px-1 text-cyan-200">max-height: calc(100vh - 12rem)</code> in the desktop shell. Web users keep the prior fixed heights.</li>
+                  </ul>
+                </section>
+                <section>
+                  <h4 className="text-cyan-300 text-base font-bold">v0.2.4</h4>
+                  <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1">
+                    <li><strong>Split tray capture into Refinery + Commodity.</strong> Two distinct tray items: one only accepts in-game refinery setup screens, the other only accepts commodity terminal screens. Wrong-type screenshots return a clear error from the server.</li>
+                    <li><strong>Screen-type validation</strong> server-side — <code className="rounded bg-slate-800 px-1 text-cyan-200">/api/refinery/analyze</code> + <code className="rounded bg-slate-800 px-1 text-cyan-200">/api/sell/analyze</code> verify signature headers (REFINERY SYSTEM / REFINEMENT CENTER vs COMMODITIES / YOUR INVENTORIES / IN DEMAND) before extracting.</li>
+                  </ul>
+                </section>
+                <section>
+                  <h4 className="text-cyan-300 text-base font-bold">v0.2.3</h4>
+                  <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1">
+                    <li><strong>Frameless overlay widget</strong> — compact + crew-widget modes now run without the OS titlebar so they sit cleanly on top of Star Citizen.</li>
+                    <li><strong>Drag handle</strong> at the top of each widget mode — grab any inch to move the frameless window around. ✕ button exits widget mode.</li>
+                  </ul>
+                  <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Changes</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1">
+                    <li>Widget min-size dropped to 240×180 with proportional text scaling via CSS zoom (baseline 420 px crew / 380 px compact; clamp 0.7..2.5).</li>
+                  </ul>
+                </section>
+                <section>
+                  <h4 className="text-cyan-300 text-base font-bold">v0.2.2</h4>
+                  <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1">
+                    <li><strong>"Check for updates…" tray menu item</strong>. Manual updater check that surfaces all three outcomes (up to date / new version downloading / check failed). Launch-time silent check unchanged.</li>
+                  </ul>
+                </section>
+                <section>
+                  <h4 className="text-cyan-300 text-base font-bold">v0.2.1</h4>
+                  <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1">
+                    <li><strong>Resizable widget windows</strong> — compact + crew widget can drag down to 240×180 (was locked at 980×640) and grow to any size. React side rescales text + controls proportionally via CSS zoom.</li>
+                  </ul>
+                </section>
+                <section>
+                  <h4 className="text-cyan-300 text-base font-bold">v0.2.0 — Initial Release</h4>
+                  <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1">
+                    <li><strong>Native shell</strong> for Windows / macOS arm64 / Linux wrapping scsalvager.net via Tauri 2.</li>
+                    <li><strong>System tray</strong> — capture refinery screenshot, show/hide window, toggle compact mode, toggle crew salvage widget, Quit. Left-click toggles visible/hidden.</li>
+                    <li><strong>Refinery countdown badge</strong> — background poll updates the tray tooltip with next-pickup ETA every 30 s. OS toast fires once per completed job.</li>
+                    <li><strong>Tray screenshot capture</strong> — xcap reads the Star Citizen window pixels (works even when SC is backgrounded), hands the PNG off to the existing web crop modal.</li>
+                    <li><strong>Deep-link OAuth</strong> — <code className="rounded bg-slate-800 px-1 text-cyan-200">scsalvager://</code> scheme; single-instance plugin reuses the existing window for repeat callbacks.</li>
+                    <li><strong>Compact mode</strong> + <strong>Crew Salvage widget</strong> always-on-top mini overlays.</li>
+                    <li><strong>Auto-updater</strong> via <code className="rounded bg-slate-800 px-1 text-cyan-200">tauri-plugin-updater</code> against <code className="rounded bg-slate-800 px-1 text-cyan-200">/api/desktop/manifest</code>. Minisign-signed releases.</li>
+                    <li><strong>Offline ledger cache</strong> mirrored into <code className="rounded bg-slate-800 px-1 text-cyan-200">window.__SCSALVAGER_DESKTOP__.ledgerCache</code> so the web bundle can read the most recent payload if the network drops.</li>
+                  </ul>
+                </section>
+              </div>
+              <div className="mt-5 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setIsDesktopNotesOpen(false)}
+                  className="rounded-lg border border-slate-700 bg-slate-800/60 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Desktop update modal — driven by the Rust bridge when the
             user clicks the tray's "Check for updates…" menu item.
             Only ever opens in Tauri; web users never see it. */}
@@ -29048,7 +29157,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     <li>The Home-tab yellow announcement banner is now driven by a dedicated <strong>Post Announcement</strong> action, separate from per-user broadcasts. Broadcasts still arrive in your Messages mailbox; announcements live on the Home banner only. The banner is purely time-gated — survives page refresh and re-login, hides automatically <strong>24 hours</strong> after the admin posts it.</li>
                     <li>Messages you send to SCSalvager Admin now surface directly in the admin's Messages mailbox (with your username + a preview), so admins can see and respond to incoming mail without having to dig per-user. Admins continue to see the full thread + history when they open your user record.</li>
                     <li>Both <strong>users and admins</strong> can <strong>delete</strong> messages from their inbox. User deletes drop the message from your own view (admins keep a moderation-side record so context survives). Admin deletes drop a message from that admin's overview (the user's own thread is unaffected).</li>
-                    <li><strong>SCSalvager Desktop</strong> is now downloadable from <strong>Settings → Desktop App</strong>. Native client (Windows / macOS arm64 / Linux) wraps the site with a system tray, refinery countdown badge, OS toasts when a job is ready, F9 / tray screenshot capture for the in-game refinery setup screen (uses the existing crop modal before upload), an offline read-only ledger cache, and silent auto-update on launch.</li>
+                    <li><strong>SCSalvager Desktop</strong> is now downloadable from <strong>Settings → Desktop App</strong>. Native client (Windows / macOS arm64 / Linux) wraps the site with a system tray, refinery countdown badge, OS toasts when a job is ready, tray-driven screenshot capture for the in-game refinery setup screen (uses the existing crop modal before upload), an offline read-only ledger cache, and silent auto-update on launch.</li>
                   </ul>
                   <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Hotfix · May 10, 2026 · Removed</p>
                   <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">

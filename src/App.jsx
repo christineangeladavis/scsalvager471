@@ -13900,6 +13900,16 @@ export default function StarCitizenSalvageGuideWebsite() {
   });
   const [crewDraft, setCrewDraft] = useState(blankCrewDraft);
   const [crewSessions, setCrewSessions] = useState([]);
+  // Active tab inside the Tauri #crew-widget mode. Persists across
+  // widget toggle via localStorage so the user lands back where
+  // they left off. Tabs: roles, ships, scu, refinery, split.
+  const [widgetTab, setWidgetTab] = useState(() => {
+    try { return window.localStorage?.getItem("scs_widget_tab") || "roles"; }
+    catch { return "roles"; }
+  });
+  useEffect(() => {
+    try { window.localStorage?.setItem("scs_widget_tab", widgetTab); } catch {}
+  }, [widgetTab]);
   const [crewShipFilter, setCrewShipFilter] = useState("");
   // Manufacturer filter for the ships-salvaged checkbox list. ""
   // means "Any manufacturer".
@@ -19392,27 +19402,27 @@ export default function StarCitizenSalvageGuideWebsite() {
   // the live split estimate.
   if (isCrewWidgetMode) {
     const active = (crewSessions || []).find((s) => s.status === "active");
-    const ship = active?.ship || crewDraft.ship || "—";
+    const ship = active?.ship || crewDraft.ship || "Reclaimer";
     const scuCS = Number(active?.scuConstructionSalvage || crewDraft.scuConstructionSalvage || 0) || 0;
     const scuCP = Number(active?.scuConstructionPieces || crewDraft.scuConstructionPieces || 0) || 0;
     const scuRMC = Number(active?.scuRMC || crewDraft.scuRMC || 0) || 0;
     const totalScu = scuCS + scuCP + scuRMC;
-    const splitAuec = Number(active?.splitAuec || crewDraft.splitAuec || 0) || 0;
+    const splitAuecVal = Number(active?.splitAuec || crewDraft.splitAuec || 0) || 0;
     const crewCount = Math.max(
       1,
-      Math.floor(Number(active?.splitCrewCount || crewDraft.splitCrewCount || 0) || 0)
+      Math.floor(Number(active?.splitCrewCount || crewDraft.splitCrewCount || 0) || 1)
     );
-    const perCrew = crewCount > 0 ? splitAuec / crewCount : 0;
-    const roles = active?.roles || crewDraft.roles || {};
-    const filledRoles = Object.entries(roles).filter(
-      ([, name]) => name && String(name).trim()
-    );
-    const fmt = (n) => Number(n || 0).toLocaleString();
-    // Writer — when an active session exists we mutate it directly
-    // (saveCrewSession persisted it; edits write through to the
-    // same row in crewSessions state and POST to /api/ledger).
-    // Without an active session we fall back to the draft so values
-    // still survive widget toggle and the main-app Save handoff.
+    const perCrew = crewCount > 0 ? splitAuecVal / crewCount : 0;
+    const rolesObj = active?.roles || crewDraft.roles || {};
+    const shipsSalvaged = active?.shipsSalvaged || crewDraft.shipsSalvaged || [];
+    const refLocation = active?.refLocation || crewDraft.refLocation || "";
+    const refMethod = active?.refMethod || crewDraft.refMethod || "";
+    const cmatSellLoc = active?.cmatSellLocation || crewDraft.cmatSellLocation || "";
+    const rmcSellLoc = active?.rmcSellLocation || crewDraft.rmcSellLocation || "";
+    const fmt = (n) => Number(n || 0).toLocaleString(undefined, { maximumFractionDigits: 2 });
+    // Writer — active session edits write through to crewSessions
+    // + saveLedger so the change persists. Draft edits go to the
+    // crewDraft state.
     const writeField = (key, value) => {
       if (active) {
         setCrewSessions((prev) => {
@@ -19424,12 +19434,123 @@ export default function StarCitizenSalvageGuideWebsite() {
         setCrewDraftField(key, value);
       }
     };
-    const numericInputCls = "mt-0.5 w-full rounded border border-slate-700 bg-slate-950 px-1 py-0.5 text-sm font-bold text-white outline-none focus:border-cyan-400";
+    const writeRole = (role, name) => {
+      if (active) {
+        setCrewSessions((prev) => {
+          const next = prev.map((s) =>
+            s.id === active.id ? { ...s, roles: { ...(s.roles || {}), [role]: name } } : s
+          );
+          saveLedger(refineryJobs, sellOrders, next);
+          return next;
+        });
+      } else {
+        setCrewDraftRole(role, name);
+      }
+    };
+    const toggleShipSalvaged = (shipName) => {
+      if (active) {
+        setCrewSessions((prev) => {
+          const next = prev.map((s) => {
+            if (s.id !== active.id) return s;
+            const arr = s.shipsSalvaged || [];
+            const has = arr.some((e) => e.ship === shipName);
+            return {
+              ...s,
+              shipsSalvaged: has
+                ? arr.filter((e) => e.ship !== shipName)
+                : [...arr, { ship: shipName, qty: 1 }],
+            };
+          });
+          saveLedger(refineryJobs, sellOrders, next);
+          return next;
+        });
+      } else {
+        setCrewDraft((prev) => ({
+          ...prev,
+          shipsSalvaged: prev.shipsSalvaged.some((e) => e.ship === shipName)
+            ? prev.shipsSalvaged.filter((e) => e.ship !== shipName)
+            : [...prev.shipsSalvaged, { ship: shipName, qty: 1 }],
+        }));
+      }
+    };
+    const writeShipQty = (shipName, qty) => {
+      const q = Math.max(1, Math.floor(Number(qty) || 1));
+      if (active) {
+        setCrewSessions((prev) => {
+          const next = prev.map((s) =>
+            s.id === active.id
+              ? {
+                  ...s,
+                  shipsSalvaged: (s.shipsSalvaged || []).map((e) =>
+                    e.ship === shipName ? { ...e, qty: q } : e
+                  ),
+                }
+              : s
+          );
+          saveLedger(refineryJobs, sellOrders, next);
+          return next;
+        });
+      } else {
+        setCrewDraftShipQty(shipName, q);
+      }
+    };
+    // Role set per ship — must match the main page.
+    const roleSet =
+      ship === "Reclaimer"
+        ? ["Pilot", "Claw Operator", "Salvage Operator 1", "Salvage Operator 2", "Cargo Operator", "Manned Turret", "Remote Turret 1", "Remote Turret 2"]
+        : ["Pilot", "Missile Operator", "Salvage Operator 1", "Salvage Operator 2", "Salvage Operator 3", "Cargo Operator"];
+    const crewedCount = roleSet.filter((r) => rolesObj[r] && String(rolesObj[r]).trim()).length;
+    // Refinery + sales calculator math — same as main page.
+    const csIn = getSafeScuValue(scuCS);
+    const cpIn = getSafeScuValue(scuCP);
+    const rmcIn = getSafeScuValue(scuRMC);
+    const csRef = computeRefineryJob({ scu: csIn, materialName: "Construction Salvage", methodName: refMethod, locationName: refLocation });
+    const cpRef = computeRefineryJob({ scu: cpIn, materialName: "Construction Pieces", methodName: refMethod, locationName: refLocation });
+    const bestPriceFor = (mat) => {
+      let best = 0;
+      for (const p of sellPoints) {
+        if (p.material === mat && Number.isFinite(p.pricePerScu) && p.pricePerScu > best) best = p.pricePerScu;
+      }
+      return best;
+    };
+    const priceAt = (mat, locName) => {
+      if (!locName) return bestPriceFor(mat);
+      const hit = sellPoints.find((p) => p.material === mat && p.name === locName);
+      return hit && Number.isFinite(hit.pricePerScu) ? hit.pricePerScu : bestPriceFor(mat);
+    };
+    const cmPrice = priceAt("Construction Materials", cmatSellLoc);
+    const rmcPrice = priceAt("Recycled Material Composite", rmcSellLoc);
+    const cmatSellOpts = sellPoints.filter((p) => p.material === "Construction Materials").map((p) => p.name).filter((n, i, a) => a.indexOf(n) === i);
+    const rmcSellOpts = sellPoints.filter((p) => p.material === "Recycled Material Composite").map((p) => p.name).filter((n, i, a) => a.indexOf(n) === i);
+    const cmatSaleAuec = ship === "Reclaimer" ? csRef.totalYield * cmPrice : (ship === "Moth" ? cpRef.totalYield * cmPrice : 0);
+    const rmcSaleAuec = rmcIn * rmcPrice;
+    const refCost = (ship === "Reclaimer" ? csRef.cost : 0) + (ship === "Moth" ? cpRef.cost : 0);
+    const grossSale = cmatSaleAuec + rmcSaleAuec;
+    const netSale = grossSale - refCost;
+    // Ship list for Tab 2 (Ships Salvaged).
+    const mfgList = Array.from(new Set((allKnownShips || []).map(getShipManufacturer).filter(Boolean))).sort();
+    const filterTerm = crewShipFilter.trim().toLowerCase();
+    const filteredShips = (allKnownShips || []).filter((s) => {
+      if (filterTerm && !s.toLowerCase().includes(filterTerm)) return false;
+      if (crewMfgFilter && getShipManufacturer(s) !== crewMfgFilter) return false;
+      return true;
+    });
+    const numCls = "w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-sm text-white outline-none focus:border-cyan-400";
+    const selCls = "w-full rounded border border-slate-700 bg-slate-950 px-2 py-1 text-xs text-slate-200 outline-none focus:border-cyan-400";
+    const labelCls = "text-[9px] font-bold uppercase tracking-wider text-slate-400";
+    const tabs = [
+      { id: "roles",    label: "Ship & Roles" },
+      { id: "ships",    label: "Salvaged" },
+      { id: "scu",      label: "SCU" },
+      { id: "refinery", label: "Refinery" },
+      { id: "split",    label: "Split" },
+    ];
     return (
       <div className="relative min-h-screen text-slate-100 bg-slate-950">
         <style>{style}</style>
-        <div className="flex h-screen flex-col p-3">
-          <div className="flex items-center justify-between gap-2">
+        <div className="flex h-screen flex-col p-2">
+          {/* Header */}
+          <div className="flex items-center justify-between gap-2 px-1">
             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-300">
               Crew · {ship}
             </span>
@@ -19437,107 +19558,264 @@ export default function StarCitizenSalvageGuideWebsite() {
               {active ? "Active" : "Draft"}
             </span>
           </div>
-          <div className="mt-2 grid flex-1 grid-cols-3 gap-1.5 overflow-hidden">
-            <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-2">
-              <label className="text-[9px] font-bold uppercase tracking-wider text-amber-300">
-                Salvage
-              </label>
-              <input
-                type="number"
-                min="0"
-                step="1"
-                value={scuCS || ""}
-                onChange={(e) => writeField("scuConstructionSalvage", e.target.value === "" ? 0 : Number(e.target.value))}
-                className={numericInputCls}
-              />
-              <div className="text-[9px] text-slate-500">SCU</div>
-            </div>
-            <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-2">
-              <label className="text-[9px] font-bold uppercase tracking-wider text-amber-300">
-                Pieces
-              </label>
-              <input
-                type="number"
-                min="0"
-                step="1"
-                value={scuCP || ""}
-                onChange={(e) => writeField("scuConstructionPieces", e.target.value === "" ? 0 : Number(e.target.value))}
-                className={numericInputCls}
-              />
-              <div className="text-[9px] text-slate-500">SCU</div>
-            </div>
-            <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-2">
-              <label className="text-[9px] font-bold uppercase tracking-wider text-amber-300">
-                RMC
-              </label>
-              <input
-                type="number"
-                min="0"
-                step="1"
-                value={scuRMC || ""}
-                onChange={(e) => writeField("scuRMC", e.target.value === "" ? 0 : Number(e.target.value))}
-                className={numericInputCls}
-              />
-              <div className="text-[9px] text-slate-500">SCU</div>
-            </div>
+          {/* Tab bar */}
+          <div className="mt-2 flex gap-0.5 border-b border-slate-700/40">
+            {tabs.map((t) => {
+              const isActive = widgetTab === t.id;
+              return (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => setWidgetTab(t.id)}
+                  className={`flex-1 border-b-2 px-1 py-1 text-[9px] font-bold uppercase tracking-wider transition ${isActive ? "border-cyan-400 text-cyan-200" : "border-transparent text-slate-400 hover:text-slate-200"}`}
+                >
+                  {t.label}
+                </button>
+              );
+            })}
           </div>
-          <div className="mt-2 grid grid-cols-2 gap-1.5">
-            <div className="rounded-lg border border-cyan-500/30 bg-cyan-500/5 p-2">
-              <div className="text-[9px] font-bold uppercase tracking-wider text-cyan-300">
-                Total SCU
+          {/* Tab body — fills, scrolls. */}
+          <div className="mt-2 flex-1 overflow-y-auto pr-0.5">
+            {widgetTab === "roles" && (
+              <div className="space-y-2">
+                <label className="block">
+                  <div className={labelCls}>Ship</div>
+                  <select
+                    value={ship}
+                    onChange={(e) => writeField("ship", e.target.value)}
+                    className={selCls}
+                  >
+                    <option value="Reclaimer">Reclaimer</option>
+                    <option value="Moth">Moth</option>
+                  </select>
+                </label>
+                <div>
+                  <div className={labelCls}>Roles · {crewedCount} / {roleSet.length}</div>
+                  <div className="mt-1 space-y-1">
+                    {roleSet.map((role) => (
+                      <label key={role} className="flex items-center gap-1.5">
+                        <span className="w-28 shrink-0 text-[10px] text-slate-300 truncate">{role}</span>
+                        <input
+                          type="text"
+                          value={rolesObj[role] || ""}
+                          onChange={(e) => writeRole(role, e.target.value)}
+                          placeholder="Crew member"
+                          className="flex-1 rounded border border-slate-700 bg-slate-950 px-1.5 py-0.5 text-[11px] text-white outline-none focus:border-cyan-400"
+                        />
+                      </label>
+                    ))}
+                  </div>
+                </div>
               </div>
-              <div className="mt-0.5 text-sm font-bold text-white">{fmt(totalScu)}</div>
-            </div>
-            <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-2">
-              <label className="flex items-center justify-between text-[9px] font-bold uppercase tracking-wider text-emerald-300">
-                <span>Crew</span>
-                <input
-                  type="number"
-                  min="1"
-                  step="1"
-                  value={crewCount}
-                  onChange={(e) => writeField("splitCrewCount", Math.max(1, Math.floor(Number(e.target.value) || 1)))}
-                  className="ml-1 w-10 rounded border border-slate-700 bg-slate-950 px-1 text-[10px] font-bold text-white outline-none focus:border-cyan-400"
-                />
-              </label>
-              <input
-                type="number"
-                min="0"
-                step="1"
-                placeholder="Total aUEC"
-                value={splitAuec || ""}
-                onChange={(e) => writeField("splitAuec", e.target.value === "" ? 0 : Number(e.target.value))}
-                className={numericInputCls}
-              />
-              <div className="text-[9px] text-slate-500">{fmt(Math.round(perCrew))} aUEC / crew</div>
-            </div>
-          </div>
-          <div className="mt-2 max-h-[5.5rem] overflow-y-auto rounded-lg border border-slate-700 bg-slate-900/40 p-2">
-            <div className="text-[9px] font-bold uppercase tracking-wider text-slate-400">
-              Roles · {filledRoles.length} crewed
-            </div>
-            {filledRoles.length === 0 ? (
-              <div className="mt-1 text-[10px] text-slate-500">
-                No roles assigned. Open the main app → Ledger → Crew Salvage.
+            )}
+            {widgetTab === "ships" && (
+              <div className="space-y-2">
+                <div className="flex gap-1">
+                  <select
+                    value={crewMfgFilter}
+                    onChange={(e) => setCrewMfgFilter(e.target.value)}
+                    className={`${selCls} flex-1`}
+                  >
+                    <option value="">Any manufacturer</option>
+                    {mfgList.map((m) => (<option key={m} value={m}>{m}</option>))}
+                  </select>
+                  <input
+                    type="text"
+                    value={crewShipFilter}
+                    onChange={(e) => setCrewShipFilter(e.target.value)}
+                    placeholder="Search…"
+                    className="flex-1 rounded border border-slate-700 bg-slate-950 px-1.5 py-0.5 text-[11px] text-white outline-none focus:border-cyan-400"
+                  />
+                </div>
+                <div className="text-[9px] text-slate-500">{shipsSalvaged.length} selected · {filteredShips.length} shown</div>
+                <ul className="space-y-0.5">
+                  {filteredShips.map((s) => {
+                    const sel = shipsSalvaged.find((e) => e.ship === s);
+                    return (
+                      <li key={s} className={`flex items-center gap-1.5 rounded border px-1.5 py-0.5 ${sel ? "border-cyan-500/40 bg-cyan-500/10" : "border-slate-800 bg-slate-900/40"}`}>
+                        <input
+                          type="checkbox"
+                          checked={Boolean(sel)}
+                          onChange={() => toggleShipSalvaged(s)}
+                          className="h-3 w-3"
+                        />
+                        <span className="flex-1 truncate text-[10px] text-slate-200">{s}</span>
+                        {sel && (
+                          <input
+                            type="number"
+                            min="1"
+                            step="1"
+                            value={sel.qty}
+                            onChange={(e) => writeShipQty(s, e.target.value)}
+                            className="w-10 rounded border border-slate-700 bg-slate-950 px-1 text-[10px] text-white outline-none focus:border-cyan-400"
+                          />
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
               </div>
-            ) : (
-              <ul className="mt-1 space-y-0.5">
-                {filledRoles.map(([role, name]) => (
-                  <li key={role} className="flex justify-between text-[10px]">
-                    <span className="truncate text-slate-400">{role}</span>
-                    <span className="ml-2 truncate text-slate-200">{name}</span>
-                  </li>
-                ))}
-              </ul>
+            )}
+            {widgetTab === "scu" && (
+              <div className="space-y-2">
+                {ship === "Reclaimer" && (
+                  <label className="block">
+                    <div className={labelCls}>Construction Salvage</div>
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={scuCS || ""}
+                      onChange={(e) => writeField("scuConstructionSalvage", e.target.value === "" ? 0 : Number(e.target.value))}
+                      className={numCls}
+                      placeholder="SCU input"
+                    />
+                  </label>
+                )}
+                {ship === "Moth" && (
+                  <label className="block">
+                    <div className={labelCls}>Construction Pieces</div>
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={scuCP || ""}
+                      onChange={(e) => writeField("scuConstructionPieces", e.target.value === "" ? 0 : Number(e.target.value))}
+                      className={numCls}
+                      placeholder="SCU input"
+                    />
+                  </label>
+                )}
+                <label className="block">
+                  <div className={labelCls}>RMC (already refined)</div>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={scuRMC || ""}
+                    onChange={(e) => writeField("scuRMC", e.target.value === "" ? 0 : Number(e.target.value))}
+                    className={numCls}
+                    placeholder="SCU"
+                  />
+                </label>
+                <div className="rounded-lg border border-cyan-500/30 bg-cyan-500/5 p-2">
+                  <div className={labelCls}>Total SCU</div>
+                  <div className="mt-0.5 text-sm font-bold text-white">{fmt(totalScu)}</div>
+                </div>
+              </div>
+            )}
+            {widgetTab === "refinery" && (
+              <div className="space-y-2">
+                <label className="block">
+                  <div className={labelCls}>Location</div>
+                  <select
+                    value={refLocation}
+                    onChange={(e) => writeField("refLocation", e.target.value)}
+                    className={selCls}
+                  >
+                    <option value="">Default (best yield)</option>
+                    {refineryLocations.map((l) => (
+                      <option key={l.name} value={l.name}>{l.name}</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block">
+                  <div className={labelCls}>Method</div>
+                  <select
+                    value={refMethod}
+                    onChange={(e) => writeField("refMethod", e.target.value)}
+                    className={selCls}
+                  >
+                    <option value="">Default</option>
+                    {refineryMethods.map((m) => (
+                      <option key={m.name} value={m.name}>{m.name}</option>
+                    ))}
+                  </select>
+                </label>
+                {(ship === "Reclaimer" || ship === "Moth") && (
+                  <label className="block">
+                    <div className={labelCls}>CM sell at</div>
+                    <select
+                      value={cmatSellLoc}
+                      onChange={(e) => writeField("cmatSellLocation", e.target.value)}
+                      className={selCls}
+                    >
+                      <option value="">Best price ({fmt(bestPriceFor("Construction Materials"))} aUEC/SCU)</option>
+                      {cmatSellOpts.map((n) => (<option key={n} value={n}>{n}</option>))}
+                    </select>
+                  </label>
+                )}
+                <label className="block">
+                  <div className={labelCls}>RMC sell at</div>
+                  <select
+                    value={rmcSellLoc}
+                    onChange={(e) => writeField("rmcSellLocation", e.target.value)}
+                    className={selCls}
+                  >
+                    <option value="">Best price ({fmt(bestPriceFor("Recycled Material Composite"))} aUEC/SCU)</option>
+                    {rmcSellOpts.map((n) => (<option key={n} value={n}>{n}</option>))}
+                  </select>
+                </label>
+                <div className="rounded-lg border border-slate-700 bg-slate-900/60 p-2 text-[11px]">
+                  {ship === "Reclaimer" && (
+                    <div className="flex justify-between"><span className="text-slate-400">CS yield</span><span className="text-white">{fmt(csRef.totalYield)} SCU</span></div>
+                  )}
+                  {ship === "Moth" && (
+                    <div className="flex justify-between"><span className="text-slate-400">CP yield</span><span className="text-white">{fmt(cpRef.totalYield)} SCU</span></div>
+                  )}
+                  <div className="flex justify-between"><span className="text-slate-400">CM sale</span><span className="text-white">{fmt(cmatSaleAuec)} aUEC</span></div>
+                  <div className="flex justify-between"><span className="text-slate-400">RMC sale</span><span className="text-white">{fmt(rmcSaleAuec)} aUEC</span></div>
+                  <div className="flex justify-between"><span className="text-slate-400">Refinery cost</span><span className="text-rose-300">-{fmt(refCost)} aUEC</span></div>
+                  <div className="mt-1 flex justify-between border-t border-slate-700/60 pt-1"><span className="font-bold text-emerald-300">Net</span><span className="font-bold text-emerald-200">{fmt(netSale)} aUEC</span></div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => writeField("splitAuec", Math.round(netSale))}
+                  className="w-full rounded border border-cyan-400/40 bg-cyan-500/15 px-2 py-1 text-[11px] font-semibold text-cyan-100 hover:bg-cyan-500/25"
+                >
+                  Send Net to Split →
+                </button>
+              </div>
+            )}
+            {widgetTab === "split" && (
+              <div className="space-y-2">
+                <label className="block">
+                  <div className={labelCls}>Total aUEC</div>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={splitAuecVal || ""}
+                    onChange={(e) => writeField("splitAuec", e.target.value === "" ? 0 : Number(e.target.value))}
+                    className={numCls}
+                    placeholder="aUEC pool"
+                  />
+                </label>
+                <label className="block">
+                  <div className={labelCls}>Crew count</div>
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    value={crewCount}
+                    onChange={(e) => writeField("splitCrewCount", Math.max(1, Math.floor(Number(e.target.value) || 1)))}
+                    className={numCls}
+                  />
+                </label>
+                <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-2">
+                  <div className={labelCls}>Per crew member</div>
+                  <div className="mt-0.5 text-lg font-bold text-emerald-200">{fmt(Math.round(perCrew))} aUEC</div>
+                  <div className="text-[9px] text-slate-500">{fmt(splitAuecVal)} ÷ {crewCount}</div>
+                </div>
+              </div>
             )}
           </div>
+          {/* Footer */}
           <div className="mt-2 flex items-center justify-between text-[10px] text-slate-500">
             <span>{active ? "Live session" : "Draft only"}</span>
             <button
               type="button"
-              onClick={() => {
-                window.location.hash = "";
-              }}
+              onClick={() => { window.location.hash = ""; }}
               className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
               title="Exit widget mode (Tauri tray → Toggle crew salvage widget)"
             >

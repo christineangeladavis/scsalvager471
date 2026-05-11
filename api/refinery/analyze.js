@@ -38,7 +38,12 @@ const ANTHROPIC_VERSION = "2023-06-01";
 
 const EXTRACTION_PROMPT = `You are reading a Star Citizen refinery order screen.
 
-Extract the following fields from the image and return them as a single JSON object. Use null for any field you cannot confidently read. Do NOT invent values.
+FIRST: verify this is actually a refinery setup / refinement-center screen. The screen MUST display a "REFINERY SYSTEM" or "REFINEMENT CENTER" header AND a "SETUP" or "PROCESSING SELECTION, YIELD AND COSTS" panel AND "RAW MATERIALS / IN MANIFEST / TO REFINE" rows AND a "PROCESSING TIME" / "TOTAL COST" footer. A commodity terminal ("COMMODITIES", "YOUR INVENTORIES", "SHOP INVENTORY", "BUY", "IN DEMAND", "NO DEMAND") is NOT a refinery screen. A hangar, mobiGlas app, kiosk, mission board, or any other UI is NOT a refinery screen.
+
+If the image is NOT a refinery setup / refinement-center screen, return EXACTLY this JSON and nothing else:
+{"error":"not_refinery"}
+
+Otherwise, extract the following fields from the image and return them as a single JSON object. Use null for any field you cannot confidently read. Do NOT invent values.
 
 Read the fields in this order — Material first, Amount second, then Location, Method, Time, and Cost. The first two are the most important; if you can only read part of the screen, prioritise getting those right.
 
@@ -174,6 +179,18 @@ export default async function handler(req, res) {
   } catch (e) {
     console.error("analyze: failed to parse JSON from model:", stripped.slice(0, 200));
     return res.status(502).json({ error: "Could not parse analysis result" });
+  }
+
+  // Type guard: the prompt instructs the model to return
+  // {"error":"not_refinery"} when the image is not a refinery setup
+  // screen. Surface that with a 422 so the client shows a clear
+  // "not a refinery screenshot" error instead of an empty-field
+  // success.
+  if (parsed && parsed.error === "not_refinery") {
+    return res.status(422).json({
+      error: "not_refinery",
+      message: "This screenshot doesn't look like a refinery setup screen. Capture the in-game refinery (Refinement Center) setup panel and try again.",
+    });
   }
 
   // Coerce types and clamp ranges.

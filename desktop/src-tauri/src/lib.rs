@@ -223,10 +223,17 @@ fn ensure_session_token(app: &AppHandle) -> Option<String> {
 // -----------------------------------------------------------------
 
 fn build_tray(app: &AppHandle) -> tauri::Result<()> {
-    let capture = MenuItem::with_id(
+    let capture_refinery = MenuItem::with_id(
         app,
-        "capture",
+        "capture_refinery",
         "Capture refinery screenshot",
+        true,
+        None::<&str>,
+    )?;
+    let capture_commodity = MenuItem::with_id(
+        app,
+        "capture_commodity",
+        "Capture commodity sale screenshot",
         true,
         None::<&str>,
     )?;
@@ -260,7 +267,8 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
     let menu = Menu::with_items(
         app,
         &[
-            &capture,
+            &capture_refinery,
+            &capture_commodity,
             &sep0,
             &show,
             &hide,
@@ -286,7 +294,7 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
         .menu(&menu)
         .show_menu_on_left_click(false)
         .on_menu_event(|app, event| match event.id.as_ref() {
-            "capture" => {
+            "capture_refinery" => {
                 // EAC blocks the F9 global hotkey while Star
                 // Citizen has focus, so the tray menu acts as
                 // the reliable capture trigger. xcap reads the
@@ -294,7 +302,13 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
                 // (Windows BitBlt against the window's backbuffer
                 // works for non-focused windows), so the user
                 // only needs to alt-tab once + click this item.
-                handle_screenshot_hotkey(app.clone());
+                handle_screenshot_hotkey(app.clone(), CaptureKind::Refinery);
+            }
+            "capture_commodity" => {
+                // Same capture pipeline; the web bridge routes the
+                // image to /api/sell/analyze instead of /refinery
+                // based on the bridge method name (openCommodityCrop).
+                handle_screenshot_hotkey(app.clone(), CaptureKind::Commodity);
             }
             "show" => {
                 if let Some(w) = app.get_webview_window("main") {
@@ -620,8 +634,33 @@ fn capture_sc_window_png() -> Result<Vec<u8>, String> {
     Ok(buf)
 }
 
-fn handle_screenshot_hotkey(app: AppHandle) {
-    eprintln!("[capture] hotkey received, beginning capture pipeline");
+/// Capture kind discriminator. Picked by which tray menu item fired
+/// the capture; passed through to the React bridge so the server-side
+/// analyzer knows which validator (refinery vs commodity terminal)
+/// to run against the OCR result.
+#[derive(Debug, Clone, Copy)]
+enum CaptureKind {
+    Refinery,
+    Commodity,
+}
+
+impl CaptureKind {
+    fn title(&self) -> &'static str {
+        match self {
+            CaptureKind::Refinery => "Refinery Screenshot Failed",
+            CaptureKind::Commodity => "Commodity Sale Screenshot Failed",
+        }
+    }
+    fn bridge_fn(&self) -> &'static str {
+        match self {
+            CaptureKind::Refinery => "openRefineryCrop",
+            CaptureKind::Commodity => "openCommodityCrop",
+        }
+    }
+}
+
+fn handle_screenshot_hotkey(app: AppHandle, kind: CaptureKind) {
+    eprintln!("[capture] hotkey received ({kind:?}), beginning capture pipeline");
     tauri::async_runtime::spawn(async move {
         // Capture happens off the UI thread. xcap is sync so wrap
         // in spawn_blocking to keep tokio runtime healthy.
@@ -631,7 +670,7 @@ fn handle_screenshot_hotkey(app: AppHandle) {
                 let _ = app
                     .notification()
                     .builder()
-                    .title("Refinery Screenshot Failed")
+                    .title(kind.title())
                     .body(&e)
                     .show();
                 return;
@@ -640,7 +679,7 @@ fn handle_screenshot_hotkey(app: AppHandle) {
                 let _ = app
                     .notification()
                     .builder()
-                    .title("Refinery Screenshot Failed")
+                    .title(kind.title())
                     .body(&format!("blocking task: {e}"))
                     .show();
                 return;
@@ -649,16 +688,17 @@ fn handle_screenshot_hotkey(app: AppHandle) {
 
         // Hand the captured PNG off to the WebView's crop modal.
         // Rust no longer uploads directly — the user gets a chance
-        // to drag-select the refinery panel before it ships, which
-        // tightens Anthropic API usage + improves OCR accuracy.
-        // App.jsx exposes window.__SCSALVAGER_DESKTOP__.openRefineryCrop
-        // for this exact handoff; we call it via WebView eval.
+        // to drag-select the panel before it ships, which tightens
+        // Anthropic API usage + improves OCR accuracy. The bridge
+        // method name encodes the capture kind (openRefineryCrop /
+        // openCommodityCrop) so the web side routes it to the right
+        // analyze endpoint.
         let b64 = base64::engine::general_purpose::STANDARD.encode(&png);
         let Some(window) = app.get_webview_window("main") else {
             let _ = app
                 .notification()
                 .builder()
-                .title("Refinery Screenshot Failed")
+                .title(kind.title())
                 .body("Main window missing.")
                 .show();
             return;
@@ -671,20 +711,21 @@ fn handle_screenshot_hotkey(app: AppHandle) {
         // If compact-mode is on, exit it so the crop modal has
         // room to render. The web hook listens for hashchange.
         let _ = window.eval(
-            "if (window.location.hash === '#compact') { window.location.hash = ''; }",
+            "if (window.location.hash === '#compact' || window.location.hash === '#crew-widget') { window.location.hash = ''; }",
         );
         // Hand off to the React bridge. Falls back to a quiet
-        // toast when the bridge isn't registered (web app still
-        // loading, or running an older bundle without the
+        // console.warn when the bridge isn't registered (web app
+        // still loading, or running an older bundle without the
         // desktop-bridge hook).
+        let bridge_fn = kind.bridge_fn();
         let js = format!(
             r#"
             (function () {{
                 var b = window.__SCSALVAGER_DESKTOP__;
-                if (b && typeof b.openRefineryCrop === 'function') {{
-                    b.openRefineryCrop({b64_json}, "image/png");
+                if (b && typeof b.{bridge_fn} === 'function') {{
+                    b.{bridge_fn}({b64_json}, "image/png");
                 }} else {{
-                    console.warn("[scsalvager-desktop] crop bridge not registered");
+                    console.warn("[scsalvager-desktop] {bridge_fn} bridge not registered");
                 }}
             }})();
             "#,
@@ -695,7 +736,7 @@ fn handle_screenshot_hotkey(app: AppHandle) {
             let _ = app
                 .notification()
                 .builder()
-                .title("Refinery Screenshot Failed")
+                .title(kind.title())
                 .body(&format!("WebView eval: {e}"))
                 .show();
             return;
@@ -957,7 +998,9 @@ pub fn run() {
                 move |_app, _shortcut, event| {
                     eprintln!("[hotkey] F9 event state={:?}", event.state());
                     if event.state() == ShortcutState::Pressed {
-                        handle_screenshot_hotkey(cap_handle.clone());
+                        // F9 defaults to refinery; commodity captures
+                        // go through the tray menu's dedicated item.
+                        handle_screenshot_hotkey(cap_handle.clone(), CaptureKind::Refinery);
                     }
                 },
             ) {

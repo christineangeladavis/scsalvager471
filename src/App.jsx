@@ -13644,23 +13644,39 @@ function StockComponentsTable({ stockComponents }) {
 function useDesktopBridge(setCropImage, setActiveTab, setLedgerSubTab) {
   useEffect(() => {
     if (typeof window === "undefined") return;
+    // Preserve any pre-existing bridge fields (e.g. ledgerCache set
+    // by the Rust background poll) when re-registering — don't
+    // clobber them.
+    const prev = window.__SCSALVAGER_DESKTOP__ || {};
     window.__SCSALVAGER_DESKTOP__ = {
-      // Called by Rust after Star Citizen window capture.
+      ...prev,
+      // Called by Rust after a "Capture refinery screenshot" trigger.
+      // Lands the user on Ledger → Refinery so the auto-filled form
+      // is visible after they confirm the crop.
       openRefineryCrop: (base64, mediaType) => {
         if (!base64 || typeof base64 !== "string") return;
         const mt = mediaType || "image/png";
         const dataUrl = `data:${mt};base64,${base64}`;
         setCropImage({ dataUrl, mediaType: mt, kind: "refinery" });
-        // Bring the user to the Refinery Job Orders surface so
-        // the auto-filled form is visible after they confirm
-        // the crop.
         setActiveTab("ledger");
         setLedgerSubTab("refinery");
+      },
+      // Called by Rust after a "Capture commodity sale screenshot"
+      // trigger. Lands the user on Ledger → Sell Orders so the
+      // auto-filled sale row shows up after crop confirm.
+      openCommodityCrop: (base64, mediaType) => {
+        if (!base64 || typeof base64 !== "string") return;
+        const mt = mediaType || "image/png";
+        const dataUrl = `data:${mt};base64,${base64}`;
+        setCropImage({ dataUrl, mediaType: mt, kind: "sell" });
+        setActiveTab("ledger");
+        setLedgerSubTab("orders");
       },
     };
     return () => {
       if (window.__SCSALVAGER_DESKTOP__) {
-        delete window.__SCSALVAGER_DESKTOP__;
+        delete window.__SCSALVAGER_DESKTOP__.openRefineryCrop;
+        delete window.__SCSALVAGER_DESKTOP__.openCommodityCrop;
       }
     };
   }, [setCropImage, setActiveTab, setLedgerSubTab]);
@@ -18527,7 +18543,7 @@ export default function StarCitizenSalvageGuideWebsite() {
           if (import.meta.env.DEV && (res.status === 401 || res.status === 503 || res.status === 404)) {
             extracted = devMockRefineryExtraction();
           } else {
-            throw new Error(info.error || `HTTP ${res.status}`);
+            throw new Error(info.message || info.error || `HTTP ${res.status}`);
           }
         } else {
           extracted = await res.json();
@@ -18701,7 +18717,7 @@ export default function StarCitizenSalvageGuideWebsite() {
           if (import.meta.env.DEV && (res.status === 401 || res.status === 503 || res.status === 404)) {
             extracted = devMockSellExtraction();
           } else {
-            throw new Error(info.error || `HTTP ${res.status}`);
+            throw new Error(info.message || info.error || `HTTP ${res.status}`);
           }
         } else {
           extracted = await res.json();

@@ -34,9 +34,14 @@ const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
 const ANTHROPIC_MODEL = "claude-haiku-4-5-20251001";
 const ANTHROPIC_VERSION = "2023-06-01";
 
-const EXTRACTION_PROMPT = `You are reading a Star Citizen Commodities / Trading Console screen.
+const EXTRACTION_PROMPT = `You are reading a Star Citizen Commodities / Trading Console (commodity sell terminal) screen.
 
-Extract the following fields from the image and return them as a single JSON object. Use null for any field you cannot confidently read. Do NOT invent values.
+FIRST: verify this is actually a commodity terminal screen. The screen MUST display a "COMMODITIES" header AND a "YOUR INVENTORIES" panel AND an "IN DEMAND" / "NO DEMAND" / "CANNOT SELL" section. Typical clues: "SHOP INVENTORY", "BUY" + "LOCAL MARKET VALUE" tabs, "AVAILABLE CARGO SIZE (SCU)", "EST. UNLOADING TIME". A refinery setup screen ("REFINERY SYSTEM", "REFINEMENT CENTER", "RAW MATERIALS / IN MANIFEST / TO REFINE", "PROCESSING TIME") is NOT a commodity terminal. A hangar, mobiGlas app, mission board, or any other UI is NOT a commodity terminal.
+
+If the image is NOT a commodity / trading terminal screen, return EXACTLY this JSON and nothing else:
+{"error":"not_commodity"}
+
+Otherwise, extract the following fields from the image and return them as a single JSON object. Use null for any field you cannot confidently read. Do NOT invent values.
 
 Read the fields in this order — Material first, Amount second, then Location, then the aUEC totals. The first two are the most important; if you can only read part of the screen, prioritise getting those right.
 
@@ -163,6 +168,17 @@ export default async function handler(req, res) {
   } catch {
     console.error("sell/analyze: failed to parse JSON from model:", stripped.slice(0, 200));
     return res.status(502).json({ error: "Could not parse analysis result" });
+  }
+
+  // Type guard — prompt instructs the model to return
+  // {"error":"not_commodity"} when the image isn't a trading
+  // terminal. Surface a 422 so the client shows a clear error
+  // instead of an empty-field "success".
+  if (parsed && parsed.error === "not_commodity") {
+    return res.status(422).json({
+      error: "not_commodity",
+      message: "This screenshot doesn't look like a commodity terminal. Capture the in-game Commodities / sell terminal screen and try again.",
+    });
   }
 
   const num = (v) =>

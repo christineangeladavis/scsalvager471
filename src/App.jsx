@@ -13641,7 +13641,7 @@ function StockComponentsTable({ stockComponents }) {
 // crop modal then takes over so the user can crop before the
 // /api/refinery/analyze upload. Falls back gracefully when not
 // running inside Tauri (the bridge object simply isn't called).
-function useDesktopBridge(setCropImage, setActiveTab, setLedgerSubTab) {
+function useDesktopBridge(setCropImage, setActiveTab, setLedgerSubTab, setUpdateModal) {
   useEffect(() => {
     if (typeof window === "undefined") return;
     // Preserve any pre-existing bridge fields (e.g. ledgerCache set
@@ -13672,14 +13672,38 @@ function useDesktopBridge(setCropImage, setActiveTab, setLedgerSubTab) {
         setActiveTab("ledger");
         setLedgerSubTab("orders");
       },
+      // Called by Rust after the user clicks the tray's
+      // "Check for updates…" menu item — drives the in-app
+      // update modal. payload: { status, version, message,
+      // currentVersion }.
+      onUpdateStatus: (payload) => {
+        if (!payload || typeof payload !== "object") return;
+        setUpdateModal({
+          open: true,
+          status: String(payload.status || "checking"),
+          version: payload.version || null,
+          currentVersion: payload.currentVersion || null,
+          message: payload.message || null,
+          progress: null,
+        });
+      },
+      // Streamed during a download triggered by apply_update.
+      onUpdateProgress: (payload) => {
+        if (!payload || typeof payload !== "object") return;
+        setUpdateModal((prev) => prev && prev.open
+          ? { ...prev, status: "downloading", progress: payload }
+          : prev);
+      },
     };
     return () => {
       if (window.__SCSALVAGER_DESKTOP__) {
         delete window.__SCSALVAGER_DESKTOP__.openRefineryCrop;
         delete window.__SCSALVAGER_DESKTOP__.openCommodityCrop;
+        delete window.__SCSALVAGER_DESKTOP__.onUpdateStatus;
+        delete window.__SCSALVAGER_DESKTOP__.onUpdateProgress;
       }
     };
-  }, [setCropImage, setActiveTab, setLedgerSubTab]);
+  }, [setCropImage, setActiveTab, setLedgerSubTab, setUpdateModal]);
 }
 
 // Tauri-runtime detection. The desktop shell exposes
@@ -14153,11 +14177,18 @@ export default function StarCitizenSalvageGuideWebsite() {
   // <img> element); we translate to natural coordinates at confirm time.
   const [cropImage, setCropImage] = useState(null);
   const [cropRect, setCropRect] = useState(null);
+  // Desktop update modal state — driven by Rust via the bridge when
+  // the user clicks the tray's "Check for updates…" item, or by
+  // the Update Now button when a download is in progress.
+  // Shape: { open, status, version, currentVersion, message, progress }
+  // status: "checking" | "up_to_date" | "available" | "downloading" |
+  //         "ready" | "error"
+  const [updateModal, setUpdateModal] = useState(null);
   // Desktop bridge — wired so the Tauri Rust code can hand off a
   // captured Star Citizen window via the global
   // window.__SCSALVAGER_DESKTOP__.openRefineryCrop(base64, mt).
   // No-op in pure web because the Rust caller doesn't exist there.
-  useDesktopBridge(setCropImage, setActiveTab, setLedgerSubTab);
+  useDesktopBridge(setCropImage, setActiveTab, setLedgerSubTab, setUpdateModal);
   const cropImgRef = useRef(null);
   const cropDragStartRef = useRef(null);
   // Default shape for a fresh sell order entry. The Clear button next
@@ -28716,6 +28747,129 @@ export default function StarCitizenSalvageGuideWebsite() {
             orders at once. The rectangle is captured in displayed-image
             coordinates and translated to natural pixels at confirm
             time so the cropped output preserves full source resolution. */}
+        {/* Desktop update modal — driven by the Rust bridge when the
+            user clicks the tray's "Check for updates…" menu item.
+            Only ever opens in Tauri; web users never see it. */}
+        {updateModal?.open && (
+          <div
+            className="fixed inset-0 z-[80] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+            onClick={() => {
+              // Only allow click-outside-to-dismiss when we're not
+              // mid-download. Closing during a download wouldn't
+              // actually cancel the Rust task, but would let the
+              // user re-trigger and confuse the modal state.
+              if (updateModal.status === "downloading") return;
+              setUpdateModal(null);
+            }}
+          >
+            <div
+              className="w-full max-w-md rounded-2xl border border-cyan-500/30 bg-slate-900 p-6 shadow-2xl shadow-cyan-950/40"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+            >
+              <h3 className="text-lg font-bold text-cyan-300">
+                {updateModal.status === "up_to_date" && "You're up to date"}
+                {updateModal.status === "available" && "Update available"}
+                {updateModal.status === "downloading" && "Downloading update…"}
+                {updateModal.status === "ready" && "Update installed"}
+                {updateModal.status === "error" && "Update check failed"}
+                {updateModal.status === "checking" && "Checking for updates…"}
+              </h3>
+              <div className="mt-3 text-sm text-slate-300">
+                {updateModal.status === "up_to_date" && (
+                  <>You are running the latest version of SCSalvager Desktop{updateModal.currentVersion ? ` (v${updateModal.currentVersion})` : ""}.</>
+                )}
+                {updateModal.status === "available" && (
+                  <>
+                    A new version is available
+                    {updateModal.version ? <> (<strong>v{updateModal.version}</strong>)</> : null}
+                    {updateModal.currentVersion ? <> · you're on v{updateModal.currentVersion}</> : null}.
+                    <div className="mt-2 text-xs text-slate-400">Update Now will download the new release and restart the app to apply it.</div>
+                  </>
+                )}
+                {updateModal.status === "downloading" && (
+                  <>
+                    Downloading SCSalvager Desktop{updateModal.version ? ` v${updateModal.version}` : ""}…
+                    {updateModal.progress && Number.isFinite(updateModal.progress.percent) && (
+                      <div className="mt-3">
+                        <div className="h-2 w-full overflow-hidden rounded-full border border-slate-700 bg-slate-950">
+                          <div
+                            className="h-full bg-cyan-400 transition-[width]"
+                            style={{ width: `${Math.max(0, Math.min(100, updateModal.progress.percent))}%` }}
+                          />
+                        </div>
+                        <div className="mt-1 text-[11px] text-slate-500">
+                          {updateModal.progress.percent}% · {Math.round((updateModal.progress.downloaded || 0) / 1024)} KB / {Math.round((updateModal.progress.total || 0) / 1024)} KB
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+                {updateModal.status === "ready" && (
+                  <>SCSalvager Desktop{updateModal.version ? ` v${updateModal.version}` : ""} downloaded. The app will restart now.</>
+                )}
+                {updateModal.status === "error" && (
+                  <>{updateModal.message || "Something went wrong while checking for updates."}</>
+                )}
+                {updateModal.status === "checking" && <>Reaching out to the update server…</>}
+              </div>
+              <div className="mt-5 flex justify-end gap-2">
+                {(updateModal.status === "up_to_date" ||
+                  updateModal.status === "error" ||
+                  updateModal.status === "ready") && (
+                  <button
+                    type="button"
+                    onClick={() => setUpdateModal(null)}
+                    className="rounded-lg border border-slate-700 bg-slate-800/60 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                  >
+                    Close
+                  </button>
+                )}
+                {updateModal.status === "available" && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setUpdateModal(null)}
+                      className="rounded-lg border border-slate-700 bg-slate-800/60 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                    >
+                      Later
+                    </button>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          // Optimistic: flip to downloading while
+                          // the invoke is in flight. Real progress
+                          // events from Rust will refine it.
+                          setUpdateModal((p) => p ? { ...p, status: "downloading" } : p);
+                          const inv = window.__TAURI_INTERNALS__?.invoke;
+                          if (typeof inv !== "function") {
+                            throw new Error("Tauri bridge not available.");
+                          }
+                          await inv("apply_update");
+                          // If we get here, Rust didn't restart (failure).
+                        } catch (e) {
+                          setUpdateModal({
+                            open: true,
+                            status: "error",
+                            version: updateModal.version,
+                            currentVersion: updateModal.currentVersion,
+                            message: e && e.message ? e.message : String(e),
+                            progress: null,
+                          });
+                        }
+                      }}
+                      className="rounded-lg border border-cyan-400 bg-cyan-500/20 px-3 py-1.5 text-xs font-semibold text-cyan-100 hover:bg-cyan-500/30"
+                    >
+                      Update Now
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
         {cropImage && (
           <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"

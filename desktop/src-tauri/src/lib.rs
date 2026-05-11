@@ -765,11 +765,50 @@ fn handle_screenshot_hotkey(app: AppHandle, kind: CaptureKind) {
 // invalid signature, which is fine for dev builds — the check
 // just no-ops.
 
-/// Runs the updater check + download flow. `manual=true` surfaces
-/// "up to date" / failure cases as OS notifications so the user
-/// gets feedback after clicking the tray's "Check for updates…"
-/// item. `manual=false` (launch-time path) stays silent on the
-/// happy path — only notifies when there's an update to surface.
+/// Push an update-flow status into the WebView so React can render
+/// the proper modal (up-to-date message, Update Now button,
+/// download progress, completion, etc). Mirrors the bridge pattern
+/// used elsewhere — calls window.__SCSALVAGER_DESKTOP__.onUpdateStatus
+/// via webview eval and falls back silently if the bridge isn't
+/// registered yet (web bundle still loading).
+fn emit_update_status(
+    app: &AppHandle,
+    status: &str,
+    version: Option<&str>,
+    message: Option<&str>,
+) {
+    let Some(window) = app.get_webview_window("main") else { return };
+    let payload = serde_json::json!({
+        "status": status,
+        "version": version,
+        "message": message,
+        "currentVersion": env!("CARGO_PKG_VERSION"),
+    });
+    let payload_str = serde_json::to_string(&payload)
+        .unwrap_or_else(|_| "{}".to_string());
+    let js = format!(
+        r#"
+        (function () {{
+            var b = window.__SCSALVAGER_DESKTOP__;
+            if (b && typeof b.onUpdateStatus === 'function') {{
+                b.onUpdateStatus({payload_str});
+            }}
+        }})();
+        "#
+    );
+    let _ = window.eval(&js);
+    // Make the window visible if it was minimized to tray, so the
+    // user actually sees the update modal after clicking the tray
+    // "Check for updates…" item.
+    let _ = window.show();
+    let _ = window.unminimize();
+    let _ = window.set_focus();
+}
+
+/// Runs the updater check. `manual=true` (tray click) emits status
+/// events to the WebView so React surfaces a proper modal with an
+/// "Update Now" button — no auto-download. `manual=false` (launch-time
+/// path) keeps the legacy auto-download + OS-notification behavior.
 fn run_update_check(app: AppHandle, manual: bool) {
     tauri::async_runtime::spawn(async move {
         let updater = match app.updater() {
@@ -777,12 +816,12 @@ fn run_update_check(app: AppHandle, manual: bool) {
             Err(e) => {
                 eprintln!("[updater] init failed: {e}");
                 if manual {
-                    let _ = app
-                        .notification()
-                        .builder()
-                        .title("SCSalvager update check failed")
-                        .body(&format!("Could not init updater: {e}"))
-                        .show();
+                    emit_update_status(
+                        &app,
+                        "error",
+                        None,
+                        Some(&format!("Could not init updater: {e}")),
+                    );
                 }
                 return;
             }
@@ -792,12 +831,12 @@ fn run_update_check(app: AppHandle, manual: bool) {
             Err(e) => {
                 eprintln!("[updater] check failed: {e}");
                 if manual {
-                    let _ = app
-                        .notification()
-                        .builder()
-                        .title("SCSalvager update check failed")
-                        .body(&format!("Could not reach update server: {e}"))
-                        .show();
+                    emit_update_status(
+                        &app,
+                        "error",
+                        None,
+                        Some(&format!("Could not reach update server: {e}")),
+                    );
                 }
                 return;
             }
@@ -805,18 +844,25 @@ fn run_update_check(app: AppHandle, manual: bool) {
         let Some(update) = update else {
             eprintln!("[updater] up to date");
             if manual {
-                let _ = app
-                    .notification()
-                    .builder()
-                    .title("SCSalvager is up to date")
-                    .body("You're running the latest version.")
-                    .show();
+                emit_update_status(&app, "up_to_date", None, None);
             }
             return;
         };
         let new_version = update.version.clone();
         eprintln!("[updater] new version available: {new_version}");
 
+        if manual {
+            // Manual flow: don't auto-download. React modal shows
+            // the version + an Update Now button; the user clicks
+            // it to invoke the apply_update command which does the
+            // actual download + restart.
+            emit_update_status(&app, "available", Some(&new_version), None);
+            return;
+        }
+
+        // Launch-time auto-check: original behavior — notify the
+        // user via OS toast + download in the background so the
+        // update applies on the next quit/reopen.
         let _ = app
             .notification()
             .builder()
@@ -873,6 +919,73 @@ fn spawn_update_checker(app: AppHandle) {
     });
 }
 
+/// Tauri command — invoked from JS via window.__TAURI_INTERNALS__.invoke
+/// when the user clicks "Update Now" in the React update modal.
+/// Re-runs the updater check (so we hold a fresh Update handle) and
+/// downloads + installs it, restarting the app when finished.
+/// Progress + completion + failure are pushed back to the WebView
+/// via the same emit_update_status bridge.
+#[tauri::command]
+async fn apply_update(app: AppHandle) -> Result<(), String> {
+    let updater = app.updater().map_err(|e| e.to_string())?;
+    let update = updater
+        .check()
+        .await
+        .map_err(|e| {
+            emit_update_status(&app, "error", None, Some(&format!("Check failed: {e}")));
+            e.to_string()
+        })?;
+    let Some(update) = update else {
+        emit_update_status(&app, "up_to_date", None, None);
+        return Err("No update available".into());
+    };
+    let new_version = update.version.clone();
+    emit_update_status(&app, "downloading", Some(&new_version), None);
+
+    let app_clone = app.clone();
+    let mut downloaded: u64 = 0;
+    let result = update
+        .download_and_install(
+            move |chunk_len, content_len| {
+                downloaded += chunk_len as u64;
+                if let Some(total) = content_len {
+                    let pct = ((downloaded as f64 / total as f64) * 100.0).round() as i64;
+                    let payload = serde_json::json!({
+                        "downloaded": downloaded,
+                        "total": total,
+                        "percent": pct,
+                    });
+                    let payload_str = serde_json::to_string(&payload)
+                        .unwrap_or_else(|_| "{}".to_string());
+                    if let Some(w) = app_clone.get_webview_window("main") {
+                        let js = format!(
+                            "if(window.__SCSALVAGER_DESKTOP__ && typeof window.__SCSALVAGER_DESKTOP__.onUpdateProgress==='function') {{ window.__SCSALVAGER_DESKTOP__.onUpdateProgress({payload_str}); }}"
+                        );
+                        let _ = w.eval(&js);
+                    }
+                }
+            },
+            || {},
+        )
+        .await;
+    match result {
+        Ok(()) => {
+            emit_update_status(&app, "ready", Some(&new_version), None);
+            // Restart so the new binary takes over immediately.
+            app.restart();
+        }
+        Err(e) => {
+            emit_update_status(
+                &app,
+                "error",
+                Some(&new_version),
+                Some(&format!("Download failed: {e}")),
+            );
+            Err(e.to_string())
+        }
+    }
+}
+
 // -----------------------------------------------------------------
 // Tauri entry.
 // -----------------------------------------------------------------
@@ -897,6 +1010,7 @@ pub fn run() {
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .plugin(tauri_plugin_updater::Builder::new().build())
+        .invoke_handler(tauri::generate_handler![apply_update])
         .on_window_event(|window, event| {
             // Close button minimizes to tray rather than quitting so the
             // background refinery poller keeps running. The tray menu's

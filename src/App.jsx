@@ -25275,7 +25275,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                   )}
 
                   {!statsLoading && !statsError && statsData && (
-                    <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                    <div className="mt-5 grid gap-3 grid-cols-[repeat(auto-fit,minmax(14rem,1fr))]">
                       <div className="rounded-2xl border border-cyan-500/25 bg-slate-950/70 p-4">
                         <div className="text-xs uppercase tracking-[0.25em] text-cyan-300/80">Total SCU Refined</div>
                         <div className="mt-2 text-2xl font-black text-amber-300">{Number(statsData.totalScuRefined || 0).toLocaleString(undefined, { maximumFractionDigits: 2 })} SCU</div>

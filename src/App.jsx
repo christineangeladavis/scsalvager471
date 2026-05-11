@@ -15491,9 +15491,25 @@ export default function StarCitizenSalvageGuideWebsite() {
         });
         if (cancelled) return;
         if (res.status === 401) {
-          // Session is gone server-side. Drop local user so the
-          // useEffect cleanup kills the interval on the next render.
+          // Session is gone server-side (admin force-logout, expiry,
+          // rotated session, etc). Drop local user so the useEffect
+          // cleanup kills the interval on the next render, then hit
+          // /api/auth/logout so the Set-Cookie: Max-Age=0 response
+          // clears the browser's stale cookie too. Otherwise the
+          // browser keeps sending the dead cookie on every request,
+          // and on desktop the WebView keeps the cookie alive even
+          // after the Rust poll deletes auth.json. Fire-and-forget;
+          // the 200 OK response doesn't matter to us.
           setUser(null);
+          try {
+            await fetch("/api/auth/logout", {
+              method: "POST",
+              credentials: "same-origin",
+            });
+          } catch {
+            // Network blip — cookie still goes stale on the next
+            // request because the server-side session is gone.
+          }
         }
       } catch {
         // Network blip — try again on the next interval.
@@ -26508,7 +26524,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                 Force-logout every active user?
               </h3>
               <p className="mt-3 text-sm text-slate-300">
-                Every active session in Redis will be invalidated. Affected users will be signed out on their next request and will need to log in again. Your own session is preserved so the admin panel keeps working.
+                Every active session in Redis will be invalidated — <strong>web and desktop both</strong>. Web users get kicked on their next heartbeat (within 30 seconds); the desktop app's background poll detects the dead session, clears its cached token, and the in-WebView heartbeat clears the session cookie at the same time. Affected users will need to log in again. Your own session is preserved so the admin panel keeps working.
               </p>
               <p className="mt-2 text-xs text-slate-500">
                 This is irreversible. Already-saved ledger data is not affected.

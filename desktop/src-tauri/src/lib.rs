@@ -909,6 +909,18 @@ pub fn run() {
             }
         })
         .setup(|app| {
+            // Stamp the running version into the main window title
+            // so users can see what build they're on without opening
+            // Settings. Resolved at compile time from Cargo.toml's
+            // package.version — bumping the crate version is enough
+            // to update this on the next release.
+            if let Some(w) = app.get_webview_window("main") {
+                let _ = w.set_title(&format!(
+                    "SCSalvager Desktop v{}",
+                    env!("CARGO_PKG_VERSION")
+                ));
+            }
+
             // Tray first so the tooltip helper is ready before the
             // background poller fires its first update.
             if let Err(e) = build_tray(app.handle()) {

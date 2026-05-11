@@ -90,6 +90,10 @@ export default async function handler(req, res) {
       rsiHandleVerified,
       lastLoginAt: meta.lastLoginAt,
       lastSeenAt: meta.lastSeenAt || null,
+      // "desktop" | "web" | null — the last client kind the user
+      // heartbeat'd from. Null pre-heartbeat or for sessions that
+      // landed before this field shipped.
+      lastClient: meta.lastClient || null,
       isOnline,
       dmsEnabled,
     });

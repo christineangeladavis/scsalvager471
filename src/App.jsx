@@ -15488,6 +15488,8 @@ export default function StarCitizenSalvageGuideWebsite() {
         const res = await fetch("/api/me/heartbeat", {
           method: "POST",
           credentials: "same-origin",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ client: isTauri ? "desktop" : "web" }),
         });
         if (cancelled) return;
         if (res.status === 401) {
@@ -26214,7 +26216,9 @@ export default function StarCitizenSalvageGuideWebsite() {
                                   u.isOnline ? "bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.7)]" : "bg-slate-500"
                                 }`}
                               />
-                              {u.isOnline ? "Online" : "Offline"}
+                              {u.isOnline
+                                ? `Online${u.lastClient === "desktop" ? " · D" : u.lastClient === "web" ? " · W" : ""}`
+                                : "Offline"}
                             </span>
                           </td>
                           <td className="px-4 py-3 whitespace-nowrap">

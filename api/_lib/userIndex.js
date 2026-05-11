@@ -118,6 +118,10 @@ export async function getUserMeta(redis, userId) {
       username: meta.username,
       lastLoginAt: Number(meta.lastLoginAt) || null,
       lastSeenAt: Number(meta.lastSeenAt) || null,
+      // "desktop" | "web" — the client kind the last heartbeat came
+      // from. Drives the "Online · D / W" suffix in the admin All
+      // Users view. Null pre-heartbeat or for older sessions.
+      lastClient: typeof meta.lastClient === "string" ? meta.lastClient : null,
     };
   } catch (e) {
     console.error("getUserMeta failed:", e && e.message ? e.message : e);
@@ -130,12 +134,19 @@ export async function getUserMeta(redis, userId) {
  * shouldn't surface to the user. Also re-asserts the user-index
  * membership in case it was somehow purged.
  */
-export async function recordUserHeartbeat(redis, userId) {
+export async function recordUserHeartbeat(redis, userId, client) {
   if (!redis || !userId) return;
   const id = String(userId);
+  // Only persist "desktop" / "web" — ignore anything else the
+  // client might send. Older clients that don't send a value
+  // leave lastClient untouched (the previous value sticks).
+  const safeClient =
+    client === "desktop" || client === "web" ? client : null;
   try {
     await redis.sadd(USERS_INDEX_KEY, id);
-    await redis.hset(userMetaKey(id), { lastSeenAt: Date.now() });
+    const patch = { lastSeenAt: Date.now() };
+    if (safeClient) patch.lastClient = safeClient;
+    await redis.hset(userMetaKey(id), patch);
   } catch (e) {
     console.error(
       "recordUserHeartbeat failed:",

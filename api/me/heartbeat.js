@@ -31,6 +31,20 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: "Not authenticated" });
   }
 
-  await recordUserHeartbeat(redis, session.userId);
+  // Optional JSON body: { client: "desktop" | "web" } — drives the
+  // "Online · D / W" suffix in the admin All Users view. Older
+  // clients that don't send a body just refresh lastSeenAt and
+  // leave the stored client kind untouched.
+  let client = null;
+  try {
+    const body = req.body && typeof req.body === "object" ? req.body : null;
+    if (body && (body.client === "desktop" || body.client === "web")) {
+      client = body.client;
+    }
+  } catch {
+    // Body parse failure — silently fall back to client=null.
+  }
+
+  await recordUserHeartbeat(redis, session.userId, client);
   return res.status(204).end();
 }

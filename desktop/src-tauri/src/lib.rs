@@ -247,11 +247,30 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
         true,
         None::<&str>,
     )?;
+    let sep_update = PredefinedMenuItem::separator(app)?;
+    let check_updates = MenuItem::with_id(
+        app,
+        "check_updates",
+        "Check for updates…",
+        true,
+        None::<&str>,
+    )?;
     let sep = PredefinedMenuItem::separator(app)?;
     let quit = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
     let menu = Menu::with_items(
         app,
-        &[&capture, &sep0, &show, &hide, &compact, &crew_widget, &sep, &quit],
+        &[
+            &capture,
+            &sep0,
+            &show,
+            &hide,
+            &compact,
+            &crew_widget,
+            &sep_update,
+            &check_updates,
+            &sep,
+            &quit,
+        ],
     )?;
 
     // Embed the PNG at compile time. default_window_icon() returns
@@ -297,6 +316,13 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
                 // compact because it has more rows (3 SCU
                 // buckets + per-role contribution + split aUEC).
                 toggle_widget_mode(app, "#crew-widget", 420.0, 320.0);
+            }
+            "check_updates" => {
+                // Manual updater check from the tray menu. Unlike
+                // the launch-time silent check, this surfaces both
+                // "up to date" and "downloading new version" via
+                // OS notifications so the user gets feedback.
+                run_update_check(app.clone(), true);
             }
             "quit" => {
                 app.exit(0);
@@ -692,40 +718,58 @@ fn handle_screenshot_hotkey(app: AppHandle) {
 // invalid signature, which is fine for dev builds — the check
 // just no-ops.
 
-fn spawn_update_checker(app: AppHandle) {
+/// Runs the updater check + download flow. `manual=true` surfaces
+/// "up to date" / failure cases as OS notifications so the user
+/// gets feedback after clicking the tray's "Check for updates…"
+/// item. `manual=false` (launch-time path) stays silent on the
+/// happy path — only notifies when there's an update to surface.
+fn run_update_check(app: AppHandle, manual: bool) {
     tauri::async_runtime::spawn(async move {
-        // Grace period so the WebView and tray have time to settle
-        // before the updater starts thrashing the network.
-        tokio::time::sleep(Duration::from_secs(15)).await;
-
         let updater = match app.updater() {
             Ok(u) => u,
             Err(e) => {
                 eprintln!("[updater] init failed: {e}");
+                if manual {
+                    let _ = app
+                        .notification()
+                        .builder()
+                        .title("SCSalvager update check failed")
+                        .body(&format!("Could not init updater: {e}"))
+                        .show();
+                }
                 return;
             }
         };
         let update = match updater.check().await {
             Ok(u) => u,
             Err(e) => {
-                // Network blip, manifest 404, signature mismatch —
-                // all non-fatal; the app keeps running on the
-                // current version. Logged so we can grep.
                 eprintln!("[updater] check failed: {e}");
+                if manual {
+                    let _ = app
+                        .notification()
+                        .builder()
+                        .title("SCSalvager update check failed")
+                        .body(&format!("Could not reach update server: {e}"))
+                        .show();
+                }
                 return;
             }
         };
         let Some(update) = update else {
             eprintln!("[updater] up to date");
+            if manual {
+                let _ = app
+                    .notification()
+                    .builder()
+                    .title("SCSalvager is up to date")
+                    .body("You're running the latest version.")
+                    .show();
+            }
             return;
         };
         let new_version = update.version.clone();
         eprintln!("[updater] new version available: {new_version}");
 
-        // OS notification announces the update. The user keeps
-        // working; clicking the notification later (or relaunching
-        // the app) triggers the actual download. For Phase 3b we
-        // download immediately and install on next quit.
         let _ = app
             .notification()
             .builder()
@@ -770,6 +814,15 @@ fn spawn_update_checker(app: AppHandle) {
                     .show();
             }
         }
+    });
+}
+
+fn spawn_update_checker(app: AppHandle) {
+    tauri::async_runtime::spawn(async move {
+        // Grace period so the WebView and tray have time to settle
+        // before the updater starts thrashing the network.
+        tokio::time::sleep(Duration::from_secs(15)).await;
+        run_update_check(app, false);
     });
 }
 

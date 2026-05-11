@@ -19408,6 +19408,23 @@ export default function StarCitizenSalvageGuideWebsite() {
       ([, name]) => name && String(name).trim()
     );
     const fmt = (n) => Number(n || 0).toLocaleString();
+    // Writer — when an active session exists we mutate it directly
+    // (saveCrewSession persisted it; edits write through to the
+    // same row in crewSessions state and POST to /api/ledger).
+    // Without an active session we fall back to the draft so values
+    // still survive widget toggle and the main-app Save handoff.
+    const writeField = (key, value) => {
+      if (active) {
+        setCrewSessions((prev) => {
+          const next = prev.map((s) => (s.id === active.id ? { ...s, [key]: value } : s));
+          saveLedger(refineryJobs, sellOrders, next);
+          return next;
+        });
+      } else {
+        setCrewDraftField(key, value);
+      }
+    };
+    const numericInputCls = "mt-0.5 w-full rounded border border-slate-700 bg-slate-950 px-1 py-0.5 text-sm font-bold text-white outline-none focus:border-cyan-400";
     return (
       <div className="relative min-h-screen text-slate-100 bg-slate-950">
         <style>{style}</style>
@@ -19422,24 +19439,45 @@ export default function StarCitizenSalvageGuideWebsite() {
           </div>
           <div className="mt-2 grid flex-1 grid-cols-3 gap-1.5 overflow-hidden">
             <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-2">
-              <div className="text-[9px] font-bold uppercase tracking-wider text-amber-300">
+              <label className="text-[9px] font-bold uppercase tracking-wider text-amber-300">
                 Salvage
-              </div>
-              <div className="mt-0.5 text-sm font-bold text-white">{fmt(scuCS)}</div>
+              </label>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                value={scuCS || ""}
+                onChange={(e) => writeField("scuConstructionSalvage", e.target.value === "" ? 0 : Number(e.target.value))}
+                className={numericInputCls}
+              />
               <div className="text-[9px] text-slate-500">SCU</div>
             </div>
             <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-2">
-              <div className="text-[9px] font-bold uppercase tracking-wider text-amber-300">
+              <label className="text-[9px] font-bold uppercase tracking-wider text-amber-300">
                 Pieces
-              </div>
-              <div className="mt-0.5 text-sm font-bold text-white">{fmt(scuCP)}</div>
+              </label>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                value={scuCP || ""}
+                onChange={(e) => writeField("scuConstructionPieces", e.target.value === "" ? 0 : Number(e.target.value))}
+                className={numericInputCls}
+              />
               <div className="text-[9px] text-slate-500">SCU</div>
             </div>
             <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-2">
-              <div className="text-[9px] font-bold uppercase tracking-wider text-amber-300">
+              <label className="text-[9px] font-bold uppercase tracking-wider text-amber-300">
                 RMC
-              </div>
-              <div className="mt-0.5 text-sm font-bold text-white">{fmt(scuRMC)}</div>
+              </label>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                value={scuRMC || ""}
+                onChange={(e) => writeField("scuRMC", e.target.value === "" ? 0 : Number(e.target.value))}
+                className={numericInputCls}
+              />
               <div className="text-[9px] text-slate-500">SCU</div>
             </div>
           </div>
@@ -19451,12 +19489,27 @@ export default function StarCitizenSalvageGuideWebsite() {
               <div className="mt-0.5 text-sm font-bold text-white">{fmt(totalScu)}</div>
             </div>
             <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-2">
-              <div className="text-[9px] font-bold uppercase tracking-wider text-emerald-300">
-                Per crew · {crewCount}
-              </div>
-              <div className="mt-0.5 text-sm font-bold text-white">
-                {fmt(Math.round(perCrew))} aUEC
-              </div>
+              <label className="flex items-center justify-between text-[9px] font-bold uppercase tracking-wider text-emerald-300">
+                <span>Crew</span>
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  value={crewCount}
+                  onChange={(e) => writeField("splitCrewCount", Math.max(1, Math.floor(Number(e.target.value) || 1)))}
+                  className="ml-1 w-10 rounded border border-slate-700 bg-slate-950 px-1 text-[10px] font-bold text-white outline-none focus:border-cyan-400"
+                />
+              </label>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                placeholder="Total aUEC"
+                value={splitAuec || ""}
+                onChange={(e) => writeField("splitAuec", e.target.value === "" ? 0 : Number(e.target.value))}
+                className={numericInputCls}
+              />
+              <div className="text-[9px] text-slate-500">{fmt(Math.round(perCrew))} aUEC / crew</div>
             </div>
           </div>
           <div className="mt-2 max-h-[5.5rem] overflow-y-auto rounded-lg border border-slate-700 bg-slate-900/40 p-2">

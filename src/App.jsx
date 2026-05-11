@@ -13910,6 +13910,31 @@ export default function StarCitizenSalvageGuideWebsite() {
   useEffect(() => {
     try { window.localStorage?.setItem("scs_widget_tab", widgetTab); } catch {}
   }, [widgetTab]);
+  // Live zoom factor for the Tauri widget modes. Computed off the
+  // window's current width vs a baseline (420px for the crew widget,
+  // 380px for the compact refinery card). Lets the user grow the
+  // window and have every text + control scale proportionally via
+  // the CSS `zoom` property (Chromium-only — Tauri uses WebView2 on
+  // Win and WKWebView on macOS; WKWebView supports zoom too).
+  const [widgetScale, setWidgetScale] = useState(1);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!(window.location.hash === "#compact" || window.location.hash === "#crew-widget")) return;
+    const base = window.location.hash === "#crew-widget" ? 420 : 380;
+    const update = () => {
+      const w = window.innerWidth || base;
+      // Clamp 0.7 — 2.5x so extreme drags don't break readability.
+      const s = Math.min(2.5, Math.max(0.7, w / base));
+      setWidgetScale(s);
+    };
+    update();
+    window.addEventListener("resize", update);
+    window.addEventListener("hashchange", update);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("hashchange", update);
+    };
+  }, []);
   const [crewShipFilter, setCrewShipFilter] = useState("");
   // Manufacturer filter for the ships-salvaged checkbox list. ""
   // means "Any manufacturer".
@@ -19330,9 +19355,29 @@ export default function StarCitizenSalvageGuideWebsite() {
       return `${sec}s`;
     };
     return (
-      <div className="relative min-h-screen text-slate-100 bg-slate-950">
+      <div className="relative min-h-screen text-slate-100 bg-slate-950" style={{ zoom: widgetScale }}>
         <style>{style}</style>
-        <div className="flex h-screen flex-col p-3">
+        {/* Drag handle — fills the top edge so the user can grab any
+            inch of it to move the frameless window over Star Citizen.
+            -webkit-app-region: drag is the Tauri/Chromium opt-in. */}
+        <div
+          style={{ WebkitAppRegion: "drag" }}
+          className="flex items-center justify-between border-b border-slate-800 bg-slate-900/80 px-2 py-1"
+        >
+          <span className="select-none text-[9px] font-bold uppercase tracking-[0.2em] text-cyan-300">
+            Compact
+          </span>
+          <button
+            type="button"
+            onClick={() => { window.location.hash = ""; }}
+            style={{ WebkitAppRegion: "no-drag" }}
+            className="rounded px-1.5 text-[10px] text-slate-400 hover:bg-slate-800 hover:text-slate-100"
+            title="Exit compact mode"
+          >
+            ✕
+          </button>
+        </div>
+        <div className="flex h-[calc(100vh-1.5rem)] flex-col p-3">
           <div className="flex items-center justify-between gap-2">
             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-300">
               SCSalvager
@@ -19546,9 +19591,31 @@ export default function StarCitizenSalvageGuideWebsite() {
       { id: "split",    label: "Split" },
     ];
     return (
-      <div className="relative min-h-screen text-slate-100 bg-slate-950">
+      <div className="relative min-h-screen text-slate-100 bg-slate-950" style={{ zoom: widgetScale }}>
         <style>{style}</style>
-        <div className="flex h-screen flex-col p-2">
+        {/* Drag handle — frameless window has no titlebar, so the bar
+            at the top doubles as a grip the user can grab to move the
+            widget over Star Citizen. -webkit-app-region: drag is the
+            Tauri/Chromium opt-in. Inner buttons override to no-drag
+            so they still respond to clicks. */}
+        <div
+          style={{ WebkitAppRegion: "drag" }}
+          className="flex items-center justify-between border-b border-slate-800 bg-slate-900/80 px-2 py-1"
+        >
+          <span className="select-none text-[9px] font-bold uppercase tracking-[0.2em] text-cyan-300">
+            Crew Salvage
+          </span>
+          <button
+            type="button"
+            onClick={() => { window.location.hash = ""; }}
+            style={{ WebkitAppRegion: "no-drag" }}
+            className="rounded px-1.5 text-[10px] text-slate-400 hover:bg-slate-800 hover:text-slate-100"
+            title="Exit widget mode"
+          >
+            ✕
+          </button>
+        </div>
+        <div className="flex h-[calc(100vh-1.5rem)] flex-col p-2">
           {/* Header */}
           <div className="flex items-center justify-between gap-2 px-1">
             <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-300">

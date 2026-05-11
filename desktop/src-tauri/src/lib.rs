@@ -372,12 +372,18 @@ fn toggle_widget_mode(app: &AppHandle, hash: &str, width: f64, height: f64) {
     let currently_on_top = w.is_always_on_top().unwrap_or(false);
     if currently_on_top {
         let _ = w.set_always_on_top(false);
-        // Restore full-app min size before sizing back up.
+        // Restore full-app chrome.
+        let _ = w.set_decorations(true);
         let _ = w.set_min_size(Some(tauri::LogicalSize::new(980.0, 640.0)));
         let _ = w.set_size(tauri::LogicalSize::new(1400.0, 900.0));
         let _ = w.eval("if (window.location.hash !== '') { window.location.hash = ''; }");
     } else {
         let _ = w.set_always_on_top(true);
+        // Frameless so the widget hovers cleanly on top of Star
+        // Citizen without an OS titlebar eating pixels. The React
+        // side provides a CSS app-region:drag handle so the user
+        // can still move the window around.
+        let _ = w.set_decorations(false);
         // Lower the min size for widget mode so the user can shrink it
         // further if they want; resizable stays true (inherited from
         // tauri.conf.json) so they can also grow it to taste, and the

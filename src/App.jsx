@@ -22110,7 +22110,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     No missions match the current filters.
                   </div>
                 ) : (
-                  <div className="mt-5 overflow-x-auto overflow-y-auto max-h-[40rem] rounded-2xl border border-slate-700 [scrollbar-width:thin] [scrollbar-color:rgb(6_182_212_/_0.7)_rgb(2_6_23)] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-slate-950 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-500/70 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-cyan-400">
+                  <div className={`mt-5 overflow-x-auto overflow-y-auto ${isTauri ? "max-h-[calc(100vh-12rem)]" : "max-h-[40rem]"} rounded-2xl border border-slate-700 [scrollbar-width:thin] [scrollbar-color:rgb(6_182_212_/_0.7)_rgb(2_6_23)] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-slate-950 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-500/70 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-cyan-400`}>
                     <table className="w-full text-left text-sm">
                       <thead className="bg-slate-950 text-slate-300 sticky top-0 z-10">
                         <tr>
@@ -26086,7 +26086,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                 // track scrollbar style as the 30-Day History table.
                 // Sticky thead keeps column titles visible while
                 // scrolling.
-                <div className="mt-5 overflow-x-auto overflow-y-auto max-h-[32rem] rounded-2xl border border-slate-700 [scrollbar-width:thin] [scrollbar-color:rgb(6_182_212_/_0.7)_rgb(2_6_23)] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-slate-950 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-500/70 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-cyan-400">
+                <div className={`mt-5 overflow-x-auto overflow-y-auto ${isTauri ? "max-h-[calc(100vh-12rem)]" : "max-h-[32rem]"} rounded-2xl border border-slate-700 [scrollbar-width:thin] [scrollbar-color:rgb(6_182_212_/_0.7)_rgb(2_6_23)] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-slate-950 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-cyan-500/70 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-cyan-400`}>
                   <table className="w-full text-left text-sm">
                     <thead className="bg-slate-950 text-slate-300 sticky top-0 z-10">
                       <tr>
@@ -26252,7 +26252,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                 // inside the panel. Scrollbar styling comes from the
                 // site-wide globals in index.html — no per-element
                 // Tailwind variants needed.
-                <div className="mt-5 overflow-x-auto overflow-y-auto max-h-[44rem] rounded-2xl border border-slate-700">
+                <div className={`mt-5 overflow-x-auto overflow-y-auto ${isTauri ? "max-h-[calc(100vh-12rem)]" : "max-h-[44rem]"} rounded-2xl border border-slate-700`}>
                   <table className="w-full text-left text-sm">
                     <thead className="bg-slate-950 text-slate-300 sticky top-0 z-10">
                       <tr>

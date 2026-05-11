@@ -1,6 +1,6 @@
 {
   "name": "scsalvager-desktop",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "private": true,
   "description": "SCSalvager Desktop — Tauri shell wrapping scsalvager.net with native tray, hotkeys, and deep-link OAuth.",
   "scripts": {

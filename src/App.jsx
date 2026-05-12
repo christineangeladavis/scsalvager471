@@ -20970,6 +20970,61 @@ export default function StarCitizenSalvageGuideWebsite() {
           )}
         </nav>
 
+        {/* Site-wide banners — render ABOVE the tab content so they
+            appear on every tab, not just Home. Both are time-gated
+            and auto-hide; no dismiss UI. */}
+        {(() => {
+          const newest = siteAnnouncements[0];
+          if (!newest) return null;
+          return (
+            <div className="mb-5 rounded-2xl border-2 border-amber-400/60 bg-amber-500/10 p-4 shadow-lg shadow-amber-950/20">
+              <div className="flex items-start gap-3">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="h-4 w-4 shrink-0 text-amber-300 mt-0.5">
+                  <path d="M12 2 1 21h22L12 2zm0 6 7.5 13h-15L12 8zm-1 4v4h2v-4h-2zm0 5v2h2v-2h-2z" />
+                </svg>
+                <div className="min-w-0 flex-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300">
+                    Announcement from SCSalvager Admin
+                  </span>
+                  <div className="mt-2 whitespace-pre-wrap break-words text-sm text-amber-100">
+                    {newest.body}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+        {(() => {
+          // Pre-patch export reminder. 24 h window before the next
+          // Star Citizen patch drop. See the earlier comment block
+          // (now removed from the Home-tab body) for date rationale.
+          const UPCOMING_DROP_MS = Date.UTC(2026, 4, 13, 15);
+          const UPCOMING_VERSION = "4.8";
+          const now = Date.now();
+          const msUntil = UPCOMING_DROP_MS - now;
+          if (msUntil <= 0 || msUntil > 24 * 60 * 60 * 1000) return null;
+          const hoursLeft = Math.max(1, Math.round(msUntil / (60 * 60 * 1000)));
+          return (
+            <div className="mb-5 rounded-2xl border-2 border-yellow-400/70 bg-yellow-500/15 p-4 shadow-lg shadow-yellow-950/20">
+              <div className="flex items-start gap-3">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="h-4 w-4 shrink-0 text-yellow-300 mt-0.5">
+                  <path d="M12 2 1 21h22L12 2zm0 6 7.5 13h-15L12 8zm-1 4v4h2v-4h-2zm0 5v2h2v-2h-2z" />
+                </svg>
+                <div className="min-w-0 flex-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-yellow-200">
+                    Heads up · Star Citizen {UPCOMING_VERSION} drops in ~{hoursLeft} hour{hoursLeft === 1 ? "" : "s"}
+                  </span>
+                  <div className="mt-2 text-sm text-yellow-100">
+                    When {UPCOMING_VERSION} goes live, every {patchStatus?.version ? `v${patchStatus.version}` : "current-patch"} ledger entry will be cleared so the new cycle starts clean.
+                    {" "}
+                    <strong>Export your current ledger now</strong> if you want to keep a copy — head to <strong>Ledger → Patch History</strong> and use <strong>Download CSV</strong> or <strong>Download XLSX</strong>. The export buttons are at the top of that panel.
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
+
         {activeTab === "ships" && (<>
 
         <DesktopGrid columns={`${shipsPanelWidth}fr ${detailsPanelWidth}fr`} className="mb-8">
@@ -21214,80 +21269,6 @@ export default function StarCitizenSalvageGuideWebsite() {
         </>)}
 
         {activeTab === "home" && (<>
-
-        {/* Broadcast banner — surfaces the newest unread admin
-            broadcast on the Home tab in a yellow card right under
-            the HOME nav. Same dismiss path as the mailbox: a click
-            on Dismiss writes the entry's dismissedAt server-side so
-            it stops surfacing here AND in the Messages dropdown.
-            Multiple unread broadcasts: only the newest one is
-            shown — dismissing it reveals the next oldest. */}
-        {(() => {
-          // Banner reads from /api/announcements which is its own
-          // global Redis key, separate from per-user inboxes.
-          // Server already filters to under-24h entries; the client
-          // just renders the newest. No dismiss button — banner is
-          // purely time-gated and survives refresh.
-          const newest = siteAnnouncements[0];
-          if (!newest) return null;
-          return (
-            <div className="mb-5 rounded-2xl border-2 border-amber-400/60 bg-amber-500/10 p-4 shadow-lg shadow-amber-950/20">
-              <div className="flex items-start gap-3">
-                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="h-4 w-4 shrink-0 text-amber-300 mt-0.5">
-                  <path d="M12 2 1 21h22L12 2zm0 6 7.5 13h-15L12 8zm-1 4v4h2v-4h-2zm0 5v2h2v-2h-2z" />
-                </svg>
-                <div className="min-w-0 flex-1">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300">
-                    Announcement from SCSalvager Admin
-                  </span>
-                  <div className="mt-2 whitespace-pre-wrap break-words text-sm text-amber-100">
-                    {newest.body}
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })()}
-        {(() => {
-          // Pre-patch export reminder. Auto-shows in the 24 h
-          // window leading up to the next Star Citizen patch drop
-          // and hides once the new patch goes live. The cross-user
-          // ledger clear that fires on patch advance soft-deletes
-          // every entry — historyEntries filters deletedAt out, so
-          // the Patch History export goes empty post-wipe. Banner
-          // gives users a 24 h heads-up to grab their export.
-          //
-          // Date target: 2026-05-13 15:00 UTC (= 08:00 PST drop
-          // expected for SC 4.8). When the patch actually advances,
-          // update PATCHES[0].startedAt in api/_lib/patches.js to
-          // match and this constant aligns automatically because
-          // it's only used by the banner-window math.
-          const UPCOMING_DROP_MS = Date.UTC(2026, 4, 13, 15);
-          const UPCOMING_VERSION = "4.8";
-          const now = Date.now();
-          const msUntil = UPCOMING_DROP_MS - now;
-          if (msUntil <= 0 || msUntil > 24 * 60 * 60 * 1000) return null;
-          const hoursLeft = Math.max(1, Math.round(msUntil / (60 * 60 * 1000)));
-          return (
-            <div className="mb-5 rounded-2xl border-2 border-yellow-400/70 bg-yellow-500/15 p-4 shadow-lg shadow-yellow-950/20">
-              <div className="flex items-start gap-3">
-                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="h-4 w-4 shrink-0 text-yellow-300 mt-0.5">
-                  <path d="M12 2 1 21h22L12 2zm0 6 7.5 13h-15L12 8zm-1 4v4h2v-4h-2zm0 5v2h2v-2h-2z" />
-                </svg>
-                <div className="min-w-0 flex-1">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-yellow-200">
-                    Heads up · Star Citizen {UPCOMING_VERSION} drops in ~{hoursLeft} hour{hoursLeft === 1 ? "" : "s"}
-                  </span>
-                  <div className="mt-2 text-sm text-yellow-100">
-                    When {UPCOMING_VERSION} goes live, every {patchStatus?.version ? `v${patchStatus.version}` : "current-patch"} ledger entry will be cleared so the new cycle starts clean.
-                    {" "}
-                    <strong>Export your current ledger now</strong> if you want to keep a copy — head to <strong>Ledger → Patch History</strong> and use <strong>Download CSV</strong> or <strong>Download XLSX</strong>. The export buttons are at the top of that panel.
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })()}
 
         <DesktopGrid columns={`${refineryPanelWidth}fr ${toolsPanelWidth}fr`} className="mb-8 items-stretch">
           <div className="flex h-full flex-col gap-4">

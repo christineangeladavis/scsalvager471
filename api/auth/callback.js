@@ -24,30 +24,14 @@ export default async function handler(req, res) {
   const cookies = parseCookies(req.headers.cookie || "");
   const storedState = cookies[STATE_COOKIE];
 
-  if (!code || !state || !storedState || state !== storedState) {
-    // Log the diagnostic details so we can grep Vercel logs when this
-    // fires. Doesn't leak the actual state values — just presence + the
-    // host/cookie context that explains *why* the cookie didn't match.
-    console.warn("[oauth/callback] state mismatch", {
+  if (!code || !state) {
+    console.warn("[oauth/callback] missing code or state", {
       hasCode: !!code,
       hasQueryState: !!state,
-      hasCookieState: !!storedState,
-      stateMatched: !!storedState && state === storedState,
-      host: req.headers.host,
-      xfh: req.headers["x-forwarded-host"],
-      cookieHeaderLen: (req.headers.cookie || "").length,
     });
     return res
       .status(400)
-      .send("Invalid OAuth state. Please return to the home page and try logging in again.");
-  }
-
-  let credentials;
-  try {
-    credentials = getDiscordCredentials();
-  } catch (e) {
-    console.error("Discord credentials missing on callback:", e.message);
-    return res.status(503).send(e.message);
+      .send("Invalid OAuth callback. Please return to the home page and try logging in again.");
   }
 
   let redis;
@@ -56,6 +40,58 @@ export default async function handler(req, res) {
   } catch (e) {
     console.error("Redis unavailable on callback:", e.message);
     return res.status(503).send("Storage unavailable. Please try again later.");
+  }
+
+  // Validate state against the cookie OR a Redis-backed mirror. The
+  // mirror is the fallback for users whose state cookie got stripped
+  // during the Discord round-trip (third-party-cookie blockers,
+  // Firefox Total Cookie Protection, adblockers, mixed canonical
+  // host). Single-use: the Redis key is DEL'd on the first match
+  // regardless of which path validated, so a replay of the same
+  // ?code=&state= URL can't reuse it.
+  const cookieMatched = !!storedState && state === storedState;
+  let redisMatched = false;
+  try {
+    const stateKey = `oauth-state:${state}`;
+    const stored = await redis.get(stateKey);
+    if (stored) {
+      redisMatched = true;
+      // Consume on first read.
+      await redis.del(stateKey);
+    }
+  } catch (e) {
+    console.warn("[oauth/callback] redis state-read failed:", e && e.message ? e.message : e);
+  }
+
+  if (!cookieMatched && !redisMatched) {
+    console.warn("[oauth/callback] state mismatch", {
+      hasCode: !!code,
+      hasQueryState: !!state,
+      hasCookieState: !!storedState,
+      cookieMatched,
+      redisMatched,
+      host: req.headers.host,
+      xfh: req.headers["x-forwarded-host"],
+      cookieHeaderLen: (req.headers.cookie || "").length,
+    });
+    return res
+      .status(400)
+      .send("Invalid OAuth state. Please return to the home page and try logging in again.");
+  }
+  // Diagnostic: which path saved this user's login? Helps gauge how
+  // many users rely on the Redis fallback so we can tune accordingly.
+  console.log("[oauth/callback] state ok", {
+    cookieMatched,
+    redisMatched,
+    fallbackUsed: !cookieMatched && redisMatched,
+  });
+
+  let credentials;
+  try {
+    credentials = getDiscordCredentials();
+  } catch (e) {
+    console.error("Discord credentials missing on callback:", e.message);
+    return res.status(503).send(e.message);
   }
 
   try {

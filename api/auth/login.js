@@ -3,6 +3,7 @@
 
 import { generateToken, buildCookie, STATE_COOKIE, STATE_TTL_SECONDS } from "../_lib/session.js";
 import { getDiscordCredentials, buildAuthorizeUrl, getCallbackUri, getOrigin } from "../_lib/discord.js";
+import { getRedis } from "../_lib/redis.js";
 
 // Canonical production host. Discord OAuth redirect_uri is pinned to
 // this exact origin (see api/_lib/discord.js), so the state cookie
@@ -35,6 +36,22 @@ export default async function handler(req, res) {
   }
 
   const state = generateToken();
+  // Defense-in-depth: also persist the state token in Redis with the
+  // same 10-minute TTL. The callback validates against the cookie
+  // first; if the cookie didn't survive the Discord round-trip
+  // (third-party-cookie blockers, Firefox Total Cookie Protection,
+  // adblockers, mixed-canonical-host scope issues), the Redis copy
+  // is the fallback. Single-use — the callback DELs it on success.
+  // Best-effort: Redis errors here don't block the OAuth flow; the
+  // cookie path still works for users whose cookies stick.
+  try {
+    const redis = getRedis();
+    await redis.set(`oauth-state:${state}`, JSON.stringify({ createdAt: Date.now() }), {
+      ex: STATE_TTL_SECONDS,
+    });
+  } catch (e) {
+    console.warn("[oauth/login] redis state-write failed:", e && e.message ? e.message : e);
+  }
   // Optional `?return=desktop-callback` puts a short-lived
   // `scs_return_to` cookie next to the state cookie so the OAuth
   // callback can redirect to the desktop deep-link bridge instead

@@ -15608,6 +15608,11 @@ export default function StarCitizenSalvageGuideWebsite() {
         { username: "TestPilot42",   scuRefined: 3050.6, salvageRefined: 1500.6, piecesRefined: 1050.0, rubbleRefined:  500.0, profitAuec: 4_905_000, verified: true },
         { username: "RefiningQueen", scuRefined: 2840.0, salvageRefined: 1400.0, piecesRefined:  940.0, rubbleRefined:  500.0, profitAuec: 4_220_300, verified: false },
         { username: "ScrapKing",     scuRefined: 1420.8, salvageRefined:  720.4, piecesRefined:  500.0, rubbleRefined:  200.4, profitAuec: 2_180_500, verified: false },
+        { username: "VultureVibes",  scuRefined: 1200.0, salvageRefined:  640.0, piecesRefined:  400.0, rubbleRefined:  160.0, profitAuec: 1_805_000, verified: false },
+        { username: "MothPilot",     scuRefined:  980.0, salvageRefined:  500.0, piecesRefined:  340.0, rubbleRefined:  140.0, profitAuec: 1_472_000, verified: true },
+        { username: "ReclaimerRX",   scuRefined:  812.4, salvageRefined:  410.4, piecesRefined:  280.0, rubbleRefined:  122.0, profitAuec: 1_220_500, verified: false },
+        { username: "WrecksRUs",     scuRefined:  640.2, salvageRefined:  320.2, piecesRefined:  220.0, rubbleRefined:  100.0, profitAuec:   960_000, verified: false },
+        { username: "Salvor",        scuRefined:  520.0, salvageRefined:  260.0, piecesRefined:  180.0, rubbleRefined:   80.0, profitAuec:   780_000, verified: false },
       ],
     });
 

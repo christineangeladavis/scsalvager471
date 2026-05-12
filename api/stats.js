@@ -215,7 +215,7 @@ export default async function handler(req, res) {
 
   const topSalvagers = perUser
     .sort((a, b) => b.scuRefined - a.scuRefined)
-    .slice(0, 5);
+    .slice(0, 10);
 
   return res.status(200).json({
     fetchedAt: Date.now(),

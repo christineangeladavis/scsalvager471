@@ -21248,6 +21248,46 @@ export default function StarCitizenSalvageGuideWebsite() {
             </div>
           );
         })()}
+        {(() => {
+          // Pre-patch export reminder. Auto-shows in the 24 h
+          // window leading up to the next Star Citizen patch drop
+          // and hides once the new patch goes live. The cross-user
+          // ledger clear that fires on patch advance soft-deletes
+          // every entry — historyEntries filters deletedAt out, so
+          // the Patch History export goes empty post-wipe. Banner
+          // gives users a 24 h heads-up to grab their export.
+          //
+          // Date target: 2026-05-13 15:00 UTC (= 08:00 PST drop
+          // expected for SC 4.8). When the patch actually advances,
+          // update PATCHES[0].startedAt in api/_lib/patches.js to
+          // match and this constant aligns automatically because
+          // it's only used by the banner-window math.
+          const UPCOMING_DROP_MS = Date.UTC(2026, 4, 13, 15);
+          const UPCOMING_VERSION = "4.8";
+          const now = Date.now();
+          const msUntil = UPCOMING_DROP_MS - now;
+          if (msUntil <= 0 || msUntil > 24 * 60 * 60 * 1000) return null;
+          const hoursLeft = Math.max(1, Math.round(msUntil / (60 * 60 * 1000)));
+          return (
+            <div className="mb-5 rounded-2xl border-2 border-yellow-400/70 bg-yellow-500/15 p-4 shadow-lg shadow-yellow-950/20">
+              <div className="flex items-start gap-3">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="h-4 w-4 shrink-0 text-yellow-300 mt-0.5">
+                  <path d="M12 2 1 21h22L12 2zm0 6 7.5 13h-15L12 8zm-1 4v4h2v-4h-2zm0 5v2h2v-2h-2z" />
+                </svg>
+                <div className="min-w-0 flex-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-yellow-200">
+                    Heads up · Star Citizen {UPCOMING_VERSION} drops in ~{hoursLeft} hour{hoursLeft === 1 ? "" : "s"}
+                  </span>
+                  <div className="mt-2 text-sm text-yellow-100">
+                    When {UPCOMING_VERSION} goes live, every {patchStatus?.version ? `v${patchStatus.version}` : "current-patch"} ledger entry will be cleared so the new cycle starts clean.
+                    {" "}
+                    <strong>Export your current ledger now</strong> if you want to keep a copy — head to <strong>Ledger → Patch History</strong> and use <strong>Download CSV</strong> or <strong>Download XLSX</strong>. The export buttons are at the top of that panel.
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
 
         <DesktopGrid columns={`${refineryPanelWidth}fr ${toolsPanelWidth}fr`} className="mb-8 items-stretch">
           <div className="flex h-full flex-col gap-4">

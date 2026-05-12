@@ -18016,16 +18016,21 @@ export default function StarCitizenSalvageGuideWebsite() {
     }
   };
   useEffect(() => {
+    // One-shot load on login. No background poll — admins pull
+    // fresh state on (a) mailbox open, (b) Inbox tab open, or
+    // (c) the explicit Refresh button. Same Redis-quota-driven
+    // change as the user-side inbox poll removal.
     refreshAdminUserMailOverview();
-    if (!user || !user.isAdmin) return;
-    const interval = setInterval(refreshAdminUserMailOverview, 60_000);
-    return () => clearInterval(interval);
   }, [user]);
   // Refresh on mailbox open so admin always sees fresh state
   // when they actually look at the dropdown.
   useEffect(() => {
     if (isMailboxOpen) refreshAdminUserMailOverview();
   }, [isMailboxOpen]);
+  // Refresh when the Inbox tab opens — admins live there.
+  useEffect(() => {
+    if (activeTab === "inbox" && user && user.isAdmin) refreshAdminUserMailOverview();
+  }, [activeTab, user]);
 
   // Site-wide announcements — separate from per-user inboxes. Open
   // to anyone, no auth needed. Drives the Home-tab yellow banner.
@@ -18070,21 +18075,18 @@ export default function StarCitizenSalvageGuideWebsite() {
     return () => { cancelled = true; };
   }, [isSettingsOpen]);
 
-  // Poll the inbox every 60 s while logged in so admin-sent
-  // messages surface in the mailbox without a manual refresh.
-  // Cadence pulled back from 15 s after a Redis-quota incident —
-  // mailbox refresh-on-open keeps latency tight when the user
-  // actually looks at the dropdown.
-  useEffect(() => {
-    if (!user) return;
-    const interval = setInterval(refreshAdminInbox, 60_000);
-    return () => clearInterval(interval);
-  }, [user]);
-  // Refresh when the mailbox is opened so the user always sees the
-  // freshest state at the moment they look.
+  // No background poll for the inbox. After the Redis-quota
+  // incident the cadence-based polling was pulled entirely —
+  // inbox refreshes only on (a) login (the initial load above),
+  // (b) opening the mailbox dropdown, and (c) opening the Inbox
+  // tab. A manual refresh button is also exposed in the dropdown
+  // for users who want to force-pull without closing/reopening.
   useEffect(() => {
     if (isMailboxOpen) refreshAdminInbox();
   }, [isMailboxOpen]);
+  useEffect(() => {
+    if (activeTab === "inbox" && user) refreshAdminInbox();
+  }, [activeTab, user]);
 
   // --- Ledger: explicit save function ---
   // Called directly by mutation handlers with the NEXT state values. There is
@@ -20191,6 +20193,17 @@ export default function StarCitizenSalvageGuideWebsite() {
                                 Messages
                               </span>
                               <div className="flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    refreshAdminInbox();
+                                    if (user?.isAdmin) refreshAdminUserMailOverview();
+                                  }}
+                                  title="Pull fresh messages from the server"
+                                  className="rounded border border-slate-700 bg-slate-800/60 px-2 py-0.5 text-[10px] font-semibold text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
+                                >
+                                  Refresh
+                                </button>
                                 <button
                                   type="button"
                                   onClick={startMailboxNewThread}

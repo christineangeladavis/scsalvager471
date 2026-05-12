@@ -18046,11 +18046,11 @@ export default function StarCitizenSalvageGuideWebsite() {
   };
   useEffect(() => {
     refreshSiteAnnouncements();
-    // Poll every 5 min. Per-user fetches are cheap because the
-    // endpoint is Edge-cached (s-maxage=60), so the request rarely
-    // reaches origin / Redis — but a long client interval keeps the
-    // request volume itself low too.
-    const interval = setInterval(refreshSiteAnnouncements, 5 * 60_000);
+    // Poll every 60 s. Per-user requests are cheap because the
+    // endpoint is Edge-cached (s-maxage=60, stale-while-revalidate=300):
+    // across every signed-in user globally, Redis is hit at most once
+    // per minute regardless of how many clients are polling.
+    const interval = setInterval(refreshSiteAnnouncements, 60_000);
     return () => clearInterval(interval);
   }, []);
 

@@ -20852,7 +20852,7 @@ export default function StarCitizenSalvageGuideWebsite() {
             // here; Ledger and Statistics are the only login-locked tabs.
             { id: "missions", label: "Missions" },
             { id: "ledger", label: "Ledger" },
-            { id: "stats", label: "Statistics" },
+            { id: "stats", label: "Global Stats" },
             // Inbox — login-gated. User-side: messages from
             // SCSalvager Admin (mirrors the mailbox dropdown).
             // Admin-side: incoming user mail aggregated across

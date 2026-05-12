@@ -15480,7 +15480,7 @@ export default function StarCitizenSalvageGuideWebsite() {
   useEffect(() => {
     if (!user) return;
     let cancelled = false;
-    const HEARTBEAT_MS = 30 * 1000;
+    const HEARTBEAT_MS = 60 * 1000;
     const beat = async () => {
       if (cancelled) return;
       if (typeof document !== "undefined" && document.visibilityState === "hidden") return;
@@ -18018,7 +18018,7 @@ export default function StarCitizenSalvageGuideWebsite() {
   useEffect(() => {
     refreshAdminUserMailOverview();
     if (!user || !user.isAdmin) return;
-    const interval = setInterval(refreshAdminUserMailOverview, 15_000);
+    const interval = setInterval(refreshAdminUserMailOverview, 60_000);
     return () => clearInterval(interval);
   }, [user]);
   // Refresh on mailbox open so admin always sees fresh state
@@ -18041,9 +18041,11 @@ export default function StarCitizenSalvageGuideWebsite() {
   };
   useEffect(() => {
     refreshSiteAnnouncements();
-    // Poll every 60 s. Less hot than the per-user mailbox since
-    // announcements are global and lighter on Redis.
-    const interval = setInterval(refreshSiteAnnouncements, 60_000);
+    // Poll every 5 min. Per-user fetches are cheap because the
+    // endpoint is Edge-cached (s-maxage=60), so the request rarely
+    // reaches origin / Redis — but a long client interval keeps the
+    // request volume itself low too.
+    const interval = setInterval(refreshSiteAnnouncements, 5 * 60_000);
     return () => clearInterval(interval);
   }, []);
 
@@ -18068,12 +18070,14 @@ export default function StarCitizenSalvageGuideWebsite() {
     return () => { cancelled = true; };
   }, [isSettingsOpen]);
 
-  // Poll the inbox every 15 s while logged in so admin-sent
+  // Poll the inbox every 60 s while logged in so admin-sent
   // messages surface in the mailbox without a manual refresh.
-  // Balances latency vs Redis load — moderation traffic is light.
+  // Cadence pulled back from 15 s after a Redis-quota incident —
+  // mailbox refresh-on-open keeps latency tight when the user
+  // actually looks at the dropdown.
   useEffect(() => {
     if (!user) return;
-    const interval = setInterval(refreshAdminInbox, 15_000);
+    const interval = setInterval(refreshAdminInbox, 60_000);
     return () => clearInterval(interval);
   }, [user]);
   // Refresh when the mailbox is opened so the user always sees the

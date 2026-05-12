@@ -23,9 +23,16 @@ export default async function handler(req, res) {
     res.setHeader("Allow", "GET");
     return res.status(405).json({ error: "Method not allowed" });
   }
-  // Cache lightly so a polling loop doesn't hammer Redis. 30 s
-  // matches the Messages mailbox polling cadence on the client.
-  res.setHeader("cache-control", "public, max-age=30");
+  // Shared Vercel Edge cache: every request across every user
+  // served from the CDN edge for 60 s, with stale-while-revalidate
+  // refreshing in the background. Burst protection for Redis —
+  // most requests never reach origin. s-maxage controls the shared
+  // (Edge) cache; max-age is intentionally short so the browser
+  // doesn't pin a stale banner if an admin just posted.
+  res.setHeader(
+    "cache-control",
+    "public, max-age=10, s-maxage=60, stale-while-revalidate=300"
+  );
 
   let redis;
   try {

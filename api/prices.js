@@ -134,7 +134,14 @@ export default async function handler(req, res) {
   if (req.method === "GET") {
     try {
       const raw = (await redis.get(MASTER_KEY)) || {};
-      res.setHeader("cache-control", "public, max-age=30");
+      // Shared Vercel Edge cache for the GET — every reader served
+      // from the CDN edge for 60 s, with stale-while-revalidate
+      // pushing the refresh into the background. Eliminates per-user
+      // Redis fan-out for what is effectively a global lookup.
+      res.setHeader(
+        "cache-control",
+        "public, max-age=10, s-maxage=60, stale-while-revalidate=300"
+      );
       return res.status(200).json(buildPublicView(raw));
     } catch (e) {
       console.error("GET /api/prices failed:", e && e.message ? e.message : e);

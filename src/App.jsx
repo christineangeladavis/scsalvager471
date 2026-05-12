@@ -25446,7 +25446,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                 {!statsLoading && !statsError && statsData && (
                   <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
                     <div>
-                      <h2 className="text-xl font-bold text-cyan-300">Top 5 Salvagers</h2>
+                      <h2 className="text-xl font-bold text-cyan-300">Leaderboard</h2>
                       <p className="mt-1 text-sm text-slate-400">Sorted by total SCU refined.</p>
                     </div>
                     {statsData.topSalvagers.length === 0 ? (

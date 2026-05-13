@@ -336,7 +336,7 @@ fn build_tray(app: &AppHandle) -> tauri::Result<()> {
                 // the launch-time silent check, this surfaces both
                 // "up to date" and "downloading new version" via
                 // OS notifications so the user gets feedback.
-                run_update_check(app.clone(), true);
+                run_update_check(app.clone(), CheckMode::Manual);
             }
             "quit" => {
                 app.exit(0);
@@ -805,17 +805,30 @@ fn emit_update_status(
     let _ = window.set_focus();
 }
 
-/// Runs the updater check. `manual=true` (tray click) emits status
-/// events to the WebView so React surfaces a proper modal with an
-/// "Update Now" button — no auto-download. `manual=false` (launch-time
-/// path) keeps the legacy auto-download + OS-notification behavior.
-fn run_update_check(app: AppHandle, manual: bool) {
+/// Two ways to enter the update flow:
+/// - Manual: user clicked the tray "Check for updates…" item. We
+///   always show feedback (up_to_date / error / available).
+/// - Launch: app just started. Silent unless an update is available
+///   — no popup when the user is on the latest version, no error
+///   toast if the update server is unreachable.
+#[derive(Debug, Clone, Copy, PartialEq)]
+enum CheckMode {
+    Manual,
+    Launch,
+}
+
+/// Runs the updater check. Both modes emit the "available" status
+/// to the WebView when an update is found — the modal's Update Now
+/// button is what kicks off the actual download via the
+/// apply_update command. Difference between the modes is whether
+/// the no-update / error branches surface to the user.
+fn run_update_check(app: AppHandle, mode: CheckMode) {
     tauri::async_runtime::spawn(async move {
         let updater = match app.updater() {
             Ok(u) => u,
             Err(e) => {
                 eprintln!("[updater] init failed: {e}");
-                if manual {
+                if mode == CheckMode::Manual {
                     emit_update_status(
                         &app,
                         "error",
@@ -830,7 +843,7 @@ fn run_update_check(app: AppHandle, manual: bool) {
             Ok(u) => u,
             Err(e) => {
                 eprintln!("[updater] check failed: {e}");
-                if manual {
+                if mode == CheckMode::Manual {
                     emit_update_status(
                         &app,
                         "error",
@@ -843,7 +856,7 @@ fn run_update_check(app: AppHandle, manual: bool) {
         };
         let Some(update) = update else {
             eprintln!("[updater] up to date");
-            if manual {
+            if mode == CheckMode::Manual {
                 emit_update_status(&app, "up_to_date", None, None);
             }
             return;
@@ -851,71 +864,23 @@ fn run_update_check(app: AppHandle, manual: bool) {
         let new_version = update.version.clone();
         eprintln!("[updater] new version available: {new_version}");
 
-        if manual {
-            // Manual flow: don't auto-download. React modal shows
-            // the version + an Update Now button; the user clicks
-            // it to invoke the apply_update command which does the
-            // actual download + restart.
-            emit_update_status(&app, "available", Some(&new_version), None);
-            return;
-        }
-
-        // Launch-time auto-check: original behavior — notify the
-        // user via OS toast + download in the background so the
-        // update applies on the next quit/reopen.
-        let _ = app
-            .notification()
-            .builder()
-            .title("SCSalvager update available")
-            .body(&format!(
-                "Version {new_version} is downloading. Quit + reopen to apply."
-            ))
-            .show();
-
-        let mut downloaded: u64 = 0;
-        let result = update
-            .download_and_install(
-                |chunk_len, content_len| {
-                    downloaded += chunk_len as u64;
-                    if let Some(total) = content_len {
-                        eprintln!("[updater] downloaded {downloaded}/{total} bytes");
-                    }
-                },
-                || {
-                    eprintln!("[updater] download finished, will apply on next launch");
-                },
-            )
-            .await;
-        match result {
-            Ok(()) => {
-                let _ = app
-                    .notification()
-                    .builder()
-                    .title("SCSalvager update ready")
-                    .body(&format!(
-                        "Version {new_version} downloaded. Quit + reopen to install."
-                    ))
-                    .show();
-            }
-            Err(e) => {
-                eprintln!("[updater] download failed: {e}");
-                let _ = app
-                    .notification()
-                    .builder()
-                    .title("SCSalvager update failed")
-                    .body(&format!("Could not download update: {e}"))
-                    .show();
-            }
-        }
+        // Both modes: surface the in-app modal so the user can
+        // choose. Auto-download was removed — the apply_update
+        // command (driven by the modal's Update Now button) is the
+        // only path that actually pulls the binary now.
+        emit_update_status(&app, "available", Some(&new_version), None);
     });
 }
 
 fn spawn_update_checker(app: AppHandle) {
     tauri::async_runtime::spawn(async move {
-        // Grace period so the WebView and tray have time to settle
-        // before the updater starts thrashing the network.
+        // Grace period so the WebView + tray + React bridge have
+        // time to settle before the modal fires. emit_update_status
+        // calls window.__SCSALVAGER_DESKTOP__.onUpdateStatus via
+        // webview.eval, which is a no-op until the bridge has been
+        // registered by useDesktopBridge on the React side.
         tokio::time::sleep(Duration::from_secs(15)).await;
-        run_update_check(app, false);
+        run_update_check(app, CheckMode::Launch);
     });
 }
 

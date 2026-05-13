@@ -1,6 +1,6 @@
 [package]
 name = "scsalvager-desktop"
-version = "0.2.8"
+version = "0.2.9"
 description = "SCSalvager Desktop — Tauri shell wrapping scsalvager.net."
 authors = ["SCSalvager.net"]
 edition = "2021"

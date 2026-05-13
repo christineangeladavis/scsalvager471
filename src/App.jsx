@@ -27802,7 +27802,7 @@ export default function StarCitizenSalvageGuideWebsite() {
             onClick={() => setIsSettingsOpen(false)}
           >
             <div
-              className="mx-4 w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-3xl border border-cyan-500/30 bg-slate-900 p-6 shadow-2xl shadow-cyan-950/40"
+              className="mx-4 w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-3xl border border-cyan-500/30 bg-slate-900 p-6 shadow-2xl shadow-cyan-950/40"
               onClick={(e) => e.stopPropagation()}
               role="dialog"
               aria-modal="true"
@@ -27839,13 +27839,13 @@ export default function StarCitizenSalvageGuideWebsite() {
                 </button>
               </div>
 
-              {/* Two-column section flow — uses CSS columns so each
-                  section stays vertically packed within a column and
-                  doesn't split across the gutter. Sections keep their
-                  existing mt-6 spacing; break-inside-avoid prevents
-                  the browser from cutting one mid-section. Single
-                  column on small screens. */}
-              <div className="md:columns-2 md:gap-x-6 [&_section]:break-inside-avoid">
+              {/* Two-column section layout — Avatar, Display Name,
+                  Notifications on the left; everything else on the
+                  right. Single column on small screens (md:grid-cols-2).
+                  [&_section]:!mt-0 cancels the per-section mt-6 so the
+                  parent's space-y-6 is the only gap source. */}
+              <div className="mt-6 grid gap-6 md:grid-cols-2 [&_section]:!mt-0">
+                <div className="space-y-6">
               {/* Avatar section. Lets users upload a custom avatar
                   that overrides their Discord avatar across the
                   site. Client resizes/center-crops to 312×312 JPEG
@@ -28070,6 +28070,8 @@ export default function StarCitizenSalvageGuideWebsite() {
                   )}
                 </div>
               </section>
+                </div>
+                <div className="space-y-6">
 
               {/* RSI Handle section
                   When set, this overrides the user's Discord username on
@@ -28450,6 +28452,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                   )}
                 </div>
               </section>
+                </div>
               </div>
             </div>
           </div>

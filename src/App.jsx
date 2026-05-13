@@ -26139,14 +26139,14 @@ export default function StarCitizenSalvageGuideWebsite() {
 
             {adminSection === "users" && (
             <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div className="flex flex-col gap-3">
                 <div>
                   <h2 className="text-xl font-bold text-cyan-300">All Users</h2>
                   <p className="mt-1 text-sm text-slate-400">
                     Every Discord user who has ever signed in to the site. Online users surface first, then sorted by most recent login. Admin-only view.
                   </p>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-2">
                   {/* Post Announcement — global yellow banner on
                       Home tab. NOT a per-user mailbox write.
                       Auto-hides 24 h after createdAt. */}
@@ -26182,7 +26182,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                       whole roster regardless of which header the
                       admin is sorting by. */}
                   {adminUsers && Array.isArray(adminUsers.users) && (
-                    <span className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-200">
+                    <span className="ml-auto rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-200">
                       {adminUsers.users.filter((u) => u.isOnline).length} / {adminUsers.users.length} online
                     </span>
                   )}

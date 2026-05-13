@@ -14827,39 +14827,6 @@ export default function StarCitizenSalvageGuideWebsite() {
       window.localStorage?.setItem("scs_sidebar_layout", sidebarLayoutOn ? "1" : "0");
     } catch {}
   }, [sidebarLayoutOn]);
-  // UI scale factor — copies scmdb.net's pattern. Five discrete
-  // sizes via a button group labeled with growing letters
-  // (A / A / A / A / 2A). When scale !== 1, apply
-  // { zoom, minHeight: `${100/scale}vh` } to the documentElement so
-  // the viewport stays full-height after the zoom shrinks/grows
-  // the layout. Default 1 (= no override).
-  const SITE_SCALE_OPTIONS = [
-    { value: 0.9,  label: "A",  title: "Small (90%)",        fontSize: 10 },
-    { value: 1,    label: "A",  title: "Normal (100%)",      fontSize: 12 },
-    { value: 1.15, label: "A",  title: "Large (115%)",       fontSize: 14 },
-    { value: 1.3,  label: "A",  title: "Extra Large (130%)", fontSize: 16 },
-    { value: 2,    label: "2A", title: "Double (200%)",      fontSize: 12 },
-  ];
-  const [siteScale, setSiteScale] = useState(() => {
-    try {
-      const v = Number(window.localStorage?.getItem("scs_ui_scale"));
-      return SITE_SCALE_OPTIONS.some((o) => o.value === v) ? v : 1;
-    } catch {
-      return 1;
-    }
-  });
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-    const root = document.documentElement;
-    if (siteScale !== 1) {
-      root.style.zoom = String(siteScale);
-      root.style.minHeight = `${100 / siteScale}vh`;
-    } else {
-      root.style.zoom = "";
-      root.style.minHeight = "";
-    }
-    try { window.localStorage?.setItem("scs_ui_scale", String(siteScale)); } catch {}
-  }, [siteScale]);
   // Privacy Policy modal — opens from the footer link. Stays decoupled
   // from auth state so anonymous visitors can read it too.
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
@@ -20037,7 +20004,7 @@ export default function StarCitizenSalvageGuideWebsite() {
           isTauri
             ? "pl-44 px-3 py-3"
             : sidebarLayoutOn
-              ? "pl-20 pr-6 py-6 max-w-screen-2xl mx-auto"
+              ? "pl-60 pr-6 py-6 max-w-screen-2xl mx-auto"
               : "mx-auto max-w-7xl px-4 py-8 md:px-8"
         }`}
         style={{ zIndex: 10, flex: 1, display: "flex", flexDirection: "column", width: "100%" }}
@@ -20754,37 +20721,6 @@ export default function StarCitizenSalvageGuideWebsite() {
                   {sidebarLayoutOn ? "Rail" : "Top tabs"}
                 </button>
               )}
-              {/* UI scale button group — copies scmdb.net's
-                  five-size pattern (90/100/115/130/200%). Growing
-                  letter size on each button hints at the scale it
-                  applies. Default = 100% (middle button highlighted).
-                  Persists to localStorage. */}
-              <div
-                className="flex items-center gap-1 rounded-2xl border border-slate-700 bg-slate-900/60 px-2 py-2"
-                role="group"
-                aria-label="UI scale"
-              >
-                {SITE_SCALE_OPTIONS.map((opt) => {
-                  const active = siteScale === opt.value;
-                  return (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => setSiteScale(opt.value)}
-                      title={opt.title}
-                      aria-pressed={active}
-                      style={{ fontSize: `${opt.fontSize}px`, lineHeight: 1 }}
-                      className={`rounded-md px-2 py-1 font-bold transition ${
-                        active
-                          ? "bg-cyan-500/25 text-cyan-100"
-                          : "text-slate-400 hover:bg-slate-800 hover:text-slate-100"
-                      }`}
-                    >
-                      {opt.label}
-                    </button>
-                  );
-                })}
-              </div>
               <div className="rounded-2xl border border-cyan-400/30 bg-cyan-500/10 px-4 py-3 text-sm text-cyan-100">
                 <div className="font-semibold">Patch Verified</div>
                 <div>{patchStatus?.version || "4.7.2"}</div>
@@ -20808,7 +20744,7 @@ export default function StarCitizenSalvageGuideWebsite() {
             isTauri
               ? "fixed left-0 top-0 bottom-0 z-30 flex w-44 flex-col gap-0.5 overflow-y-auto border-r border-cyan-500/25 bg-slate-950 p-2"
               : sidebarLayoutOn
-                ? "fixed left-0 top-0 bottom-0 z-30 flex w-16 flex-col items-center gap-1 overflow-y-auto border-r border-cyan-500/40 bg-gradient-to-b from-slate-950 to-slate-900 py-4 shadow-[inset_-1px_0_0_rgba(34,211,238,0.15)]"
+                ? "fixed left-0 top-0 bottom-0 z-30 flex w-52 flex-col gap-0.5 overflow-y-auto border-r border-cyan-500/40 bg-gradient-to-b from-slate-950 to-slate-900 px-2 py-4 shadow-[inset_-1px_0_0_rgba(34,211,238,0.15)]"
                 : "mb-6 flex gap-1 border-b border-cyan-500/25"
           }
           role="tablist"
@@ -20985,12 +20921,11 @@ export default function StarCitizenSalvageGuideWebsite() {
                 ? "border-cyan-400 bg-cyan-500/15 text-cyan-100"
                 : "border-transparent text-slate-400 hover:bg-slate-800/50 hover:text-slate-200"
             }`;
-            // Web rail icon-button styling: compact 44×44 cell with
-            // SC-style cyan-glow accent on active. Uses CSS group
-            // hover to surface a floating label to the right.
-            const railCls = `group relative flex h-11 w-11 items-center justify-center rounded-lg transition ${
+            // Web sidebar button: icon + label row, full-width.
+            // SC HUD vibe via cyan glow + leading-edge accent bar.
+            const railCls = `relative flex w-full items-center gap-2.5 rounded-md pl-3 pr-2 py-2 text-[13px] font-semibold uppercase tracking-wider transition ${
               isActive
-                ? "bg-cyan-500/20 text-cyan-200 shadow-[0_0_12px_rgba(34,211,238,0.35)] ring-1 ring-cyan-400/50"
+                ? "bg-cyan-500/15 text-cyan-100 shadow-[0_0_12px_rgba(34,211,238,0.25)] before:absolute before:left-0 before:top-1.5 before:bottom-1.5 before:w-0.5 before:rounded-full before:bg-cyan-400 before:shadow-[0_0_8px_rgba(34,211,238,0.7)]"
                 : "text-slate-400 hover:bg-slate-800/60 hover:text-cyan-200"
             }`;
             // SVG icon glyphs per tab id. Stroke-only so the cyan
@@ -21025,7 +20960,7 @@ export default function StarCitizenSalvageGuideWebsite() {
               { id: "exports",    label: "Patch Exports" },
             ];
             let subList = null;
-            if (isActive && isTauri) {
+            if (isActive && (isTauri || sidebarLayoutOn)) {
               if (tab.id === "ledger") subList = { items: ledgerSubs, value: ledgerSubTab, set: setLedgerSubTab };
               else if (tab.id === "missions" && missionsSubs) subList = { items: missionsSubs, value: missionsSubTab, set: setMissionsSubTab };
               else if (tab.id === "admin") subList = { items: adminSubs, value: adminSection, set: setAdminSection };
@@ -21044,17 +20979,12 @@ export default function StarCitizenSalvageGuideWebsite() {
               >
                 {isRailMode ? (
                   <>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 shrink-0" aria-hidden="true">
                       {TAB_ICONS[tab.id] || <circle cx="12" cy="12" r="8" />}
                     </svg>
-                    {/* Floating label that pops out to the right on
-                        hover/focus. Pointer-events-none so it never
-                        intercepts clicks. */}
-                    <span className="pointer-events-none absolute left-full ml-2 whitespace-nowrap rounded-md border border-cyan-500/40 bg-slate-950 px-2 py-1 text-[11px] font-semibold uppercase tracking-wider text-cyan-200 opacity-0 shadow-lg shadow-cyan-950/40 group-hover:opacity-100 group-focus:opacity-100 transition">
-                      {tab.label}
-                    </span>
+                    <span className="flex-1 text-left text-[12px] tracking-[0.15em]">{tab.label}</span>
                     {showLedgerLock && (
-                      <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-amber-400 ring-1 ring-slate-950" aria-hidden="true" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-amber-400" aria-hidden="true" title="Requires login" />
                     )}
                   </>
                 ) : (

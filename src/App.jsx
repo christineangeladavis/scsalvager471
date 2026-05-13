@@ -20125,7 +20125,7 @@ export default function StarCitizenSalvageGuideWebsite() {
             <img
               src="/scsalvager_banner.jpg"
               alt="SCSalvager.net — Salvage · Recover · Profit"
-              className="block w-full h-80 object-cover [mask-image:radial-gradient(ellipse_at_center,black_55%,transparent_98%)] [-webkit-mask-image:radial-gradient(ellipse_at_center,black_55%,transparent_98%)]"
+              className="block w-full h-32 sm:h-40 object-cover [mask-image:radial-gradient(ellipse_at_center,black_55%,transparent_98%)] [-webkit-mask-image:radial-gradient(ellipse_at_center,black_55%,transparent_98%)]"
               width="1600"
               height="565"
             />

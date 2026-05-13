@@ -97,57 +97,39 @@ jobs:
             echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
           fi
 
-      # Build only — tauri-action's built-in publishing path was
-      # dropping the Tauri 2 updater archives (.nsis.zip / .msi.zip
-      # / .app.tar.gz / .AppImage.tar.gz + their .sig siblings) from
-      # the asset list and failing silently on Windows when
-      # createUpdaterArtifacts was enabled. We let tauri-action
-      # build + sign the bundles (its strength), then upload every
-      # artifact in the next step via `gh release upload`. Passing
-      # an empty tagName tells tauri-action to skip release creation
-      # + asset upload entirely.
-      - name: Build + sign bundles via tauri-action (no upload)
-        uses: tauri-apps/tauri-action@v0
+      # Build + sign bundles directly via the Tauri CLI. We used to
+      # use tauri-apps/tauri-action@v0 here, but its built-in
+      # post-bundle processing dropped the Tauri 2 updater
+      # archives (.nsis.zip / .msi.zip / .app.tar.gz /
+      # .AppImage.tar.gz) from disk after building — even when
+      # `tagName: ""` was passed to disable its publish path. We
+      # invoke the CLI directly so the full bundle output stays on
+      # disk for the upload step below.
+      - name: Build + sign bundles
+        shell: bash
+        working-directory: desktop
         env:
           # Updater signing — only effective when the operator has
           # populated these secrets via repo settings. Without them
-          # tauri-action skips the signature step and the manifest
+          # tauri build skips the signature step and the manifest
           # endpoint won't surface the build to the running app
           # (no .sig sibling to ship).
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-
-          # Windows Authenticode + macOS notarization env vars
-          # are intentionally NOT pre-wired here. tauri-action
-          # interprets a defined-but-empty env var as "try to
-          # sign, then fail" — which crashed the macOS build with
-          # `security import: SecKeychainItemImport: One or more
-          # parameters... not valid` because no Apple cert exists
-          # in repo secrets yet.
-          #
-          # When the operator wants signed builds, paste the
-          # appropriate block back into this env section after
-          # populating the matching repo secrets:
-          #
-          # Windows (instant SmartScreen pass with EV cert):
-          #   WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
-          #   WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
-          #
-          # macOS (instant Gatekeeper pass with Apple Dev ID):
-          #   APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-          #   APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          #   APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
-          #   APPLE_ID: ${{ secrets.APPLE_ID }}
-          #   APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
-          #   APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-        with:
-          projectPath: desktop
-          # Empty tagName disables release creation + upload — we
-          # do that ourselves below to capture every artifact.
-          tagName: ""
-          releaseDraft: false
-          prerelease: false
-          args: ${{ matrix.rust-target == 'aarch64-apple-darwin' && '--target aarch64-apple-darwin' || (matrix.rust-target == 'x86_64-apple-darwin' && '--target x86_64-apple-darwin' || '') }}
+          # Windows Authenticode + macOS notarization env vars are
+          # intentionally NOT pre-wired here. When the operator
+          # wants signed builds, add them after populating the
+          # matching repo secrets:
+          #   WINDOWS_CERTIFICATE / _PASSWORD
+          #   APPLE_CERTIFICATE / _PASSWORD / _SIGNING_IDENTITY /
+          #     APPLE_ID / APPLE_PASSWORD / APPLE_TEAM_ID
+        run: |
+          set -e
+          TARGET="${{ matrix.rust-target }}"
+          case "$TARGET" in
+            *apple-darwin) npx tauri build --target "$TARGET" ;;
+            *)             npx tauri build ;;
+          esac
 
       # Create the GitHub release on the first matrix runner that
       # gets here. `gh release create` errors with "release already
@@ -201,9 +183,13 @@ jobs:
 
           echo "Scanning $BUNDLE_DIR for upload candidates..."
           # Collect every installer + updater archive + .sig file
-          # under bundle/. Exclude the bare unsigned .app dir on
-          # macOS (we only want the .app.tar.gz wrapper).
-          mapfile -t FILES < <(find "$BUNDLE_DIR" -type f \( \
+          # under bundle/. macOS GHA runners ship bash 3.2 (no
+          # `mapfile` builtin) so we read into the array with a
+          # portable while-loop instead.
+          FILES=()
+          while IFS= read -r f; do
+            FILES+=("$f")
+          done < <(find "$BUNDLE_DIR" -type f \( \
             -name "*.msi" -o -name "*.msi.sig" -o \
             -name "*.msi.zip" -o -name "*.msi.zip.sig" -o \
             -name "*-setup.exe" -o -name "*-setup.exe.sig" -o \

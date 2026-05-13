@@ -14707,7 +14707,7 @@ export default function StarCitizenSalvageGuideWebsite() {
       if (!m.dismissedAt) g.unreadCount += 1;
     }
     for (const g of byUser.values()) {
-      g.messages.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+      g.messages.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
       g.allRead = g.unreadCount === 0;
     }
     // Groups sorted by most-recent activity descending — fresh
@@ -15458,7 +15458,9 @@ export default function StarCitizenSalvageGuideWebsite() {
     // conversations read chronologically (matches Discord / iMessage /
     // SMS conventions). Earlier we sorted DESC for an "inbox" feel,
     // but per-user threading reads cleaner top-down.
-    return [...adminInbox].sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+    // Descending order — newest at top, oldest at bottom. Per
+    // user request: every inbox surface sorts most-recent first.
+    return [...adminInbox].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
   }, [adminInbox]);
   // Unified Inbox feed. Personal messages (admin↔this-user thread)
   // and grouped per-user mail (admin sessions only) live in one
@@ -15475,7 +15477,7 @@ export default function StarCitizenSalvageGuideWebsite() {
         out.push({ kind: "user", ts: g.latestTs || 0, id: `u-${g.userId}`, data: g });
       }
     }
-    return out.sort((a, b) => a.ts - b.ts);
+    return out.sort((a, b) => b.ts - a.ts);
   }, [mailboxMessages, groupedUserMail, user?.isAdmin]);
   // Unread count drives the red badge. Only inbound (admin → user)
   // entries that aren't dismissed contribute — user-authored
@@ -20362,7 +20364,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                                 </div>
                                 <div className="max-h-[40vh] overflow-y-auto">
                                   {groupedUserMail.filter((g) => !g.allRead).map((g) => {
-                                    const latest = g.messages[g.messages.length - 1];
+                                    const latest = g.messages[0];
                                     const ts = latest?.createdAt
                                       ? new Date(latest.createdAt).toLocaleString([], {
                                           month: "short",
@@ -25723,7 +25725,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                     }
                     // kind === "user" — grouped per-sender entry
                     const g = entry.data;
-                    const latest = g.messages[g.messages.length - 1];
+                    const latest = g.messages[0];
                     const latestTs = g.latestTs ? new Date(g.latestTs).toLocaleString() : "";
                     return (
                       <li
@@ -27325,7 +27327,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                 ) : (
                   <div className="mt-2 max-h-64 space-y-2 overflow-y-auto pr-1">
                     {[...adminMessageThread]
-                      .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0))
+                      .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
                       .map((m) => {
                       const isUser = m.from === "user";
                       const isDeleted = Boolean(m.deletedAt);

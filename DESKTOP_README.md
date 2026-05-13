@@ -9,6 +9,23 @@ deb). Auto-update endpoint: `/api/desktop/manifest` (served by scsalvager.net).
 
 ---
 
+## v0.2.10
+
+### Fixed
+- **Auto-updater now actually serves updates.** Previous releases
+  shipped the installers but not the signed updater bundles
+  (`.nsis.zip` / `.msi.zip` / `.app.tar.gz` / `.AppImage.tar.gz`
+  with `.sig` siblings) the Tauri updater plugin polls for, so
+  the manifest endpoint always answered "up to date". Bundle
+  config now sets `createUpdaterArtifacts: true` and the build
+  step emits + signs the updater archives. Existing v0.2.6 –
+  v0.2.9 clients won't be able to self-update to v0.2.10 (their
+  manifest poll still 204s against the older releases that
+  lacked the `.sig` files); install v0.2.10 manually once and
+  every future release will update in-app.
+
+---
+
 ## v0.2.9
 
 ### Changed

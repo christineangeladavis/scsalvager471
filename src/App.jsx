@@ -14809,22 +14809,6 @@ export default function StarCitizenSalvageGuideWebsite() {
   // Desktop release-notes modal — sourced from DESKTOP_README.md.
   // Opens from the Settings → Desktop App "Release notes" button.
   const [isDesktopNotesOpen, setIsDesktopNotesOpen] = useState(false);
-  // Site-wide UI scale (header slider). Persisted across sessions.
-  // Values: 60 | 80 | 100 (percent). Applied via CSS zoom on
-  // document.documentElement so every px-based unit scales together.
-  const [siteScale, setSiteScale] = useState(() => {
-    try {
-      const v = Number(window.localStorage?.getItem("scs_site_scale"));
-      return v === 60 || v === 80 || v === 100 ? v : 100;
-    } catch {
-      return 100;
-    }
-  });
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-    document.documentElement.style.zoom = siteScale / 100;
-    try { window.localStorage?.setItem("scs_site_scale", String(siteScale)); } catch {}
-  }, [siteScale]);
   // Privacy Policy modal — opens from the footer link. Stays decoupled
   // from auth state so anonymous visitors can read it too.
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
@@ -20694,35 +20678,6 @@ export default function StarCitizenSalvageGuideWebsite() {
                     Log in with Discord
                   </a>
                 )}
-              </div>
-              {/* UI scale slider — three discrete positions
-                  (60 / 80 / 100). Drives the CSS zoom factor on
-                  document.documentElement so every px-based unit
-                  scales together. Persists across sessions via
-                  localStorage. */}
-              <div className="rounded-2xl border border-slate-700 bg-slate-900/60 px-3 py-2 text-xs text-slate-300">
-                <label htmlFor="site-scale" className="block text-[10px] uppercase tracking-wider text-slate-400">
-                  UI scale · {siteScale}%
-                </label>
-                <input
-                  id="site-scale"
-                  type="range"
-                  min="0"
-                  max="2"
-                  step="1"
-                  value={siteScale === 60 ? 0 : siteScale === 80 ? 1 : 2}
-                  onChange={(e) => {
-                    const idx = Number(e.target.value);
-                    setSiteScale(idx === 0 ? 60 : idx === 1 ? 80 : 100);
-                  }}
-                  className="mt-1 w-28 accent-cyan-400"
-                  aria-valuetext={`${siteScale} percent`}
-                />
-                <div className="mt-0.5 flex justify-between text-[9px] text-slate-500">
-                  <span>60</span>
-                  <span>80</span>
-                  <span>100</span>
-                </div>
               </div>
               <div className="rounded-2xl border border-cyan-400/30 bg-cyan-500/10 px-4 py-3 text-sm text-cyan-100">
                 <div className="font-semibold">Patch Verified</div>

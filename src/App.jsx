@@ -20033,13 +20033,7 @@ export default function StarCitizenSalvageGuideWebsite() {
 
       {/* Scrollable UI content */}
       <div
-        className={`relative ${
-          isTauri
-            ? "pl-44 px-3 py-3"
-            : sidebarLayoutOn
-              ? "pl-20 pr-6 py-6 max-w-screen-2xl mx-auto"
-              : "mx-auto max-w-7xl px-4 py-8 md:px-8"
-        }`}
+        className={`relative ${(isTauri || sidebarLayoutOn) ? "pl-44 px-3 py-3" : "mx-auto max-w-7xl px-4 py-8 md:px-8"}`}
         style={{ zIndex: 10, flex: 1, display: "flex", flexDirection: "column", width: "100%" }}
       >
         {updateAvailable && !updateModalDismissed && (() => {
@@ -20736,14 +20730,14 @@ export default function StarCitizenSalvageGuideWebsite() {
                   </a>
                 )}
               </div>
-              {/* Layout toggle — icon rail vs top tabs. Experimental,
-                  web-only. Persists to localStorage so the choice
-                  survives reloads. */}
+              {/* Layout toggle — sidebar vs top tabs. Web-only;
+                  Tauri shell is always sidebar. Persists via
+                  localStorage so the experiment survives reloads. */}
               {!isTauri && (
                 <button
                   type="button"
                   onClick={() => setSidebarLayoutOn((v) => !v)}
-                  title={sidebarLayoutOn ? "Switch to top-tabs layout" : "Switch to icon-rail layout"}
+                  title={sidebarLayoutOn ? "Switch to top-tabs layout" : "Switch to sidebar layout"}
                   aria-pressed={sidebarLayoutOn}
                   className={`rounded-2xl border px-3 py-2 text-xs font-semibold transition ${
                     sidebarLayoutOn
@@ -20751,7 +20745,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                       : "border-slate-700 bg-slate-900/60 text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
                   }`}
                 >
-                  {sidebarLayoutOn ? "Rail" : "Top tabs"}
+                  {sidebarLayoutOn ? "Sidebar" : "Top tabs"}
                 </button>
               )}
               {/* UI scale button group — copies scmdb.net's
@@ -20805,11 +20799,9 @@ export default function StarCitizenSalvageGuideWebsite() {
                 176px sidebar. */}
         <nav
           className={
-            isTauri
+            (isTauri || sidebarLayoutOn)
               ? "fixed left-0 top-0 bottom-0 z-30 flex w-44 flex-col gap-0.5 overflow-y-auto border-r border-cyan-500/25 bg-slate-950 p-2"
-              : sidebarLayoutOn
-                ? "fixed left-0 top-0 bottom-0 z-30 flex w-16 flex-col items-center gap-1 overflow-y-auto border-r border-cyan-500/40 bg-gradient-to-b from-slate-950 to-slate-900 py-4 shadow-[inset_-1px_0_0_rgba(34,211,238,0.15)]"
-                : "mb-6 flex gap-1 border-b border-cyan-500/25"
+              : "mb-6 flex gap-1 border-b border-cyan-500/25"
           }
           role="tablist"
         >
@@ -20974,39 +20966,26 @@ export default function StarCitizenSalvageGuideWebsite() {
               : []),
           ].map((tab) => {
             const isActive = activeTab === tab.id;
+            // Ledger and Statistics both require Discord login to do
+            // anything useful; show a small lock icon + tooltip while
+            // logged out so the requirement is visible at a glance.
             const showLedgerLock = (tab.id === "ledger" || tab.id === "stats") && !user && !authLoading;
             const horizontalCls = `-mb-px inline-flex items-center gap-1.5 border-b-2 px-3 py-3 text-xs font-semibold uppercase tracking-wider transition sm:px-5 sm:text-sm sm:tracking-[0.2em] ${
               isActive
                 ? "border-cyan-400 text-cyan-200"
                 : "border-transparent text-slate-400 hover:border-cyan-500/40 hover:text-slate-200"
             }`;
-            const tauriCls = `inline-flex items-center justify-between gap-2 rounded-md border-l-4 px-3 py-2 text-[13px] font-semibold tracking-wider transition ${
+            const verticalCls = `inline-flex items-center justify-between gap-2 rounded-md border-l-4 px-3 py-2 text-[13px] font-semibold tracking-wider transition ${
               isActive
                 ? "border-cyan-400 bg-cyan-500/15 text-cyan-100"
                 : "border-transparent text-slate-400 hover:bg-slate-800/50 hover:text-slate-200"
             }`;
-            // Web rail icon-button styling: compact 44×44 cell with
-            // SC-style cyan-glow accent on active. Uses CSS group
-            // hover to surface a floating label to the right.
-            const railCls = `group relative flex h-11 w-11 items-center justify-center rounded-lg transition ${
-              isActive
-                ? "bg-cyan-500/20 text-cyan-200 shadow-[0_0_12px_rgba(34,211,238,0.35)] ring-1 ring-cyan-400/50"
-                : "text-slate-400 hover:bg-slate-800/60 hover:text-cyan-200"
-            }`;
-            // SVG icon glyphs per tab id. Stroke-only so the cyan
-            // accent reads cleanly over the dark rail.
-            const TAB_ICONS = {
-              home: <path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-8.5z" />,
-              ships: <path d="M4 14 12 4l8 10-3 1-5-4-5 4-3-1zm0 4 8 3 8-3" />,
-              missions: <path d="M12 3v3m0 12v3m9-9h-3M6 12H3m13.95-6.95-2.12 2.12M9.17 14.83l-2.12 2.12m0-10.9 2.12 2.12m5.66 5.66 2.12 2.12M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" />,
-              ledger: <path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3V4zm0 14a1 1 0 0 0 1 1h11M9 8h7M9 12h7" />,
-              stats: <path d="M4 19V5m0 14h16M8 16v-5m4 5V8m4 8v-3" />,
-              inbox: <path d="M3 8 5 4h14l2 4v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8zm0 0h6l1.5 2h3L15 8h6" />,
-              admin: <path d="M12 3 4 6v6c0 4.5 3.2 8.5 8 9 4.8-.5 8-4.5 8-9V6l-8-3z" />,
-            };
-            // Nested sub-tabs for the Tauri shell only — the web
-            // rail is too narrow to host them. Web users still get
-            // the inline horizontal sub-nav inside each tab body.
+            // Nested sub-tabs for the sidebar layout. Each parent
+            // tab can carry its own sub-nav state; when the parent
+            // is active AND the layout is vertical, render those
+            // sub-tab buttons indented under the parent. The inline
+            // horizontal sub-nav in each tab body stays for now —
+            // both surfaces drive the same state.
             const refuelingUnlockedHere = isPatchAtLeast(patchStatus?.version, "4.8");
             const ledgerSubs = [
               { id: "orders",  label: "Orders" },
@@ -21025,12 +21004,11 @@ export default function StarCitizenSalvageGuideWebsite() {
               { id: "exports",    label: "Patch Exports" },
             ];
             let subList = null;
-            if (isActive && isTauri) {
+            if (isActive && (isTauri || sidebarLayoutOn)) {
               if (tab.id === "ledger") subList = { items: ledgerSubs, value: ledgerSubTab, set: setLedgerSubTab };
               else if (tab.id === "missions" && missionsSubs) subList = { items: missionsSubs, value: missionsSubTab, set: setMissionsSubTab };
               else if (tab.id === "admin") subList = { items: adminSubs, value: adminSection, set: setAdminSection };
             }
-            const isRailMode = !isTauri && sidebarLayoutOn;
             return (
               <React.Fragment key={tab.id}>
               <button
@@ -21038,34 +21016,19 @@ export default function StarCitizenSalvageGuideWebsite() {
                 role="tab"
                 aria-selected={isActive}
                 onClick={() => setActiveTab(tab.id)}
-                title={showLedgerLock ? `${tab.label} · Requires login` : tab.label}
-                aria-label={tab.label}
-                className={isTauri ? tauriCls : isRailMode ? railCls : horizontalCls}
+                title={showLedgerLock ? "Requires login" : undefined}
+                className={(isTauri || sidebarLayoutOn) ? verticalCls : horizontalCls}
               >
-                {isRailMode ? (
-                  <>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
-                      {TAB_ICONS[tab.id] || <circle cx="12" cy="12" r="8" />}
-                    </svg>
-                    {/* Floating label that pops out to the right on
-                        hover/focus. Pointer-events-none so it never
-                        intercepts clicks. */}
-                    <span className="pointer-events-none absolute left-full ml-2 whitespace-nowrap rounded-md border border-cyan-500/40 bg-slate-950 px-2 py-1 text-[11px] font-semibold uppercase tracking-wider text-cyan-200 opacity-0 shadow-lg shadow-cyan-950/40 group-hover:opacity-100 group-focus:opacity-100 transition">
-                      {tab.label}
-                    </span>
-                    {showLedgerLock && (
-                      <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-amber-400 ring-1 ring-slate-950" aria-hidden="true" />
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <span>{tab.label}</span>
-                    {showLedgerLock && (
-                      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="h-3 w-3 shrink-0 opacity-70">
-                        <path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 1 1 6 0v3H9z" />
-                      </svg>
-                    )}
-                  </>
+                <span>{tab.label}</span>
+                {showLedgerLock && (
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    aria-hidden="true"
+                    className="h-3 w-3 shrink-0 opacity-70"
+                  >
+                    <path d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 8V7a3 3 0 1 1 6 0v3H9z" />
+                  </svg>
                 )}
               </button>
               {subList && (

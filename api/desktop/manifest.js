@@ -129,7 +129,14 @@ export default async function handler(req, res) {
     return res.status(204).end();
   }
 
-  const releaseVersion = String(release.tag_name || "").replace(/^v/, "");
+  // Tag names are "desktop-v0.2.8" / "v1.0.0" / "0.2.0" depending on
+  // the convention in use. Extract the semver core so the comparison
+  // doesn't get derailed by the "desktop-" prefix. Falls back to the
+  // raw tag if no semver match (rare — keeps the endpoint working
+  // with hand-tagged releases).
+  const tagName = String(release.tag_name || "");
+  const semverMatch = tagName.match(/(\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?)/);
+  const releaseVersion = semverMatch ? semverMatch[1] : tagName.replace(/^v/, "");
   if (!releaseVersion || !isNewer(releaseVersion, currentVersion)) {
     return res.status(204).end();
   }

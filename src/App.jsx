@@ -20749,6 +20749,20 @@ export default function StarCitizenSalvageGuideWebsite() {
           }
           role="tablist"
         >
+          {/* Web sidebar banner — scaled to fit the rail width.
+              Sits above the tab list. Same radial-mask fade as
+              the legacy hero so the artwork blends into the
+              gradient sidebar bg. Tauri sidebar skips this; its
+              own brand block sits at the top. */}
+          {!isTauri && sidebarLayoutOn && (
+            <img
+              src="/scsalvager_banner.jpg"
+              alt="SCSalvager.net"
+              className="-mx-2 -mt-4 mb-3 block w-[calc(100%+1rem)] h-20 object-cover [mask-image:radial-gradient(ellipse_at_center,black_55%,transparent_98%)] [-webkit-mask-image:radial-gradient(ellipse_at_center,black_55%,transparent_98%)]"
+              width="1600"
+              height="565"
+            />
+          )}
           {isTauri && (
             <div className="mb-2 border-b border-slate-700/40 px-2 py-2">
               <div className="flex items-center justify-between">

@@ -20004,7 +20004,7 @@ export default function StarCitizenSalvageGuideWebsite() {
           isTauri
             ? "pl-44 px-3 py-3"
             : sidebarLayoutOn
-              ? "pl-60 pr-60 py-6 max-w-screen-2xl mx-auto"
+              ? "pl-60 pr-6 py-6 max-w-screen-2xl mx-auto"
               : "mx-auto max-w-7xl px-4 py-8 md:px-8"
         }`}
         style={{ zIndex: 10, flex: 1, display: "flex", flexDirection: "column", width: "100%" }}
@@ -20081,20 +20081,20 @@ export default function StarCitizenSalvageGuideWebsite() {
             </div>
           );
         })()}
-        {!isTauri && (() => {
-          // Wrapper element + classes flip with the layout. Rail
-          // mode hosts everything inside a fixed right-edge
-          // <aside>; top-tabs mode keeps the legacy <header>.
-          const Tag = sidebarLayoutOn ? "aside" : "header";
-          const wrapperCls = sidebarLayoutOn
-            ? "fixed right-0 top-0 bottom-0 z-30 w-52 overflow-y-auto border-l border-cyan-500/40 bg-gradient-to-b from-slate-950 to-slate-900 shadow-[inset_1px_0_0_rgba(34,211,238,0.15)]"
-            : "mb-8 overflow-hidden rounded-3xl border border-cyan-500/30 shadow-2xl shadow-cyan-950/40";
-          return (
-          <Tag className={wrapperCls}>
-          {/* Banner — only renders in top-tabs mode. Rail mode
-              already shows the banner at the top of the left
-              sidebar; double-rendering would waste pixels. */}
-          {!sidebarLayoutOn && (
+        {!isTauri && (
+        <header className="mb-8 overflow-hidden rounded-3xl border border-cyan-500/30 shadow-2xl shadow-cyan-950/40">
+          {/* Banner displayed at ~75% of its natural height (h-80 →
+              320px). object-cover preserves the artwork's center
+              band when the viewport is narrower than 1600px. The
+              radial mask fades the edges to transparent for a soft
+              dissolve into the header background; -webkit-mask
+              mirror covers Safari. */}
+          {/* Banner — hidden in the desktop app shell. The 320px
+              hero eats too much vertical real estate inside a
+              desktop window where space matters more than visual
+              flourish. Web users still see it as the marketing
+              landing visual. */}
+          {!isTauri && (
             <img
               src="/scsalvager_banner.jpg"
               alt="SCSalvager.net — Salvage · Recover · Profit"
@@ -20103,10 +20103,7 @@ export default function StarCitizenSalvageGuideWebsite() {
               height="565"
             />
           )}
-          <div className={sidebarLayoutOn
-            ? "flex flex-col items-stretch gap-3 p-3"
-            : "flex flex-col gap-3 bg-gradient-to-br from-slate-900 via-slate-950 to-blue-950 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-5"
-          }>
+          <div className="flex flex-col gap-3 bg-gradient-to-br from-slate-900 via-slate-950 to-blue-950 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-5">
             <div className="flex flex-wrap items-center gap-2 sm:self-center">
               {!isTauri && (
               <a
@@ -20731,9 +20728,8 @@ export default function StarCitizenSalvageGuideWebsite() {
             </div>
             )}
           </div>
-          </Tag>
-          );
-        })()}
+        </header>
+        )}
 
         {/* --- Tab navigation ---
             Layout split:

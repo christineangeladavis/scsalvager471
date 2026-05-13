@@ -14850,39 +14850,18 @@ export default function StarCitizenSalvageGuideWebsite() {
   // Desktop release-notes modal — sourced from DESKTOP_README.md.
   // Opens from the Settings → Desktop App "Release notes" button.
   const [isDesktopNotesOpen, setIsDesktopNotesOpen] = useState(false);
-  // UI scale factor — copies scmdb.net's pattern. Five discrete
-  // sizes via a button group labeled with growing letters
-  // (A / A / A / A / 2A). When scale !== 1, apply
-  // { zoom, minHeight: `${100/scale}vh` } to the documentElement so
-  // the viewport stays full-height after the zoom shrinks/grows
-  // the layout. Default 1 (= no override).
-  const SITE_SCALE_OPTIONS = [
-    { value: 0.9,  label: "A",  title: "Small (90%)",        fontSize: 10 },
-    { value: 1,    label: "A",  title: "Normal (100%)",      fontSize: 12 },
-    { value: 1.15, label: "A",  title: "Large (115%)",       fontSize: 14 },
-    { value: 1.3,  label: "A",  title: "Extra Large (130%)", fontSize: 16 },
-    { value: 2,    label: "2A", title: "Double (200%)",      fontSize: 12 },
-  ];
-  const [siteScale, setSiteScale] = useState(() => {
-    try {
-      const v = Number(window.localStorage?.getItem("scs_ui_scale"));
-      return SITE_SCALE_OPTIONS.some((o) => o.value === v) ? v : 1;
-    } catch {
-      return 1;
-    }
-  });
+  // One-shot cleanup: prior builds let users pick a UI zoom factor
+  // and persisted it via localStorage["scs_ui_scale"] + inline
+  // style on documentElement. Selector is gone; this clears any
+  // stale state so users who set a scale don't stay zoomed
+  // forever.
   useEffect(() => {
     if (typeof document === "undefined") return;
+    try { window.localStorage?.removeItem("scs_ui_scale"); } catch {}
     const root = document.documentElement;
-    if (siteScale !== 1) {
-      root.style.zoom = String(siteScale);
-      root.style.minHeight = `${100 / siteScale}vh`;
-    } else {
-      root.style.zoom = "";
-      root.style.minHeight = "";
-    }
-    try { window.localStorage?.setItem("scs_ui_scale", String(siteScale)); } catch {}
-  }, [siteScale]);
+    if (root.style.zoom) root.style.zoom = "";
+    if (root.style.minHeight) root.style.minHeight = "";
+  }, []);
   // Privacy Policy modal — opens from the footer link. Stays decoupled
   // from auth state so anonymous visitors can read it too.
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
@@ -20752,37 +20731,6 @@ export default function StarCitizenSalvageGuideWebsite() {
                     Log in with Discord
                   </a>
                 )}
-              </div>
-              {/* UI scale button group — copies scmdb.net's
-                  five-size pattern (90/100/115/130/200%). Growing
-                  letter size on each button hints at the scale it
-                  applies. Default = 100% (middle button highlighted).
-                  Persists to localStorage. */}
-              <div
-                className="flex items-center gap-1 rounded-2xl border border-slate-700 bg-slate-900/60 px-2 py-2"
-                role="group"
-                aria-label="UI scale"
-              >
-                {SITE_SCALE_OPTIONS.map((opt) => {
-                  const active = siteScale === opt.value;
-                  return (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => setSiteScale(opt.value)}
-                      title={opt.title}
-                      aria-pressed={active}
-                      style={{ fontSize: `${opt.fontSize}px`, lineHeight: 1 }}
-                      className={`rounded-md px-2 py-1 font-bold transition ${
-                        active
-                          ? "bg-cyan-500/25 text-cyan-100"
-                          : "text-slate-400 hover:bg-slate-800 hover:text-slate-100"
-                      }`}
-                    >
-                      {opt.label}
-                    </button>
-                  );
-                })}
               </div>
               <div className="rounded-2xl border border-cyan-400/30 bg-cyan-500/10 px-4 py-3 text-sm text-cyan-100">
                 <div className="font-semibold">Patch Verified</div>

@@ -21228,8 +21228,11 @@ export default function StarCitizenSalvageGuideWebsite() {
                     Shows the standard claim duration, the expedited
                     claim duration, and the aUEC fee to expedite.
                     Format helper renders MMmSSs from raw seconds; an
-                    em-dash falls through if any field is missing. */}
-                {(() => {
+                    em-dash falls through if any field is missing.
+                    Hidden once Star Citizen 4.8 ships — the new
+                    Item Recovery flow obsoletes the static claim
+                    timers and expedite fees. */}
+                {!isPatchAtLeast(patchStatus?.version, "4.8") && (() => {
                   if (
                     !Number.isFinite(selectedShip.claimSeconds) ||
                     !Number.isFinite(selectedShip.expediteSeconds) ||

@@ -97,7 +97,16 @@ jobs:
             echo "tag=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Build + sign + publish via tauri-action
+      # Build only — tauri-action's built-in publishing path was
+      # dropping the Tauri 2 updater archives (.nsis.zip / .msi.zip
+      # / .app.tar.gz / .AppImage.tar.gz + their .sig siblings) from
+      # the asset list and failing silently on Windows when
+      # createUpdaterArtifacts was enabled. We let tauri-action
+      # build + sign the bundles (its strength), then upload every
+      # artifact in the next step via `gh release upload`. Passing
+      # an empty tagName tells tauri-action to skip release creation
+      # + asset upload entirely.
+      - name: Build + sign bundles via tauri-action (no upload)
         uses: tauri-apps/tauri-action@v0
         env:
           # Updater signing — only effective when the operator has
@@ -131,20 +140,115 @@ jobs:
           #   APPLE_ID: ${{ secrets.APPLE_ID }}
           #   APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           #   APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           projectPath: desktop
-          tagName: ${{ steps.tag.outputs.tag }}
-          releaseName: "SCSalvager Desktop ${{ steps.tag.outputs.tag }}"
-          releaseBody: |
-            Auto-generated build from `${{ steps.tag.outputs.tag }}`.
-            See README.md / What's New modal on scsalvager.net for the
-            human changelog. Installers are signed with the SCSalvager
-            updater key; the running app polls
-            /api/desktop/manifest and offers the update on next launch.
+          # Empty tagName disables release creation + upload — we
+          # do that ourselves below to capture every artifact.
+          tagName: ""
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.rust-target == 'aarch64-apple-darwin' && '--target aarch64-apple-darwin' || (matrix.rust-target == 'x86_64-apple-darwin' && '--target x86_64-apple-darwin' || '') }}
+
+      # Create the GitHub release on the first matrix runner that
+      # gets here. `gh release create` errors with "release already
+      # exists" on the 2nd + 3rd runners — swallow that and treat
+      # it as success so the upload step can proceed.
+      - name: Ensure GitHub release exists
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set +e
+          TAG="${{ steps.tag.outputs.tag }}"
+          REPO="${{ github.repository }}"
+          OUT=$(gh release create "$TAG" \
+            --repo "$REPO" \
+            --title "SCSalvager Desktop $TAG" \
+            --notes "Auto-generated build from \`$TAG\`. See README.md / What's New modal on scsalvager.net for the human changelog. Installers are signed with the SCSalvager updater key; the running app polls /api/desktop/manifest and offers the update on next launch." \
+            2>&1)
+          STATUS=$?
+          echo "$OUT"
+          if [ $STATUS -ne 0 ] && ! echo "$OUT" | grep -qi "already exists"; then
+            exit $STATUS
+          fi
+          exit 0
+
+      # Upload every artifact in the bundle output directory —
+      # raw installers (.exe / .msi / .dmg / .deb / .AppImage),
+      # Tauri 2 updater archives (.nsis.zip / .msi.zip /
+      # .app.tar.gz / .AppImage.tar.gz), and their .sig siblings.
+      # `--clobber` overwrites an existing same-name asset (handy
+      # for tag re-runs).
+      - name: Upload bundle artifacts to release
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -e
+          TAG="${{ steps.tag.outputs.tag }}"
+          REPO="${{ github.repository }}"
+          OS_LABEL="${{ matrix.target }}"
+          RUST_TARGET="${{ matrix.rust-target }}"
+
+          # macOS uses target-specific bundle path when --target is
+          # passed; other platforms use the default release/bundle.
+          case "$OS_LABEL" in
+            darwin-*) BUNDLE_DIR="desktop/src-tauri/target/${RUST_TARGET}/release/bundle" ;;
+            *)        BUNDLE_DIR="desktop/src-tauri/target/release/bundle" ;;
+          esac
+
+          echo "Scanning $BUNDLE_DIR for upload candidates..."
+          # Collect every installer + updater archive + .sig file
+          # under bundle/. Exclude the bare unsigned .app dir on
+          # macOS (we only want the .app.tar.gz wrapper).
+          mapfile -t FILES < <(find "$BUNDLE_DIR" -type f \( \
+            -name "*.msi" -o -name "*.msi.sig" -o \
+            -name "*.msi.zip" -o -name "*.msi.zip.sig" -o \
+            -name "*-setup.exe" -o -name "*-setup.exe.sig" -o \
+            -name "*-setup.nsis.zip" -o -name "*-setup.nsis.zip.sig" -o \
+            -name "*.dmg" -o -name "*.dmg.sig" -o \
+            -name "*.app.tar.gz" -o -name "*.app.tar.gz.sig" -o \
+            -name "*.AppImage" -o -name "*.AppImage.sig" -o \
+            -name "*.AppImage.tar.gz" -o -name "*.AppImage.tar.gz.sig" -o \
+            -name "*.deb" -o -name "*.deb.sig" \
+            \))
+
+          if [ ${#FILES[@]} -eq 0 ]; then
+            echo "::error::No bundle artifacts found in $BUNDLE_DIR"
+            exit 1
+          fi
+
+          # Tauri 2 emits the macOS updater archive as plain
+          # `SCSalvager.app.tar.gz` (+ .sig) with no version or
+          # arch token. The rename step below parses
+          # `<product>_<version>_<arch><suffix>` and would mangle
+          # that name, so we copy these files to a versioned name
+          # in a staging dir before upload.
+          STAGE_DIR="$RUNNER_TEMP/upload-stage"
+          mkdir -p "$STAGE_DIR"
+          STAGED=()
+          VERSION_NUM="${TAG#desktop-v}"
+          for f in "${FILES[@]}"; do
+            BASENAME=$(basename "$f")
+            case "$BASENAME" in
+              SCSalvager.app.tar.gz|SCSalvager.app.tar.gz.sig)
+                # macOS only — rebuild canonical pattern.
+                TAIL="${BASENAME#SCSalvager}"  # ".app.tar.gz" or ".app.tar.gz.sig"
+                NEW="SCSalvager_${VERSION_NUM}_aarch64${TAIL}"
+                cp "$f" "$STAGE_DIR/$NEW"
+                STAGED+=("$STAGE_DIR/$NEW")
+                ;;
+              *)
+                STAGED+=("$f")
+                ;;
+            esac
+          done
+
+          echo "Uploading ${#STAGED[@]} files:"
+          for f in "${STAGED[@]}"; do echo "  $f"; done
+          gh release upload "$TAG" "${STAGED[@]}" --repo "$REPO" --clobber
 
       # Rename uploaded release assets into the canonical pattern:
       #   SCSalvager-Desktop-<os-label>_v<version><suffix>

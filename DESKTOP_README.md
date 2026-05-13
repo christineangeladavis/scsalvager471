@@ -9,7 +9,47 @@ deb). Auto-update endpoint: `/api/desktop/manifest` (served by scsalvager.net).
 
 ---
 
-## v0.2.6 (queued)
+## v0.2.9
+
+### Changed
+- **Launch-time update check now prompts via the in-app modal.** When you
+  open the app, the 15-second post-launch updater check no longer
+  silently downloads + toasts. If a new version is available the
+  Update Available modal opens with **Update Now** / **Later** buttons.
+  No popup at all if you're already on the latest version. The tray
+  "Check for updates…" item behaves the same as before.
+
+---
+
+## v0.2.8
+
+### Changed
+- **Release artifacts use a canonical naming convention** from this
+  version forward:
+  `SCSalvager-Desktop-<os-label>_v<version><suffix>`
+  (e.g. `SCSalvager-Desktop-windows-x86_64_v0.2.8-setup.exe`). The
+  Settings → Desktop App download buttons and the auto-updater both
+  resolve the new + legacy names so older releases still install
+  cleanly.
+
+---
+
+## v0.2.7
+
+### Added
+- **Clear All Ledgers** admin button (visible in the web view's Admin
+  Panel → All Users header) that soft-clears every user's refinery
+  jobs + sell orders behind a 2-step confirmation. Useful for the
+  patch-advance cleanup on a new SC release.
+
+### Fixed
+- Admin **All Users** header layout — title now sits on its own row
+  above the action buttons; action row wraps cleanly on narrower
+  windows.
+
+---
+
+## v0.2.6
 
 ### Added
 - **In-app update modal** when clicking the tray's "Check for updates…" item.
@@ -19,11 +59,12 @@ deb). Auto-update endpoint: `/api/desktop/manifest` (served by scsalvager.net).
   KB / KB), *ready* confirms the install and restarts the app, *error*
   surfaces the underlying message.
 
-### Changes
+### Changed
 - Tray's manual update check no longer fires OS toast notifications — feedback
   routes through the modal instead, with the window auto-shown/focused even
   if the app was minimised to tray. Launch-time auto-check still uses OS
-  notifications + silent background download (unchanged).
+  notifications + silent background download (changed again in v0.2.9 —
+  launch-time also goes through the modal now).
 
 ---
 

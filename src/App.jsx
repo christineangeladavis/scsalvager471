@@ -13643,6 +13643,110 @@ function StockComponentsTable({ stockComponents }) {
 }
 
 // Desktop bridge — exposes a global the Rust Tauri code calls to
+// Tiny markdown → JSX renderer. Supports the subset we use in
+// DESKTOP_README.md: ## / ### headings, - bullets, **bold** runs,
+// `inline code` runs, --- horizontal rules, blank-line paragraphs.
+// Not a full CommonMark — just enough to render the release-notes
+// modal without pulling in a markdown library.
+function renderMarkdown(src) {
+  if (!src) return null;
+  const out = [];
+  let listItems = null;
+  const flushList = () => {
+    if (listItems && listItems.length) {
+      out.push(
+        <ul key={`ul-${out.length}`} className="mt-1 list-disc pl-5 space-y-1">
+          {listItems}
+        </ul>
+      );
+    }
+    listItems = null;
+  };
+  const renderInline = (line) => {
+    // Split on bold + code spans, preserve order.
+    const tokens = [];
+    let remaining = line;
+    while (remaining.length) {
+      const m = remaining.match(/(\*\*[^*]+\*\*|`[^`]+`)/);
+      if (!m) {
+        tokens.push(remaining);
+        break;
+      }
+      if (m.index > 0) tokens.push(remaining.slice(0, m.index));
+      const tok = m[1];
+      if (tok.startsWith("**")) {
+        tokens.push(
+          <strong key={tokens.length} className="font-bold text-slate-100">
+            {tok.slice(2, -2)}
+          </strong>
+        );
+      } else if (tok.startsWith("`")) {
+        tokens.push(
+          <code key={tokens.length} className="rounded bg-slate-800 px-1 text-cyan-200">
+            {tok.slice(1, -1)}
+          </code>
+        );
+      }
+      remaining = remaining.slice(m.index + tok.length);
+    }
+    return tokens;
+  };
+  const lines = src.split(/\r?\n/);
+  for (let i = 0; i < lines.length; i++) {
+    const raw = lines[i];
+    const line = raw.trimEnd();
+    if (line === "" || line === "---") {
+      flushList();
+      if (line === "---") {
+        out.push(<hr key={`hr-${out.length}`} className="my-4 border-slate-800" />);
+      }
+      continue;
+    }
+    if (line.startsWith("# ")) {
+      flushList();
+      out.push(
+        <h3 key={`h1-${out.length}`} className="mt-4 text-base font-bold text-cyan-300">
+          {renderInline(line.slice(2))}
+        </h3>
+      );
+      continue;
+    }
+    if (line.startsWith("## ")) {
+      flushList();
+      out.push(
+        <h4 key={`h2-${out.length}`} className="mt-4 text-base font-bold text-cyan-300">
+          {renderInline(line.slice(3))}
+        </h4>
+      );
+      continue;
+    }
+    if (line.startsWith("### ")) {
+      flushList();
+      out.push(
+        <p key={`h3-${out.length}`} className="mt-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+          {renderInline(line.slice(4))}
+        </p>
+      );
+      continue;
+    }
+    if (/^- /.test(line)) {
+      if (!listItems) listItems = [];
+      listItems.push(
+        <li key={`li-${listItems.length}`}>{renderInline(line.slice(2))}</li>
+      );
+      continue;
+    }
+    flushList();
+    out.push(
+      <p key={`p-${out.length}`} className="mt-2 text-slate-300">
+        {renderInline(line)}
+      </p>
+    );
+  }
+  flushList();
+  return out;
+}
+
 // hand off a captured Star Citizen refinery screenshot. The web
 // crop modal then takes over so the user can crop before the
 // /api/refinery/analyze upload. Falls back gracefully when not
@@ -14856,6 +14960,32 @@ export default function StarCitizenSalvageGuideWebsite() {
   // Desktop release-notes modal — sourced from DESKTOP_README.md.
   // Opens from the Settings → Desktop App "Release notes" button.
   const [isDesktopNotesOpen, setIsDesktopNotesOpen] = useState(false);
+  // Markdown body fetched from /api/desktop/release-notes (which
+  // proxies DESKTOP_README.md from main). Re-fetched every time
+  // the modal opens so it always shows the latest text without a
+  // page reload. Edge-cached server-side for 5 min.
+  const [desktopNotesMarkdown, setDesktopNotesMarkdown] = useState("");
+  const [desktopNotesLoading, setDesktopNotesLoading] = useState(false);
+  useEffect(() => {
+    if (!isDesktopNotesOpen) return;
+    let cancelled = false;
+    setDesktopNotesLoading(true);
+    fetch("/api/desktop/release-notes")
+      .then((r) => (r.ok ? r.text() : Promise.reject(new Error(`HTTP ${r.status}`))))
+      .then((text) => {
+        if (cancelled) return;
+        setDesktopNotesMarkdown(text);
+        setDesktopNotesLoading(false);
+      })
+      .catch((e) => {
+        if (cancelled) return;
+        setDesktopNotesMarkdown(
+          `# Release notes unavailable\n\n${e && e.message ? e.message : "Network error."}`
+        );
+        setDesktopNotesLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [isDesktopNotesOpen]);
   // One-shot cleanup: prior builds let users pick a UI zoom factor
   // and persisted it via localStorage["scs_ui_scale"] + inline
   // style on documentElement. Selector is gone; this clears any
@@ -29013,74 +29143,12 @@ export default function StarCitizenSalvageGuideWebsite() {
                   ✕
                 </button>
               </div>
-              <div className="mt-5 space-y-6 text-sm text-slate-300 leading-relaxed">
-                <section>
-                  <h4 className="text-cyan-300 text-base font-bold">v0.2.6 (queued)</h4>
-                  <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
-                  <ul className="mt-1 list-disc pl-5 space-y-1">
-                    <li><strong>In-app update modal</strong> when clicking the tray's "Check for updates…" item. Up-to-date / available + Update Now / downloading progress / ready / error states all surface in the WebView instead of OS toasts.</li>
-                  </ul>
-                  <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Changes</p>
-                  <ul className="mt-1 list-disc pl-5 space-y-1">
-                    <li>Manual update check no longer fires OS toasts — feedback routes through the modal. Window auto-shows/focuses even when minimized to tray. Launch-time auto-check still uses OS notifications + silent background download.</li>
-                  </ul>
-                </section>
-                <section>
-                  <h4 className="text-cyan-300 text-base font-bold">v0.2.5</h4>
-                  <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
-                  <ul className="mt-1 list-disc pl-5 space-y-1">
-                    <li><strong>Version in window titlebar</strong> — the main window title now reads <code className="rounded bg-slate-800 px-1 text-cyan-200">SCSalvager Desktop v&lt;version&gt;</code>, set at runtime from <code className="rounded bg-slate-800 px-1 text-cyan-200">CARGO_PKG_VERSION</code>.</li>
-                    <li><strong>Admin tables fill the window height</strong> — Admin Panel → All Users, Guest Logins, and the Missions table grow with the window via <code className="rounded bg-slate-800 px-1 text-cyan-200">max-height: calc(100vh - 12rem)</code> in the desktop shell. Web users keep the prior fixed heights.</li>
-                  </ul>
-                </section>
-                <section>
-                  <h4 className="text-cyan-300 text-base font-bold">v0.2.4</h4>
-                  <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
-                  <ul className="mt-1 list-disc pl-5 space-y-1">
-                    <li><strong>Split tray capture into Refinery + Commodity.</strong> Two distinct tray items: one only accepts in-game refinery setup screens, the other only accepts commodity terminal screens. Wrong-type screenshots return a clear error from the server.</li>
-                    <li><strong>Screen-type validation</strong> server-side — <code className="rounded bg-slate-800 px-1 text-cyan-200">/api/refinery/analyze</code> + <code className="rounded bg-slate-800 px-1 text-cyan-200">/api/sell/analyze</code> verify signature headers (REFINERY SYSTEM / REFINEMENT CENTER vs COMMODITIES / YOUR INVENTORIES / IN DEMAND) before extracting.</li>
-                  </ul>
-                </section>
-                <section>
-                  <h4 className="text-cyan-300 text-base font-bold">v0.2.3</h4>
-                  <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
-                  <ul className="mt-1 list-disc pl-5 space-y-1">
-                    <li><strong>Frameless overlay widget</strong> — compact + crew-widget modes now run without the OS titlebar so they sit cleanly on top of Star Citizen.</li>
-                    <li><strong>Drag handle</strong> at the top of each widget mode — grab any inch to move the frameless window around. ✕ button exits widget mode.</li>
-                  </ul>
-                  <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Changes</p>
-                  <ul className="mt-1 list-disc pl-5 space-y-1">
-                    <li>Widget min-size dropped to 240×180 with proportional text scaling via CSS zoom (baseline 420 px crew / 380 px compact; clamp 0.7..2.5).</li>
-                  </ul>
-                </section>
-                <section>
-                  <h4 className="text-cyan-300 text-base font-bold">v0.2.2</h4>
-                  <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
-                  <ul className="mt-1 list-disc pl-5 space-y-1">
-                    <li><strong>"Check for updates…" tray menu item</strong>. Manual updater check that surfaces all three outcomes (up to date / new version downloading / check failed). Launch-time silent check unchanged.</li>
-                  </ul>
-                </section>
-                <section>
-                  <h4 className="text-cyan-300 text-base font-bold">v0.2.1</h4>
-                  <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
-                  <ul className="mt-1 list-disc pl-5 space-y-1">
-                    <li><strong>Resizable widget windows</strong> — compact + crew widget can drag down to 240×180 (was locked at 980×640) and grow to any size. React side rescales text + controls proportionally via CSS zoom.</li>
-                  </ul>
-                </section>
-                <section>
-                  <h4 className="text-cyan-300 text-base font-bold">v0.2.0 — Initial Release</h4>
-                  <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
-                  <ul className="mt-1 list-disc pl-5 space-y-1">
-                    <li><strong>Native shell</strong> for Windows / macOS arm64 / Linux wrapping scsalvager.net via Tauri 2.</li>
-                    <li><strong>System tray</strong> — capture refinery screenshot, show/hide window, toggle compact mode, toggle crew salvage widget, Quit. Left-click toggles visible/hidden.</li>
-                    <li><strong>Refinery countdown badge</strong> — background poll updates the tray tooltip with next-pickup ETA every 30 s. OS toast fires once per completed job.</li>
-                    <li><strong>Tray screenshot capture</strong> — xcap reads the Star Citizen window pixels (works even when SC is backgrounded), hands the PNG off to the existing web crop modal.</li>
-                    <li><strong>Deep-link OAuth</strong> — <code className="rounded bg-slate-800 px-1 text-cyan-200">scsalvager://</code> scheme; single-instance plugin reuses the existing window for repeat callbacks.</li>
-                    <li><strong>Compact mode</strong> + <strong>Crew Salvage widget</strong> always-on-top mini overlays.</li>
-                    <li><strong>Auto-updater</strong> via <code className="rounded bg-slate-800 px-1 text-cyan-200">tauri-plugin-updater</code> against <code className="rounded bg-slate-800 px-1 text-cyan-200">/api/desktop/manifest</code>. Minisign-signed releases.</li>
-                    <li><strong>Offline ledger cache</strong> mirrored into <code className="rounded bg-slate-800 px-1 text-cyan-200">window.__SCSALVAGER_DESKTOP__.ledgerCache</code> so the web bundle can read the most recent payload if the network drops.</li>
-                  </ul>
-                </section>
+              <div className="mt-5 text-sm text-slate-300 leading-relaxed">
+                {desktopNotesLoading && !desktopNotesMarkdown ? (
+                  <p className="text-xs italic text-slate-500">Loading release notes…</p>
+                ) : (
+                  renderMarkdown(desktopNotesMarkdown)
+                )}
               </div>
               <div className="mt-5 flex justify-end">
                 <button

@@ -14737,7 +14737,14 @@ export default function StarCitizenSalvageGuideWebsite() {
       const el = userMenuBtnRef.current;
       if (!el) return;
       const r = el.getBoundingClientRect();
-      setUserMenuRect({ top: r.bottom + 4, right: window.innerWidth - r.right });
+      // In rail mode the trigger lives in the right sidebar, so
+      // dropdowns open LEFT of the button. Top-tabs mode keeps
+      // the original drop-down-from-below positioning.
+      setUserMenuRect(
+        !isTauri && sidebarLayoutOn
+          ? { top: r.top, right: window.innerWidth - r.left + 8 }
+          : { top: r.bottom + 4, right: window.innerWidth - r.right }
+      );
     };
     update();
     window.addEventListener("scroll", update, true);
@@ -14746,7 +14753,7 @@ export default function StarCitizenSalvageGuideWebsite() {
       window.removeEventListener("scroll", update, true);
       window.removeEventListener("resize", update);
     };
-  }, [isUserMenuOpen]);
+  }, [isUserMenuOpen, sidebarLayoutOn, isTauri]);
   // Notification bell — left of the user menu in the header. Surfaces
   // setup nags (DMs not enabled, RSI handle not linked/verified) so
   // logged-in users have a one-click path to the Settings section
@@ -14762,7 +14769,11 @@ export default function StarCitizenSalvageGuideWebsite() {
       const el = notifBtnRef.current;
       if (!el) return;
       const r = el.getBoundingClientRect();
-      setNotifRect({ top: r.bottom + 4, right: window.innerWidth - r.right });
+      setNotifRect(
+        !isTauri && sidebarLayoutOn
+          ? { top: r.top, right: window.innerWidth - r.left + 8 }
+          : { top: r.bottom + 4, right: window.innerWidth - r.right }
+      );
     };
     update();
     window.addEventListener("scroll", update, true);
@@ -14771,7 +14782,7 @@ export default function StarCitizenSalvageGuideWebsite() {
       window.removeEventListener("scroll", update, true);
       window.removeEventListener("resize", update);
     };
-  }, [isNotificationsOpen]);
+  }, [isNotificationsOpen, sidebarLayoutOn, isTauri]);
   // Mailbox = dedicated dropdown for admin → user messages. Sits
   // next to the notification bell. Separate from isNotificationsOpen
   // so the two dropdowns don't fight for screen space.
@@ -14786,7 +14797,11 @@ export default function StarCitizenSalvageGuideWebsite() {
       const el = mailboxBtnRef.current;
       if (!el) return;
       const r = el.getBoundingClientRect();
-      setMailboxRect({ top: r.bottom + 4, right: window.innerWidth - r.right });
+      setMailboxRect(
+        !isTauri && sidebarLayoutOn
+          ? { top: r.top, right: window.innerWidth - r.left + 8 }
+          : { top: r.bottom + 4, right: window.innerWidth - r.right }
+      );
     };
     update();
     window.addEventListener("scroll", update, true);
@@ -14795,7 +14810,7 @@ export default function StarCitizenSalvageGuideWebsite() {
       window.removeEventListener("scroll", update, true);
       window.removeEventListener("resize", update);
     };
-  }, [isMailboxOpen]);
+  }, [isMailboxOpen, sidebarLayoutOn, isTauri]);
   // Mailbox compose state: text the user is drafting back to
   // SCSalvager Admin. `replyToId` is set when replying to a specific
   // admin message; null for a brand-new outgoing thread. Status

@@ -146,14 +146,25 @@ jobs:
           prerelease: false
           args: ${{ matrix.rust-target == 'aarch64-apple-darwin' && '--target aarch64-apple-darwin' || (matrix.rust-target == 'x86_64-apple-darwin' && '--target x86_64-apple-darwin' || '') }}
 
-      # Rename uploaded release assets so the OS label sits in
-      # every filename. Tauri's default bundle names only carry
-      # the architecture (x64 / aarch64 / amd64); operators and
-      # downloaders want the OS visible too. Rename matches each
-      # OS's specific bundle extensions so other matrix runners
-      # don't get their assets touched. .sig siblings are
-      # renamed in lockstep with the installer they sign.
-      - name: Rename release assets to include OS label
+      # Rename uploaded release assets into the canonical pattern:
+      #   SCSalvager-Desktop-<os-label>_v<version><suffix>
+      # where <os-label> is the matrix target (e.g. windows-x86_64)
+      # and <suffix> preserves the trailing locale + "-setup" + ext
+      # tokens that Tauri's bundler emits after the arch. Examples:
+      #   SCSalvager_0.2.7_x64-setup.exe       ->
+      #     SCSalvager-Desktop-windows-x86_64_v0.2.7-setup.exe
+      #   SCSalvager_0.2.7_x64_en-US.msi       ->
+      #     SCSalvager-Desktop-windows-x86_64_v0.2.7_en-US.msi
+      #   SCSalvager_0.2.7_aarch64.dmg         ->
+      #     SCSalvager-Desktop-darwin-aarch64_v0.2.7.dmg
+      #   SCSalvager_0.2.7_amd64.AppImage      ->
+      #     SCSalvager-Desktop-linux-x86_64_v0.2.7.AppImage
+      #   SCSalvager_0.2.7_amd64.deb           ->
+      #     SCSalvager-Desktop-linux-x86_64_v0.2.7.deb
+      # .sig siblings are renamed in lockstep with the installer
+      # they sign. Each matrix runner skips files that don't match
+      # its OS so the others don't get touched.
+      - name: Rename release assets to canonical Desktop naming
         if: success()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -172,30 +183,32 @@ jobs:
             *)         EXT_RE='__never_match__' ;;
           esac
 
-          # Snapshot the existing asset name set once so we can detect
-          # rename-target collisions (re-runs of the same tag end up
-          # with both the original-named upload AND the previously-
-          # renamed asset on the release; the PATCH 422s on the dup).
+          # Snapshot existing asset names so the loop can detect a
+          # rename-target collision (re-runs of the same tag leave
+          # the previously-renamed asset on the release; PATCH 422s
+          # on duplicate name).
           EXISTING_NAMES=$(gh api "repos/$REPO/releases/$REL_ID/assets" --paginate --jq '.[].name')
 
           gh api "repos/$REPO/releases/$REL_ID/assets" --paginate \
             --jq '.[] | "\(.id)|\(.name)"' \
             | while IFS='|' read -r ASSET_ID ASSET_NAME; do
-                # Skip if already prefixed with this OS label.
-                if [[ "$ASSET_NAME" == *"-${OS_LABEL}_"* ]]; then continue; fi
+                # Skip if already in canonical form.
+                if [[ "$ASSET_NAME" == SCSalvager-Desktop-* ]]; then continue; fi
                 # Skip files that don't belong to this OS.
                 if ! [[ "$ASSET_NAME" =~ $EXT_RE ]]; then continue; fi
-                # Insert the OS label after the first product-name
-                # token, before the underscore that prefixes the
-                # version. SCSalvager_0.1.0_x64.msi becomes
-                # SCSalvager-windows-x86_64_0.1.0_x64.msi.
-                NEW_NAME="${ASSET_NAME%%_*}-${OS_LABEL}_${ASSET_NAME#*_}"
-                # On re-runs of the same tag, the already-renamed
-                # asset from the prior run still occupies NEW_NAME.
-                # Detect that + skip — the previously-renamed asset
-                # is the authoritative one; this run's
-                # duplicate upload sits orphaned but doesn't break
-                # the release manifest.
+                # Parse the Tauri-default name:
+                #   <product>_<version>_<arch><suffix>
+                # version = first \d+\.\d+\.\d+ run after first "_".
+                # SUFFIX = whatever follows the arch token (e.g.
+                # "-setup.exe", "_en-US.msi", ".dmg") and includes
+                # any ".sig" tail.
+                AFTER_PRODUCT="${ASSET_NAME#*_}"            # "0.2.7_x64-setup.exe"
+                VERSION="${AFTER_PRODUCT%%_*}"             # "0.2.7"
+                AFTER_VERSION="${AFTER_PRODUCT#*_}"        # "x64-setup.exe"
+                # Strip the arch token (x86_64 must come before
+                # x64 in the alternation since the longer wins).
+                SUFFIX=$(echo "$AFTER_VERSION" | sed -E 's/^(x86_64|aarch64|amd64|x64)//')
+                NEW_NAME="SCSalvager-Desktop-${OS_LABEL}_v${VERSION}${SUFFIX}"
                 if grep -Fxq "$NEW_NAME" <<< "$EXISTING_NAMES"; then
                   echo "Skip: $NEW_NAME already on release (likely a tag re-run)"
                   continue

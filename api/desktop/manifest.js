@@ -44,9 +44,16 @@ const RELEASES_URL =
 // Intel Mac demand surfaces, re-add the matrix entry + a
 // "darwin-x86_64" line here.
 const ASSET_BY_PLATFORM = {
-  "windows-x86_64": { match: /_x64-setup\.nsis\.zip$|_x64\.msi\.zip$|_x64-setup\.exe\.zip$/i, key: "windows-x86_64" },
-  "darwin-aarch64": { match: /_aarch64\.app\.tar\.gz$/i, key: "darwin-aarch64" },
-  "linux-x86_64": { match: /amd64\.AppImage\.tar\.gz$/i, key: "linux-x86_64" },
+  // Match the canonical Desktop naming
+  //   SCSalvager-Desktop-<os-label>_v<version><suffix>
+  // along with the legacy naming
+  //   SCSalvager(-<os-label>)?_<version>_<arch><suffix>
+  // so older releases on the GitHub side still resolve. The arch
+  // token is optional in the regex; the OS label in the asset
+  // name disambiguates per platform.
+  "windows-x86_64": { match: /-setup\.nsis\.zip$|\.msi\.zip$|-setup\.exe\.zip$/i, key: "windows-x86_64" },
+  "darwin-aarch64": { match: /\.app\.tar\.gz$/i, key: "darwin-aarch64" },
+  "linux-x86_64": { match: /\.AppImage\.tar\.gz$/i, key: "linux-x86_64" },
 };
 
 function platformKey(target, arch) {

@@ -20122,7 +20122,10 @@ export default function StarCitizenSalvageGuideWebsite() {
             ? "flex flex-col items-stretch gap-3 p-3"
             : "flex flex-col gap-3 bg-gradient-to-br from-slate-900 via-slate-950 to-blue-950 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-5"
           }>
-            <div className="flex flex-wrap items-center gap-2 sm:self-center">
+            <div className={sidebarLayoutOn
+              ? "flex flex-col items-stretch gap-2 [&_a]:w-full [&_a]:justify-center [&_button]:w-full [&_button]:justify-center"
+              : "flex flex-wrap items-center gap-2 sm:self-center"
+            }>
               {!isTauri && (
               <a
                 href="https://discord.gg/BrAtUj2k6q"
@@ -20154,8 +20157,14 @@ export default function StarCitizenSalvageGuideWebsite() {
               )}
             </div>
             {!isTauri && (
-            <div className="flex flex-row items-center justify-between gap-3 sm:justify-end">
-              <div className="flex items-center gap-2">
+            <div className={sidebarLayoutOn
+              ? "flex flex-col items-stretch gap-2"
+              : "flex flex-row items-center justify-between gap-3 sm:justify-end"
+            }>
+              <div className={sidebarLayoutOn
+                ? "flex flex-col items-stretch gap-2"
+                : "flex items-center gap-2"
+              }>
                 {authLoading ? (
                   <div className="rounded-lg border border-slate-700 bg-slate-800/50 px-3 py-1.5 text-xs text-slate-500">Loading…</div>
                 ) : user ? (

@@ -14450,6 +14450,47 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [adminGuestsLoading, setAdminGuestsLoading] = useState(false);
   const [adminGuestsError, setAdminGuestsError] = useState("");
   const [showForceLogoutConfirm, setShowForceLogoutConfirm] = useState(false);
+  // Clear-all-ledgers confirmation flow. Two-step modal: clicking
+  // the All Users panel button opens step=1, clicking "Yes,
+  // continue" advances to step=2 (final last-chance), clicking
+  // "Wipe every ledger" fires the POST. Closing the modal at any
+  // step resets to 0. In-flight + feedback states match the
+  // force-logout pattern.
+  const [clearAllLedgersStep, setClearAllLedgersStep] = useState(0);
+  const [isClearAllLedgersInFlight, setIsClearAllLedgersInFlight] = useState(false);
+  const [clearAllLedgersFeedback, setClearAllLedgersFeedback] = useState(null);
+  const performClearAllLedgers = async () => {
+    setIsClearAllLedgersInFlight(true);
+    setClearAllLedgersFeedback(null);
+    try {
+      const res = await fetch("/api/admin/clear-all-users-ledger", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ confirm: "CLEAR_ALL_USERS_LEDGERS" }),
+      });
+      const info = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setClearAllLedgersFeedback({
+          kind: "err",
+          text: info.error || `Could not clear ledgers (HTTP ${res.status}).`,
+        });
+        return;
+      }
+      setClearAllLedgersFeedback({
+        kind: "ok",
+        text: `Cleared ${info.jobsCleared || 0} refinery jobs + ${info.salesCleared || 0} sell orders across ${info.usersProcessed || 0} users.`,
+      });
+      setClearAllLedgersStep(0);
+    } catch (e) {
+      setClearAllLedgersFeedback({
+        kind: "err",
+        text: e && e.message ? e.message : "Network error.",
+      });
+    } finally {
+      setIsClearAllLedgersInFlight(false);
+    }
+  };
   const [isForceLogoutInFlight, setIsForceLogoutInFlight] = useState(false);
   const [forceLogoutFeedback, setForceLogoutFeedback] = useState(null);
   const [adminPatches, setAdminPatches] = useState(null);
@@ -26161,8 +26202,28 @@ export default function StarCitizenSalvageGuideWebsite() {
                   >
                     Force Logout All
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setClearAllLedgersFeedback(null);
+                      setClearAllLedgersStep(1);
+                    }}
+                    disabled={isClearAllLedgersInFlight}
+                    className="shrink-0 rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-200 hover:border-rose-400/70 hover:bg-rose-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    Clear All Ledgers
+                  </button>
                 </div>
               </div>
+              {clearAllLedgersFeedback && (
+                <div className={`mt-3 rounded-2xl border p-3 text-xs ${
+                  clearAllLedgersFeedback.kind === "ok"
+                    ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-200"
+                    : "border-rose-500/40 bg-rose-500/10 text-rose-200"
+                }`}>
+                  {clearAllLedgersFeedback.text}
+                </div>
+              )}
 
               {forceLogoutFeedback && (
                 <div className={`mt-3 rounded-2xl border p-3 text-xs ${
@@ -26657,6 +26718,72 @@ export default function StarCitizenSalvageGuideWebsite() {
                 >
                   {isForceLogoutInFlight ? "Logging out…" : "Force Logout All"}
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* --- Clear All Ledgers confirmation modal ---
+            Two-step before firing the bulk soft-clear. Step 1 is
+            a generic warning; step 2 is the last-chance with the
+            destructive "Wipe every ledger" button. Mirrors the
+            Force Logout All flow. */}
+        {clearAllLedgersStep > 0 && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+            onClick={() => !isClearAllLedgersInFlight && setClearAllLedgersStep(0)}
+          >
+            <div
+              className="mx-4 max-w-md rounded-3xl border border-rose-500/40 bg-slate-900 p-6 shadow-2xl shadow-rose-950/40"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="clear-all-title"
+            >
+              <h3 id="clear-all-title" className="text-lg font-bold text-rose-200">
+                {clearAllLedgersStep === 1 ? "Clear EVERY user's ledger?" : "Final confirmation"}
+              </h3>
+              {clearAllLedgersStep === 1 ? (
+                <>
+                  <p className="mt-3 text-sm text-slate-300">
+                    Soft-deletes every refinery job and sell order across every user in the index. Affected users' stats, lifetime aUEC, and the global leaderboard exclude these entries immediately. Patch Exports + the admin audit trail still see them.
+                  </p>
+                  <p className="mt-2 text-xs text-slate-500">
+                    Use this on patch advance once the new SC release lands. Cannot be reversed without manual Redis surgery.
+                  </p>
+                </>
+              ) : (
+                <p className="mt-3 text-sm text-rose-100">
+                  Last chance. This wipes <strong>every user's</strong> active ledger. Are you absolutely sure?
+                </p>
+              )}
+              <div className="mt-5 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setClearAllLedgersStep(0)}
+                  disabled={isClearAllLedgersInFlight}
+                  className="rounded-xl border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-200 hover:border-slate-500 hover:bg-slate-700 disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                {clearAllLedgersStep === 1 ? (
+                  <button
+                    type="button"
+                    onClick={() => setClearAllLedgersStep(2)}
+                    className="rounded-xl border border-rose-400 bg-rose-500/30 px-4 py-2 text-sm font-bold text-rose-100 hover:bg-rose-500/40"
+                  >
+                    Yes, continue
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={performClearAllLedgers}
+                    disabled={isClearAllLedgersInFlight}
+                    className="rounded-xl border border-rose-400 bg-rose-500 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-rose-950/50 hover:bg-rose-600 disabled:opacity-50"
+                  >
+                    {isClearAllLedgersInFlight ? "Wiping…" : "Wipe every ledger"}
+                  </button>
+                )}
               </div>
             </div>
           </div>

@@ -27802,7 +27802,7 @@ export default function StarCitizenSalvageGuideWebsite() {
             onClick={() => setIsSettingsOpen(false)}
           >
             <div
-              className="mx-4 w-full max-w-md rounded-3xl border border-cyan-500/30 bg-slate-900 p-6 shadow-2xl shadow-cyan-950/40"
+              className="mx-4 w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-3xl border border-cyan-500/30 bg-slate-900 p-6 shadow-2xl shadow-cyan-950/40"
               onClick={(e) => e.stopPropagation()}
               role="dialog"
               aria-modal="true"
@@ -27839,6 +27839,13 @@ export default function StarCitizenSalvageGuideWebsite() {
                 </button>
               </div>
 
+              {/* Two-column section flow — uses CSS columns so each
+                  section stays vertically packed within a column and
+                  doesn't split across the gutter. Sections keep their
+                  existing mt-6 spacing; break-inside-avoid prevents
+                  the browser from cutting one mid-section. Single
+                  column on small screens. */}
+              <div className="md:columns-2 md:gap-x-6 [&_section]:break-inside-avoid">
               {/* Avatar section. Lets users upload a custom avatar
                   that overrides their Discord avatar across the
                   site. Client resizes/center-crops to 312×312 JPEG
@@ -28443,6 +28450,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                   )}
                 </div>
               </section>
+              </div>
             </div>
           </div>
         )}

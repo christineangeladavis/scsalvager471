@@ -66,6 +66,15 @@ jobs:
         with:
           workspaces: desktop/src-tauri -> target
           key: ${{ matrix.target }}
+          # Skip cache save on Windows. Swatinem/rust-cache's
+          # post-job tar.exe + zstd dance through Git's bundled
+          # tar.exe is flaky on Windows runners (the Cargo cache
+          # tarball trips on long target/ paths and the post-step
+          # exits non-zero). Cache RESTORE still runs — Linux +
+          # macOS save normally, Windows just does a cold build
+          # every release. Trade ~3 min on Windows builds for a
+          # green workflow.
+          save-if: ${{ runner.os != 'Windows' }}
 
       - name: Install Node.js
         uses: actions/setup-node@v5

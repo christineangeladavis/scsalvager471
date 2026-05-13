@@ -17349,6 +17349,9 @@ export default function StarCitizenSalvageGuideWebsite() {
         text: `Sent. ${info.count || 0} message${info.count === 1 ? "" : "s"} now in their inbox.`,
       });
       setQuickMessageDraft("");
+      // Sync the admin's own overview so the Inbox tab + mailbox
+      // dropdown reflect the outbound message right away.
+      refreshAdminUserMailOverview();
     } catch (e) {
       setQuickMessageStatus({
         kind: "err",
@@ -17509,6 +17512,9 @@ export default function StarCitizenSalvageGuideWebsite() {
         text: `Sent. ${info.count || 0} message${info.count === 1 ? "" : "s"} in their inbox.`,
       });
       refreshAdminMessageThread(adminUserDetail.userId);
+      // Also pull the admin's overview so the Inbox tab's User
+      // mail block reflects the outbound message immediately.
+      refreshAdminUserMailOverview();
     } catch (e) {
       setAdminMessageStatus({
         kind: "err",

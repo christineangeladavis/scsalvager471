@@ -113,7 +113,10 @@ export default async function handler(req, res) {
     }
     for (const e of list) {
       if (!e || typeof e !== "object") continue;
-      if (e.from !== "user") continue;
+      // Include both directions — admin sees their outbound messages
+      // alongside incoming user mail in the Inbox tab. Caller can
+      // tell them apart via `from`.
+      if (e.from !== "user" && e.from !== "admin") continue;
       if (e.deletedAt) continue;
       if (typeof e.id !== "string") continue;
       if (dismissed.has(e.id)) continue;
@@ -123,6 +126,7 @@ export default async function handler(req, res) {
         username: username || "Unknown",
         body: typeof e.body === "string" ? e.body : "",
         createdAt: Number.isFinite(e.createdAt) ? e.createdAt : 0,
+        from: e.from,
         replyToId: typeof e.replyToId === "string" ? e.replyToId : null,
         dismissedAt: Number.isFinite(e.dismissedAt) ? e.dismissedAt : null,
       });

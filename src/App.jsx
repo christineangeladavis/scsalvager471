@@ -14809,24 +14809,6 @@ export default function StarCitizenSalvageGuideWebsite() {
   // Desktop release-notes modal — sourced from DESKTOP_README.md.
   // Opens from the Settings → Desktop App "Release notes" button.
   const [isDesktopNotesOpen, setIsDesktopNotesOpen] = useState(false);
-  // Experimental sidebar layout for web. When true, web users get
-  // the same vertical-sidebar nav the Tauri shell already uses,
-  // with sub-tabs nested under each parent tab. Tauri sessions
-  // are always in sidebar mode; this flag only affects browsers.
-  // Persisted to localStorage so the experiment sticks across
-  // reloads. Toggle from the header.
-  const [sidebarLayoutOn, setSidebarLayoutOn] = useState(() => {
-    try {
-      return window.localStorage?.getItem("scs_sidebar_layout") === "1";
-    } catch {
-      return false;
-    }
-  });
-  useEffect(() => {
-    try {
-      window.localStorage?.setItem("scs_sidebar_layout", sidebarLayoutOn ? "1" : "0");
-    } catch {}
-  }, [sidebarLayoutOn]);
   // UI scale factor — copies scmdb.net's pattern. Five discrete
   // sizes via a button group labeled with growing letters
   // (A / A / A / A / 2A). When scale !== 1, apply
@@ -20033,7 +20015,7 @@ export default function StarCitizenSalvageGuideWebsite() {
 
       {/* Scrollable UI content */}
       <div
-        className={`relative ${(isTauri || sidebarLayoutOn) ? "pl-44 px-3 py-3" : "mx-auto max-w-7xl px-4 py-8 md:px-8"}`}
+        className={`relative ${isTauri ? "pl-44 px-3 py-3" : "mx-auto max-w-7xl px-4 py-8 md:px-8"}`}
         style={{ zIndex: 10, flex: 1, display: "flex", flexDirection: "column", width: "100%" }}
       >
         {updateAvailable && !updateModalDismissed && (() => {
@@ -20730,24 +20712,6 @@ export default function StarCitizenSalvageGuideWebsite() {
                   </a>
                 )}
               </div>
-              {/* Layout toggle — sidebar vs top tabs. Web-only;
-                  Tauri shell is always sidebar. Persists via
-                  localStorage so the experiment survives reloads. */}
-              {!isTauri && (
-                <button
-                  type="button"
-                  onClick={() => setSidebarLayoutOn((v) => !v)}
-                  title={sidebarLayoutOn ? "Switch to top-tabs layout" : "Switch to sidebar layout"}
-                  aria-pressed={sidebarLayoutOn}
-                  className={`rounded-2xl border px-3 py-2 text-xs font-semibold transition ${
-                    sidebarLayoutOn
-                      ? "border-cyan-400 bg-cyan-500/15 text-cyan-100"
-                      : "border-slate-700 bg-slate-900/60 text-slate-300 hover:border-cyan-400/40 hover:text-cyan-200"
-                  }`}
-                >
-                  {sidebarLayoutOn ? "Sidebar" : "Top tabs"}
-                </button>
-              )}
               {/* UI scale button group — copies scmdb.net's
                   five-size pattern (90/100/115/130/200%). Growing
                   letter size on each button hints at the scale it
@@ -20799,7 +20763,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                 176px sidebar. */}
         <nav
           className={
-            (isTauri || sidebarLayoutOn)
+            isTauri
               ? "fixed left-0 top-0 bottom-0 z-30 flex w-44 flex-col gap-0.5 overflow-y-auto border-r border-cyan-500/25 bg-slate-950 p-2"
               : "mb-6 flex gap-1 border-b border-cyan-500/25"
           }
@@ -20980,44 +20944,15 @@ export default function StarCitizenSalvageGuideWebsite() {
                 ? "border-cyan-400 bg-cyan-500/15 text-cyan-100"
                 : "border-transparent text-slate-400 hover:bg-slate-800/50 hover:text-slate-200"
             }`;
-            // Nested sub-tabs for the sidebar layout. Each parent
-            // tab can carry its own sub-nav state; when the parent
-            // is active AND the layout is vertical, render those
-            // sub-tab buttons indented under the parent. The inline
-            // horizontal sub-nav in each tab body stays for now —
-            // both surfaces drive the same state.
-            const refuelingUnlockedHere = isPatchAtLeast(patchStatus?.version, "4.8");
-            const ledgerSubs = [
-              { id: "orders",  label: "Orders" },
-              { id: "history", label: "History" },
-              { id: "crew",    label: "Crew Salvage" },
-              ...(refuelingUnlockedHere ? [{ id: "inventory", label: "Inventory" }] : []),
-            ];
-            const missionsSubs = refuelingUnlockedHere ? [
-              { id: "salvage",   label: "Salvage" },
-              { id: "refueling", label: "Refueling" },
-            ] : null;
-            const adminSubs = [
-              { id: "users",      label: "All Users" },
-              { id: "guests",     label: "Guest Logins" },
-              { id: "refineries", label: "7-Day History" },
-              { id: "exports",    label: "Patch Exports" },
-            ];
-            let subList = null;
-            if (isActive && (isTauri || sidebarLayoutOn)) {
-              if (tab.id === "ledger") subList = { items: ledgerSubs, value: ledgerSubTab, set: setLedgerSubTab };
-              else if (tab.id === "missions" && missionsSubs) subList = { items: missionsSubs, value: missionsSubTab, set: setMissionsSubTab };
-              else if (tab.id === "admin") subList = { items: adminSubs, value: adminSection, set: setAdminSection };
-            }
             return (
-              <React.Fragment key={tab.id}>
               <button
+                key={tab.id}
                 type="button"
                 role="tab"
                 aria-selected={isActive}
                 onClick={() => setActiveTab(tab.id)}
                 title={showLedgerLock ? "Requires login" : undefined}
-                className={(isTauri || sidebarLayoutOn) ? verticalCls : horizontalCls}
+                className={isTauri ? verticalCls : horizontalCls}
               >
                 <span>{tab.label}</span>
                 {showLedgerLock && (
@@ -21031,28 +20966,6 @@ export default function StarCitizenSalvageGuideWebsite() {
                   </svg>
                 )}
               </button>
-              {subList && (
-                <div className="ml-3 mb-1 flex flex-col gap-0.5 border-l border-slate-700/40 pl-2">
-                  {subList.items.map((s) => {
-                    const subActive = subList.value === s.id;
-                    return (
-                      <button
-                        key={s.id}
-                        type="button"
-                        onClick={() => subList.set(s.id)}
-                        className={`text-left rounded-md px-2 py-1 text-[12px] font-medium transition ${
-                          subActive
-                            ? "bg-cyan-500/10 text-cyan-200"
-                            : "text-slate-400 hover:bg-slate-800/50 hover:text-slate-200"
-                        }`}
-                      >
-                        {s.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-              </React.Fragment>
             );
           })}
           {/* Sidebar footer — desktop-only. aUEC pill above the

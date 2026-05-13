@@ -172,6 +172,12 @@ jobs:
             *)         EXT_RE='__never_match__' ;;
           esac
 
+          # Snapshot the existing asset name set once so we can detect
+          # rename-target collisions (re-runs of the same tag end up
+          # with both the original-named upload AND the previously-
+          # renamed asset on the release; the PATCH 422s on the dup).
+          EXISTING_NAMES=$(gh api "repos/$REPO/releases/$REL_ID/assets" --paginate --jq '.[].name')
+
           gh api "repos/$REPO/releases/$REL_ID/assets" --paginate \
             --jq '.[] | "\(.id)|\(.name)"' \
             | while IFS='|' read -r ASSET_ID ASSET_NAME; do
@@ -184,6 +190,16 @@ jobs:
                 # version. SCSalvager_0.1.0_x64.msi becomes
                 # SCSalvager-windows-x86_64_0.1.0_x64.msi.
                 NEW_NAME="${ASSET_NAME%%_*}-${OS_LABEL}_${ASSET_NAME#*_}"
+                # On re-runs of the same tag, the already-renamed
+                # asset from the prior run still occupies NEW_NAME.
+                # Detect that + skip — the previously-renamed asset
+                # is the authoritative one; this run's
+                # duplicate upload sits orphaned but doesn't break
+                # the release manifest.
+                if grep -Fxq "$NEW_NAME" <<< "$EXISTING_NAMES"; then
+                  echo "Skip: $NEW_NAME already on release (likely a tag re-run)"
+                  continue
+                fi
                 echo "Rename: $ASSET_NAME -> $NEW_NAME"
                 gh api -X PATCH "repos/$REPO/releases/assets/$ASSET_ID" \
                   --field name="$NEW_NAME" >/dev/null

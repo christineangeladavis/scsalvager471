@@ -9,7 +9,7 @@ UPDATE 5/13/2026 v3.0
 
 Added:
 - **Star Citizen 4.8 is live.** Header **Patch Verified** pill, footer **"Data verified for patch …"** string, and every `isPatchAtLeast(…, "4.8")` gate site-wide auto-flipped to 4.8. No separate redeploy was needed — the patch-aware UI un-gates the moment `/api/patches` flags 4.8 as the active cycle.
-- **Ships tab → Picker — 6 new ships** appear in the search + comparison list: Drake Ironclad, Drake Ironclad Assault, Drake Pitbull, MISC Starlite, Aegis Tiburon, Origin M80. Pre-staged in v2.7.0 and gated on the live patch; unlocks automatically with the 4.8 flip.
+- **Ledger tab → Crew Salvage — 6 new ships** appear in the Crew Salvage ship picker: Drake Ironclad, Drake Ironclad Assault, Drake Pitbull, MISC Starlite, Aegis Tiburon, Origin M80. Pre-staged in v2.7.0 and gated on the live patch; unlocks automatically with the 4.8 flip.
 - **Ships tab → Ship Details (RSI Salvation)** — **RSI Salvation** now purchasable at **Levski · Teach's Ship Shop (Nyx)** for 1,186,030 aUEC. The new location surfaces in the Salvation's purchase-location list automatically once 4.8 goes live.
 - **Ledger tab → Inventory sub-tab** un-gates. New per-location / per-material inventory view derived from your refinery ledger. Sits alongside the existing Ledger sub-tabs (Refinery Job Orders, Sell Orders, Patch History) — pick **Inventory** from the sub-tab strip to drill into stockpiles by location + material.
 - **Missions tab → Refueling sub-tab** un-gates. 12 United Wayfarers Club refueling contracts sourced from the scmdb.net 4.8 dump. Sub-tab strip on the Missions tab now switches between **Salvage Missions** (the existing 4.7.2 catalog) and **Refueling Missions**; both share the same filter row, table, and detail popup.

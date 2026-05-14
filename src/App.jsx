@@ -14774,6 +14774,14 @@ export default function StarCitizenSalvageGuideWebsite() {
   const [announcementDraft, setAnnouncementDraft] = useState("");
   const [announcementStatus, setAnnouncementStatus] = useState(null);
   const [announcementInFlight, setAnnouncementInFlight] = useState(false);
+  // Clear-announcements admin action: state-driven 2-step
+  // confirm. First click flips clearAnnouncementsConfirm to true
+  // and the button re-labels to "Confirm clear"; second click
+  // fires the POST. A 5 s timer resets the confirm state if the
+  // admin walks away without confirming.
+  const [clearAnnouncementsConfirm, setClearAnnouncementsConfirm] = useState(false);
+  const [clearAnnouncementsInFlight, setClearAnnouncementsInFlight] = useState(false);
+  const [clearAnnouncementsFeedback, setClearAnnouncementsFeedback] = useState(null);
   // User-side inbox feed. Pulled from /api/notifications/inbox on
   // login + refreshed when the bell is opened. Each entry surfaces
   // in the bell as a "Message from SCSalvager Admin" notification.
@@ -17550,6 +17558,49 @@ export default function StarCitizenSalvageGuideWebsite() {
       });
     } finally {
       setAnnouncementInFlight(false);
+    }
+  };
+
+  // Clear every site-wide announcement. Two-step confirm: first
+  // click arms `clearAnnouncementsConfirm`, second click fires
+  // the POST. Arming auto-resets after 5 s if the admin doesn't
+  // confirm.
+  const clearAnnouncements = async () => {
+    if (clearAnnouncementsInFlight) return;
+    if (!clearAnnouncementsConfirm) {
+      setClearAnnouncementsConfirm(true);
+      setClearAnnouncementsFeedback(null);
+      setTimeout(() => setClearAnnouncementsConfirm(false), 5000);
+      return;
+    }
+    setClearAnnouncementsInFlight(true);
+    setClearAnnouncementsFeedback(null);
+    try {
+      const res = await fetch("/api/admin/clear-announcements", {
+        method: "POST",
+        credentials: "same-origin",
+      });
+      const info = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setClearAnnouncementsFeedback({
+          kind: "err",
+          text: info.error || `Clear failed (HTTP ${res.status}).`,
+        });
+        return;
+      }
+      await refreshSiteAnnouncements();
+      setClearAnnouncementsFeedback({
+        kind: "ok",
+        text: `Cleared ${info.cleared ?? 0} announcement${info.cleared === 1 ? "" : "s"}.`,
+      });
+    } catch (e) {
+      setClearAnnouncementsFeedback({
+        kind: "err",
+        text: e && e.message ? e.message : "Network error.",
+      });
+    } finally {
+      setClearAnnouncementsInFlight(false);
+      setClearAnnouncementsConfirm(false);
     }
   };
 
@@ -26265,6 +26316,41 @@ export default function StarCitizenSalvageGuideWebsite() {
                     </svg>
                     Post Announcement
                   </button>
+                  {/* Clear Announcements — wipes site:announcements
+                      so the Home banner clears for every visitor.
+                      Two-step confirm via clearAnnouncementsConfirm
+                      state. */}
+                  <button
+                    type="button"
+                    onClick={clearAnnouncements}
+                    disabled={clearAnnouncementsInFlight}
+                    className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-semibold disabled:cursor-not-allowed disabled:opacity-50 ${
+                      clearAnnouncementsConfirm
+                        ? "border-rose-400 bg-rose-500/25 text-rose-100 hover:bg-rose-500/35"
+                        : "border-rose-500/40 bg-rose-500/10 text-rose-200 hover:border-rose-400/70 hover:bg-rose-500/20"
+                    }`}
+                    title={clearAnnouncementsConfirm ? "Click again to confirm" : "Wipe every site-wide announcement"}
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className="h-3 w-3">
+                      <path d="M6 7h12v2H6V7zm2 3h8l-1 11H9L8 10zm2-7h4v2h-4V3z" />
+                    </svg>
+                    {clearAnnouncementsInFlight
+                      ? "Clearing…"
+                      : clearAnnouncementsConfirm
+                        ? "Confirm clear"
+                        : "Clear Announcements"}
+                  </button>
+                  {clearAnnouncementsFeedback && (
+                    <span
+                      className={`text-xs ${
+                        clearAnnouncementsFeedback.kind === "ok"
+                          ? "text-emerald-300"
+                          : "text-rose-300"
+                      }`}
+                    >
+                      {clearAnnouncementsFeedback.text}
+                    </span>
+                  )}
                   {/* Broadcast composer trigger — fanout to every
                       indexed user's mailbox in one POST. Distinct
                       from Post Announcement: broadcast goes to

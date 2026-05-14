@@ -17588,10 +17588,16 @@ export default function StarCitizenSalvageGuideWebsite() {
         });
         return;
       }
+      // Optimistic local clear — the Home-tab yellow banner reads
+      // off siteAnnouncements[0], so emptying the array here drops
+      // the banner from this admin's view immediately. Other
+      // visitors pick up the empty list on their next /api/announcements
+      // poll (every 60 s, plus the s-maxage=60 Edge cache window).
+      setSiteAnnouncements([]);
       await refreshSiteAnnouncements();
       setClearAnnouncementsFeedback({
         kind: "ok",
-        text: `Cleared ${info.cleared ?? 0} announcement${info.cleared === 1 ? "" : "s"}.`,
+        text: `Cleared ${info.cleared ?? 0} announcement${info.cleared === 1 ? "" : "s"}. Other visitors see the banner clear within ~60 s.`,
       });
     } catch (e) {
       setClearAnnouncementsFeedback({
@@ -29541,17 +29547,17 @@ export default function StarCitizenSalvageGuideWebsite() {
                   <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
                   <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
                     <li><strong>Star Citizen 4.8 is live.</strong> Header <strong>Patch Verified</strong> pill + footer "Data verified for patch …" auto-flipped to 4.8, and every <code className="rounded bg-slate-800 px-1 text-cyan-200">isPatchAtLeast(…, "4.8")</code> gate site-wide un-gates the moment <code className="rounded bg-slate-800 px-1 text-cyan-200">/api/patches</code> flags 4.8 as the active cycle. No separate redeploy needed.</li>
-                    <li><strong>6 new ships</strong> in the picker: Drake Ironclad, Drake Ironclad Assault, Drake Pitbull, MISC Starlite, Aegis Tiburon, Origin M80. Pre-staged in v2.7.0 and gated on the live patch.</li>
-                    <li><strong>RSI Salvation</strong> now purchasable at <strong>Levski · Teach's Ship Shop (Nyx)</strong> for 1,186,030 aUEC.</li>
-                    <li><strong>Ledger → Inventory sub-tab</strong> un-gates. Per-location / per-material inventory view derived from your refinery ledger.</li>
-                    <li><strong>Missions → Refueling sub-tab</strong> un-gates. 12 United Wayfarers Club refueling contracts sourced from the scmdb.net 4.8 dump; shares the existing Missions filter row + detail popup.</li>
-                    <li><strong>Scraper Module Quality slider</strong> un-gates on every module detail card (500 → 1000 with a paired numeric input). The comparison table's Speed / Radius / Efficiency columns rescale live as you scrub — linear 0–20% boost.</li>
-                    <li><strong>Scraper Module Performance</strong> Quality multipliers go live via the <code className="rounded bg-slate-800 px-1 text-cyan-200">boostActive</code> flag — Quality 1000 modules now project ~20% higher than the 500-baseline tier on Speed / Radius / Efficiency.</li>
-                    <li><strong>Mission detail panel</strong> surfaces blueprint rewards on contracts that drop them.</li>
+                    <li><strong>Ships tab → Picker — 6 new ships</strong> in the search + comparison list: Drake Ironclad, Drake Ironclad Assault, Drake Pitbull, MISC Starlite, Aegis Tiburon, Origin M80. Pre-staged in v2.7.0 and gated on the live patch.</li>
+                    <li><strong>Ships tab → Ship Details (RSI Salvation)</strong> — <strong>RSI Salvation</strong> now purchasable at <strong>Levski · Teach's Ship Shop (Nyx)</strong> for 1,186,030 aUEC. New location surfaces in the Salvation's purchase-location list automatically.</li>
+                    <li><strong>Ledger tab → Inventory sub-tab</strong> un-gates. Per-location / per-material inventory view derived from your refinery ledger. Sits alongside Refinery Job Orders, Sell Orders, and Patch History on the Ledger sub-tab strip — pick <strong>Inventory</strong> to drill into stockpiles by location + material.</li>
+                    <li><strong>Missions tab → Refueling sub-tab</strong> un-gates. 12 United Wayfarers Club refueling contracts sourced from the scmdb.net 4.8 dump. Sub-tab strip on the Missions tab now switches between <strong>Salvage Missions</strong> (the existing 4.7.2 catalog) and <strong>Refueling Missions</strong>; both share the same filter row, table, and detail popup.</li>
+                    <li><strong>Home tab → Scraper Module Performance (per-module detail cards) — Quality slider</strong> un-gates on every module's detail card (500 → 1000 with a paired numeric input). The Performance comparison table's <strong>Speed / Radius / Efficiency</strong> columns rescale live as you scrub — linear 0–20% boost.</li>
+                    <li><strong>Home tab → Scraper Module Performance (comparison table) — Quality multipliers</strong> go live via the <code className="rounded bg-slate-800 px-1 text-cyan-200">boostActive</code> flag. Quality 1000 modules now project ~20% higher than the 500-baseline tier on Speed / Radius / Efficiency.</li>
+                    <li><strong>Missions tab → mission detail panel</strong> surfaces <strong>blueprint rewards</strong> on contracts that drop them. Blueprint card appears under the standard reward + buy-in row when the contract awards one.</li>
                   </ul>
                   <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Removed</p>
                   <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
-                    <li><strong>Insurance costs + timers</strong> from the Ship Details page. CIG dropped these fields from the 4.8 ship cards, so the section is hidden site-wide.</li>
+                    <li><strong>Ships tab → Ship Details — Insurance costs + timers</strong> hidden site-wide. CIG dropped these fields from the 4.8 ship cards.</li>
                   </ul>
                 </section>
 

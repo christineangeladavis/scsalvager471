@@ -8,17 +8,17 @@ Made by Chrissyy · Referral: STAR-CH2W-R73F
 UPDATE 5/13/2026 v3.0
 
 Added:
-- **Star Citizen 4.8 is live.** Header Patch Verified pill, footer "Data verified for patch …" string, and every `isPatchAtLeast(…, "4.8")` gate site-wide auto-flipped to 4.8. No separate redeploy was needed — the patch-aware UI un-gates the moment `/api/patches` flags 4.8 as the active cycle.
-- **6 new ships** in the picker: Drake Ironclad, Drake Ironclad Assault, Drake Pitbull, MISC Starlite, Aegis Tiburon, Origin M80. Pre-staged in v2.7.0 and gated on the live patch; unlocks automatically with the 4.8 flip.
-- **RSI Salvation** now purchasable at **Levski · Teach's Ship Shop (Nyx)** for 1,186,030 aUEC.
-- **Ledger → Inventory sub-tab** un-gates. Per-location / per-material inventory view derived from your refinery ledger.
-- **Missions → Refueling sub-tab** un-gates. 12 United Wayfarers Club refueling contracts sourced from the scmdb.net 4.8 dump. Shares the existing Missions filter row + detail popup.
-- **Scraper Module Quality slider** un-gates on every module detail card (500 → 1000 with a paired numeric input). The comparison table's Speed / Radius / Efficiency columns rescale live (linear 0–20% boost as you scrub).
-- **Scraper Module Performance** Quality multipliers go live via the `boostActive` flag — Quality 1000 modules now project ~20% higher than the 500-baseline tier on Speed / Radius / Efficiency.
-- **Mission detail panel** surfaces blueprint rewards on contracts that drop them.
+- **Star Citizen 4.8 is live.** Header **Patch Verified** pill, footer **"Data verified for patch …"** string, and every `isPatchAtLeast(…, "4.8")` gate site-wide auto-flipped to 4.8. No separate redeploy was needed — the patch-aware UI un-gates the moment `/api/patches` flags 4.8 as the active cycle.
+- **Ships tab → Picker — 6 new ships** appear in the search + comparison list: Drake Ironclad, Drake Ironclad Assault, Drake Pitbull, MISC Starlite, Aegis Tiburon, Origin M80. Pre-staged in v2.7.0 and gated on the live patch; unlocks automatically with the 4.8 flip.
+- **Ships tab → Ship Details (RSI Salvation)** — **RSI Salvation** now purchasable at **Levski · Teach's Ship Shop (Nyx)** for 1,186,030 aUEC. The new location surfaces in the Salvation's purchase-location list automatically once 4.8 goes live.
+- **Ledger tab → Inventory sub-tab** un-gates. New per-location / per-material inventory view derived from your refinery ledger. Sits alongside the existing Ledger sub-tabs (Refinery Job Orders, Sell Orders, Patch History) — pick **Inventory** from the sub-tab strip to drill into stockpiles by location + material.
+- **Missions tab → Refueling sub-tab** un-gates. 12 United Wayfarers Club refueling contracts sourced from the scmdb.net 4.8 dump. Sub-tab strip on the Missions tab now switches between **Salvage Missions** (the existing 4.7.2 catalog) and **Refueling Missions**; both share the same filter row, table, and detail popup.
+- **Home tab → Scraper Module Performance (per-module detail cards) — Quality slider** un-gates on every module's detail card (500 → 1000 with a paired numeric input you can type into directly). The Performance comparison table's **Speed / Radius / Efficiency** columns rescale live as you scrub (linear 0–20% boost).
+- **Home tab → Scraper Module Performance (comparison table) — Quality multipliers** go live via the `boostActive` flag. Quality 1000 modules now project ~20% higher than the 500-baseline tier on Speed / Radius / Efficiency.
+- **Missions tab → mission detail panel** surfaces **blueprint rewards** on contracts that drop them. Drilling into a contract that awards a blueprint shows the blueprint card under the standard reward + buy-in row.
 
 Removed:
-- **Insurance costs + timers** from the Ship Details page. CIG dropped the fields from the 4.8 ship cards, so the section is hidden site-wide.
+- **Ships tab → Ship Details — Insurance costs + timers** hidden site-wide. CIG dropped these fields from the 4.8 ship cards, so the Insurance section no longer surfaces on the Ship Details page.
 
 ---
 

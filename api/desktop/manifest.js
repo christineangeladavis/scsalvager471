@@ -44,16 +44,25 @@ const RELEASES_URL =
 // Intel Mac demand surfaces, re-add the matrix entry + a
 // "darwin-x86_64" line here.
 const ASSET_BY_PLATFORM = {
-  // Match the canonical Desktop naming
+  // Tauri 2's native updater format. On Windows + Linux the
+  // updater downloads the raw installer (.exe / .AppImage) and
+  // verifies it against a sibling .sig — no .zip / .tar.gz
+  // wrapper. On macOS the updater still needs the .app.tar.gz
+  // wrapper because it extracts + replaces the .app bundle in
+  // place (Mac builds require the "app" bundle target in
+  // tauri.conf.json — currently absent, so Mac auto-update is a
+  // known gap until that target gets added on the next release).
+  //
+  // Patterns match both the canonical naming
   //   SCSalvager-Desktop-<os-label>_v<version><suffix>
-  // along with the legacy naming
+  // and the legacy naming
   //   SCSalvager(-<os-label>)?_<version>_<arch><suffix>
   // so older releases on the GitHub side still resolve. The arch
   // token is optional in the regex; the OS label in the asset
   // name disambiguates per platform.
-  "windows-x86_64": { match: /-setup\.nsis\.zip$|\.msi\.zip$|-setup\.exe\.zip$/i, key: "windows-x86_64" },
+  "windows-x86_64": { match: /-setup\.exe$/i, key: "windows-x86_64" },
   "darwin-aarch64": { match: /\.app\.tar\.gz$/i, key: "darwin-aarch64" },
-  "linux-x86_64": { match: /\.AppImage\.tar\.gz$/i, key: "linux-x86_64" },
+  "linux-x86_64": { match: /\.AppImage$/i, key: "linux-x86_64" },
 };
 
 function platformKey(target, arch) {

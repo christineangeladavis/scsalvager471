@@ -18531,9 +18531,25 @@ export default function StarCitizenSalvageGuideWebsite() {
     const t = Number(ts);
     return t >= selectedPatch.from && t < selectedPatch.to;
   };
+  // Soft-delete gate for Patch History. Live panels (current refinery
+  // jobs, sell orders, Recent Sales) always strip deletedAt. Patch
+  // History is the retrospective view, so for PAST patches we
+  // re-surface entries that were soft-deleted by the patch-reset
+  // clear (deletedAt >= patch end), while still hiding entries the
+  // user discarded mid-cycle (deletedAt < patch end). For the live
+  // patch the strict filter applies so manual discards stay hidden.
+  // Global stats stay unaffected — /api/stats filters deletedAt
+  // server-side regardless of what this client view does.
+  const historyVisible = (entry) => {
+    if (!entry.deletedAt) return true;
+    if (isViewingCurrentPatch) return false;
+    const dAt = Number(entry.deletedAt);
+    if (!Number.isFinite(dAt)) return false;
+    return dAt >= selectedPatch.to;
+  };
   const historyEntries = useMemo(() => {
     const refinery = refineryJobs
-      .filter((j) => !j.deletedAt && j.pickedUpAt && inSelectedWindow(j.pickedUpAt))
+      .filter((j) => historyVisible(j) && j.pickedUpAt && inSelectedWindow(j.pickedUpAt))
       .map((j) => {
         const parts = [];
         if (j.location) parts.push(j.location);
@@ -18550,7 +18566,7 @@ export default function StarCitizenSalvageGuideWebsite() {
         };
       });
     const sells = sellOrders
-      .filter((o) => !o.deletedAt && o.submittedAt && inSelectedWindow(o.submittedAt))
+      .filter((o) => historyVisible(o) && o.submittedAt && inSelectedWindow(o.submittedAt))
       .map((o) => {
         const materialLabel = o.material || "Construction Materials";
         // Mission contract entries (written by /api/me/contract on
@@ -18612,7 +18628,7 @@ export default function StarCitizenSalvageGuideWebsite() {
         };
       });
     return [...refinery, ...sells].sort((a, b) => b.ts - a.ts);
-  }, [refineryJobs, sellOrders, selectedPatch.from, selectedPatch.to]);
+  }, [refineryJobs, sellOrders, selectedPatch.from, selectedPatch.to, isViewingCurrentPatch]);
 
   // --- Ledger: form validity (requires login + load complete + all fields valid) ---
   // Cost and time are auto-derived from materialScu + method, so no need to validate them.

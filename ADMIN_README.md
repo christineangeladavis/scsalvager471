@@ -24,6 +24,14 @@ Modals:
 
 ---
 
+## 2026-05-13 — Clear Announcements button
+
+- New endpoint `POST /api/admin/clear-announcements` (admin-only). Sets Redis key `site:announcements` to an empty array, dropping the Home-tab yellow banner for every visitor immediately (instead of waiting for the per-entry 24 h auto-hide window).
+- New **Clear Announcements** button on the **All Users** header next to **Post Announcement**. Rose-styled, two-step inline confirm: first click flips the label to "Confirm clear" and arms the action for 5 s; second click fires the POST. Success feedback shows `"Cleared <N> announcement(s)."` and the local banner cache refreshes via `refreshSiteAnnouncements()` so the admin sees the banner disappear without waiting for the 60 s poll.
+- Response shape: `{ ok: true, cleared: <number> }`.
+
+---
+
 ## 2026-05-09 — Admin → user messaging via the notification bell
 
 - New endpoint `POST /api/admin/message-user` (admin-only). Body: `{ userId, body }`. Appends an entry to Redis key `inbox:<userId>` (cap **20 newest per user**, oldest dropped on overflow, body capped at 1,000 chars). The acting admin's userId is stored on each entry as `fromAdminId` for audit but **never returned to the recipient** — recipients always see the hardcoded sender label "SCSalvager Admin".

@@ -22,6 +22,11 @@ on:
         required: false
         default: false
         type: boolean
+      channel_id:
+        description: "Override target channel ID. Leave blank to post in #releases."
+        required: false
+        default: ""
+        type: string
 
 env:
   DISCORD_RELEASES_CHANNEL_ID: "1497542109526233188"
@@ -30,16 +35,25 @@ jobs:
   post:
     runs-on: ubuntu-latest
     steps:
-      - name: Post to Discord #releases
+      - name: Post to Discord
         env:
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
           MESSAGE: ${{ inputs.message }}
           MENTION_EVERYONE: ${{ inputs.mention_everyone }}
+          CHANNEL_OVERRIDE: ${{ inputs.channel_id }}
         run: |
           set -euo pipefail
           if [ -z "${DISCORD_BOT_TOKEN:-}" ]; then
             echo "::error::Missing DISCORD_BOT_TOKEN secret."
             exit 1
+          fi
+
+          # Use the override if the operator supplied one; otherwise
+          # fall back to the hard-coded #releases channel.
+          if [ -n "${CHANNEL_OVERRIDE:-}" ]; then
+            target_channel="$CHANNEL_OVERRIDE"
+          else
+            target_channel="$DISCORD_RELEASES_CHANNEL_ID"
           fi
 
           # workflow_dispatch inputs are single-line. Interpret literal \n
@@ -70,10 +84,10 @@ jobs:
             -H "Content-Type: application/json" \
             -H "User-Agent: scsalvager-message-poster (+https://scsalvager.net)" \
             -d "$payload" \
-            "https://discord.com/api/v10/channels/$DISCORD_RELEASES_CHANNEL_ID/messages")
+            "https://discord.com/api/v10/channels/$target_channel/messages")
 
           if [ "$http_status" -ge 200 ] && [ "$http_status" -lt 300 ]; then
-            echo "Posted message to #releases."
+            echo "Posted message to channel $target_channel."
           else
             echo "::error::Discord rejected post (HTTP $http_status)"
             cat /tmp/discord_resp.json

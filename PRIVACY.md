@@ -1,6 +1,6 @@
 # Privacy Policy
 
-_Last updated: April 29, 2026_
+_Last updated: May 13, 2026_
 
 SCSalvager.net is a community salvage companion for Star Citizen. This page explains exactly what we store about you, why, where it lives, who else can see it, and what you can do about it.
 

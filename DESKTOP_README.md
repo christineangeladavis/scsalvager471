@@ -9,6 +9,20 @@ deb). Auto-update endpoint: `/api/desktop/manifest` (served by scsalvager.net).
 
 ---
 
+## v1.0.0
+
+### Changed
+- **Milestone bump aligning with Star Citizen 4.8 going live.**
+  No functional changes vs v0.2.10 — same native tray, refinery
+  countdown badge, F9 / tray screenshot capture, OS toasts,
+  deep-link OAuth, offline ledger cache, compact + crew
+  salvage widget modes, auto-updater, in-app update modal, and
+  release notes modal sourced from this README. Version
+  number reset to reflect the desktop app's "production-ready"
+  status alongside scsalvager.net's v3.0 cut.
+
+---
+
 ## v0.2.10
 
 ### Fixed

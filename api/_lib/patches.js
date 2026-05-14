@@ -18,7 +18,7 @@ export const PATCHES = [
   // Newest first. When a future-dated patch goes live, its startedAt is
   // already correct — patchRange() naturally treats it as released once
   // Date.now() crosses startedAt.
-  { version: "4.8", startedAt: Date.UTC(2026, 4, 14) /* 2026-05-14 */ },
+  { version: "4.8", startedAt: Date.UTC(2026, 4, 13, 15) /* 2026-05-13 15:00 UTC = 8 AM PST */ },
   { version: "4.7.2", startedAt: Date.UTC(2026, 3, 22) /* 2026-04-22 */ },
 ];
 

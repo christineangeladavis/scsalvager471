@@ -363,7 +363,7 @@ const SC_STORAGE_LOCATIONS = {
 // notification bell surfaces a "new site update available" entry until
 // the user opens the What's New modal (or marks it read). Per-browser
 // pointer is stored at localStorage["scs_whatsnew_seen_version"].
-const LATEST_WHATSNEW_VERSION = "v2.7.4";
+const LATEST_WHATSNEW_VERSION = "v3.0";
 
 // localStorage key for explicitly dismissed notification ids. Lets
 // users hide the red badge without changing their underlying setup
@@ -16295,7 +16295,7 @@ export default function StarCitizenSalvageGuideWebsite() {
   const devMockPatches = () => {
     const now = Date.now();
     const v472Start = Date.UTC(2026, 3, 22); // 2026-04-22
-    const v48Start = Date.UTC(2026, 4, 14); // 2026-05-14
+    const v48Start = Date.UTC(2026, 4, 13, 15); // 2026-05-13 15:00 UTC = 8 AM PST
     const v48Released = v48Start <= now;
     return {
       patches: [
@@ -20878,7 +20878,7 @@ export default function StarCitizenSalvageGuideWebsite() {
               </div>
               <div className="rounded-2xl border border-cyan-400/30 bg-cyan-500/10 px-4 py-3 text-sm text-cyan-100">
                 <div className="font-semibold">Patch Verified</div>
-                <div>{patchStatus?.version || "4.7.2"}</div>
+                <div>{patchStatus?.version || "4.8"}</div>
               </div>
             </div>
             )}
@@ -21156,7 +21156,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                   Header equivalent is hidden in the desktop shell. */}
               <div className="rounded-md border border-cyan-400/30 bg-cyan-500/10 px-2 py-1 text-[11px] text-cyan-100">
                 <div className="font-semibold">Patch Verified</div>
-                <div className="text-[10px] text-cyan-200/80">{patchStatus?.version || "4.7.2"}</div>
+                <div className="text-[10px] text-cyan-200/80">{patchStatus?.version || "4.8"}</div>
               </div>
             </div>
           )}
@@ -28764,7 +28764,7 @@ export default function StarCitizenSalvageGuideWebsite() {
         <footer className="mt-auto border-t border-slate-800 pt-5 pb-6 text-sm text-slate-400" style={{ marginTop: "auto" }}>
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <span>
-              <span className="font-semibold text-slate-200">Made by Chrissyy</span> · Data verified for patch {patchStatus?.version || "4.7.2"}
+              <span className="font-semibold text-slate-200">Made by Chrissyy</span> · Data verified for patch {patchStatus?.version || "4.8"}
               {" · "}
               <button
                 type="button"
@@ -28830,7 +28830,7 @@ export default function StarCitizenSalvageGuideWebsite() {
               <div className="flex items-start justify-between">
                 <div>
                   <h3 id="privacy-title" className="text-lg font-bold text-cyan-300">Privacy Policy</h3>
-                  <p className="mt-1 text-xs text-slate-500">Last updated: April 29, 2026</p>
+                  <p className="mt-1 text-xs text-slate-500">Last updated: May 13, 2026</p>
                 </div>
                 <button
                   type="button"
@@ -28977,7 +28977,7 @@ export default function StarCitizenSalvageGuideWebsite() {
               <div className="flex items-start justify-between">
                 <div>
                   <h3 id="terms-title" className="text-lg font-bold text-cyan-300">Terms of Service</h3>
-                  <p className="mt-1 text-xs text-slate-500">Last updated: April 29, 2026</p>
+                  <p className="mt-1 text-xs text-slate-500">Last updated: May 13, 2026</p>
                 </div>
                 <button
                   type="button"
@@ -29449,6 +29449,25 @@ export default function StarCitizenSalvageGuideWebsite() {
               </div>
 
               <div className="mt-5 space-y-7 text-sm text-slate-300 leading-relaxed">
+
+                <section>
+                  <h4 className="text-cyan-300 text-base font-bold">v3.0 — May 13, 2026</h4>
+                  <p className="mt-2 text-xs uppercase tracking-wider text-slate-500">Added</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li><strong>Star Citizen 4.8 is live.</strong> Header <strong>Patch Verified</strong> pill + footer "Data verified for patch …" auto-flipped to 4.8, and every <code className="rounded bg-slate-800 px-1 text-cyan-200">isPatchAtLeast(…, "4.8")</code> gate site-wide un-gates the moment <code className="rounded bg-slate-800 px-1 text-cyan-200">/api/patches</code> flags 4.8 as the active cycle. No separate redeploy needed.</li>
+                    <li><strong>6 new ships</strong> in the picker: Drake Ironclad, Drake Ironclad Assault, Drake Pitbull, MISC Starlite, Aegis Tiburon, Origin M80. Pre-staged in v2.7.0 and gated on the live patch.</li>
+                    <li><strong>RSI Salvation</strong> now purchasable at <strong>Levski · Teach's Ship Shop (Nyx)</strong> for 1,186,030 aUEC.</li>
+                    <li><strong>Ledger → Inventory sub-tab</strong> un-gates. Per-location / per-material inventory view derived from your refinery ledger.</li>
+                    <li><strong>Missions → Refueling sub-tab</strong> un-gates. 12 United Wayfarers Club refueling contracts sourced from the scmdb.net 4.8 dump; shares the existing Missions filter row + detail popup.</li>
+                    <li><strong>Scraper Module Quality slider</strong> un-gates on every module detail card (500 → 1000 with a paired numeric input). The comparison table's Speed / Radius / Efficiency columns rescale live as you scrub — linear 0–20% boost.</li>
+                    <li><strong>Scraper Module Performance</strong> Quality multipliers go live via the <code className="rounded bg-slate-800 px-1 text-cyan-200">boostActive</code> flag — Quality 1000 modules now project ~20% higher than the 500-baseline tier on Speed / Radius / Efficiency.</li>
+                    <li><strong>Mission detail panel</strong> surfaces blueprint rewards on contracts that drop them.</li>
+                  </ul>
+                  <p className="mt-3 text-xs uppercase tracking-wider text-slate-500">Removed</p>
+                  <ul className="mt-1 list-disc pl-5 space-y-1 text-slate-300">
+                    <li><strong>Insurance costs + timers</strong> from the Ship Details page. CIG dropped these fields from the 4.8 ship cards, so the section is hidden site-wide.</li>
+                  </ul>
+                </section>
 
                 <section>
                   <h4 className="text-cyan-300 text-base font-bold">v2.7.4 — May 9, 2026</h4>

@@ -1,6 +1,6 @@
 # Terms of Service
 
-_Last updated: April 29, 2026_
+_Last updated: May 13, 2026_
 
 SCSalvager.net ("the site", "we", "us") is a free community tool for Star Citizen players. By using the site you agree to the terms below. If any of them don't work for you, please don't use the site.
 

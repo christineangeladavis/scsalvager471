@@ -1,9 +1,26 @@
 # [SCSalvager.net](http://SCSalvager.net) - Your All in One Salvage Tool
 
-Interactive salvage companion for Star Citizen patch 4.7.2.
+Interactive salvage companion for Star Citizen patch 4.8.
 Made by Chrissyy · Referral: STAR-CH2W-R73F
 
 ## What's in this build
+
+UPDATE 5/13/2026 v3.0
+
+Added:
+- **Star Citizen 4.8 is live.** Header Patch Verified pill, footer "Data verified for patch …" string, and every `isPatchAtLeast(…, "4.8")` gate site-wide auto-flipped to 4.8. No separate redeploy was needed — the patch-aware UI un-gates the moment `/api/patches` flags 4.8 as the active cycle.
+- **6 new ships** in the picker: Drake Ironclad, Drake Ironclad Assault, Drake Pitbull, MISC Starlite, Aegis Tiburon, Origin M80. Pre-staged in v2.7.0 and gated on the live patch; unlocks automatically with the 4.8 flip.
+- **RSI Salvation** now purchasable at **Levski · Teach's Ship Shop (Nyx)** for 1,186,030 aUEC.
+- **Ledger → Inventory sub-tab** un-gates. Per-location / per-material inventory view derived from your refinery ledger.
+- **Missions → Refueling sub-tab** un-gates. 12 United Wayfarers Club refueling contracts sourced from the scmdb.net 4.8 dump. Shares the existing Missions filter row + detail popup.
+- **Scraper Module Quality slider** un-gates on every module detail card (500 → 1000 with a paired numeric input). The comparison table's Speed / Radius / Efficiency columns rescale live (linear 0–20% boost as you scrub).
+- **Scraper Module Performance** Quality multipliers go live via the `boostActive` flag — Quality 1000 modules now project ~20% higher than the 500-baseline tier on Speed / Radius / Efficiency.
+- **Mission detail panel** surfaces blueprint rewards on contracts that drop them.
+
+Removed:
+- **Insurance costs + timers** from the Ship Details page. CIG dropped the fields from the 4.8 ship cards, so the section is hidden site-wide.
+
+---
 
 UPDATE 5/9/2026 v2.7.4
 

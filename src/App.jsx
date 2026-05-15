@@ -287,6 +287,18 @@ const PLAYER_SELL_POINT = "Sold to Player";
 // hangar instead of being sold immediately. The canonical SC
 // location list below feeds the secondary dropdown.
 const LOCAL_STORAGE_SELL_POINT = "Send to Local Storage";
+
+// Ledger → Inventory sub-tab tracked materials. Order drives the
+// header chip strip + per-card tile order + dropdown order in
+// both the inline Add form and the per-location modal.
+const INV_MATERIALS = [
+  { name: "Construction Materials", short: "CMAT", accent: "border-amber-500/30 bg-amber-500/10", accentText: "text-amber-200", chipAccent: "border-amber-500/30 bg-amber-500/10 text-amber-200" },
+  { name: "Recycled Material Composite", short: "RMC", accent: "border-emerald-500/30 bg-emerald-500/10", accentText: "text-emerald-200", chipAccent: "border-emerald-500/30 bg-emerald-500/10 text-emerald-200" },
+  { name: "Construction Salvage", short: "Salvage", accent: "border-sky-500/30 bg-sky-500/10", accentText: "text-sky-200", chipAccent: "border-sky-500/30 bg-sky-500/10 text-sky-200" },
+  { name: "Construction Pieces", short: "Pieces", accent: "border-violet-500/30 bg-violet-500/10", accentText: "text-violet-200", chipAccent: "border-violet-500/30 bg-violet-500/10 text-violet-200" },
+  { name: "Construction Rubble", short: "Rubble", accent: "border-rose-500/30 bg-rose-500/10", accentText: "text-rose-200", chipAccent: "border-rose-500/30 bg-rose-500/10 text-rose-200" },
+];
+const INV_MATERIALS_TRACKED = new Set(INV_MATERIALS.map((m) => m.name));
 const SC_STORAGE_LOCATIONS = {
   Stanton: [
     // Cities (planetside major hubs)
@@ -25304,10 +25316,7 @@ export default function StarCitizenSalvageGuideWebsite() {
                 points here. */}
             {ledgerSubTab === "inventory" && isPatchAtLeast(patchStatus?.version, "4.8") && (() => {
               const prefix = `${LOCAL_STORAGE_SELL_POINT} · `;
-              const TRACKED = new Set([
-                "Recycled Material Composite",
-                "Construction Materials",
-              ]);
+              const TRACKED = INV_MATERIALS_TRACKED;
               const buckets = new Map();
               for (const o of sellOrders) {
                 if (!o || o.deletedAt) continue;
@@ -25325,8 +25334,9 @@ export default function StarCitizenSalvageGuideWebsite() {
                 if ((o.submittedAt || 0) > b.lastTs) b.lastTs = o.submittedAt || 0;
               }
               const rows = Array.from(buckets.values()).sort((a, b) => b.scu - a.scu);
-              const totalRmc = rows.filter(r => r.material === "Recycled Material Composite").reduce((n, r) => n + r.scu, 0);
-              const totalCmat = rows.filter(r => r.material === "Construction Materials").reduce((n, r) => n + r.scu, 0);
+              const totalByMaterial = Object.fromEntries(
+                INV_MATERIALS.map((m) => [m.name, rows.filter((r) => r.material === m.name).reduce((n, r) => n + r.scu, 0)])
+              );
               return (
                 <div className="rounded-3xl border border-cyan-500/25 bg-slate-900/70 p-5 shadow-xl shadow-cyan-950/20 backdrop-blur">
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
@@ -25337,12 +25347,14 @@ export default function StarCitizenSalvageGuideWebsite() {
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      <span className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-xs font-semibold text-emerald-200">
-                        RMC: {totalRmc.toLocaleString(undefined, { maximumFractionDigits: 1 })} SCU
-                      </span>
-                      <span className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-200">
-                        CMAT: {totalCmat.toLocaleString(undefined, { maximumFractionDigits: 1 })} SCU
-                      </span>
+                      {INV_MATERIALS.map((m) => (
+                        <span
+                          key={m.name}
+                          className={`rounded-lg border px-2.5 py-1 text-xs font-semibold ${m.chipAccent}`}
+                        >
+                          {m.short}: {totalByMaterial[m.name].toLocaleString(undefined, { maximumFractionDigits: 1 })} SCU
+                        </span>
+                      ))}
                     </div>
                   </div>
 
@@ -25362,8 +25374,9 @@ export default function StarCitizenSalvageGuideWebsite() {
                           className="mt-1 w-full rounded-md border border-cyan-500/25 bg-slate-900 px-3 py-1.5 text-sm outline-none focus:border-cyan-400"
                         >
                           <option value="">(Select a Material)</option>
-                          <option value="Construction Materials">Construction Materials</option>
-                          <option value="Recycled Material Composite">Recycled Material Composite</option>
+                          {INV_MATERIALS.map((m) => (
+                            <option key={m.name} value={m.name}>{m.name}</option>
+                          ))}
                         </select>
                       </div>
                       <div>
@@ -25414,18 +25427,25 @@ export default function StarCitizenSalvageGuideWebsite() {
 
                   {(() => {
                     // Group rows by storage location so each card
-                    // shows both CMAT + RMC totals at that spot.
-                    // Sort cards by combined SCU descending.
+                    // shows every tracked material's total at that
+                    // spot. Sort cards by combined SCU descending.
                     const byLoc = new Map();
                     for (const r of rows) {
-                      if (!byLoc.has(r.location)) byLoc.set(r.location, { cmat: 0, rmc: 0, lastTs: 0 });
+                      if (!byLoc.has(r.location)) {
+                        byLoc.set(r.location, { totals: {}, lastTs: 0 });
+                        for (const m of INV_MATERIALS) byLoc.get(r.location).totals[m.name] = 0;
+                      }
                       const card = byLoc.get(r.location);
-                      if (r.material === "Construction Materials") card.cmat += r.scu;
-                      else if (r.material === "Recycled Material Composite") card.rmc += r.scu;
+                      if (card.totals[r.material] != null) card.totals[r.material] += r.scu;
                       if (r.lastTs > card.lastTs) card.lastTs = r.lastTs;
                     }
                     const cards = Array.from(byLoc.entries())
-                      .map(([location, c]) => ({ location, ...c, total: c.cmat + c.rmc }))
+                      .map(([location, c]) => ({
+                        location,
+                        totals: c.totals,
+                        lastTs: c.lastTs,
+                        total: INV_MATERIALS.reduce((n, m) => n + (c.totals[m.name] || 0), 0),
+                      }))
                       .sort((a, b) => b.total - a.total);
                     if (cards.length === 0) {
                       return (
@@ -25436,38 +25456,41 @@ export default function StarCitizenSalvageGuideWebsite() {
                     }
                     return (
                       <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                        {cards.map((c) => (
-                          <button
-                            key={c.location}
-                            type="button"
-                            onClick={() => openInventoryModal(c.location)}
-                            title="Click to add or remove from this storage location"
-                            className="group rounded-2xl border border-slate-700 bg-slate-950/60 p-4 text-left transition-colors hover:border-cyan-400/60 hover:bg-cyan-500/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300"
-                          >
-                            <div className="text-sm font-bold text-white group-hover:text-cyan-200">
-                              {c.location}
-                            </div>
-                            <div className="mt-3 grid grid-cols-2 gap-2">
-                              <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-2 py-1.5 text-center">
-                                <div className="text-[10px] font-bold uppercase tracking-wider text-amber-200">CMAT</div>
-                                <div className="mt-0.5 text-sm font-mono font-bold text-amber-100">
-                                  {c.cmat.toLocaleString(undefined, { maximumFractionDigits: 1 })} SCU
+                        {cards.map((c) => {
+                          // Only show tiles for materials that have a
+                          // non-zero balance at this location so the
+                          // cards don't bloat with empty 0-SCU rows.
+                          const presentTiles = INV_MATERIALS.filter((m) => (c.totals[m.name] || 0) !== 0);
+                          const tilesToRender = presentTiles.length > 0 ? presentTiles : [INV_MATERIALS[0]];
+                          return (
+                            <button
+                              key={c.location}
+                              type="button"
+                              onClick={() => openInventoryModal(c.location)}
+                              title="Click to add or remove from this storage location"
+                              className="group rounded-2xl border border-slate-700 bg-slate-950/60 p-4 text-left transition-colors hover:border-cyan-400/60 hover:bg-cyan-500/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300"
+                            >
+                              <div className="text-sm font-bold text-white group-hover:text-cyan-200">
+                                {c.location}
+                              </div>
+                              <div className="mt-3 grid grid-cols-2 gap-2">
+                                {tilesToRender.map((m) => (
+                                  <div key={m.name} className={`rounded-lg border ${m.accent} px-2 py-1.5 text-center`}>
+                                    <div className={`text-[10px] font-bold uppercase tracking-wider ${m.accentText}`}>{m.short}</div>
+                                    <div className="mt-0.5 text-sm font-mono font-bold text-slate-100">
+                                      {(c.totals[m.name] || 0).toLocaleString(undefined, { maximumFractionDigits: 1 })} SCU
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                              {c.lastTs > 0 && (
+                                <div className="mt-2 text-[10px] text-slate-500">
+                                  Last activity: {formatTimeAgo(c.lastTs) || "just now"}
                                 </div>
-                              </div>
-                              <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-1.5 text-center">
-                                <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-200">RMC</div>
-                                <div className="mt-0.5 text-sm font-mono font-bold text-emerald-100">
-                                  {c.rmc.toLocaleString(undefined, { maximumFractionDigits: 1 })} SCU
-                                </div>
-                              </div>
-                            </div>
-                            {c.lastTs > 0 && (
-                              <div className="mt-2 text-[10px] text-slate-500">
-                                Last activity: {formatTimeAgo(c.lastTs) || "just now"}
-                              </div>
-                            )}
-                          </button>
-                        ))}
+                              )}
+                            </button>
+                          );
+                        })}
                       </div>
                     );
                   })()}
@@ -25521,39 +25544,38 @@ export default function StarCitizenSalvageGuideWebsite() {
                       can see the result before submitting. */}
                   {(() => {
                     const fullLoc = `${LOCAL_STORAGE_SELL_POINT} · ${inventoryModalLocation}`;
-                    let cmat = 0, rmc = 0;
+                    const totals = Object.fromEntries(INV_MATERIALS.map((m) => [m.name, 0]));
                     for (const o of sellOrders) {
                       if (!o || o.deletedAt) continue;
                       if (o.location !== fullLoc) continue;
-                      if (o.material === "Construction Materials") cmat += Number(o.scu) || 0;
-                      else if (o.material === "Recycled Material Composite") rmc += Number(o.scu) || 0;
+                      if (totals[o.material] == null) continue;
+                      totals[o.material] += Number(o.scu) || 0;
                     }
                     const typedScu = Number(inventoryForm.scu);
                     const hasDelta = inventoryForm.material && Number.isFinite(typedScu) && typedScu > 0;
-                    const cardFor = (label, current, mat, accent, accentText) => {
-                      const isTarget = inventoryForm.material === mat;
-                      const projAdd = isTarget && hasDelta ? current + typedScu : current;
-                      const projRem = isTarget && hasDelta ? current - typedScu : current;
-                      return (
-                        <div className={`rounded-lg border ${accent} px-2 py-1.5 text-center`}>
-                          <div className={`text-[10px] font-bold uppercase tracking-wider ${accentText}`}>{label}</div>
-                          <div className="mt-0.5 text-sm font-mono font-bold text-slate-100">
-                            {current.toLocaleString(undefined, { maximumFractionDigits: 1 })} SCU
-                          </div>
-                          {isTarget && hasDelta && (
-                            <div className="mt-1 text-[10px] font-mono">
-                              <span className="text-emerald-300">+ → {projAdd.toLocaleString(undefined, { maximumFractionDigits: 1 })}</span>
-                              <span className="mx-1 text-slate-600">·</span>
-                              <span className={projRem < 0 ? "text-rose-300" : "text-rose-200"}>− → {projRem.toLocaleString(undefined, { maximumFractionDigits: 1 })}</span>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    };
                     return (
-                      <div className="mt-3 grid grid-cols-2 gap-2">
-                        {cardFor("CMAT", cmat, "Construction Materials", "border-amber-500/30 bg-amber-500/10", "text-amber-200")}
-                        {cardFor("RMC", rmc, "Recycled Material Composite", "border-emerald-500/30 bg-emerald-500/10", "text-emerald-200")}
+                      <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+                        {INV_MATERIALS.map((m) => {
+                          const current = totals[m.name];
+                          const isTarget = inventoryForm.material === m.name;
+                          const projAdd = isTarget && hasDelta ? current + typedScu : current;
+                          const projRem = isTarget && hasDelta ? current - typedScu : current;
+                          return (
+                            <div key={m.name} className={`rounded-lg border ${m.accent} px-2 py-1.5 text-center`}>
+                              <div className={`text-[10px] font-bold uppercase tracking-wider ${m.accentText}`}>{m.short}</div>
+                              <div className="mt-0.5 text-sm font-mono font-bold text-slate-100">
+                                {current.toLocaleString(undefined, { maximumFractionDigits: 1 })} SCU
+                              </div>
+                              {isTarget && hasDelta && (
+                                <div className="mt-1 text-[10px] font-mono">
+                                  <span className="text-emerald-300">+ → {projAdd.toLocaleString(undefined, { maximumFractionDigits: 1 })}</span>
+                                  <span className="mx-1 text-slate-600">·</span>
+                                  <span className={projRem < 0 ? "text-rose-300" : "text-rose-200"}>− → {projRem.toLocaleString(undefined, { maximumFractionDigits: 1 })}</span>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
                     );
                   })()}
@@ -25567,8 +25589,9 @@ export default function StarCitizenSalvageGuideWebsite() {
                         className="mt-1 w-full rounded-md border border-cyan-500/25 bg-slate-900 px-3 py-1.5 text-sm outline-none focus:border-cyan-400"
                       >
                         <option value="">(Select a Material)</option>
-                        <option value="Construction Materials">Construction Materials</option>
-                        <option value="Recycled Material Composite">Recycled Material Composite</option>
+                        {INV_MATERIALS.map((m) => (
+                          <option key={m.name} value={m.name}>{m.name}</option>
+                        ))}
                       </select>
                     </div>
                     <div>

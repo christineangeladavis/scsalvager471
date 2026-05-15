@@ -19402,7 +19402,7 @@ export default function StarCitizenSalvageGuideWebsite() {
     const subLoc = inventoryForm.storageLocation.trim();
     const scuRaw = Number(inventoryForm.scu);
     const effectiveMode = modeOverride || inventoryForm.mode;
-    if (mat !== "Construction Materials" && mat !== "Recycled Material Composite") {
+    if (!INV_MATERIALS_TRACKED.has(mat)) {
       setInventoryError("Pick a material.");
       return;
     }

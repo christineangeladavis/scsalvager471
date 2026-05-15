@@ -14208,15 +14208,17 @@ export default function StarCitizenSalvageGuideWebsite() {
   // Mark an active session complete: stamps completedAt, locks
   // edits, and writes a synthetic sell-order entry so the run
   // shows up in the user's Patch History (and Statistics
-  // aggregations). No-op when session is already complete.
+  // aggregations). Also fans the per-pilot split share out to any
+  // crew slot whose name matches a registered SCSalvager user, so
+  // those pilots see the run on their own ledger without the
+  // captain having to coordinate. No-op when session already
+  // complete.
   const markCrewSessionComplete = (id) => {
+    let creditPayload = null;
     setCrewSessions((prev) => {
       const target = prev.find((s) => s.id === id);
       if (!target || target.status === "complete") return prev;
       const completedAt = Date.now();
-      // Total salvaged SCU for the ledger entry = sum of the three
-      // material buckets. Falls back to a legacy single-field
-      // totalScu if a pre-migration session is in flight.
       const totalScu =
         (Number(target.scuConstructionSalvage) || 0) +
         (Number(target.scuConstructionPieces) || 0) +
@@ -14227,12 +14229,39 @@ export default function StarCitizenSalvageGuideWebsite() {
         (n, e) => n + (Number(e.qty) || 1),
         0
       );
-      // New crew sessions list with this one flipped to "complete".
       const nextSessions = prev.map((s) =>
         s.id === id ? { ...s, status: "complete", completedAt } : s
       );
-      // Synthetic ledger entry for Patch History. Only write when
-      // there's at least some SCU or aUEC to log.
+
+      // Per-pilot split fan-out. crew slot count drives the
+      // divisor; we use the explicit splitCrewCount field when the
+      // captain typed one, otherwise count distinct non-empty role
+      // entries. Captain's own roster entries are filtered out
+      // server-side (it matches against the caller's userId) so
+      // their solo write doesn't double-credit.
+      const rosterNames = Object.values(target.roles || {})
+        .map((v) => (typeof v === "string" ? v.trim() : ""))
+        .filter(Boolean);
+      const explicitCount = Math.max(0, Math.floor(Number(target.splitCrewCount) || 0));
+      const headcount = explicitCount > 0 ? explicitCount : rosterNames.length;
+      if (rosterNames.length > 0 && headcount > 0) {
+        const perPilotScu = totalScu / headcount;
+        const perPilotAuec = splitAuec / headcount;
+        if (perPilotScu > 0 || perPilotAuec > 0) {
+          creditPayload = {
+            sessionId: id,
+            ship: target.ship || "",
+            totalHulls,
+            completedAt,
+            pilots: rosterNames.map((name) => ({
+              name,
+              scu: perPilotScu,
+              aUEC: perPilotAuec,
+            })),
+          };
+        }
+      }
+
       if (totalScu > 0 || splitAuec > 0) {
         const newOrder = {
           id: `crew-salvage-${completedAt}-${Math.floor(Math.random() * 1e6)}`,
@@ -14247,19 +14276,35 @@ export default function StarCitizenSalvageGuideWebsite() {
         };
         setSellOrders((prevOrders) => {
           const next = [...prevOrders, newOrder];
-          // Persist to server alongside refineryJobs + the updated
-          // crew-sessions list so the completion state survives a
-          // page reload / cross-device login.
           saveLedger(refineryJobs, next, nextSessions);
           return next;
         });
       } else {
-        // No synthetic sell-order written — still need to persist the
-        // status flip so the session's "Complete" pill survives reload.
         saveLedger(refineryJobs, sellOrders, nextSessions);
       }
       return nextSessions;
     });
+
+    // Fire-and-forget credit broadcast. Captured during the
+    // setCrewSessions callback so it sees the active session's
+    // pre-completion data even if React batches state updates.
+    // Server resolves names → userIds, skips unknowns + caller.
+    if (creditPayload) {
+      fetch("/api/me/credit-crew-session", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(creditPayload),
+      }).catch((e) => {
+        // Best-effort fan-out — captain's own ledger entry is
+        // already persisted, so a transient credit failure
+        // doesn't block the completion flow. Log and move on.
+        console.warn(
+          "credit-crew-session POST failed:",
+          e && e.message ? e.message : e
+        );
+      });
+    }
   };
   const [refineryJobs, setRefineryJobs] = useState([]);
   const [sellOrders, setSellOrders] = useState([]);

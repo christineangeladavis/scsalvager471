@@ -299,6 +299,69 @@ const INV_MATERIALS = [
   { name: "Construction Rubble", short: "Rubble", accent: "border-rose-500/30 bg-rose-500/10", accentText: "text-rose-200", chipAccent: "border-rose-500/30 bg-rose-500/10 text-rose-200" },
 ];
 const INV_MATERIALS_TRACKED = new Set(INV_MATERIALS.map((m) => m.name));
+
+// Reusable typeahead for Crew Salvage role inputs (and any future
+// player-name fields). Renders the supplied <input> wrapper, then
+// floats a dropdown of matching directory entries when the user
+// types. Click a suggestion → calls onChange(suggestion) and closes.
+// Blur-with-delay so the click on a suggestion lands before the
+// dropdown unmounts.
+function PilotTypeahead({
+  value,
+  onChange,
+  directory,
+  placeholder,
+  inputClassName,
+  wrapperClassName,
+  maxResults = 8,
+}) {
+  const [focused, setFocused] = useState(false);
+  const suggestions = useMemo(() => {
+    const q = (value || "").trim().toLowerCase();
+    if (!q || !focused) return [];
+    const list = Array.isArray(directory) ? directory : [];
+    return list
+      .filter((name) => name && name.toLowerCase().includes(q) && name.toLowerCase() !== q)
+      .slice(0, maxResults);
+  }, [value, directory, focused, maxResults]);
+
+  return (
+    <div className={`relative ${wrapperClassName || ""}`}>
+      <input
+        type="text"
+        value={value || ""}
+        onChange={(e) => onChange(e.target.value)}
+        onFocus={() => setFocused(true)}
+        // 120 ms delay so a click on a suggestion fires before the
+        // dropdown blurs out from under the pointer.
+        onBlur={() => setTimeout(() => setFocused(false), 120)}
+        placeholder={placeholder}
+        className={inputClassName}
+        autoComplete="off"
+      />
+      {suggestions.length > 0 && (
+        <div className="absolute left-0 right-0 top-full z-30 mt-1 max-h-56 overflow-y-auto rounded-md border border-cyan-500/30 bg-slate-900 shadow-xl shadow-cyan-950/30">
+          {suggestions.map((name) => (
+            <button
+              key={name}
+              type="button"
+              // mousedown fires before blur — picks the row even
+              // when the input is still focused.
+              onMouseDown={(e) => {
+                e.preventDefault();
+                onChange(name);
+                setFocused(false);
+              }}
+              className="block w-full px-3 py-1.5 text-left text-xs text-cyan-100 hover:bg-cyan-500/15"
+            >
+              {name}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 const SC_STORAGE_LOCATIONS = {
   Stanton: [
     // Cities (planetside major hubs)
@@ -14848,6 +14911,14 @@ export default function StarCitizenSalvageGuideWebsite() {
   // banner on the Home tab. Survives refresh — banner only hides
   // when 24 h elapses since createdAt.
   const [siteAnnouncements, setSiteAnnouncements] = useState([]);
+  // Registered-user directory for Crew Salvage roster typeahead.
+  // Loaded once via /api/users/directory; refreshed when the user
+  // mounts the Crew Salvage tab so new signups surface in autofill
+  // without a hard reload. Stores plain { username } objects so the
+  // client doesn't expose userIds across the cross-user boundary —
+  // name resolution still happens server-side in
+  // /api/me/credit-crew-session.
+  const [userDirectory, setUserDirectory] = useState([]);
   // Desktop downloads — populated from /api/desktop/downloads
   // (proxies the latest GitHub Release). Drives the Settings →
   // Desktop App download buttons.
@@ -18370,6 +18441,26 @@ export default function StarCitizenSalvageGuideWebsite() {
     return () => clearInterval(interval);
   }, []);
 
+  // Registered-user directory fetch. Powers the Crew Salvage roster
+  // typeahead. One-shot on login; refreshing happens via the
+  // 60 s Edge cache on /api/users/directory so a new signup surfaces
+  // in autofill within ~1 min of registering.
+  const refreshUserDirectory = async () => {
+    try {
+      const res = await fetch("/api/users/directory");
+      if (!res.ok) return;
+      const data = await res.json();
+      const list = Array.isArray(data.users) ? data.users : [];
+      setUserDirectory(list.map((u) => u && u.username).filter(Boolean));
+    } catch {
+      // silent — typeahead just stays empty
+    }
+  };
+  useEffect(() => {
+    if (!user) return;
+    refreshUserDirectory();
+  }, [user]);
+
   // Lazy-load desktop release info on every Settings open. The
   // server caches 5 min so the GitHub-API call doesn't fan out to
   // GitHub on every open, but the client always re-fetches in
@@ -20068,12 +20159,13 @@ export default function StarCitizenSalvageGuideWebsite() {
                     {roleSet.map((role) => (
                       <label key={role} className="flex items-center gap-1.5">
                         <span className="w-28 shrink-0 text-[10px] text-slate-300 truncate">{role}</span>
-                        <input
-                          type="text"
+                        <PilotTypeahead
                           value={rolesObj[role] || ""}
-                          onChange={(e) => writeRole(role, e.target.value)}
+                          onChange={(name) => writeRole(role, name)}
+                          directory={userDirectory}
                           placeholder="Crew member"
-                          className="flex-1 rounded border border-slate-700 bg-slate-950 px-1.5 py-0.5 text-[11px] text-white outline-none focus:border-cyan-400"
+                          wrapperClassName="flex-1"
+                          inputClassName="w-full rounded border border-slate-700 bg-slate-950 px-1.5 py-0.5 text-[11px] text-white outline-none focus:border-cyan-400"
                         />
                       </label>
                     ))}
@@ -24592,12 +24684,13 @@ export default function StarCitizenSalvageGuideWebsite() {
                             <label className="block text-[10px] uppercase tracking-wider text-amber-300">
                               {role}
                             </label>
-                            <input
-                              type="text"
+                            <PilotTypeahead
                               value={crewDraft.roles[role] || ""}
-                              onChange={(e) => setCrewDraftRole(role, e.target.value)}
+                              onChange={(name) => setCrewDraftRole(role, name)}
+                              directory={userDirectory}
                               placeholder="Crew member name…"
-                              className="mt-1.5 w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-100 placeholder-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-1 focus:ring-cyan-400/40"
+                              wrapperClassName="mt-1.5"
+                              inputClassName="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm text-slate-100 placeholder-slate-500 focus:border-cyan-400/60 focus:outline-none focus:ring-1 focus:ring-cyan-400/40"
                             />
                           </div>
                         ))}

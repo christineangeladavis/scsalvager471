@@ -19834,12 +19834,10 @@ export default function StarCitizenSalvageGuideWebsite() {
     const inProgressJobs = activeJobs.filter(
       (j) => !Number.isFinite(j.completesAt) || j.completesAt > now
     );
-    const nextJob = inProgressJobs.reduce(
-      (best, j) =>
-        !best || (j.completesAt || Infinity) < (best.completesAt || Infinity)
-          ? j
-          : best,
-      null
+    // All in-progress jobs sorted shortest-time-remaining first.
+    // Jobs with no completesAt sort last (Infinity).
+    const sortedInProgress = [...inProgressJobs].sort(
+      (a, b) => (a.completesAt || Infinity) - (b.completesAt || Infinity)
     );
     const formatRemaining = (ms) => {
       if (!Number.isFinite(ms) || ms <= 0) return "ready";
@@ -19883,39 +19881,61 @@ export default function StarCitizenSalvageGuideWebsite() {
               {Number(lifetimeAUEC || 0).toLocaleString()} aUEC
             </span>
           </div>
-          <div className="mt-2 flex-1 overflow-hidden rounded-xl border border-cyan-500/30 bg-slate-900/60 p-3">
-            {readyJobs.length > 0 ? (
-              <>
+          <div className="mt-2 flex-1 overflow-y-auto rounded-xl border border-cyan-500/30 bg-slate-900/60 p-3">
+            {readyJobs.length > 0 && (
+              <div className="mb-2">
                 <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-300">
                   Ready for pickup · {readyJobs.length}
                 </div>
-                <div className="mt-1 truncate text-sm font-bold text-white">
-                  {readyJobs[0].material}
+                <div className="mt-1 space-y-1">
+                  {readyJobs.map((j) => (
+                    <div
+                      key={j.id}
+                      className="flex items-center justify-between gap-2 rounded-md border border-emerald-500/25 bg-emerald-500/10 px-2 py-1"
+                    >
+                      <div className="min-w-0">
+                        <div className="truncate text-xs font-bold text-white">{j.material}</div>
+                        <div className="truncate text-[10px] text-slate-400">
+                          {Number(j.yield || 0).toFixed(2)} SCU · {j.location || "—"}
+                        </div>
+                      </div>
+                      <span className="shrink-0 font-mono text-[10px] font-bold text-emerald-300">
+                        ready
+                      </span>
+                    </div>
+                  ))}
                 </div>
-                <div className="text-[10px] text-slate-400 truncate">
-                  {Number(readyJobs[0].yield || 0).toFixed(2)} SCU · {readyJobs[0].location || "—"}
-                </div>
-              </>
-            ) : nextJob ? (
+              </div>
+            )}
+            {sortedInProgress.length > 0 ? (
               <>
                 <div className="text-[10px] font-bold uppercase tracking-wider text-cyan-300">
-                  Next pickup
+                  In progress · {sortedInProgress.length}
                 </div>
-                <div className="mt-1 truncate text-sm font-bold text-white">
-                  {nextJob.material}
-                </div>
-                <div className="text-[10px] text-slate-400 truncate">
-                  {Number(nextJob.yield || 0).toFixed(2)} SCU · {nextJob.location || "—"}
-                </div>
-                <div className="mt-1 font-mono text-base font-bold text-amber-300">
-                  {formatRemaining(nextJob.completesAt - now)}
+                <div className="mt-1 space-y-1">
+                  {sortedInProgress.map((j) => (
+                    <div
+                      key={j.id}
+                      className="flex items-center justify-between gap-2 rounded-md border border-cyan-500/20 bg-slate-900/70 px-2 py-1"
+                    >
+                      <div className="min-w-0">
+                        <div className="truncate text-xs font-bold text-white">{j.material}</div>
+                        <div className="truncate text-[10px] text-slate-400">
+                          {Number(j.yield || 0).toFixed(2)} SCU · {j.location || "—"}
+                        </div>
+                      </div>
+                      <span className="shrink-0 font-mono text-xs font-bold text-amber-300">
+                        {formatRemaining((j.completesAt || 0) - now)}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </>
-            ) : (
+            ) : readyJobs.length === 0 ? (
               <div className="flex h-full items-center justify-center text-xs text-slate-500">
                 No active refinery jobs
               </div>
-            )}
+            ) : null}
           </div>
           <div className="mt-2 flex items-center justify-between text-[10px] text-slate-500">
             <span>{activeJobs.length} active · {readyJobs.length} ready</span>
